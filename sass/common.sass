@@ -1,0 +1,455 @@
+@import compass/css3
+@import form
+@import url('https://fonts.googleapis.com/css?family=Montserrat:300,400,600')
+
+$black: #000
+$gray: #9ea3a4
+$blue: #0061a8
+$orange: #e15928
+$yellow: #F8BA57
+
+$primary: $blue !default
+$primary-md: darken($primary, 10%) !default
+$primary-dk: darken($primary, 20%) !default
+$secondary: $orange
+$secondary-md: darken($secondary, 10%) !default
+$navy: $primary-dk
+
+// -------------------------- COMMON --------------------------------------------------
+
+// extendables
+.uppercase
+  text-transform: uppercase
+  letter-spacing: 1px
+
+// common
+body
+  font-family: "Montserrat", Helvetica, Arial, sans-serif
+  background: white
+  color: #444
+  font-size: 16px
+
+p, ul, li
+  color: #666
+  line-height: 1.6em
+  font-weight: 300
+
+img
+  max-width: 100%
+
+li
+  line-height: 1.5em
+
+a
+  color: $primary
+  cursor: pointer
+  &:hover
+    color: $primary-md
+    text-decoration: none
+
+h1, h2
+  font-weight: 300
+  color: #666
+  margin-bottom: 10px
+
+h1
+  font-size: 36px
+
+h2
+  font-size: 28px
+
+h3
+  font-size: 21px
+  margin-bottom: 10px
+
+h4
+  font-size: 16px
+  font-weight: bold
+  color: #666
+
+.left
+  float: left
+
+.container
+  width: 100%
+  max-width: 100%
+  padding: 0
+
+.row-inset
+  max-width: 1300px
+  margin: auto
+  padding: 0 15px
+
+.content
+  > div
+    margin-bottom: 40px
+    clear: both
+    &:after
+      content: ""
+      clear: both
+      display: block
+
+select:-moz-focusring
+  outline: none
+  color: transparent
+  text-shadow: 0 0 0 #000
+
+// header
+.header
+  background: white
+  color: white
+  padding-top: 15px
+  padding-bottom: 15px
+  text-align: center
+  overflow: hidden
+  box-shadow: 0 1px 3px rgba(0,0,0,0.3)
+  .header-brand a
+    background-image: url('../images/adt-authorized-provider.png')
+    background-repeat: no-repeat
+    display: block
+    float: left
+    margin: auto
+    width: 205px
+    height: 85px
+    text-indent: -9999px
+    margin-right: 10px
+    background-size: contain
+
+// form
+.form-banner
+  position: relative
+
+.navy-blue-bg
+  background: $navy
+  text-align: center
+  padding-bottom: 20px
+  p
+    color: white
+  h2
+    color: white
+    font-size: 21px
+    margin-bottom: 15px
+    span
+      font-size: 18px
+
+.orange-banner
+  background: #fabb58
+  background: -moz-linear-gradient(top,#fabb58 0%,#ec4825 100%)
+  background: -webkit-linear-gradient(top,#fabb58 0%,#ec4825 100%)
+  background: linear-gradient(to bottom,#fabb58 0%,#ec4825 100%)
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#fabb58',endColorstr='#ec4825',GradientType=0)
+  margin-left: -30px
+  margin-right: -30px
+  position: relative
+  padding: 15px
+  color: white
+  text-shadow: 0 1px 1px rgba(0,0,0,0.5)
+  &:before, &:after
+    width: 0
+    height: 0
+    border-top: 15px solid #c44222
+    content: ''
+    position: absolute
+    bottom: -15px
+  &:before
+    border-left: 15px solid transparent
+    float: left
+    left: 0
+  &:after
+    border-right: 15px solid transparent
+    float: right
+    right: 0
+  h3
+    margin: 0
+    font-weight: 600
+    letter-spacing: 1px
+  .price
+    font-weight: 600
+    font-size: 80px
+    sup
+      font-size: 32px
+      position: relative
+      top: -32px
+      margin: 0 2px
+    .month
+      font-size: 24px
+      margin-left: -75px
+
+.products-section
+  margin-bottom: 20px
+
+.product-box
+  width: 100%
+  background: $primary
+  padding: 10px 15px
+  border: none
+  color: white
+  font-weight: 300
+.plus-sign
+  position: relative
+  margin: -6px auto -2px auto
+  color: #343434
+  background: white
+  border: 1px solid $navy
+  padding: 2px
+  width: 28px
+  height: 28px
+  font-size: 14pt
+  border-radius: 14px
+
+.disclaimer
+  font-size: 12px
+  line-height: 1.2em
+
+.cta-wrapper
+  margin: 5px 20px
+  padding: 10px
+  background: #fabb58
+  background: -moz-linear-gradient(top,#fabb58 0%,#ec4825 100%)
+  background: -webkit-linear-gradient(top,#fabb58 0%,#ec4825 100%)
+  background: linear-gradient(to bottom,#fabb58 0%,#ec4825 100%)
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#fabb58',endColorstr='#ec4825',GradientType=0)
+  border-radius: 5px
+  p
+    margin: 0
+    text-shadow: 0 1px 1px rgba(0,0,0,0.5)
+  a
+    color: white
+  .phone
+    font-size: 28px
+    font-weight: 600
+
+.bbb
+  display: block
+  margin: 40px auto
+  width: 200px
+
+.feature-list
+  padding-left: 15px
+  list-style: none
+  .fa-check
+    color: $yellow
+
+.home-alarm-marketing-section
+  padding: 50px 30px 20px
+  img
+    display: block
+    margin: auto
+  h2, p, li
+    color: white
+
+.testimonial-block
+  background-color: rgba($navy, 0.2)
+  margin-top: 20px
+  padding: 15px
+  width: 100%
+  border-top: 1px solid $primary
+  border-bottom: 1px solid $primary
+.testimonial
+  color: white
+  font-weight: 300
+  font-style: italic
+.testimonial-name
+  font-size: 11px
+  text-transform: uppercase
+  letter-spacing: 1px
+
+.benefit
+  padding-left: 65px
+  text-align: left
+  h4
+    margin-top: 5px
+
+.stars
+  .fa-star
+    color: $yellow
+
+.protect
+  padding: 80px 30px
+  h2
+    font-weight: 600
+    font-size: 48px
+    color: $primary
+  .img-container
+    height: 120px
+    text-align: center
+    margin-top: 30px
+  .description
+    padding-left: 40px
+    position: relative
+    .number
+      font-size: 40px
+      font-weight: 600
+      color: $primary
+      position: absolute
+      top: -8px
+      left: 0
+
+.btn, .btn-primary
+  font-weight: 300
+  color: white
+  font-size: 18px
+  padding: 12px 30px !important
+  background: $primary !important
+  border: none !important
+  border-radius: 5px
+  white-space: normal
+  margin-bottom: 10px
+  cursor: pointer
+  text-shadow: rgba(0,0,0,0.2) 0 1px 0
+  &:hover
+    color: white
+    background: $primary-md !important
+    top: 1px
+    position: relative
+.btn-sm
+  padding: 8px 20px !important
+  font-size: 16px
+  border-radius: 2px
+
+.footer
+  clear: both
+  background: #333333
+  overflow: auto
+  padding: 30px 60px
+  text-align: center
+  .footer-logo
+    width: 200px
+  p
+    color: #999
+    text-align: center
+  a
+    color: white
+
+// home
+#home
+  .form-banner
+    margin-top: 115px
+    background: $primary-md
+    background: -moz-linear-gradient(top,$primary-md 0%,$primary-dk 100%)
+    background: -webkit-linear-gradient(top,$primary-md 0%,$primary-dk 100%)
+    background: linear-gradient(to bottom,$primary-md 0%,$primary-dk 100%)
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#0e4e81',endColorstr='#192a3c',GradientType=0)
+    .form-container
+      padding: 30px
+      text-align: center
+      .btn
+        display: block
+        margin: 20px
+
+#home, #thanks
+  .intro, .product, .next
+    text-align: center
+    padding-top: 80px
+    padding-bottom: 80px
+    h2
+      margin-bottom: 30px
+    img
+      margin-bottom: 15px
+
+  .testimonial-banner
+    padding-top: 80px
+    padding-bottom: 80px
+
+  .bg-blue
+    background: $primary
+    h2, p
+      color: white
+
+
+#thanks
+  .form-banner
+    margin-top: 115px
+    background: url('../images/adt-hero.jpg') no-repeat
+    background-size: cover
+    min-height: 600px
+    padding: 200px 30px 30px
+    h1
+      color: $primary
+      font-size: 60px
+      font-weight: 600
+    p
+      font-size: 21px
+  .what-to-expect
+    text-align: left
+    p, li
+      color: white
+    .number
+      font-size: 24px
+      font-weight: 600
+
+//////////////////////////////////////  MEDIA QUERIES  ///////////////////////////////////////
+
+@media (max-width: 1200px)
+  .container
+    max-width: 100%
+
+//bootstrap breakpoint
+
+@media (min-width: 992px)
+  .body
+    padding: 30px
+
+// Responsive: Landscape phone to desktop/tablet
+
+@media (min-width: 769px)
+
+@media (max-width: 768px)
+  .header
+    background: $navy
+    box-shadow: none
+    .header-brand a
+      background-image: url('../images/adt-authorized-provider-white.png')
+      width: 100%
+      margin: 0
+      height: 70px
+    .cta-wrapper
+      margin: 0
+      .phone
+        font-size: 18px
+  .orange-banner
+    margin: 0
+    background: url('../images/stop-sign.png') no-repeat center center
+    background-size: 250px
+    height: 250px
+    padding: 70px 0
+    &:after, &:before
+      display: none
+  #home
+    .form-banner
+      margin-top: 100px
+      background: $navy
+      padding: 0 0 30px
+      border-bottom: 5px solid $secondary
+      .form-container
+        padding: 10px
+        background-size: contain !important
+        margin-bottom: 20px
+        margin-left: -15px
+        margin-right: -15px
+  #thanks
+    .form-banner
+      margin-top: 100px
+      background: #edeef3
+      min-height: auto
+      padding: 40px 10px
+      h1
+        font-size: 48px
+
+// UP TO LANDSCAPE PHONE
+// ---------------------
+@media (max-width: 480px)
+
+  #home, #thanks
+    .intro, .product, .matched, .next
+      padding-top: 50px
+      padding-bottom: 50px
+      text-align: center
+    .intro img
+      margin-top: 30px
+    .matched .phone-match
+      margin: 30px 0 -50px
+  .footer
+    padding: 40px 15px
+  h1
+    font-size: 28px

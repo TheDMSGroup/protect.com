@@ -1,0 +1,280 @@
+@import url("https://fonts.googleapis.com/css?family=Montserrat:300,400,600");
+/* line 16, ../sass/privacy.sass */
+.uppercase {
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* line 21, ../sass/privacy.sass */
+body {
+  font-family: "Montserrat", Helvetica, Arial, sans-serif;
+  background: white;
+  color: #444;
+  font-size: 16px;
+}
+
+/* line 27, ../sass/privacy.sass */
+p, ul, li {
+  color: #666;
+  line-height: 1.6em;
+  font-weight: 300;
+}
+
+/* line 32, ../sass/privacy.sass */
+img {
+  max-width: 100%;
+}
+
+/* line 35, ../sass/privacy.sass */
+a {
+  color: #0061a8;
+  cursor: pointer;
+}
+/* line 38, ../sass/privacy.sass */
+a:hover {
+  color: #004475;
+  text-decoration: none;
+}
+
+/* line 42, ../sass/privacy.sass */
+h1 {
+  font-size: 36px;
+  font-weight: normal;
+  margin-bottom: 10px;
+}
+
+/* line 47, ../sass/privacy.sass */
+h2 {
+  font-size: 28px;
+  margin-bottom: 10px;
+}
+
+/* line 51, ../sass/privacy.sass */
+h3 {
+  font-size: 21px;
+  margin-bottom: 10px;
+}
+
+/* line 55, ../sass/privacy.sass */
+h4 {
+  font-size: 16px;
+  font-weight: bold;
+}
+
+/* line 59, ../sass/privacy.sass */
+.left {
+  float: left;
+}
+
+/* line 62, ../sass/privacy.sass */
+.container {
+  width: 100%;
+  max-width: 100%;
+  padding: 0 15px;
+}
+
+/* line 67, ../sass/privacy.sass */
+.container > div {
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+/* line 72, ../sass/privacy.sass */
+.content > div {
+  margin-bottom: 40px;
+  clear: both;
+}
+/* line 75, ../sass/privacy.sass */
+.content > div:after {
+  content: "";
+  clear: both;
+  display: block;
+}
+
+/* line 81, ../sass/privacy.sass */
+.header {
+  background: white;
+  color: white;
+  padding-top: 15px;
+  padding-bottom: 15px;
+  text-align: center;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+/* line 89, ../sass/privacy.sass */
+.header .header-brand a {
+  background-image: url("../images/adt-authorized-provider.png");
+  background-repeat: no-repeat;
+  display: block;
+  float: left;
+  margin: auto;
+  width: 205px;
+  height: 85px;
+  text-indent: -9999px;
+  margin-right: 10px;
+  background-size: contain;
+}
+
+/* line 101, ../sass/privacy.sass */
+.cta-wrapper {
+  margin: 5px 20px;
+  padding: 10px;
+  background: #fabb58;
+  background: -moz-linear-gradient(top, #fabb58 0%, #ec4825 100%);
+  background: -webkit-linear-gradient(top, #fabb58 0%, #ec4825 100%);
+  background: linear-gradient(to bottom, #fabb58 0%, #ec4825 100%);
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#fabb58',endColorstr='#ec4825',GradientType=0);
+  border-radius: 5px;
+}
+/* line 110, ../sass/privacy.sass */
+.cta-wrapper p {
+  margin: 0;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.5);
+}
+/* line 113, ../sass/privacy.sass */
+.cta-wrapper a {
+  color: white;
+}
+/* line 115, ../sass/privacy.sass */
+.cta-wrapper .phone {
+  font-size: 28px;
+  font-weight: 600;
+}
+
+/* line 119, ../sass/privacy.sass */
+.body {
+  margin-top: 115px;
+}
+
+/* line 123, ../sass/privacy.sass */
+.footer {
+  clear: both;
+  overflow: auto;
+  padding: 30px 60px;
+  text-align: center;
+}
+/* line 128, ../sass/privacy.sass */
+.footer .footer-logo {
+  width: 200px;
+}
+/* line 130, ../sass/privacy.sass */
+.footer p {
+  color: #999;
+  text-align: center;
+}
+
+/* line 137, ../sass/privacy.sass */
+#privacy h1 {
+  font-size: 30px;
+  color: #0061a8;
+  text-shadow: none;
+  font-weight: 500;
+}
+/* line 142, ../sass/privacy.sass */
+#privacy h2 {
+  font-size: 20px;
+  color: #0061a8;
+  font-weight: 500;
+  border-bottom: 3px solid #0061a8;
+  padding-bottom: 10px;
+  margin: 20px 0 10px;
+  text-align: left;
+}
+
+@media (max-width: 1200px) {
+  /* line 154, ../sass/privacy.sass */
+  .container {
+    max-width: 100%;
+  }
+}
+@media (min-width: 992px) {
+  /* line 160, ../sass/privacy.sass */
+  .body {
+    padding: 30px;
+  }
+
+  /* line 162, ../sass/privacy.sass */
+  .container > div {
+    padding-left: 60px;
+    padding-right: 60px;
+  }
+}
+@media (min-width: 769px) {
+  /* line 169, ../sass/privacy.sass */
+  .form-container {
+    margin-top: -68px;
+  }
+}
+@media (max-width: 768px) {
+  /* line 173, ../sass/privacy.sass */
+  .header {
+    background: #002642;
+    box-shadow: none;
+  }
+  /* line 176, ../sass/privacy.sass */
+  .header .header-brand a {
+    background-image: url("../images/adt-authorized-provider-white.png");
+    width: 100%;
+    margin: 0;
+    height: 70px;
+  }
+  /* line 181, ../sass/privacy.sass */
+  .header .cta-wrapper {
+    margin: 0;
+  }
+  /* line 183, ../sass/privacy.sass */
+  .header .cta-wrapper .phone {
+    font-size: 18px;
+  }
+
+  /* line 185, ../sass/privacy.sass */
+  .form-banner {
+    background-size: cover;
+    display: inline-block;
+    padding: 0 !important;
+  }
+  /* line 189, ../sass/privacy.sass */
+  .form-banner h1 {
+    text-align: center;
+    margin-bottom: 30px;
+    margin-top: 30px;
+  }
+}
+@media (max-width: 480px) {
+  /* line 197, ../sass/privacy.sass */
+  .container > div {
+    padding-left: 15px;
+    padding-right: 15px;
+  }
+
+  /* line 200, ../sass/privacy.sass */
+  .form-banner {
+    background-size: contain;
+  }
+  /* line 202, ../sass/privacy.sass */
+  .form-banner h1 {
+    font-size: 28px;
+  }
+
+  /* line 204, ../sass/privacy.sass */
+  .form-container {
+    padding: 0;
+    background-size: contain;
+    margin-bottom: 20px;
+    margin-left: -15px;
+    margin-right: -15px;
+  }
+  /* line 210, ../sass/privacy.sass */
+  .form-container .form-body {
+    padding: 15px;
+  }
+
+  /* line 215, ../sass/privacy.sass */
+  #privacy h1 {
+    font-size: 28px;
+  }
+  /* line 217, ../sass/privacy.sass */
+  #privacy h2 {
+    font-size: 18px;
+  }
+}
