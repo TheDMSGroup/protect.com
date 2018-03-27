@@ -14,10 +14,10 @@ $(function () {
     // get utm_source param from url
     let utmSource = getURLParameter('utm_source');
 
-    var number = defaultNumber;
+    let number = defaultNumber;
     // if the UTM source has its own number, set it as the number
     if(typeof phoneNumbers[utmSource] !== 'undefined') {
-        var number = phoneNumbers[utmSource];
+        number = phoneNumbers[utmSource];
     }
 
     // update text fields based on number
