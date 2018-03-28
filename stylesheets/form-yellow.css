@@ -35,7 +35,7 @@
   margin: 10px 0 20px;
 }
 /* line 46, ../sass/form-yellow.sass */
-.ll .formio-component-textfield .control-label {
+.ll .formio-component-textfield .control-label, .ll .formio-component-email .control-label {
   display: none;
 }
 /* line 48, ../sass/form-yellow.sass */
@@ -77,9 +77,10 @@
 /* line 70, ../sass/form-yellow.sass */
 .ll .disclaimer {
   font-size: 12px;
+  font-weight: 300;
   line-height: 1.2em;
 }
-/* line 73, ../sass/form-yellow.sass */
+/* line 74, ../sass/form-yellow.sass */
 .ll .cta-wrapper {
   margin: 30px 20px;
   padding: 10px;
@@ -87,28 +88,42 @@
   border-radius: 5px;
   border: 1px solid #0061a8;
 }
-/* line 79, ../sass/form-yellow.sass */
+/* line 80, ../sass/form-yellow.sass */
 .ll .cta-wrapper p {
   margin: 0;
   text-shadow: none;
 }
-/* line 82, ../sass/form-yellow.sass */
+/* line 83, ../sass/form-yellow.sass */
 .ll .cta-wrapper a {
   color: #0061a8;
 }
-/* line 84, ../sass/form-yellow.sass */
+/* line 85, ../sass/form-yellow.sass */
 .ll .cta-wrapper a:hover {
   text-decoration: none;
   color: #004475;
 }
-/* line 87, ../sass/form-yellow.sass */
+/* line 88, ../sass/form-yellow.sass */
 .ll .cta-wrapper .phone {
   font-size: 28px;
   font-weight: 600;
 }
+/* line 92, ../sass/form-yellow.sass */
+.ll .form-group.required .control-label:after {
+  content: "";
+}
+/* line 95, ../sass/form-yellow.sass */
+.ll .has-error .help-block {
+  color: white;
+  background: #c62928;
+  padding: 2px 5px;
+  font-weight: 300;
+  font-size: 14px;
+  text-align: left;
+  margin-top: -5px;
+}
 
 @media (max-width: 768px) {
-  /* line 94, ../sass/form-yellow.sass */
+  /* line 107, ../sass/form-yellow.sass */
   .ll {
     margin-top: 30px;
   }
