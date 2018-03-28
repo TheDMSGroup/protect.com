@@ -1,5 +1,4 @@
 @import compass/css3
-@import form
 @import url('https://fonts.googleapis.com/css?family=Montserrat:300,400,600')
 
 $black: #000
@@ -197,7 +196,7 @@ select:-moz-focusring
   font-size: 14pt
   border-radius: 14px
 
-.disclaimer
+.disclaimer, .disclaimer p
   font-size: 12px
   line-height: 1.2em
 
@@ -264,12 +263,18 @@ select:-moz-focusring
   .fa-star
     color: $yellow
 
-.protect
+.protect, .benefits
   padding: 80px 30px
   h2
     font-weight: 600
     font-size: 48px
     color: $primary
+  h4
+    font-weight: 300
+    text-align: left
+    font-size: 20px
+    margin-left: 20px
+    margin-top: 0px
   .img-container
     height: 120px
     text-align: center
@@ -277,13 +282,13 @@ select:-moz-focusring
   .description
     padding-left: 40px
     position: relative
-    .number
-      font-size: 40px
-      font-weight: 600
-      color: $primary
-      position: absolute
-      top: -8px
-      left: 0
+  .number
+    font-size: 40px
+    font-weight: 600
+    color: $primary
+    position: absolute
+    top: -8px
+    left: 0
 
 .btn, .btn-primary
   font-weight: 300
@@ -320,11 +325,130 @@ select:-moz-focusring
     text-align: center
   a
     color: white
+.header-special
+  font-weight: 600
+  font-style: italic
+  color: $secondary
+  font-size: 32px
+.form-banner
+  margin-top: 115px
+  background-size: cover
+  background-repeat: no-repeat
+
+h2.blue-bold
+  color: $primary
+  font-weight: 600
+  font-size: 36px
+
+.card
+  background: white
+  padding: 15px
+  border-radius: 3px
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2)
+  min-height: 450px
+
+table
+  .blue
+    background: #003869 !important
+    color: white
+  td
+    text-align: center
+  td.left
+    text-align: left
+    float: none
+
+// page sections
+.hero
+  padding: 30px 0
+  h2
+    font-size: 42px
+    color: $navy
+    font-weight: 400
+  h3
+    font-weight: 300
+    color: $primary
+    font-size: 32px
+.offer-benefits-list
+  padding: 30px 0 20px
+  ul
+    padding: 0
+    list-style: none
+  li
+    margin-bottom: 15px
+  p
+    font-size: 21px
+    color: $primary
+  img, p
+    display: inline
+.intro, .benefits, .product, .next, .compare, .extras
+  text-align: center
+  padding-top: 80px
+  padding-bottom: 80px
+  h2
+    margin-bottom: 30px
+  img
+    margin-bottom: 15px
+
+.testimonial-banner
+  padding-top: 80px
+  padding-bottom: 80px
+
+.bg-blue
+  background: $primary
+  h2, p
+    color: white
+
+.pulse
+  padding-top: 60px
+  .anywhere
+    margin-top: 30px
+    list-style: none
+    padding: 0
+    img
+      position: relative
+      top: -3px
+    li
+      border-top: 1px solid #333
+      padding: 15px 10px
+      color: white
+      font-size: 16px
+      padding-left: 32px
+      text-indent: -34px
+
+.form-footer
+  padding: 2px 30px 20px
+  text-align: center
+  margin-top: -1px
+  .cta-wrapper
+    margin: 0px 0px 20px
+    padding: 10px
+    border-radius: 5px
+    &:hover
+      background: $primary
+    p
+      margin: 0
+      text-shadow: none
+    a
+      color: white
+      &:hover
+        text-decoration: none
+        color: white
+    .phone
+      font-size: 28px
+      font-weight: 600
+  .bbb-white
+    width: 200px
+    margin: 20px auto
+    display: block
 
 // home
 #home
   .form-banner
-    margin-top: 115px
+    background-image: url('../images/hero-kid-by-window.jpg')
+
+// blue
+#blue, #blue-wide
+  .form-banner
     background: $primary-md
     background: -moz-linear-gradient(top,$primary-md 0%,$primary-dk 100%)
     background: -webkit-linear-gradient(top,$primary-md 0%,$primary-dk 100%)
@@ -336,32 +460,78 @@ select:-moz-focusring
       .btn
         display: block
         margin: 20px
-
-#home, #thanks
-  .intro, .product, .next
-    text-align: center
-    padding-top: 80px
-    padding-bottom: 80px
-    h2
-      margin-bottom: 30px
-    img
-      margin-bottom: 15px
-
-  .testimonial-banner
-    padding-top: 80px
-    padding-bottom: 80px
-
-  .bg-blue
-    background: $primary
-    h2, p
+  .header-special
+    color: white
+  .hero
+    h2, h3
+      color: white
+    .offer-benefits-list
+      p
+        color: white
+    .disclaimer
       color: white
 
+  .form-footer
+    background: $yellow
+    .cta-wrapper
+      border: 1px solid $secondary
+      &:hover
+        background: $secondary
+  .form .ll
+    background: $yellow
+
+#special, #home
+  .form .ll
+    background: rgba(133, 143, 151, 0.84)
+    h2, .disclaimer
+      color: white
+    .disclaimer
+      a
+        color: rgba(255,255,255,0.6)
+        &:hover
+          color: rgba(255,255,255, 0.9)
+    .btn
+      background: $secondary !important
+      width: 100%
+      box-sizing: border-box
+      margin: 10px 0 20px
+      font-weight: 600 !important
+      font-size: 24px
+      border: 1px solid #bfc0c2 !important
+      &:hover
+        background: $secondary-md !important
+  .form-footer
+    background: rgba(133, 143, 151, 0.84)
+    .cta-wrapper
+      background: rgba(29, 31, 34, 0.3)
+      &:hover
+        background: $primary
+
+#special
+  .form-banner
+    background-image: url('../images/hero-kid-at-home.jpg')
+  .intro
+    background: #ded9dd
+    border-top: 1px solid white
+    h4
+      color: $primary
+    .sprite-new
+      background: url(../images/sprite-new.png)
+      display: inline-block
+      height: 220px
+      width: 220px
+      display: block
+      margin: 0 auto
+      &.money
+        background-position: 0px 0
+      &.home
+        background-position: -250px 0
+      &.clock
+        background-position: -480px 0
 
 #thanks
   .form-banner
-    margin-top: 115px
-    background: url('../images/adt-hero.jpg') no-repeat
-    background-size: cover
+    background-image: url('../images/adt-hero.jpg') no-repeat
     min-height: 600px
     padding: 200px 30px 30px
     h1
@@ -415,9 +585,13 @@ select:-moz-focusring
     padding: 70px 0
     &:after, &:before
       display: none
+  .form-banner
+    margin-top: 100px
   #home
     .form-banner
-      margin-top: 100px
+      padding-bottom: 15px
+  #blue
+    .form-banner
       background: $navy
       padding: 0 0 30px
       border-bottom: 5px solid $secondary
@@ -429,7 +603,6 @@ select:-moz-focusring
         margin-right: -15px
   #thanks
     .form-banner
-      margin-top: 100px
       background: #edeef3
       min-height: auto
       padding: 40px 10px
@@ -439,17 +612,59 @@ select:-moz-focusring
 // UP TO LANDSCAPE PHONE
 // ---------------------
 @media (max-width: 480px)
-
-  #home, #thanks
-    .intro, .product, .matched, .next
-      padding-top: 50px
-      padding-bottom: 50px
-      text-align: center
-    .intro img
-      margin-top: 30px
-    .matched .phone-match
-      margin: 30px 0 -50px
+  .product-intro
+    padding: 0 20px
+    .header-special
+      font-size: 28px
+    img
+      margin-bottom: 10px
+  // page sections
+  .intro, .product, .matched, .next, .benefits, .extras
+    padding-top: 50px
+    padding-bottom: 50px
+    text-align: center
+  .intro img
+    margin-top: 30px
+  .matched .phone-match
+    margin: 30px 0 -50px
   .footer
     padding: 40px 15px
   h1
     font-size: 28px
+  .offer-benefits-list
+    padding: 10px 0 30px
+    li
+      margin-bottom: 5px
+      img
+        width: 15px
+    p
+      font-size: 14px
+  #blue-wide
+    .form-banner
+      padding-bottom: 15px
+  #special
+    .form-banner
+      padding-bottom: 20px
+      .hero
+        h2
+          font-size: 18px
+          text-align: center
+          &.header-special
+            font-weight: 600
+            font-size: 28px
+            color: $secondary
+    .card
+      margin-bottom: 20px
+      min-height: auto
+    .product
+      h3
+        font-size: 16px
+        text-align: center
+    .feature
+      border-bottom: 1px solid #ddd
+      margin: 15px 0
+      padding-bottom: 5px
+      h4
+        margin-left: 50px
+      .number
+        left: 30px
