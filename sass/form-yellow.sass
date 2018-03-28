@@ -42,7 +42,7 @@ $navy: $primary-dk
   h2
     color: $navy
     margin: 10px 0 20px
-  .formio-component-textfield
+  .formio-component-textfield, .formio-component-email
     .control-label
       display: none
   .formio-component-radio
@@ -69,6 +69,7 @@ $navy: $primary-dk
     margin-bottom: 20px
   .disclaimer
     font-size: 12px
+    font-weight: 300
     line-height: 1.2em
   .cta-wrapper
     margin: 30px 20px
@@ -87,6 +88,18 @@ $navy: $primary-dk
     .phone
       font-size: 28px
       font-weight: 600
+  // required styles
+  .form-group.required .control-label:after
+    content: ""
+  // error styles
+  .has-error .help-block
+    color: white
+    background: #c62928
+    padding: 2px 5px
+    font-weight: 300
+    font-size: 14px
+    text-align: left
+    margin-top: -5px
 
 //////////////////////////////////////  MEDIA QUERIES  ///////////////////////////////////////
 

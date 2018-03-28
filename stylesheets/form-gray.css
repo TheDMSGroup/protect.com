@@ -30,7 +30,7 @@
   margin: 10px 0 20px;
 }
 /* line 43, ../sass/form-gray.sass */
-.ll .formio-component-textfield .control-label {
+.ll .formio-component-textfield .control-label, .ll .formio-component-email .control-label {
   display: none;
 }
 /* line 45, ../sass/form-gray.sass */
@@ -47,11 +47,17 @@
   margin: 0 5px;
 }
 /* line 52, ../sass/form-gray.sass */
+.ll .formio-component-radio .radio span {
+  color: white;
+  font-weight: 300;
+}
+/* line 55, ../sass/form-gray.sass */
 .ll label {
   font-weight: 300;
   text-align: left;
+  color: white;
 }
-/* line 55, ../sass/form-gray.sass */
+/* line 59, ../sass/form-gray.sass */
 .ll .btn {
   background: #e15928 !important;
   width: 100%;
@@ -61,31 +67,46 @@
   font-size: 24px;
   border: 1px solid #bfc0c2 !important;
 }
-/* line 63, ../sass/form-gray.sass */
+/* line 67, ../sass/form-gray.sass */
 .ll .btn:hover {
   background: #bc451a !important;
 }
-/* line 65, ../sass/form-gray.sass */
+/* line 69, ../sass/form-gray.sass */
 .ll .tcpa {
   margin-bottom: 20px;
 }
-/* line 67, ../sass/form-gray.sass */
+/* line 71, ../sass/form-gray.sass */
 .ll .disclaimer {
   font-size: 12px;
+  font-weight: 300;
   color: white;
   line-height: 1.2em;
 }
-/* line 71, ../sass/form-gray.sass */
+/* line 76, ../sass/form-gray.sass */
 .ll .disclaimer a {
   color: rgba(255, 255, 255, 0.6);
 }
-/* line 73, ../sass/form-gray.sass */
+/* line 78, ../sass/form-gray.sass */
 .ll .disclaimer a:hover {
   color: rgba(255, 255, 255, 0.9);
 }
+/* line 81, ../sass/form-gray.sass */
+.ll .form-group.required .control-label:after {
+  content: "";
+}
+/* line 84, ../sass/form-gray.sass */
+.ll .has-error .help-block {
+  color: white;
+  background: #c62928;
+  padding: 2px 5px;
+  font-weight: 300;
+  font-size: 14px;
+  text-align: left;
+  margin-top: -5px;
+}
 
 @media (max-width: 768px) {
-  /* line 79, ../sass/form-gray.sass */
+  /* line 96, ../sass/form-gray.sass */
   .ll {
     margin-top: 15px;
   }

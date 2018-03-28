@@ -584,50 +584,49 @@ table td.left {
 .form-footer {
   padding: 2px 30px 20px;
   text-align: center;
-  margin-top: -1px;
 }
-/* line 422, ../sass/common.sass */
+/* line 421, ../sass/common.sass */
 .form-footer .cta-wrapper {
   margin: 0px 0px 20px;
   padding: 10px;
   border-radius: 5px;
 }
-/* line 426, ../sass/common.sass */
+/* line 425, ../sass/common.sass */
 .form-footer .cta-wrapper:hover {
   background: #0061a8;
 }
-/* line 428, ../sass/common.sass */
+/* line 427, ../sass/common.sass */
 .form-footer .cta-wrapper p {
   margin: 0;
   text-shadow: none;
 }
-/* line 431, ../sass/common.sass */
+/* line 430, ../sass/common.sass */
 .form-footer .cta-wrapper a {
   color: white;
 }
-/* line 433, ../sass/common.sass */
+/* line 432, ../sass/common.sass */
 .form-footer .cta-wrapper a:hover {
   text-decoration: none;
   color: white;
 }
-/* line 436, ../sass/common.sass */
+/* line 435, ../sass/common.sass */
 .form-footer .cta-wrapper .phone {
   font-size: 28px;
   font-weight: 600;
 }
-/* line 439, ../sass/common.sass */
+/* line 438, ../sass/common.sass */
 .form-footer .bbb-white {
   width: 200px;
   margin: 20px auto;
   display: block;
 }
 
-/* line 446, ../sass/common.sass */
+/* line 445, ../sass/common.sass */
 #home .form-banner {
   background-image: url("../images/hero-kid-by-window.jpg");
 }
 
-/* line 451, ../sass/common.sass */
+/* line 450, ../sass/common.sass */
 #blue .form-banner, #blue-wide .form-banner {
   background: #004475;
   background: -moz-linear-gradient(top, #004475 0%, #002642 100%);
@@ -635,66 +634,66 @@ table td.left {
   background: linear-gradient(to bottom, #004475 0%, #002642 100%);
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#0e4e81',endColorstr='#192a3c',GradientType=0);
 }
-/* line 457, ../sass/common.sass */
+/* line 456, ../sass/common.sass */
 #blue .form-banner .form-container, #blue-wide .form-banner .form-container {
   padding: 30px;
   text-align: center;
 }
-/* line 460, ../sass/common.sass */
+/* line 459, ../sass/common.sass */
 #blue .form-banner .form-container .btn, #blue-wide .form-banner .form-container .btn {
   display: block;
   margin: 20px;
 }
-/* line 463, ../sass/common.sass */
+/* line 462, ../sass/common.sass */
 #blue .header-special, #blue-wide .header-special {
   color: white;
 }
-/* line 466, ../sass/common.sass */
+/* line 465, ../sass/common.sass */
 #blue .hero h2, #blue .hero h3, #blue-wide .hero h2, #blue-wide .hero h3 {
   color: white;
 }
-/* line 469, ../sass/common.sass */
+/* line 468, ../sass/common.sass */
 #blue .hero .offer-benefits-list p, #blue-wide .hero .offer-benefits-list p {
   color: white;
 }
-/* line 471, ../sass/common.sass */
+/* line 470, ../sass/common.sass */
 #blue .hero .disclaimer, #blue-wide .hero .disclaimer {
   color: white;
 }
-/* line 474, ../sass/common.sass */
+/* line 473, ../sass/common.sass */
 #blue .form-footer, #blue-wide .form-footer {
   background: #F8BA57;
 }
-/* line 476, ../sass/common.sass */
+/* line 475, ../sass/common.sass */
 #blue .form-footer .cta-wrapper, #blue-wide .form-footer .cta-wrapper {
   border: 1px solid #e15928;
 }
-/* line 478, ../sass/common.sass */
+/* line 477, ../sass/common.sass */
 #blue .form-footer .cta-wrapper:hover, #blue-wide .form-footer .cta-wrapper:hover {
   background: #e15928;
 }
-/* line 480, ../sass/common.sass */
+/* line 479, ../sass/common.sass */
 #blue .form .ll, #blue-wide .form .ll {
   background: #F8BA57;
 }
 
-/* line 484, ../sass/common.sass */
+/* line 483, ../sass/common.sass */
 #special .form .ll, #home .form .ll {
   background: rgba(133, 143, 151, 0.84);
 }
-/* line 486, ../sass/common.sass */
+/* line 485, ../sass/common.sass */
 #special .form .ll h2, #special .form .ll .disclaimer, #home .form .ll h2, #home .form .ll .disclaimer {
   color: white;
 }
-/* line 489, ../sass/common.sass */
+/* line 488, ../sass/common.sass */
 #special .form .ll .disclaimer a, #home .form .ll .disclaimer a {
   color: rgba(255, 255, 255, 0.6);
 }
-/* line 491, ../sass/common.sass */
+/* line 490, ../sass/common.sass */
 #special .form .ll .disclaimer a:hover, #home .form .ll .disclaimer a:hover {
   color: rgba(255, 255, 255, 0.9);
 }
-/* line 493, ../sass/common.sass */
+/* line 492, ../sass/common.sass */
 #special .form .ll .btn, #home .form .ll .btn {
   background: #e15928 !important;
   width: 100%;
@@ -704,37 +703,37 @@ table td.left {
   font-size: 24px;
   border: 1px solid #bfc0c2 !important;
 }
-/* line 501, ../sass/common.sass */
+/* line 500, ../sass/common.sass */
 #special .form .ll .btn:hover, #home .form .ll .btn:hover {
   background: #bc451a !important;
 }
-/* line 503, ../sass/common.sass */
+/* line 502, ../sass/common.sass */
 #special .form-footer, #home .form-footer {
   background: rgba(133, 143, 151, 0.84);
 }
-/* line 505, ../sass/common.sass */
+/* line 504, ../sass/common.sass */
 #special .form-footer .cta-wrapper, #home .form-footer .cta-wrapper {
   background: rgba(29, 31, 34, 0.3);
 }
-/* line 507, ../sass/common.sass */
+/* line 506, ../sass/common.sass */
 #special .form-footer .cta-wrapper:hover, #home .form-footer .cta-wrapper:hover {
   background: #0061a8;
 }
 
-/* line 511, ../sass/common.sass */
+/* line 510, ../sass/common.sass */
 #special .form-banner {
   background-image: url("../images/hero-kid-at-home.jpg");
 }
-/* line 513, ../sass/common.sass */
+/* line 512, ../sass/common.sass */
 #special .intro {
   background: #ded9dd;
   border-top: 1px solid white;
 }
-/* line 516, ../sass/common.sass */
+/* line 515, ../sass/common.sass */
 #special .intro h4 {
   color: #0061a8;
 }
-/* line 518, ../sass/common.sass */
+/* line 517, ../sass/common.sass */
 #special .intro .sprite-new {
   background: url(../images/sprite-new.png);
   display: inline-block;
@@ -743,84 +742,84 @@ table td.left {
   display: block;
   margin: 0 auto;
 }
-/* line 525, ../sass/common.sass */
+/* line 524, ../sass/common.sass */
 #special .intro .sprite-new.money {
   background-position: 0px 0;
 }
-/* line 527, ../sass/common.sass */
+/* line 526, ../sass/common.sass */
 #special .intro .sprite-new.home {
   background-position: -250px 0;
 }
-/* line 529, ../sass/common.sass */
+/* line 528, ../sass/common.sass */
 #special .intro .sprite-new.clock {
   background-position: -480px 0;
 }
 
-/* line 533, ../sass/common.sass */
+/* line 532, ../sass/common.sass */
 #thanks .form-banner {
-  background-image: url("../images/adt-hero.jpg") no-repeat;
+  background-image: url("../images/adt-hero.jpg");
   min-height: 600px;
   padding: 200px 30px 30px;
 }
-/* line 537, ../sass/common.sass */
+/* line 536, ../sass/common.sass */
 #thanks .form-banner h1 {
   color: #0061a8;
   font-size: 60px;
   font-weight: 600;
 }
-/* line 541, ../sass/common.sass */
+/* line 540, ../sass/common.sass */
 #thanks .form-banner p {
   font-size: 21px;
 }
-/* line 543, ../sass/common.sass */
+/* line 542, ../sass/common.sass */
 #thanks .what-to-expect {
   text-align: left;
 }
-/* line 545, ../sass/common.sass */
+/* line 544, ../sass/common.sass */
 #thanks .what-to-expect p, #thanks .what-to-expect li {
   color: white;
 }
-/* line 547, ../sass/common.sass */
+/* line 546, ../sass/common.sass */
 #thanks .what-to-expect .number {
   font-size: 24px;
   font-weight: 600;
 }
 
 @media (max-width: 1200px) {
-  /* line 554, ../sass/common.sass */
+  /* line 553, ../sass/common.sass */
   .container {
     max-width: 100%;
   }
 }
 @media (min-width: 992px) {
-  /* line 560, ../sass/common.sass */
+  /* line 559, ../sass/common.sass */
   .body {
     padding: 30px;
   }
 }
 @media (max-width: 768px) {
-  /* line 568, ../sass/common.sass */
+  /* line 567, ../sass/common.sass */
   .header {
     background: #002642;
     box-shadow: none;
   }
-  /* line 571, ../sass/common.sass */
+  /* line 570, ../sass/common.sass */
   .header .header-brand a {
     background-image: url("../images/adt-authorized-provider-white.png");
     width: 100%;
     margin: 0;
     height: 70px;
   }
-  /* line 576, ../sass/common.sass */
+  /* line 575, ../sass/common.sass */
   .header .cta-wrapper {
     margin: 0;
   }
-  /* line 578, ../sass/common.sass */
+  /* line 577, ../sass/common.sass */
   .header .cta-wrapper .phone {
     font-size: 18px;
   }
 
-  /* line 580, ../sass/common.sass */
+  /* line 579, ../sass/common.sass */
   .orange-banner {
     margin: 0;
     background: url("../images/stop-sign.png") no-repeat center center;
@@ -828,28 +827,28 @@ table td.left {
     height: 250px;
     padding: 70px 0;
   }
-  /* line 586, ../sass/common.sass */
+  /* line 585, ../sass/common.sass */
   .orange-banner:after, .orange-banner:before {
     display: none;
   }
 
-  /* line 588, ../sass/common.sass */
+  /* line 587, ../sass/common.sass */
   .form-banner {
     margin-top: 100px;
   }
 
-  /* line 591, ../sass/common.sass */
+  /* line 590, ../sass/common.sass */
   #home .form-banner {
     padding-bottom: 15px;
   }
 
-  /* line 594, ../sass/common.sass */
+  /* line 593, ../sass/common.sass */
   #blue .form-banner {
     background: #002642;
     padding: 0 0 30px;
     border-bottom: 5px solid #e15928;
   }
-  /* line 598, ../sass/common.sass */
+  /* line 597, ../sass/common.sass */
   #blue .form-banner .form-container {
     padding: 10px;
     background-size: contain !important;
@@ -858,116 +857,116 @@ table td.left {
     margin-right: -15px;
   }
 
-  /* line 605, ../sass/common.sass */
+  /* line 604, ../sass/common.sass */
   #thanks .form-banner {
     background: #edeef3;
     min-height: auto;
     padding: 40px 10px;
   }
-  /* line 609, ../sass/common.sass */
+  /* line 608, ../sass/common.sass */
   #thanks .form-banner h1 {
     font-size: 48px;
   }
 }
 @media (max-width: 480px) {
-  /* line 615, ../sass/common.sass */
+  /* line 614, ../sass/common.sass */
   .product-intro {
     padding: 0 20px;
   }
-  /* line 617, ../sass/common.sass */
+  /* line 616, ../sass/common.sass */
   .product-intro .header-special {
     font-size: 28px;
   }
-  /* line 619, ../sass/common.sass */
+  /* line 618, ../sass/common.sass */
   .product-intro img {
     margin-bottom: 10px;
   }
 
-  /* line 622, ../sass/common.sass */
+  /* line 621, ../sass/common.sass */
   .intro, .product, .matched, .next, .benefits, .extras {
     padding-top: 50px;
     padding-bottom: 50px;
     text-align: center;
   }
 
-  /* line 626, ../sass/common.sass */
+  /* line 625, ../sass/common.sass */
   .intro img {
     margin-top: 30px;
   }
 
-  /* line 628, ../sass/common.sass */
+  /* line 627, ../sass/common.sass */
   .matched .phone-match {
     margin: 30px 0 -50px;
   }
 
-  /* line 630, ../sass/common.sass */
+  /* line 629, ../sass/common.sass */
   .footer {
     padding: 40px 15px;
   }
 
-  /* line 632, ../sass/common.sass */
+  /* line 631, ../sass/common.sass */
   h1 {
     font-size: 28px;
   }
 
-  /* line 634, ../sass/common.sass */
+  /* line 633, ../sass/common.sass */
   .offer-benefits-list {
     padding: 10px 0 30px;
   }
-  /* line 636, ../sass/common.sass */
+  /* line 635, ../sass/common.sass */
   .offer-benefits-list li {
     margin-bottom: 5px;
   }
-  /* line 638, ../sass/common.sass */
+  /* line 637, ../sass/common.sass */
   .offer-benefits-list li img {
     width: 15px;
   }
-  /* line 640, ../sass/common.sass */
+  /* line 639, ../sass/common.sass */
   .offer-benefits-list p {
     font-size: 14px;
   }
 
-  /* line 643, ../sass/common.sass */
+  /* line 642, ../sass/common.sass */
   #blue-wide .form-banner {
     padding-bottom: 15px;
   }
 
-  /* line 646, ../sass/common.sass */
+  /* line 645, ../sass/common.sass */
   #special .form-banner {
     padding-bottom: 20px;
   }
-  /* line 649, ../sass/common.sass */
+  /* line 648, ../sass/common.sass */
   #special .form-banner .hero h2 {
     font-size: 18px;
     text-align: center;
   }
-  /* line 652, ../sass/common.sass */
+  /* line 651, ../sass/common.sass */
   #special .form-banner .hero h2.header-special {
     font-weight: 600;
     font-size: 28px;
     color: #e15928;
   }
-  /* line 656, ../sass/common.sass */
+  /* line 655, ../sass/common.sass */
   #special .card {
     margin-bottom: 20px;
     min-height: auto;
   }
-  /* line 660, ../sass/common.sass */
+  /* line 659, ../sass/common.sass */
   #special .product h3 {
     font-size: 16px;
     text-align: center;
   }
-  /* line 663, ../sass/common.sass */
+  /* line 662, ../sass/common.sass */
   #special .feature {
     border-bottom: 1px solid #ddd;
     margin: 15px 0;
     padding-bottom: 5px;
   }
-  /* line 667, ../sass/common.sass */
+  /* line 666, ../sass/common.sass */
   #special .feature h4 {
     margin-left: 50px;
   }
-  /* line 669, ../sass/common.sass */
+  /* line 668, ../sass/common.sass */
   #special .feature .number {
     left: 30px;
   }
