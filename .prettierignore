@@ -1,0 +1,48 @@
+# Dependencies
+node_modules/
+dist/
+.nuxt/
+.output/
+
+# Build outputs
+build/
+coverage/
+
+# Generated files
+*.min.js
+*.min.css
+
+# Assets that shouldn't be formatted
+public/assets/icons/**
+components/svg/**
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Lock files
+package-lock.json
+yarn.lock
+pnpm-lock.yaml

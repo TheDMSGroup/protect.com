@@ -1,0 +1,32 @@
+{
+  "name": "protect-nuxt",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare"
+  },
+  "dependencies": {
+    "@nuxt/eslint": "^1.10.0",
+    "@nuxt/image": "^2.0.0",
+    "@nuxtjs/sitemap": "^7.4.7",
+    "@pinia/nuxt": "^0.11.3",
+    "@unhead/ssr": "^2.0.19",
+    "@unhead/vue": "^2.0.19",
+    "axios": "^1.13.2",
+    "ipx": "^3.1.1",
+    "nuxt": "^4.2.0",
+    "pinia": "^3.0.4",
+    "vue": "^3.5.22",
+    "vue-router": "^4.6.3"
+  },
+  "devDependencies": {
+    "@bootstrap-vue-next/nuxt": "^0.40.7",
+    "bootstrap": "^5.3.8",
+    "bootstrap-vue-next": "^0.40.7",
+    "sass-embedded": "^1.93.3"
+  }
+}

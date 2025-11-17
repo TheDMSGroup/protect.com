@@ -1,0 +1,14 @@
+// Import Bootstrap Sass
+@import "bootstrap/scss/bootstrap";
+@import "bootstrap/scss/mixins";
+// Your custom styles
+@import "./_variables.scss";
+@import "./type.scss";
+
+.cls-2 {
+  opacity: 0.25;
+}
+img {
+  max-width: 100%;
+  width: 100%;
+}
