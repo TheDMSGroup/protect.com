@@ -1,0 +1,59 @@
+@import url('https://fonts.googleapis.com/css2?family=Cantata+One&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700&display=swap');
+
+h1 {
+  font-family: 'Cantata One', serif;
+  color: #3b54ba;
+  font-size: 70px;
+}
+h2 {
+  font-family: 'Cantata One', serif;
+  color: #3b54ba;
+  font-size: 50px;
+
+  @include media-breakpoint-down(md) {
+    font-size: 2rem;
+  }
+}
+h3 {
+  font-family: 'Nunito Sans', sans-serif;
+  font-weight: 600;
+  color: #666666;
+  font-size: 37px;
+}
+h4 {
+  font-family: 'Nunito Sans', sans-serif;
+  font-weight: 400;
+  color: #3b54ba;
+  font-size: 32px;
+}
+h5 {
+  font-family: 'Nunito Sans', sans-serif;
+  font-weight: 600;
+  color: #666666;
+  font-size: 31px;
+}
+article {
+  h1 {
+    font-family: 'Nunito Sans', sans-serif;
+    font-weight: 700;
+    color: #666666;
+    font-size: 28px;
+  }
+}
+div, span, a, li, strong, em, label, input, button, td, th, section, header, footer, nav, main, aside, ul, ol, dl, dt, dd, blockquote, pre, code, textarea, select, option {
+  font-family: 'Nunito Sans', sans-serif;
+  font-weight: 400;
+  font-size: 18px;
+}
+p {
+  font-family: 'Nunito Sans', sans-serif;
+  font-weight: 600;
+  color: #666666;
+  font-size: 20px;
+}
+
+a {
+  color: $blue;
+  text-decoration: unset;
+}
