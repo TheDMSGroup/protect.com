@@ -132,16 +132,24 @@
     transition: all 0.3s ease;
   }
 
-  .slide-fade-enter,
+  .slide-fade-enter-from,
   .slide-fade-leave-to {
     transform: translateY(-6px);
     opacity: 0;
   }
 
+  .slide-fade-enter-to,
+  .slide-fade-leave-from {
+    transform: translateY(0);
+    opacity: 1;
+  }
+
   .selects-component {
-    box-shadow: 0 0 16px -5px rgba(0, 0, 0, 0.18);
     width: 100%;
     position: relative;
+    & > .input-group {
+      background: #fff;
+    }
 
     svg.elixr-icon.choice-icon {
       fill: #4153b3;
@@ -180,7 +188,7 @@
       cursor: pointer;
     }
     .input-group.clickable {
-      z-index: 99;
+      z-index: 999;
       flex-wrap: nowrap;
 
       .input-group {
@@ -188,17 +196,26 @@
       }
     }
     .list-group {
-      // top: -1px;
-      position: relative;
+      z-index: 999;
+      position: absolute;
+      width: 100%;
+      background: #fff;
+      border-radius: 0 0 5px 5px;
+      box-shadow: 0 4px 16px -5px rgba(0, 0, 0, 0.18);
 
       .list-group-item {
         color: #a6a6a6;
         text-align: left;
         font-size: 18px;
+        background: #fff;
         &:first-child {
           border-top-left-radius: 0;
           border-top-right-radius: 0;
           border-top: none;
+        }
+        &:last-child {
+          border-bottom-left-radius: 5px;
+          border-bottom-right-radius: 5px;
         }
         &:hover {
           background: #f9f9f9;
@@ -343,6 +360,8 @@
     // }
     .input-group {
       height: 80px;
+      box-shadow: 0 0 16px -5px rgba(0, 0, 0, 0.18);
+      border-radius: 5px;
       input.form-control {
         height: 80px;
       }

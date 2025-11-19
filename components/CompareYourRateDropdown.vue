@@ -72,10 +72,6 @@
       position: relative;
     }
 
-    .selects-component {
-      position: static;
-    }
-
     .valid {
       z-index: 100;
 

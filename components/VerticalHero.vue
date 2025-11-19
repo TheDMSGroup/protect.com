@@ -32,7 +32,6 @@
   });
 
   const { heroImage, headline, subheadline, ctaType, ctaConfig, heroClass, subheadlineType } = props;
-  console.log(ctaConfig, ctaType);
 </script>
 
 <template>
@@ -101,6 +100,12 @@
               line-height: 1.4;
               max-width: 500px;
             }
+          }
+        }
+        .hero-right {
+          img {
+            max-width: unset;
+            width: unset;
           }
         }
       }
