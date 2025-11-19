@@ -91,7 +91,7 @@
 
     .hero {
       display: flex;
-      justify-content: space-between;
+      justify-content: center;
       width: 100%;
       height: 700px;
 
@@ -175,10 +175,10 @@
         width: 40%;
         display: flex;
         justify-content: center;
-        align-items: center;
+        align-items: start;
+        padding-top: 3em;
 
         @include media-breakpoint-down(lg) {
-          padding-top: 3em;
           align-items: flex-start;
         }
         @include media-breakpoint-down(md) {

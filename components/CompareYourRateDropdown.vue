@@ -12,7 +12,7 @@
 
   const { compareRateConfig, submitText } = props;
 
-  const goTo = ref("");
+  const selectValue = ref("");
   const router = useRouter();
 
   const changeRoute = () => {
@@ -20,13 +20,35 @@
       router.push({ path: `/${goTo.value}/` });
     }
   };
+  // callabcks for emitted events from the input
+  const handleValidSelect = (eventValue) => {
+    selectValue.value = eventValue;
+  };
+  const handleInvalidSelect = () => {
+    // Clear selectValue on invalid input
+    selectValue.value = "";
+  };
+  // Computed for button disabled state
+  const isButtonDisabled = computed(() => {
+    const disabled = !selectValue.value || selectValue.value === "";
+    return disabled;
+  });
+  const goTo = computed(() => {
+    return selectValue.value;
+  });
 </script>
 
 <template>
   <div class="compare-your-rate-dropdown">
-    <SelectsMain v-model="goTo" :valid="true" :config="compareRateConfig" />
+    <SelectsMain
+      :valid="true"
+      :config="compareRateConfig"
+      @select-updated:model-value="handleValidSelect"
+      @select-invalid:model-value="handleInvalidSelect"
+    />
     <span class="click-continue" @click="changeRoute">
       <ButtonsMain
+        :disabled="isButtonDisabled"
         class="continue"
         :config="{
           size: 'lg',
@@ -34,6 +56,7 @@
           label: submitText,
           icon: 'arrow-right-short',
         }"
+        @click="changeRoute"
       />
     </span>
   </div>

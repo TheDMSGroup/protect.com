@@ -13,11 +13,9 @@
 
   // Reactive data
   const zipcode = ref("");
-
   // Router for navigation
   const router = useRouter();
 
-  // Methods
   const submit = () => {
     console.log(props.action);
     if (props.action.includes("http")) {
@@ -33,27 +31,35 @@
     }
   };
 
-  const set = (field, value) => {
-    if (field === "zipcode") {
-      zipcode.value = value;
-    }
+  // callabcks for emitted events from the input
+  const handleValidInput = (inputValue) => {
+    zipcode.value = inputValue;
+  };
+  const handleInvalidInput = () => {
+    // Clear zipcode on invalid input
+    zipcode.value = "";
   };
 
-  const validateZip = () => {
-    if (zipcode.value) {
-      const re = /\d{5}/;
-      return re.test(zipcode.value);
+  // declare whatever validation function you need
+  const validateZip = (inputValue) => {
+    if (inputValue) {
+      const re = /^\d{5}$/;
+      return re.test(inputValue);
     }
     return false;
   };
+  // Computed for button disabled state
+  const isButtonDisabled = computed(() => {
+    const disabled = !zipcode.value || zipcode.value === "";
+    return disabled;
+  });
 </script>
 
 <template>
   <form class="zipcode-form" :action="action" method="GET" @submit.prevent @submit="submit">
     <InputsMain
-      :state="true"
-      :valid="validateZip()"
-      @input="set('zipcode', $event.target.value)"
+      :validate="validateZip"
+      :valid="!!zipcode"
       :value="zipcode"
       :config="{
         label: 'Enter your zip code',
@@ -64,9 +70,11 @@
         model: zipcode,
         type: 'number',
       }"
-    ></InputsMain>
+      @input-updated:model-value="handleValidInput"
+      @input-invalid:model-value="handleInvalidInput"
+    />
     <ButtonsMain
-      :disabled="!validateZip()"
+      :disabled="isButtonDisabled"
       :config="{
         type: 'submit',
         size: 'lg',
@@ -74,7 +82,7 @@
         label: 'CONTINUE',
         icon: 'arrow-right-short',
       }"
-    ></ButtonsMain>
+    />
   </form>
 </template>
 

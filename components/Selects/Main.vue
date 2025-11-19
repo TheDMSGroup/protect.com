@@ -8,56 +8,65 @@
       type: Object,
       default: () => ({}),
     },
-    valid: {
-      type: Boolean,
-      default: true,
-    },
-    value: {
-      type: String,
-      default: "",
-    },
-    model: {
-      type: String,
-      default: "",
+    validate: {
+      type: Function,
+      default: (inputValue) => {
+        return typeof inputValue === "string" && inputValue.length > 0;
+      },
     },
   });
 
-  const { config, valid, value } = props;
-
-  // Define emits
-  defineEmits(["input"]);
+  // Emits
+  const emit = defineEmits(["selectUpdated:modelValue", "selectInvalid:modelValue"]);
 
   // Reactive data
   const focus = ref(false);
   const menu = ref(false);
-  const selected = ref(null);
+  const selected = ref(false);
+  const valid = ref(false);
 
   // Computed properties
   const currentIcon = computed(() => {
-    return selected.value && selected.value.value ? selected.value.value.icon : config.icon;
+    return selected.value && selected.value.value ? selected.value.value.icon : props.config.icon;
   });
 
   const selectedValue = computed(() => {
     if (selected.value) {
       return selected.value.value;
     }
-    return value;
+    return null;
   });
 
   const display = computed(() => {
     if (selected.value && selected.value) {
       return selected.value.text;
     } else {
-      return config.placeholderText;
+      return props.config.placeholderText;
     }
   });
 
-  // Methods
-  const setValue = (option) => {
-    selected.value = option;
-    toggleMenu();
+  const update = (selectValue, selectText) => {
+    console.log("Selected value:", selectValue);
+    // Run validation if provided
+    if (props.validate) {
+      const isValid = props.validate(selectValue);
+      // Emit different events based on validation
+      if (isValid) {
+        console.log("Valid selection:", selectValue);
+        emit("selectUpdated:modelValue", selectValue);
+        valid.value = true;
+        selected.value = { value: selectValue, text: selectText };
+        toggleMenu();
+      } else {
+        emit("selectInvalid:modelValue", selectValue);
+        valid.value = false;
+      }
+    } else {
+      // No validation, emit normally
+      emit("selectUpdated:modelValue", selectValue);
+    }
   };
-
+  // Methods
   const toggleMenu = () => {
     menu.value = !menu.value;
   };
@@ -77,11 +86,11 @@
 
 <template>
   <div class="selects-component" :class="{ error: !valid, valid: valid }">
-    <b-form-select class="hidden" :value="selectedValue" :options="config.options" @input="$emit('input', $event.value)" />
-    <div v-if="!valid && config.invalidFeedback" class="error-message">
-      {{ config.invalidFeedback }}
+    <b-form-select class="hidden" :value="selectedValue" :options="props.config.options" @input="update($event.value)" />
+    <div v-if="!valid && props.config.invalidFeedback" class="error-message">
+      {{ props.config.invalidFeedback }}
     </div>
-    <div class="input-group clickable" :class="{ focus: focus, 'menu-open': false && menu }" @click="toggleMenu">
+    <div class="input-group clickable" :class="{ focus: focus, 'menu-open': false && menu }" @click="toggleMenu()">
       <b-input-group size="lg">
         <template #prepend>
           <b-input-group-text v-if="iconComponentName" class="select-icon">
@@ -105,7 +114,7 @@
     </div>
     <transition name="slide-fade">
       <b-list-group v-if="menu" class="clickable">
-        <b-list-group-item v-for="option in config.options" :key="option.value.value" @click="setValue(option)">
+        <b-list-group-item v-for="option in props.config.options" :key="option.value.value" @click="update(option.value.value, option.text)">
           {{ option.text }}
         </b-list-group-item>
       </b-list-group>
