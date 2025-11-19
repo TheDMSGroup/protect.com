@@ -3,6 +3,12 @@ export default defineNuxtConfig({
   compatibilityDate: "2025-07-15",
   devtools: { enabled: true },
   modules: ["@nuxtjs/sitemap", "@bootstrap-vue-next/nuxt", "@nuxt/image", "@pinia/nuxt", "@nuxt/eslint"],
+  app: {
+    head: {
+      viewport: "width=device-width, initial-scale=1",
+      charset: "utf-8",
+    },
+  },
   runtimeConfig: {
     // Private keys (only available on server-side)
     graphqlApiUrl: process.env.GRAPHQL_API_URL || "https://us-west-2.cdn.hygraph.com/content/ckwzg7tk528a001z4e7z0bqi0/master",

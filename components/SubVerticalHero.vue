@@ -199,7 +199,6 @@
     @include media-breakpoint-down(md) {
       width: 140%;
       left: -20%;
-      top: -20px;
     }
   }
 </style>

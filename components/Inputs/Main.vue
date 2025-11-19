@@ -63,42 +63,40 @@
     <div v-if="!valid && config.invalidFeedback && touched" class="error-message">
       {{ config.invalidFeedback }}
     </div>
-    <div class="input-group" :class="{ focus: false && focus && !config.noFocusStyle }">
-      <b-input-group size="lg">
-        <template v-if="currentIconLoaded" #prepend>
-          <b-input-group-text>
-            <component :is="dynamicIcon" />
-          </b-input-group-text>
-        </template>
-        <template v-if="!config.noCheckMark" #append>
-          <b-input-group-text class="indicator" @click="config.appendIconClickFunction()">
-            <component :is="config.appendIcon" v-if="config.appendIcon" />
-            <IconsCheckMark v-else :classes="valid ? 'valid' : 'error'" />
-          </b-input-group-text>
-        </template>
-        <b-form-input
-          :id="config.name"
-          :ref="config.name"
-          :type="config.type ? config.type : 'text'"
-          :name="config.name"
-          :placeholder="config.placeholderText"
-          :class="{
-            'has-leading-icon': config.icon,
-            'has-check-mark': !config.noCheckMark,
-            'no-check-mark': config.noCheckMark,
-            valid: valid,
-          }"
-          @keyup.enter="onEnterButton()"
-          @focus="focus = true"
-          @blur="focus = false"
-          @input="
-            update($event.target.value);
-            touched = true;
-          "
-        />
-        <label :for="config.name" :class="{ focus: focus || value, valid: valid }">{{ config.label }}</label>
-      </b-input-group>
-    </div>
+    <b-input-group size="lg" :class="{ focus: false && focus && !config.noFocusStyle }">
+      <template v-if="currentIconLoaded" #prepend>
+        <b-input-group-text>
+          <component :is="dynamicIcon" />
+        </b-input-group-text>
+      </template>
+      <template v-if="!config.noCheckMark" #append>
+        <b-input-group-text class="indicator" @click="config.appendIconClickFunction()">
+          <component :is="config.appendIcon" v-if="config.appendIcon" />
+          <IconsCheckMark v-else :classes="valid ? 'valid' : 'error'" />
+        </b-input-group-text>
+      </template>
+      <b-form-input
+        :id="config.name"
+        :ref="config.name"
+        :type="config.type ? config.type : 'text'"
+        :name="config.name"
+        :placeholder="config.placeholderText"
+        :class="{
+          'has-leading-icon': config.icon,
+          'has-check-mark': !config.noCheckMark,
+          'no-check-mark': config.noCheckMark,
+          valid: valid,
+        }"
+        @keyup.enter="onEnterButton()"
+        @focus="focus = true"
+        @blur="focus = false"
+        @input="
+          update($event.target.value);
+          touched = true;
+        "
+      />
+      <label :for="config.name" :class="{ focus: focus || value, valid: valid }">{{ config.label }}</label>
+    </b-input-group>
   </div>
 </template>
 
@@ -123,11 +121,13 @@
   .inputs-wrapper {
     position: relative;
   }
+  .input-group-text {
+    border: 0;
+  }
   .input-group {
     &.focus {
       box-shadow: 0 0 0 2px #b5c7e5;
     }
-    border-radius: 5px;
     height: 80px;
     input.form-control {
       height: 80px;
