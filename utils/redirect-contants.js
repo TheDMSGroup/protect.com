@@ -42,6 +42,7 @@ export const stateMapping = {
   SD: "south-dakota",
   TN: "tennessee",
   TX: "texas",
+  USA: "usa",
   UT: "utah",
   VT: "vermont",
   VA: "virginia",

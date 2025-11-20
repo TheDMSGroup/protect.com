@@ -37,3 +37,22 @@ $pale-yellow: #FAFAEC;
 $widthMobile: 575px;
 $widthTablet: 767px;
 $widthDesktop: 992px;
+
+
+@mixin mobile {
+  @media (max-width: #{$widthMobile}) {
+    @content;
+  }
+}
+
+@mixin tablet {
+  @media (min-width: #{$widthMobile + 1px}) and (max-width: #{$widthTablet}) {
+    @content;
+  }
+}
+
+@mixin desktop {
+  @media (min-width: #{$widthTablet + 1px}) {
+    @content;
+  }
+}
