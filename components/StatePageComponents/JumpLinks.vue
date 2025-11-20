@@ -71,45 +71,30 @@
   </section>
 </template>
 
-<script>
-import { redirectWithParams } from '../../mixins/utilsMixin';
+<script setup>
+import { computed } from 'vue';
 
-export default {
-  name: 'JumpLinks',
-  components: {},
-  props: {
-    config: Object,
-    stateData: Object,
-    zipcode: String,
-  },
-  data() {
-    return {};
-  },
-  computed: {
-    svgPath() {
-      return require(`../../assets/states/outlines/${this.stateData.state.replace(/\s/g, '').toLowerCase()}.svg`);
-    },
-  },
-  methods: {
-    getQuotes() {
-      redirectWithParams('https://insure.protect.com', { zipcode: this.zipcode });
-    },
-    getImage(image) {
-      const desiredImage = image.replace(/\s/g, '').toLowerCase();
-      try {
-        if (desiredImage) {
-          // Attempt to load specific image
-          return require('../../assets/states/license-plates/' + desiredImage + '.jpg');
-        }
-        // Default to shield icon if no image provided
-        return require('../../assets/states/license-plates/california.jpg');
-      } catch (error) {
-        // Fallback if image doesn't exist
-        console.warn('Image not found: ' + desiredImage + ', using default shield icon');
-        return require('../../assets/states/license-plates/california.jpg');
-      }
-    },
-  },
+const props = defineProps({
+  config: Object,
+  stateData: Object,
+  zipcode: String,
+});
+
+const svgPath = computed(() => {
+  const stateName = props.stateData.state.replace(/\s/g, '').toLowerCase();
+  return `/assets/states/outlines/${stateName}.svg`;
+});
+
+const getQuotes = () => {
+  const baseUrl = 'https://insure.protect.com';
+  const params = new URLSearchParams({ zipcode: props.zipcode || '' });
+  window.location.href = `${baseUrl}?${params.toString()}`;
+};
+
+const getImage = (image) => {
+  const desiredImage = image.replace(/\s/g, '').toLowerCase();
+  // Return path from public folder
+  return `/assets/states/license-plates/${desiredImage}.jpg`;
 };
 </script>
 

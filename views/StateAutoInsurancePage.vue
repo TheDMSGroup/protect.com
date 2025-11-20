@@ -47,20 +47,20 @@
           </div>
         </div>
       </section>
-      <!-- <insurance-overview :stateData="stateData" /> -->
+      <StatePageComponentsInsuranceOverview :stateData="stateData" />
       <!-- CTA Section -->
       <!-- <cta-section :stateData="stateData" :zipcode="zipcode" /> -->
       <!-- Money Saving Tips Section -->
-      <!-- <money-saving-tips :stateData="stateData" :zipcode="zipcode" /> -->
+       <StatePageComponentsMoneySavingTips :stateData="stateData" :zipcode="zipcode" />
       <!-- Explore CTA Section -->
-      <!-- <jump-links :stateData="stateData" :zipcode="zipcode" /> -->
+      <StatePageComponentsJumpLinks :stateData="stateData" :zipcode="zipcode" />
       <!-- FAQ Section -->
-      <!-- <faq :stateData="stateData" :faq="stateData.faqs ? stateData.faqs : defaultFaqs" /> -->
+      <StatePageComponentsFaq :stateData="stateData" :faq="stateData.faqs ? stateData.faqs : defaultFaqs" />
       <!-- How Protect.com Works Section -->
-      <!-- <how-it-works :stateData="stateData" /> -->
+       <StatePageComponentsHowItWorks :stateData="stateData" :zipcode="zipcode" />
       <!-- Auto Rate Calculator Section -->
       <div class="calculator-section">
-        <!-- <auto-rate-calculator /> -->
+        <AutoRateCalculator :componentProps="{ zipcode: zipcode }" />
       </div>
       <section class="methodology">
         <div class="container">
@@ -1025,7 +1025,7 @@ const defaultFaqs = computed(() => {
     },
     {
       question: `Is ${stateData.state} a fault or no-fault state?`,
-      answer: `${stateData.state} is ${stateData.faultType.toLowerCase()} state. This affects how insurance claimsare handled after an accident.`,
+      answer: `${stateData.state} is ${stateData?.faultType?.toLowerCase()} state. This affects how insurance claimsare handled after an accident.`,
     },
     {
       question: `What factors affect my insurance rates in ${stateData.state}?`,

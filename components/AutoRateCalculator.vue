@@ -254,7 +254,9 @@
             </div> -->
 
             <div class="cta-section">
-              <button class="cta-primary" @click="goToQuote()">Get Official Quote <externalLink/></button>
+              <button class="cta-primary" @click="goToQuote()">Get Official Quote
+                <!-- <externalLink/> -->
+              </button>
               <button class="cta-secondary" @click="resetCalculator">Start Over</button>
             </div>
           </div>
@@ -264,37 +266,33 @@
   </div>
 </template>
 
-<script>
-import externalLink from '../assets/icons/external-link.vue';
-import { redirectWithParams } from '../mixins/utilsMixin';
+<script setup>
+import { ref, computed } from 'vue';
+// import externalLink from '/assets/icons/external-link.vue';
 
-export default {
-  name: 'InsuranceCalculatorWide',
-  components: {
-    externalLink,
+const props = defineProps({
+  componentProps: {
+    type: Object,
+    default: () => ({}),
   },
-  props: {
-    componentProps: {
-      type: Object,
-      default: () => ({}),
-    },
-  },
-  data() {
-    return {
-      multipleVehicles: null,
-      hasIncidents: null,
-      age: null,
-      zipCode: '',
-      creditScore: '',
-      isHomeowner: null,
-      detectedState: '',
-      baseRate: 0,
-      showResults: false,
-      calculatedRate: 0,
-      isCalculating: false,
+});
 
-      // State insurance rates data
-      stateRates: {
+// Reactive data
+const multipleVehicles = ref(null);
+const hasIncidents = ref(null);
+const age = ref(null);
+const zipCode = ref('');
+const creditScore = ref('');
+const isHomeowner = ref(null);
+const detectedState = ref('');
+const baseRate = ref(0);
+const showResults = ref(false);
+const calculatedRate = ref(0);
+const isCalculating = ref(false);
+
+// State insurance rates data
+const stateRates = {
+      base: {
         Alabama: 1739,
         Alaska: 1468,
         Arizona: 1678,
@@ -345,196 +343,198 @@ export default {
         'West Virginia': 1955,
         Wisconsin: 1542,
         Wyoming: 1442,
-      },
-
-      // ZIP code to state mapping
-      zipToState: {
-        '350-369': 'Alabama',
-        '995-999': 'Alaska',
-        '850-865': 'Arizona',
-        '716-729': 'Arkansas',
-        '900-961': 'California',
-        '800-816': 'Colorado',
-        '060-069': 'Connecticut',
-        '197-199': 'Delaware',
-        '320-349': 'Florida',
-        '300-319': 'Georgia',
-        '967-968': 'Hawaii',
-        '832-838': 'Idaho',
-        '600-629': 'Illinois',
-        '460-479': 'Indiana',
-        '500-528': 'Iowa',
-        '660-679': 'Kansas',
-        '400-427': 'Kentucky',
-        '700-714': 'Louisiana',
-        '039-049': 'Maine',
-        '206-219': 'Maryland',
-        '010-027': 'Massachusetts',
-        '480-499': 'Michigan',
-        '550-567': 'Minnesota',
-        '386-397': 'Mississippi',
-        '630-658': 'Missouri',
-        '590-599': 'Montana',
-        '680-693': 'Nebraska',
-        '890-898': 'Nevada',
-        '030-038': 'New Hampshire',
-        '070-089': 'New Jersey',
-        '870-884': 'New Mexico',
-        '100-149': 'New York',
-        '270-289': 'North Carolina',
-        '580-588': 'North Dakota',
-        '430-458': 'Ohio',
-        '730-749': 'Oklahoma',
-        '970-979': 'Oregon',
-        '150-196': 'Pennsylvania',
-        '028-029': 'Rhode Island',
-        '290-299': 'South Carolina',
-        '570-577': 'South Dakota',
-        '370-385': 'Tennessee',
-        '750-799': 'Texas',
-        '840-847': 'Utah',
-        '050-059': 'Vermont',
-        '220-246': 'Virginia',
-        '980-994': 'Washington',
-        '247-268': 'West Virginia',
-        '530-549': 'Wisconsin',
-        '820-831': 'Wyoming',
-      },
+      }
     };
-  },
-  computed: {
-    isFormComplete() {
-      return this.multipleVehicles !== null
-             && this.hasIncidents !== null
-             && this.age > 0
-             && this.zipCode.length === 5
-             && this.creditScore !== ''
-             && this.isHomeowner !== null
-             && this.detectedState !== '';
-    },
 
-    completedQuestions() {
-      let completed = 0;
-      if (this.multipleVehicles !== null) completed++;
-      if (this.hasIncidents !== null) completed++;
-      if (this.age > 0) completed++;
-      if (this.zipCode.length === 5 && this.detectedState) completed++;
-      if (this.creditScore !== '') completed++;
-      if (this.isHomeowner !== null) completed++;
-      return completed;
-    },
+// ZIP code to state mapping
+const zipToState = {
+  '350-369': 'Alabama',
+  '995-999': 'Alaska',
+  '850-865': 'Arizona',
+  '716-729': 'Arkansas',
+  '900-961': 'California',
+  '800-816': 'Colorado',
+  '060-069': 'Connecticut',
+  '197-199': 'Delaware',
+  '320-349': 'Florida',
+  '300-319': 'Georgia',
+  '967-968': 'Hawaii',
+  '832-838': 'Idaho',
+  '600-629': 'Illinois',
+  '460-479': 'Indiana',
+  '500-528': 'Iowa',
+  '660-679': 'Kansas',
+  '400-427': 'Kentucky',
+  '700-714': 'Louisiana',
+  '039-049': 'Maine',
+  '206-219': 'Maryland',
+  '010-027': 'Massachusetts',
+  '480-499': 'Michigan',
+  '550-567': 'Minnesota',
+  '386-397': 'Mississippi',
+  '630-658': 'Missouri',
+  '590-599': 'Montana',
+  '680-693': 'Nebraska',
+  '890-898': 'Nevada',
+  '030-038': 'New Hampshire',
+  '070-089': 'New Jersey',
+  '870-884': 'New Mexico',
+  '100-149': 'New York',
+  '270-289': 'North Carolina',
+  '580-588': 'North Dakota',
+  '430-458': 'Ohio',
+  '730-749': 'Oklahoma',
+  '970-979': 'Oregon',
+  '150-196': 'Pennsylvania',
+  '028-029': 'Rhode Island',
+  '290-299': 'South Carolina',
+  '570-577': 'South Dakota',
+  '370-385': 'Tennessee',
+  '750-799': 'Texas',
+  '840-847': 'Utah',
+  '050-059': 'Vermont',
+  '220-246': 'Virginia',
+  '980-994': 'Washington',
+  '247-268': 'West Virginia',
+  '530-549': 'Wisconsin',
+  '820-831': 'Wyoming',
+};
 
-    progressPercentage() {
-      return (this.completedQuestions / 6) * 100;
-    },
+// Computed properties
+const isFormComplete = computed(() => {
+  return multipleVehicles.value !== null
+    && hasIncidents.value !== null
+    && age.value > 0
+    && zipCode.value.length === 5
+    && creditScore.value !== ''
+    && isHomeowner.value !== null
+    && detectedState.value !== '';
+});
 
-    monthlyRangeLow() {
-      return Math.round((this.calculatedRate - 120) / 12);
-    },
+const completedQuestions = computed(() => {
+  let completed = 0;
+  if (multipleVehicles.value !== null) completed++;
+  if (hasIncidents.value !== null) completed++;
+  if (age.value > 0) completed++;
+  if (zipCode.value.length === 5 && detectedState.value) completed++;
+  if (creditScore.value !== '') completed++;
+  if (isHomeowner.value !== null) completed++;
+  return completed;
+});
 
-    monthlyRangeHigh() {
-      return Math.round((this.calculatedRate + 240) / 12);
-    },
+const progressPercentage = computed(() => {
+  return (completedQuestions.value / 6) * 100;
+});
 
-    annualRangeLow() {
-      return this.calculatedRate - 120;
-    },
+const monthlyRangeLow = computed(() => {
+  return Math.round((calculatedRate.value - 120) / 12);
+});
 
-    annualRangeHigh() {
-      return this.calculatedRate + 240;
-    },
+const monthlyRangeHigh = computed(() => {
+  return Math.round((calculatedRate.value + 240) / 12);
+});
 
-    totalDiscount() {
-      let discount = 0;
-      if (this.multipleVehicles) discount += 0.10;
-      if (this.creditScore === 'excellent') discount += 0.15;
-      if (this.creditScore === 'good') discount += 0.05;
-      if (this.isHomeowner) discount += 0.15;
-      return discount;
-    },
-  },
-  methods: {
-    mapUserInfo() {
-      const info = {
-        zipcode: this.zipCode,
-        homeowner: this.isHomeowner,
-        bundle: this.isHomeowner,
-        second_vehicle: this.multipleVehicles,
-      };
-      Object.keys(this.componentProps).forEach((key) => {
-        info[key] = this.componentProps[key];
-      });
-      return info;
-    },
-    goToQuote() {
-      this.mapUserInfo();
-      redirectWithParams('insure.protect.com', this.mapUserInfo());
-    },
-    detectState() {
-      if (this.zipCode.length >= 3) {
-        const zip3 = this.zipCode.substring(0, 3);
+const annualRangeLow = computed(() => {
+  return calculatedRate.value - 120;
+});
 
-        const foundEntry = Object.entries(this.zipToState).find(([range]) => {
-          const [start, end] = range.split('-').map(Number);
-          const zipNum = parseInt(zip3, 10);
+const annualRangeHigh = computed(() => {
+  return calculatedRate.value + 240;
+});
 
-          return zipNum >= start && zipNum <= end;
-        });
+const totalDiscount = computed(() => {
+  let discount = 0;
+  if (multipleVehicles.value) discount += 0.10;
+  if (creditScore.value === 'excellent') discount += 0.15;
+  if (creditScore.value === 'good') discount += 0.05;
+  if (isHomeowner.value) discount += 0.15;
+  return discount;
+});
 
-        if (foundEntry) {
-          this.detectedState = foundEntry[1];
-          this.baseRate = this.stateRates[foundEntry[1]];
-          return;
-        }
-      }
+// Methods
+const mapUserInfo = () => {
+  const info = {
+    zipcode: zipCode.value,
+    homeowner: isHomeowner.value,
+    bundle: isHomeowner.value,
+    second_vehicle: multipleVehicles.value,
+  };
+  Object.keys(props.componentProps).forEach((key) => {
+    info[key] = props.componentProps[key];
+  });
+  return info;
+};
 
-      if (this.zipCode.length === 5) {
-        this.detectedState = 'National Average';
-        this.baseRate = 1700;
-      }
-    },
+const goToQuote = () => {
+  const info = mapUserInfo();
+  const baseUrl = 'https://insure.protect.com';
+  const params = new URLSearchParams(info);
+  window.location.href = `${baseUrl}?${params.toString()}`;
+};
 
-    async calculateRate() {
-      this.isCalculating = true;
+const detectState = () => {
+  if (zipCode.value.length >= 3) {
+    const zip3 = zipCode.value.substring(0, 3);
 
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+    const foundEntry = Object.entries(zipToState).find(([range]) => {
+      const [start, end] = range.split('-').map(Number);
+      const zipNum = parseInt(zip3, 10);
 
-      let multiplier = 1;
+      return zipNum >= start && zipNum <= end;
+    });
 
-      if (this.multipleVehicles) multiplier -= 0.10;
-      if (this.hasIncidents) multiplier += 0.35;
+    if (foundEntry) {
+      detectedState.value = foundEntry[1];
+      baseRate.value = stateRates[foundEntry[1]];
+      return;
+    }
+  }
 
-      if (this.age < 25) multiplier += 0.40;
-      else if (this.age > 65) multiplier += 0.15;
+  if (zipCode.value.length === 5) {
+    detectedState.value = 'National Average';
+    baseRate.value = 1700;
+  }
+};
 
-      switch (this.creditScore) {
-        case 'excellent': multiplier -= 0.15; break;
-        case 'good': multiplier -= 0.05; break;
-        case 'poor': multiplier += 0.25; break;
-        default: break;
-      }
+const calculateRate = async () => {
+  isCalculating.value = true;
 
-      if (this.isHomeowner) multiplier -= 0.15;
+  await new Promise((resolve) => setTimeout(resolve, 1500));
 
-      this.calculatedRate = Math.round(this.baseRate * multiplier);
-      this.isCalculating = false;
-      this.showResults = true;
-    },
+  let multiplier = 1;
 
-    resetCalculator() {
-      this.multipleVehicles = null;
-      this.hasIncidents = null;
-      this.age = null;
-      this.zipCode = '';
-      this.creditScore = '';
-      this.isHomeowner = null;
-      this.detectedState = '';
-      this.baseRate = 0;
-      this.showResults = false;
-      this.calculatedRate = 0;
-      this.isCalculating = false;
-    },
-  },
+  if (multipleVehicles.value) multiplier -= 0.10;
+  if (hasIncidents.value) multiplier += 0.35;
+
+  if (age.value < 25) multiplier += 0.40;
+  else if (age.value > 65) multiplier += 0.15;
+
+  switch (creditScore.value) {
+    case 'excellent': multiplier -= 0.15; break;
+    case 'good': multiplier -= 0.05; break;
+    case 'poor': multiplier += 0.25; break;
+    default: break;
+  }
+
+  if (isHomeowner.value) multiplier -= 0.15;
+
+  calculatedRate.value = Math.round(baseRate.value * multiplier);
+  isCalculating.value = false;
+  showResults.value = true;
+};
+
+const resetCalculator = () => {
+  multipleVehicles.value = null;
+  hasIncidents.value = null;
+  age.value = null;
+  zipCode.value = '';
+  creditScore.value = '';
+  isHomeowner.value = null;
+  detectedState.value = '';
+  baseRate.value = 0;
+  showResults.value = false;
+  calculatedRate.value = 0;
+  isCalculating.value = false;
 };
 </script>
 

@@ -28,24 +28,18 @@
   </section>
 </template>
 
-<script>
+<script setup>
+const props = defineProps({
+  config: Object,
+  stateData: Object,
+});
 
-export default {
-  name: 'InsuranceOverview',
-  components: {},
-  props: {
-    config: Object,
-    stateData: Object,
-  },
-  methods: {
-    formatCurrency(value) {
-      return new Intl.NumberFormat('en-US', {
-        style: 'currency',
-        currency: 'USD',
-        minimumFractionDigits: 0,
-      }).format(value);
-    },
-  },
+const formatCurrency = (value) => {
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    minimumFractionDigits: 0,
+  }).format(value);
 };
 </script>
 
