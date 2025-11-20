@@ -68,7 +68,11 @@ export default defineEventHandler(async (event) => {
     }
 
     if (subvertical && subvertical !== "") {
-      variables.subvertical = `${subvertical}-insurance`;
+      if (subvertical.endsWith("-insurance")) {
+        variables.subvertical = subvertical;
+      } else {
+        variables.subvertical = `${subvertical}-insurance`;
+      }
     }
 
     console.log("GraphQL Query:", graphqlQuery);

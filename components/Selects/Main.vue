@@ -123,27 +123,6 @@
 </template>
 
 <style lang="scss" scoped>
-  // slide-fade
-  .slide-fade-enter-active {
-    transition: all 0.3s ease;
-  }
-
-  .slide-fade-leave-active {
-    transition: all 0.3s ease;
-  }
-
-  .slide-fade-enter-from,
-  .slide-fade-leave-to {
-    transform: translateY(-6px);
-    opacity: 0;
-  }
-
-  .slide-fade-enter-to,
-  .slide-fade-leave-from {
-    transform: translateY(0);
-    opacity: 1;
-  }
-
   .selects-component {
     width: 100%;
     position: relative;

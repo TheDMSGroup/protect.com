@@ -1,5 +1,6 @@
 <script setup>
   import { paginate } from "~/composables/articles.js";
+  import { useStore } from "@/stores/store.js";
 
   const props = defineProps({
     articlesFeedConfig: {
@@ -25,9 +26,7 @@
     return props.articlesFeedConfig?.vertical || route.params.vertical || route.query.vertical || "insurance";
   });
 
-  const subvertical = computed(() => {
-    return props.articlesFeedConfig?.subvertical || route.params.subvertical || route.query.subvertical || "";
-  });
+  const subvertical = ref(props.articlesFeedConfig?.subvertical || route.params.subvertical || route.query.subvertical || "");
 
   const {
     data: articlesResults,
@@ -45,6 +44,44 @@
   const articles = computed(() => {
     return articlesResults.value?.articles || [];
   });
+
+  //dropdown
+  const store = useStore();
+  const categories = store.articles.categories || [];
+
+  //show tags
+  const showTagsDropdown = ref(false);
+
+  // filter arrow position
+  const selectCategoriesArrowPosition = computed(() => {
+    return showTagsDropdown.value ? "up" : "down";
+  });
+
+  //category output - computed to be reactive to subvertical changes
+  const categoryOutput = computed(() => {
+    if (!subvertical.value) return "";
+    const currentCategory = categories.find((cat) => cat.value === subvertical.value);
+    return currentCategory?.name || "";
+  });
+
+  const toggleTagsDropdown = () => {
+    showTagsDropdown.value = !showTagsDropdown.value;
+  };
+
+  const selectTag = (event) => {
+    const selectedValue = event.target.value || event.target.getAttribute("value");
+    if (selectedValue) {
+      subvertical.value = selectedValue;
+      showTagsDropdown.value = false;
+      // Reset to page 1 when filtering changes
+      page.value = 1;
+    }
+  };
+
+  const resetTags = () => {
+    subvertical.value = "";
+    page.value = 1;
+  };
 
   //static value of how many articles to show per page
   const filterLength = 8;
@@ -112,6 +149,17 @@
     },
     { immediate: true }
   );
+
+  // Watch for route changes and update subvertical accordingly
+  watch(
+    () => [route.params.subvertical, route.query.subvertical],
+    () => {
+      const newSubvertical = props.articlesFeedConfig?.subvertical || route.params.subvertical || route.query.subvertical || "";
+      if (newSubvertical !== subvertical.value) {
+        subvertical.value = newSubvertical;
+      }
+    }
+  );
 </script>
 <template lang="html">
   <div ref="blogFeed" class="blog-feed-wrapper">
@@ -119,7 +167,7 @@
       <div class="upper-header">
         <h2>Articles</h2>
       </div>
-      <div class="results-and-dropdown">
+      <div class="results-and-dropdown mb-3">
         <span>
           <span v-if="articles">Showing results {{ paginationStart + 1 }} to {{ paginationEnd }} of {{ articles.length }}</span>
         </span>
@@ -142,21 +190,38 @@
                 </g>
               </svg>
             </div>
-            <div v-if="showTagsDropdown" class="category-options">
-              <div v-for="category in categories" :key="category.value" :value="category.value" class="category">
-                <label :value="category.value" :for="`tag-select-${category.value}`" @click="selectTag">
-                  {{ category.name }}
-                  <div class="radio-box">
-                    <input :id="`tag-select-${category.value}`" type="radio" :checked="subvertical === category.value" :value="category.value" />
-                  </div>
-                </label>
+            <transition name="slide-fade">
+              <div v-if="showTagsDropdown" class="category-options">
+                <div v-for="category in categories" :key="category.value" :value="category.value" class="category">
+                  <label :value="category.value" :for="`tag-select-${category.value}`" @click="selectTag">
+                    {{ category.name }}
+                    <div class="radio-box">
+                      <input :id="`tag-select-${category.value}`" type="radio" :checked="subvertical === category.value" :value="category.value" />
+                    </div>
+                  </label>
+                </div>
               </div>
-            </div>
+            </transition>
           </div>
         </div>
       </div>
     </div>
     <div class="blog-feed container">
+      <div v-if="subvertical" class="current_tag_text">
+        <h3>Articles in "{{ categoryOutput }}" category</h3>
+
+        <span @click="resetTags">
+          <ButtonsMain
+            class="current_tag_reset"
+            :config="{
+              size: 'sm',
+              variant: 'outline-primary',
+              label: 'View All',
+              click: resetTags,
+            }"
+          />
+        </span>
+      </div>
       <!-- Error and loading states -->
       <div v-if="error" class="alert alert-danger">
         <strong>Error loading articles.</strong>
@@ -278,7 +343,6 @@
 
             @include media-breakpoint-down(xs) {
               width: 100%;
-              margin: 1em 0 0;
             }
 
             .select-header {
@@ -381,7 +445,7 @@
                   position: absolute;
                   right: 10px;
                   height: 44px;
-                  display: flex;
+                  display: none;
                   align-items: center;
                   cursor: initial;
                   top: 0;
@@ -509,6 +573,11 @@
         }
       }
     }
+  }
+  .current_tag_reset {
+    font-size: 0.875rem;
+    margin-top: 0.5em;
+    cursor: pointer;
   }
   .current_tag_text {
     margin-bottom: 2em;
