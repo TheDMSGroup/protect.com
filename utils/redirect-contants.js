@@ -27,19 +27,19 @@ export const stateMapping = {
   MT: "montana",
   NE: "nebraska",
   NV: "nevada",
-  NH: "new-hampshire",
-  NJ: "new-jersey",
-  NM: "new-mexico",
-  NY: "new-york",
-  NC: "north-carolina",
-  ND: "north-dakota",
+  NH: "newhampshire",
+  NJ: "newjersey",
+  NM: "newmexico",
+  NY: "newyork",
+  NC: "northcarolina",
+  ND: "northdakota",
   OH: "ohio",
   OK: "oklahoma",
   OR: "oregon",
   PA: "pennsylvania",
-  RI: "rhode-island",
-  SC: "south-carolina",
-  SD: "south-dakota",
+  RI: "rhodeisland",
+  SC: "southcarolina",
+  SD: "southdakota",
   TN: "tennessee",
   TX: "texas",
   USA: "usa",
@@ -47,10 +47,24 @@ export const stateMapping = {
   VT: "vermont",
   VA: "virginia",
   WA: "washington",
-  WV: "west-virginia",
+  WV: "westvirginia",
   WI: "wisconsin",
   WY: "wyoming",
 };
+
+// Create reverse lookup map for efficient slug validation
+// Maps normalized slugs (without hyphens) to official slugs (with hyphens)
+export const reverseSlugMap = Object.values(stateMapping).reduce((acc, slug) => {
+  const normalized = slug.replace(/-/g, ''); // 'new-york' -> 'newyork'
+  acc[normalized] = slug; // Store: 'newyork' -> 'new-york'
+  return acc;
+}, {});
+
+// Helper function to get official slug from any variant
+export function getOfficialSlug(inputSlug) {
+  const normalized = inputSlug.toLowerCase().replace(/-/g, '');
+  return reverseSlugMap[normalized];
+}
 
 export const redirectRules = [
   { from: "/insurance/auto", to: "/car-insurance", code: 301 },

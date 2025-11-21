@@ -24,11 +24,11 @@
         <div class="hero-provider-rating">
           <span class="reviews-text">Reviews</span>
           <div class="stars">
-            <star-icon font-scale=".9"></star-icon>
-            <star-icon font-scale=".9"></star-icon>
-            <star-icon font-scale=".9"></star-icon>
-            <star-icon font-scale=".9"></star-icon>
-            <star-icon font-scale=".9"></star-icon>
+            <IconsStars font-scale=".9"></IconsStars>
+            <IconsStars font-scale=".9"></IconsStars>
+            <IconsStars font-scale=".9"></IconsStars>
+            <IconsStars font-scale=".9"></IconsStars>
+            <IconsStars font-scale=".9"></IconsStars>
           </div>
         </div>
         <div class="hero-provider-button">
@@ -45,11 +45,11 @@
         <div class="hero-provider-rating">
           <span class="reviews-text">Reviews</span>
           <div class="stars">
-            <star-icon font-scale=".9"></star-icon>
-            <star-icon font-scale=".9"></star-icon>
-            <star-icon font-scale=".9"></star-icon>
-            <star-icon font-scale=".9"></star-icon>
-            <star-icon font-scale=".9"></star-icon>
+            <IconsStars font-scale=".9"></IconsStars>
+            <IconsStars font-scale=".9"></IconsStars>
+            <IconsStars font-scale=".9"></IconsStars>
+            <IconsStars font-scale=".9"></IconsStars>
+            <IconsStars font-scale=".9"></IconsStars>
           </div>
         </div>
         <div class="hero-provider-button">
@@ -66,11 +66,11 @@
         <div class="hero-provider-rating">
           <span class="reviews-text">Reviews</span>
           <div class="stars">
-            <star-icon font-scale=".9"></star-icon>
-            <star-icon font-scale=".9"></star-icon>
-            <star-icon font-scale=".9"></star-icon>
-            <star-icon font-scale=".9"></star-icon>
-            <star-icon font-scale=".9"></star-icon>
+            <IconsStars font-scale=".9"></IconsStars>
+            <IconsStars font-scale=".9"></IconsStars>
+            <IconsStars font-scale=".9"></IconsStars>
+            <IconsStars font-scale=".9"></IconsStars>
+            <IconsStars font-scale=".9"></IconsStars>
           </div>
         </div>
         <div class="hero-provider-button">
@@ -89,17 +89,7 @@ const props = defineProps({
     stateData: Object,
     zipcode: String,
   });
-// import StarIcon from '../../assets/icons/stars.vue';
 // import { redirectWithParams } from '../../mixins/utilsMixin';
-
-// const availableIcons = {
-//   StarIcon,
-// };
-// export default {
-//   name: 'HeroProviderCards',
-//   components: {
-//     ...availableIcons,
-//   },
 
 const svgPath = computed(() => {
   return '/assets/states/outlines/icon-shield.png';
@@ -134,7 +124,7 @@ const svgPath = computed(() => {
     // };
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 
   @import '../../scss/variables';
 
@@ -256,6 +246,9 @@ const svgPath = computed(() => {
         font-size: 0.875rem;
         display: flex;
         gap: 1px;
+        .star-icon {
+          height: 12px;
+        }
       }
 
       .reviews-text {

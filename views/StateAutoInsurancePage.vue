@@ -31,13 +31,13 @@
               <div class="desktop-quote-form">
                 <form @submit.prevent="getQuotes" class="quote-form-inline">
                   <div class="form-row">
-                    <!-- <geo-pin-icon class="left-icon" /> -->
+                    <IconsGeoPin class="left-icon" />
                     <input type="text" v-model="zipcode" placeholder="enter zipcode" class="zipcode-input"
                       maxlength="5">
                     <button type="submit" class="compare-btn">COMPARE QUOTES</button>
                   </div>
                   <p class="form-disclaimer">
-                    <img src="../assets/shield-icon-small.png" alt="shield icon"> No spam, just quotes.
+                    <img src="/assets/shield-icon-small.png" alt="shield icon"> No spam, just quotes.
                   </p>
                 </form>
               </div>
@@ -49,13 +49,13 @@
       </section>
       <StatePageComponentsInsuranceOverview :stateData="stateData" />
       <!-- CTA Section -->
-      <!-- <cta-section :stateData="stateData" :zipcode="zipcode" /> -->
+      <StatePageComponentsCtaSection :stateData="stateData" :zipcode="zipcode" />
       <!-- Money Saving Tips Section -->
        <StatePageComponentsMoneySavingTips :stateData="stateData" :zipcode="zipcode" />
       <!-- Explore CTA Section -->
       <StatePageComponentsJumpLinks :stateData="stateData" :zipcode="zipcode" />
       <!-- FAQ Section -->
-      <StatePageComponentsFaq :stateData="stateData" :faq="stateData.faqs ? stateData.faqs : defaultFaqs" />
+      <Faq :stateData="stateData" :faq="stateData.faqs ? stateData.faqs : defaultFaqs" />
       <!-- How Protect.com Works Section -->
        <StatePageComponentsHowItWorks :stateData="stateData" :zipcode="zipcode" />
       <!-- Auto Rate Calculator Section -->
@@ -1005,7 +1005,17 @@ const loading = computed(() => {
   return !stateInsuranceStats;
 });
 const stateData = computed(() => {
-    const stateStatInfo = stateInsuranceStats.filter((state) => state.state === props.topic)[0];
+  console.log(props.topic);
+    // Normalize both the topic and state names for comparison (remove spaces/hyphens)
+    const normalizedTopic = props.topic.toLowerCase().replace(/[-\s]/g, '');
+    const stateStatInfo = stateInsuranceStats.filter((state) =>
+      state.state.toLowerCase().replace(/[-\s]/g, '') === normalizedTopic
+    )[0];
+
+    if (!stateStatInfo) {
+      return null;
+    }
+
     Object.keys(stateStatInfo)
       .filter((key) => key.includes('Cost'))
       .forEach((key) => {
@@ -1014,21 +1024,24 @@ const stateData = computed(() => {
     return stateStatInfo;
   });
 const defaultFaqs = computed(() => {
+  const state = stateData.value;
+  if (!state) return [];
+
   return [
     {
-      question: `What is the minimum auto insurance required in ${stateData.state}?`,
-      answer: `${stateData.state} requires minimum liability coverage of ${stateData.combinedSplitLimit}. This means ${stateData.bodilyInjuryPerPerson} for bodily injury per person, ${stateData.bodilyInjuryPerAccident} per accident, and ${stateData.propertyDamage} for property damage.`,
+      question: `What is the minimum auto insurance required in ${state.state}?`,
+      answer: `${state.state} requires minimum liability coverage of ${state.combinedSplitLimit}. This means ${state.bodilyInjuryPerPerson} for bodily injury per person, ${state.bodilyInjuryPerAccident} per accident, and ${state.propertyDamage} for property damage.`,
     },
     {
-      question: `How much does auto insurance cost in ${stateData.state}?`,
-      answer: `The average annual cost of auto insurance in ${stateData.state} is ${formatCurrency(stateData.avgAnnualCost)}. However, rates vary significantly based on factors like age, driving record, location, and coverage levels.`,
+      question: `How much does auto insurance cost in ${state.state}?`,
+      answer: `The average annual cost of auto insurance in ${state.state} is ${formatCurrency(state.avgAnnualCost)}. However, rates vary significantly based on factors like age, driving record, location, and coverage levels.`,
     },
     {
-      question: `Is ${stateData.state} a fault or no-fault state?`,
-      answer: `${stateData.state} is ${stateData?.faultType?.toLowerCase()} state. This affects how insurance claimsare handled after an accident.`,
+      question: `Is ${state.state} a fault or no-fault state?`,
+      answer: `${state.state} is ${state?.faultType?.toLowerCase()} state. This affects how insurance claimsare handled after an accident.`,
     },
     {
-      question: `What factors affect my insurance rates in ${stateData.state}?`,
+      question: `What factors affect my insurance rates in ${state.state}?`,
       answer: 'Insurance rates are influenced by your driving record, age, location, vehicle type, credit score, coverage levels, and available discounts. Young drivers typically pay more, while experienced drivers with clean records get better rates.',
     },
     {

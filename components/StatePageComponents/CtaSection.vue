@@ -19,8 +19,8 @@
               <div class="form-group">
                 <label>Ready to see what you can save?</label>
                 <div class="form-row">
-                  <geo-pin-icon class="left-icon" />
-                  <input type="text" v-model="zipcode" placeholder="Zip Code" class="zipcode-input" maxlength="5" />
+                  <IconsGeoPin class="left-icon" />
+                  <input type="text" v-model="localZipcode" placeholder="Zip Code" class="zipcode-input" maxlength="5" />
                   <button @click="getQuotes" class="compare-btn">COMPARE QUOTES</button>
                 </div>
                 <div class="form-disclaimer">
@@ -37,35 +37,45 @@
   </section>
 </template>
 
-<script>
-import { redirectWithParams } from '../../mixins/utilsMixin';
-import GeoPinIcon from '../../assets/icons/geo-pin.vue';
+<script setup>
+import { computed, ref } from 'vue';
 
-export default {
-  name: 'CtaSection',
-  components: {
-    GeoPinIcon,
+const props = defineProps({
+  config: {
+    type: Object,
+    default: () => ({})
   },
-  props: {
-    config: Object,
-    stateData: Object,
-    zipcode: String,
+  stateData: {
+    type: Object,
+    default: () => ({})
   },
-  data() {
-    return {};
-  },
-  computed: {
-    svgPath() {
-      return require('../../assets/states/outlines/icon-shield.png');
-    },
-  },
-  methods: {
-    getQuotes() {
-      if (this.zipcode.length === 5) {
-        redirectWithParams('https://insure.protect.com', { zipcode: this.zipcode });
+  zipcode: {
+    type: String,
+    default: ''
+  }
+});
+
+// Local zipcode ref to handle v-model
+const localZipcode = ref(props.zipcode);
+
+// Watch for prop changes
+watch(() => props.zipcode, (newValue) => {
+  localZipcode.value = newValue;
+});
+
+const svgPath = computed(() => {
+  return '/assets/states/outlines/icon-shield.png';
+});
+
+const getQuotes = () => {
+  if (localZipcode.value.length === 5) {
+    navigateTo(`https://insure.protect.com?zipcode=${localZipcode.value}`, {
+      external: true,
+      open: {
+        target: '_blank'
       }
-    },
-  },
+    });
+  }
 };
 </script>
 
@@ -354,6 +364,7 @@ export default {
     img.cta-icon-inline {
         height: 15px;
         padding-right: 5px;
+        width: auto;
     }
   .left-icon {
     position: absolute;

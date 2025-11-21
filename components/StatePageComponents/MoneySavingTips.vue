@@ -10,7 +10,7 @@
         <div class="tip-card">
           <a :href="getQuotes" target="_blank">
           <div data-v-01e33d74="" class="tip-star-overlay">
-            <!-- <star-icon class="star-icon golden"></star-icon> -->
+            <IconsStars classes="star-icon golden"></IconsStars>
           </div>
           <div class="tip-icon">
             <img :src="getImage('chart-simple-solid-full.svg')" alt="SVG Icon" class="svg-icon" />
@@ -162,7 +162,7 @@ const getImage = (image) => {
 }
 
 .star-icon {
-  width: 100%;
+  width: 36px;
   height: 100%;
   object-fit: contain;
   animation: subtleRotate 2s ease-in-out infinite;

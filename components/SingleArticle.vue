@@ -91,7 +91,7 @@
               </span>
               <span class="divider" v-if="readTime">|</span>
               <span class="read-time" v-if="readTime">
-                <img alt="time" src="../public/clock.jpg" />
+                <img alt="time" src="/assets/clock.jpg" />
                 {{ readTime }}
               </span>
             </span>

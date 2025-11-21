@@ -9,7 +9,11 @@
 
         <div class="cta-right">
           <h3 class="cta-title">What are the best car insurance companies in {{ stateData.stateAbbreviation }}?</h3>
-          <p>
+          <p v-if="stateData.jumpLink">
+            {{ stateData.jumpLink }}
+          </p>
+          <p v-else>
+
             Instead of focusing solely on the cheapest companies, we look at the full picture — offering a balance
             between the most affordable pricing, coverage types, and the provider's reputation. We prioritize providers
             known for exceptional customer service, ensuring you're not just getting a good rate, but reliable support

@@ -255,7 +255,7 @@
 
             <div class="cta-section">
               <button class="cta-primary" @click="goToQuote()">Get Official Quote
-                <!-- <externalLink/> -->
+                <IconsExternalLink/>
               </button>
               <button class="cta-secondary" @click="resetCalculator">Start Over</button>
             </div>
@@ -268,7 +268,6 @@
 
 <script setup>
 import { ref, computed } from 'vue';
-// import externalLink from '/assets/icons/external-link.vue';
 
 const props = defineProps({
   componentProps: {
@@ -292,59 +291,57 @@ const isCalculating = ref(false);
 
 // State insurance rates data
 const stateRates = {
-      base: {
-        Alabama: 1739,
-        Alaska: 1468,
-        Arizona: 1678,
-        Arkansas: 1872,
-        California: 2291,
-        Colorado: 2040,
-        Connecticut: 1905,
-        Delaware: 2137,
-        Florida: 2560,
-        Georgia: 1897,
-        Hawaii: 1336,
-        Idaho: 1272,
-        Illinois: 1501,
-        Indiana: 1442,
-        Iowa: 1390,
-        Kansas: 1718,
-        Kentucky: 2301,
-        Louisiana: 2839,
-        Maine: 1128,
-        Maryland: 1741,
-        Massachusetts: 1626,
-        Michigan: 2639,
-        Minnesota: 1777,
-        Mississippi: 1678,
-        Missouri: 1931,
-        Montana: 1781,
-        Nebraska: 1675,
-        Nevada: 1961,
-        'New Hampshire': 1368,
-        'New Jersey': 1905,
-        'New Mexico': 1649,
-        'New York': 1898,
-        'North Carolina': 1410,
-        'North Dakota': 1442,
-        Ohio: 1354,
-        Oklahoma: 1918,
-        Oregon: 1457,
-        Pennsylvania: 1759,
-        'Rhode Island': 1828,
-        'South Carolina': 1731,
-        'South Dakota': 1441,
-        Tennessee: 1712,
-        Texas: 1990,
-        Utah: 1668,
-        Vermont: 1373,
-        Virginia: 1504,
-        Washington: 1569,
-        'West Virginia': 1955,
-        Wisconsin: 1542,
-        Wyoming: 1442,
-      }
-    };
+  Alabama: 1739,
+  Alaska: 1468,
+  Arizona: 1678,
+  Arkansas: 1872,
+  California: 2291,
+  Colorado: 2040,
+  Connecticut: 1905,
+  Delaware: 2137,
+  Florida: 2560,
+  Georgia: 1897,
+  Hawaii: 1336,
+  Idaho: 1272,
+  Illinois: 1501,
+  Indiana: 1442,
+  Iowa: 1390,
+  Kansas: 1718,
+  Kentucky: 2301,
+  Louisiana: 2839,
+  Maine: 1128,
+  Maryland: 1741,
+  Massachusetts: 1626,
+  Michigan: 2639,
+  Minnesota: 1777,
+  Mississippi: 1678,
+  Missouri: 1931,
+  Montana: 1781,
+  Nebraska: 1675,
+  Nevada: 1961,
+  'New Hampshire': 1368,
+  'New Jersey': 1905,
+  'New Mexico': 1649,
+  'New York': 1898,
+  'North Carolina': 1410,
+  'North Dakota': 1442,
+  Ohio: 1354,
+  Oklahoma: 1918,
+  Oregon: 1457,
+  Pennsylvania: 1759,
+  'Rhode Island': 1828,
+  'South Carolina': 1731,
+  'South Dakota': 1441,
+  Tennessee: 1712,
+  Texas: 1990,
+  Utah: 1668,
+  Vermont: 1373,
+  Virginia: 1504,
+  Washington: 1569,
+  'West Virginia': 1955,
+  Wisconsin: 1542,
+  Wyoming: 1442,
+};
 
 // ZIP code to state mapping
 const zipToState = {
@@ -485,7 +482,7 @@ const detectState = () => {
 
     if (foundEntry) {
       detectedState.value = foundEntry[1];
-      baseRate.value = stateRates[foundEntry[1]];
+      baseRate.value = stateRates[foundEntry[1]] || 1700;
       return;
     }
   }
@@ -573,12 +570,19 @@ const resetCalculator = () => {
 /* Progress */
 .progress-bar {
   position: relative;
-  height: 6px;
-  background: #f1f5f9;
+  height: 30px;
+  background: transparent;
+  display: flex;
+  align-items: center;
 }
 
 .progress-fill {
-  height: 100%;
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 6px;
+  width: 0;
   background: linear-gradient(90deg, #00d4aa, #667eea);
   transition: width 0.4s ease;
 }
@@ -586,16 +590,18 @@ const resetCalculator = () => {
 .progress-text {
   position: absolute;
   top: 50%;
-  right: 16px;
   transform: translateY(-50%);
+  right: 16px;
   font-size: 0.8rem;
   font-weight: 600;
   color: #64748b;
   background: #f9f9f9;
   border: 1px solid #667eea;
-  padding: 2px 6px;
+  padding: 4px 8px;
   border-radius: 4px;
   box-shadow: 0 2px 8px rgba(102, 126, 234, 0.10);
+  line-height: 1.2;
+  white-space: nowrap;
 }
 
 /* Layout */
