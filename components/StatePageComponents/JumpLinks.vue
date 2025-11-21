@@ -61,7 +61,7 @@
           </div> -->
         </div>
       </div>
-      <div class="bottom-cta-bar" @click="getQuotes">
+      <div class="bottom-cta-bar" @click="getQuotes" role="button" tabindex="0" @keydown.enter="getQuotes" @keydown.space.prevent="getQuotes" :aria-label="`Compare and save on car insurance in ${stateData.state}`">
         <div class="bottom-cta-content">
           <div class="circular-container">
             <div class="circle-background">

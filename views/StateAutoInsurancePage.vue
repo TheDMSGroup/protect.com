@@ -70,11 +70,14 @@
           <div>
             <p>Minimum car insurance rates by state provided by <a
                 href="https://finance.yahoo.com/personal-finance/insurance/article/state-minimum-car-insurance-233457321.html"
-                target="_blank">Yahoo Finance</a>. Average full coverage car insurance rates
+                target="_blank"
+                rel="noopener noreferrer">Yahoo Finance</a>. Average full coverage car insurance rates
               by state provided by <a href="https://www.bankrate.com/insurance/car/states/"
-                target="_blank">Bankrate</a>. National average car insurance costs by age provided by <a
+                target="_blank"
+                rel="noopener noreferrer">Bankrate</a>. National average car insurance costs by age provided by <a
                 href="https://wallethub.com/edu/ci/average-car-insurance-rates-by-age/69321"
-                target="_blank">WalletHub</a>.</p>
+                target="_blank"
+                rel="noopener noreferrer">WalletHub</a>.</p>
             <p>Car insurance rates vary by geographic region, number of drivers, vehicles, driving record, and many
               other factors. For the purposes of this site and the rates you see, the standard profile has been applied:
             </p>
@@ -1005,24 +1008,31 @@ const loading = computed(() => {
   return !stateInsuranceStats;
 });
 const stateData = computed(() => {
+  if (!props.topic) {
+    return null;
+  }
+
   console.log(props.topic);
-    // Normalize both the topic and state names for comparison (remove spaces/hyphens)
-    const normalizedTopic = props.topic.toLowerCase().replace(/[-\s]/g, '');
-    const stateStatInfo = stateInsuranceStats.filter((state) =>
-      state.state.toLowerCase().replace(/[-\s]/g, '') === normalizedTopic
-    )[0];
+  console.log('props?', props);
+  const normalizedTopic = props.topic.toLowerCase().replace(/[-\s]/g, '');
+  const stateStatInfo = stateInsuranceStats.filter((state) =>
+    state.state.toLowerCase().replace(/[-\s]/g, '') === normalizedTopic
+  )[0];
 
-    if (!stateStatInfo) {
-      return null;
-    }
+  if (!stateStatInfo) {
+    return null;
+  }
 
-    Object.keys(stateStatInfo)
-      .filter((key) => key.includes('Cost'))
-      .forEach((key) => {
-        stateStatInfo[key] = parseCurrency(stateStatInfo[key]);
-      });
-    return stateStatInfo;
-  });
+  Object.keys(stateStatInfo)
+    .filter((key) => key.includes('Cost'))
+    .forEach((key) => {
+      stateStatInfo[key] = parseCurrency(stateStatInfo[key]);
+    });
+  return stateStatInfo;
+});
+
+
+
 const defaultFaqs = computed(() => {
   const state = stateData.value;
   if (!state) return [];

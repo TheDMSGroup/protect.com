@@ -14,7 +14,7 @@
     <link rel="preload" href="/assets/geico-logo.png" as="image" type="image/png">
     <link rel="preload" href="/assets/statefarm-logo.png" as="image" type="image/png">
 
-    <div class="provider-cards-stack hero-provider-stack" @click="goTo">
+    <div class="provider-cards-stack hero-provider-stack" @click="goTo" role="button" tabindex="0" @keydown.enter="goTo" @keydown.space.prevent="goTo" aria-label="Get insurance quotes from top providers">
       <div class="provider-card hero-provider-card" :style="{ animationDelay: '.2s' }">
         <div class="hero-provider-logo">
           <img src="/assets/progressive-logo.png" alt="Progressive" class="provider-logo-img"
