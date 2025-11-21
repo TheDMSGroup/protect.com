@@ -10,6 +10,24 @@ export const useStore = defineStore("store", {
       apiUrl: "https://us-west-2.cdn.hygraph.com/content/ckwzg7tk528a001z4e7z0bqi0/master",
       domain: "protectCom",
       articleType: "article",
+      categories: [
+        {
+          name: "Car Insurance",
+          value: "auto-insurance",
+        },
+        {
+          name: "Health Insurance",
+          value: "health-insurance",
+        },
+        {
+          name: "Home Insurance",
+          value: "home-insurance",
+        },
+        {
+          name: "Medicare",
+          value: "medicare",
+        },
+      ],
     },
     visitorInfo: {
       zip: "",

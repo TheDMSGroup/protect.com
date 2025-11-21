@@ -5,22 +5,28 @@ export default defineNuxtConfig({
   modules: ["@nuxtjs/sitemap", "@bootstrap-vue-next/nuxt", "@nuxt/image", "@pinia/nuxt", "@nuxt/eslint"],
   app: {
     head: {
-      htmlAttrs: {
-        lang: 'en'
-      },
-      title: "Protect.com - Compare Car Insurance Quotes",
+      viewport: "width=device-width, initial-scale=1",
+      charset: "utf-8",
+      title: "Compare Insurance Quotes For Auto, Home & Health | Protect.com",
       meta: [
-        { charset: "utf-8" },
-        { name: "viewport", content: "width=device-width, initial-scale=1" },
         {
           name: "description",
-          content: "Find the best car insurance rates in your area. Compare quotes from top providers and save on auto insurance."
+          content: "Compare car, home, renters, and health insurance quotes from top providers. Save money with Protect.com's free comparison tool.",
         },
+        {
+          name: "keywords",
+          content:
+            "car insurance, auto insurance, home insurance, renters insurance, health insurance, compare insurance quotes, insurance providers, save on insurance",
+        },
+        { name: "author", content: "Protect.com" },
+        { property: "og:type", content: "website" },
+        { property: "og:url", content: "https://protect.com/" },
+        { property: "og:site_name", content: "Protect.com" },
+        { property: "og:image", content: "https://stage.protect.com/img/protect-share.dabdad17.jpg" },
+        { name: "twitter:card", content: "summary_large_image" },
+        { name: "twitter:creator", content: "@ProtectDotCom" },
       ],
-      link: [
-        { rel: "icon", type: "image/x-icon", href: "/favicon.ico" }
-      ]
-    }
+    },
   },
   runtimeConfig: {
     // Private keys (only available on server-side)

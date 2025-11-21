@@ -93,7 +93,7 @@
       headline="Explore new policy options"
       subheadline="Discover how much you could save with Protect. "
       image="pet-family.png"
-      :action="action"
+      :action="zipcodeUrl"
     />
 
     <BlogFeed :show-categories="false" vertical="insurance" :sub-verticals="['home-insurance']" />
