@@ -23,6 +23,10 @@ export const useStore = defineStore("store", {
           name: "Home Insurance",
           value: "home-insurance",
         },
+        {
+          name: "Medicare",
+          value: "medicare",
+        },
       ],
     },
     _stateValueMapCache: null, // Private cache

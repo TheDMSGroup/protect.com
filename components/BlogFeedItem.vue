@@ -1,29 +1,19 @@
 <script setup>
-import { defineProps } from "vue";
+  const props = defineProps({
+    article: {
+      type: Object,
+      required: true,
+    },
+  });
 
-const props = defineProps({
-  article: Object,
-  required: true,
-});
+  const { urlSlug, coverImage, title, excerpt } = props.article;
 
-const { urlSlug, coverImage, title, excerpt, ...metaData } = props.article;
-
-const imageUrl = coverImage?.url;
+  const imageUrl = coverImage?.url;
 </script>
 
 <template lang="html">
   <div class="blog-feed-item col-lg-3 col-md-6 col-sm-12">
-    <NuxtLink
-      :to="{
-        name: 'article-slug',
-        params: {
-          slug: urlSlug,
-          domain: 'protectCom',
-          vertical: metaData.vertical,
-          subvertical: metaData.subvertical,
-        },
-      }"
-    >
+    <NuxtLink :to="`/article/${urlSlug}`">
       <div class="col-md-12 article-image">
         <img :src="imageUrl" />
       </div>
@@ -58,77 +48,77 @@ export default {
 </script> -->
 
 <style lang="scss" scoped>
-.blog-feed-item {
-  margin-bottom: 15px;
-  padding-right: 15px;
-  background: #fff;
-  display: block;
+  .blog-feed-item {
+    margin-bottom: 15px;
+    padding-right: 15px;
+    background: #fff;
+    display: block;
 
-  @include media-breakpoint-down(sm) {
+    @include media-breakpoint-down(sm) {
+      &:nth-child(1n) {
+        padding: 1em;
+      }
+
+      &:nth-child(4n) {
+        padding: 1em;
+      }
+    }
+
     &:nth-child(1n) {
-      padding: 1em;
+      padding-left: 0;
+
+      @include media-breakpoint-down(sm) {
+        padding: 1em;
+      }
     }
 
     &:nth-child(4n) {
-      padding: 1em;
+      padding-right: 0;
+
+      @include media-breakpoint-down(sm) {
+        padding: 1em;
+      }
     }
-  }
 
-  &:nth-child(1n) {
-    padding-left: 0;
-
-    @include media-breakpoint-down(sm) {
-      padding: 1em;
-    }
-  }
-
-  &:nth-child(4n) {
-    padding-right: 0;
-
-    @include media-breakpoint-down(sm) {
-      padding: 1em;
-    }
-  }
-
-  .article-image {
-    padding: 0;
-    display: -webkit-box;
-    display: -ms-flexbox;
-    display: flex;
-    background-color: #ddd;
-    height: 200px;
-
-    a {
+    .article-image {
       padding: 0;
       display: -webkit-box;
       display: -ms-flexbox;
       display: flex;
-      width: 100%;
+      background-color: #ddd;
+      height: 200px;
 
-      img {
+      a {
+        padding: 0;
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
         width: 100%;
-        object-fit: cover;
-        max-height: 300px;
+
+        img {
+          width: 100%;
+          object-fit: cover;
+          max-height: 300px;
+        }
+      }
+    }
+    .article-body {
+      padding: 15px 0;
+
+      h3 {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: $gray-dark;
+      }
+
+      p {
+        font-size: 1em;
+      }
+
+      .continue-reading {
+        color: $green;
+        border-bottom: 2px solid $green;
       }
     }
   }
-  .article-body {
-    padding: 15px 0;
-
-    h3 {
-      font-size: 1.5rem;
-      font-weight: 600;
-      color: $gray-dark;
-    }
-
-    p {
-      font-size: 1em;
-    }
-
-    .continue-reading {
-      color: $green;
-      border-bottom: 2px solid $green;
-    }
-  }
-}
 </style>

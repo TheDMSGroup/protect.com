@@ -3,51 +3,29 @@
   import { useStore } from "@/stores/store.js";
 
   const props = defineProps({
-    articlesFeedConfig: {
-      type: Object,
-      required: false,
-      default: () => ({}),
+    articles: {
+      type: Array,
+      required: true,
+    },
+    vertical: {
+      type: String,
+      default: "",
+    },
+    subvertical: {
+      type: String,
+      default: "",
     },
   });
+
+  console.log(props.subvertical);
 
   // Use route parameters to watch for navigation changes
   const route = useRoute();
 
-  // Create computed properties that gracefully handle both props and route params
-  const domain = computed(() => {
-    return props.articlesFeedConfig?.domain || route.query.domain || '"protectCom"';
-  });
-
-  const articleType = computed(() => {
-    return props.articlesFeedConfig?.articleType || route.query.articleType || "article";
-  });
-
-  const vertical = computed(() => {
-    return props.articlesFeedConfig?.vertical || route.params.vertical || route.query.vertical || "insurance";
-  });
-
-  const subvertical = ref(props.articlesFeedConfig?.subvertical || route.params.subvertical || route.query.subvertical || "");
-
-  const {
-    data: articlesResults,
-    pending,
-    error,
-  } = await useAsyncData(
-    "articles",
-    () => $fetch(`/api/articles?domain=${domain.value}&articleType=${articleType.value}&vertical=${vertical.value}&subvertical=${subvertical.value}`),
-    {
-      watch: [() => domain.value, () => articleType.value, () => vertical.value, () => subvertical.value, () => route.fullPath],
-    }
-  );
-
-  // Create a computed that reactively gets articles from the API response
-  const articles = computed(() => {
-    return articlesResults.value?.articles || [];
-  });
-
   //dropdown
   const store = useStore();
   const categories = store.articles.categories || [];
+  const userFilterSelectionSubvertical = ref("");
 
   //show tags
   const showTagsDropdown = ref(false);
@@ -59,8 +37,8 @@
 
   //category output - computed to be reactive to subvertical changes
   const categoryOutput = computed(() => {
-    if (!subvertical.value) return "";
-    const currentCategory = categories.find((cat) => cat.value === subvertical.value);
+    if (!props.subvertical) return "";
+    const currentCategory = categories.find((cat) => cat.value === props.subvertical);
     return currentCategory?.name || "";
   });
 
@@ -68,19 +46,12 @@
     showTagsDropdown.value = !showTagsDropdown.value;
   };
 
-  const selectTag = (event) => {
-    const selectedValue = event.target.value || event.target.getAttribute("value");
-    if (selectedValue) {
-      subvertical.value = selectedValue;
-      showTagsDropdown.value = false;
-      // Reset to page 1 when filtering changes
-      page.value = 1;
-    }
-  };
-
-  const resetTags = () => {
-    subvertical.value = "";
+  const resetTags = async () => {
+    userFilterSelectionSubvertical.value = "";
     page.value = 1;
+
+    // Navigate back to articles-vertical route
+    await navigateTo({ path: `/articles/${props.vertical}`, params: { vertical: props.vertical } }, { replace: true });
   };
 
   //static value of how many articles to show per page
@@ -98,15 +69,15 @@
   //calculate end based off of start plus filter length, but not exceeding total articles
   const paginationEnd = computed(() => {
     const end = paginationStart.value + filterLength;
-    return end > articles.value.length ? articles.value.length : end;
+    return end > props.articles.length ? props.articles.length : end;
   });
 
   //calculate the amount of pages needed for pagination
   //use Math.ceil to round up to the nearest whole number
   //ex: 37 articles with filterLength 8 would need 5 pages (37/5=4.625 rounded up to 5)
   const paginationPagesCount = computed(() => {
-    if (articles.value && filterLength) {
-      return Math.ceil(articles.value.length / filterLength);
+    if (props.articles && filterLength) {
+      return Math.ceil(props.articles.length / filterLength);
     }
     return 0;
   });
@@ -114,12 +85,8 @@
   // Compute the current articles to display based on pagination
   // Composable paginate takes (items, startIndex, endIndex)
   const currentArticles = computed(() => {
-    return paginate(articles.value, paginationStart.value, paginationStart.value + filterLength);
+    return paginate(props.articles, paginationStart.value, paginationStart.value + filterLength);
   });
-
-  // Create extended pending state to prevent flashing
-  const extendedPending = ref(false);
-  const minLoadingTime = 800; // milliseconds
 
   // Kick off reactivity by updating the pagination page
   // This comes from the emitted event in the PaginationNav component
@@ -133,31 +100,12 @@
   // keep ref to blog feed for scrolling
   const blogFeed = useTemplateRef("blogFeed");
 
-  // Watch for pending state changes
+  // Clear user filter selection when route changes
   watch(
-    pending,
-    (isPending) => {
-      if (isPending) {
-        // Start loading immediately
-        extendedPending.value = true;
-      } else {
-        // Delay hiding loading state
-        setTimeout(() => {
-          extendedPending.value = false;
-        }, minLoadingTime);
-      }
-    },
-    { immediate: true }
-  );
-
-  // Watch for route changes and update subvertical accordingly
-  watch(
-    () => [route.params.subvertical, route.query.subvertical],
+    () => route.fullPath,
     () => {
-      const newSubvertical = props.articlesFeedConfig?.subvertical || route.params.subvertical || route.query.subvertical || "";
-      if (newSubvertical !== subvertical.value) {
-        subvertical.value = newSubvertical;
-      }
+      paginationStart.value = 0;
+      userFilterSelectionSubvertical.value = "";
     }
   );
 </script>
@@ -169,7 +117,7 @@
       </div>
       <div class="results-and-dropdown mb-3">
         <span>
-          <span v-if="articles">Showing results {{ paginationStart + 1 }} to {{ paginationEnd }} of {{ articles.length }}</span>
+          <span v-if="props.articles">Showing results {{ paginationStart + 1 }} to {{ paginationEnd }} of {{ props.articles.length }}</span>
         </span>
         <div class="right-dropdown">
           <div class="select-wrapper">
@@ -193,12 +141,7 @@
             <transition name="slide-fade">
               <div v-if="showTagsDropdown" class="category-options">
                 <div v-for="category in categories" :key="category.value" :value="category.value" class="category">
-                  <label :value="category.value" :for="`tag-select-${category.value}`" @click="selectTag">
-                    {{ category.name }}
-                    <div class="radio-box">
-                      <input :id="`tag-select-${category.value}`" type="radio" :checked="subvertical === category.value" :value="category.value" />
-                    </div>
-                  </label>
+                  <NuxtLink class="category-link" :to="`/articles/${vertical}/${category.value}`">{{ category.name }}</NuxtLink>
                 </div>
               </div>
             </transition>
@@ -211,31 +154,13 @@
         <h3>Articles in "{{ categoryOutput }}" category</h3>
 
         <span @click="resetTags">
-          <ButtonsMain
-            class="current_tag_reset"
-            :config="{
-              size: 'sm',
-              variant: 'outline-primary',
-              label: 'View All',
-              click: resetTags,
-            }"
-          />
+          <NuxtLink class="view-all-link" :to="`/articles/${props.vertical}`">View All</NuxtLink>
         </span>
       </div>
-      <!-- Error and loading states -->
-      <div v-if="error" class="alert alert-danger">
-        <strong>Error loading articles.</strong>
-        <div v-if="error.statusMessage">{{ error.statusMessage }}</div>
-        <div v-else>{{ error.message || String(error) }}</div>
-      </div>
-
-      <div v-else-if="extendedPending" class="loading">
-        <LoadingSkeletonArticleGrid />
-      </div>
-      <div v-else-if="currentArticles && currentArticles.length > 0" class="feed-list">
+      <div v-if="currentArticles && currentArticles.length > 0" class="feed-list">
         <BlogFeedItem v-for="article in currentArticles" :key="article.id" :article="article" />
       </div>
-      <div v-else-if="articles && articles.length === 0" class="no-results">No articles found.</div>
+      <div v-else-if="props.articles && props.articles.length === 0" class="no-results">No articles found.</div>
 
       <div v-if="paginationPagesCount > 1" class="pagination row">
         <PaginationNav :total-pages="paginationPagesCount" :current-page="page" @navigate:page="updatePages" />
@@ -544,6 +469,14 @@
       padding: 0;
       margin-bottom: 50px;
 
+      .view-all-link {
+        padding: 10px;
+        border: 1px solid $blue-light;
+        color: $blue-light;
+        font-weight: 600;
+        border-radius: 4px;
+      }
+
       .results-list {
         display: flex;
         flex-wrap: wrap;
@@ -591,6 +524,19 @@
       margin-bottom: 15px;
     }
     a {
+      color: $blue;
+    }
+  }
+
+  .category-link {
+    cursor: pointer;
+    color: $blue-light;
+    display: block;
+    padding: 10px 0;
+    width: 100%;
+
+    &:hover {
+      background-color: #f8f9fa;
       color: $blue;
     }
   }
