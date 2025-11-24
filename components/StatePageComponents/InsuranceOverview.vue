@@ -15,7 +15,7 @@
           <div class="stat-value success">{{ formatCurrency(stateData.avgMonthlyCost) }}</div>
           <div class="stat-label">Monthly Minimum</div>
         </div>
-        <div class="overview-stat">
+        <div class="overview-stat" v-if="stateData.faultType">
           <div class="stat-value">{{ stateData.faultType }}</div>
           <div class="stat-label">State Type</div>
         </div>
@@ -28,24 +28,18 @@
   </section>
 </template>
 
-<script>
+<script setup>
+const props = defineProps({
+  config: Object,
+  stateData: Object,
+});
 
-export default {
-  name: 'InsuranceOverview',
-  components: {},
-  props: {
-    config: Object,
-    stateData: Object,
-  },
-  methods: {
-    formatCurrency(value) {
-      return new Intl.NumberFormat('en-US', {
-        style: 'currency',
-        currency: 'USD',
-        minimumFractionDigits: 0,
-      }).format(value);
-    },
-  },
+const formatCurrency = (value) => {
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    minimumFractionDigits: 0,
+  }).format(value);
 };
 </script>
 
@@ -59,12 +53,18 @@ export default {
 
   .overview-grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: var(--spacing-2xl);
 
     @include mobile {
       grid-template-columns: repeat(2, 1fr);
       gap: var(--spacing-lg);
+
+      .overview-stat:nth-last-child(1):nth-child(odd) {
+        grid-column: 1 / -1;
+        justify-self: center;
+        min-width: 200px;
+      }
     }
   }
 

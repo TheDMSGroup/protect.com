@@ -54,7 +54,7 @@
     </b-container>
 
     <b-container>
-      <FAQ :faq="seoFaq" />
+      <Faq :faq="seoFaq" />
     </b-container>
   </div>
 </template>

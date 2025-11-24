@@ -10,7 +10,7 @@
         <div class="tip-card">
           <a :href="getQuotes" target="_blank">
           <div data-v-01e33d74="" class="tip-star-overlay">
-            <star-icon class="star-icon golden"></star-icon>
+            <IconsStars classes="star-icon golden"></IconsStars>
           </div>
           <div class="tip-icon">
             <img :src="getImage('chart-simple-solid-full.svg')" alt="SVG Icon" class="svg-icon" />
@@ -66,46 +66,27 @@
   </section>
 </template>
 
-<script>
-import StarIcon from '../../assets/icons/stars.vue';
-import { generateRedirectUrl } from '../../mixins/utilsMixin';
+<script setup>
+import { computed } from 'vue';
+// import StarIcon from '/assets/icons/stars.vue';
 
-export default {
-  name: 'MoneySavingTips',
-  components: {
-    StarIcon,
-  },
-  props: {
-    config: Object,
-    stateData: Object,
-    zipcode: String,
-  },
-  data() {
-    return {};
-  },
-  computed: {
-    getQuotes() {
-      console.log('zip', this.zipcode);
-      return generateRedirectUrl('https://insure.protect.com', { zipcode: this.zipcode });
-    },
-  },
-  methods: {
-    getImage(image) {
-      const desiredImage = image.replace(/\s/g, '').toLowerCase();
-      try {
-        if (desiredImage) {
-          // Attempt to load specific image
-          return require('../../assets/' + desiredImage);
-        }
-        // Default to shield icon if no image provided
-        return require('../../assets/states/license-plates/california.jpg');
-      } catch (error) {
-        // Fallback if image doesn't exist
-        console.warn('Image not found: ' + desiredImage + ', using default shield icon');
-        return require('../../assets/states/license-plates/california.jpg');
-      }
-    },
-  },
+const props = defineProps({
+  config: Object,
+  stateData: Object,
+  zipcode: String,
+});
+
+const getQuotes = computed(() => {
+  console.log('zip', props.zipcode);
+  const baseUrl = 'https://insure.protect.com';
+  const params = new URLSearchParams({ zipcode: props.zipcode || '' });
+  return `${baseUrl}?${params.toString()}`;
+});
+
+const getImage = (image) => {
+  const desiredImage = image.replace(/\s/g, '').toLowerCase();
+  // In Nuxt 3, assets should be in the public folder or imported
+  return `/assets/${desiredImage}`;
 };
 </script>
 
@@ -181,7 +162,7 @@ export default {
 }
 
 .star-icon {
-  width: 100%;
+  width: 36px;
   height: 100%;
   object-fit: contain;
   animation: subtleRotate 2s ease-in-out infinite;
