@@ -139,6 +139,7 @@
     if (multipleVehicles.value !== null) completed++;
     if (hasIncidents.value !== null) completed++;
     if (age.value > 0) completed++;
+    console.log(zipCode.value.length, detectedState.value);
     if (zipCode.value.length === 5 && detectedState.value) completed++;
     if (creditScore.value !== "") completed++;
     if (isHomeowner.value !== null) completed++;
@@ -246,6 +247,10 @@
     calculatedRate.value = Math.round(baseRate.value * multiplier);
     isCalculating.value = false;
     showResults.value = true;
+    sendEngagementToGa("auto_rate_calculator_complete", {
+      calculatedRate: calculatedRate.value,
+      state: detectedState.value,
+    });
   };
 
   const resetCalculator = () => {
@@ -260,6 +265,36 @@
     showResults.value = false;
     calculatedRate.value = 0;
     isCalculating.value = false;
+  };
+
+  const handleInput = (variableName, value) => {
+    // Create a map of variable names to their refs
+    const variableMap = {
+      multipleVehicles,
+      hasIncidents,
+      isHomeowner,
+      age,
+      zipCode,
+      creditScore,
+    };
+    // Dynamically set the value if the variable exists
+    if (variableMap[variableName]) {
+      console.log("Setting", variableName, "to", value);
+      variableMap[variableName].value = value;
+    }
+
+    sendEngagementToGa("auto_rate_calculator_interaction", {
+      variable: variableName,
+      value: value,
+    });
+  };
+  const sendEngagementToGa = (eventType, eventPayload) => {
+    const { proxy } = useScriptGoogleTagManager();
+    proxy.dataLayer.push({
+      event: eventType,
+      ...eventPayload,
+    });
+    console.log("GA Event Sent:", eventType, eventPayload, proxy.dataLayer);
   };
 
   useHead({
@@ -300,8 +335,8 @@
                 Multiple vehicles?
               </label>
               <div class="toggle-group">
-                <button class="toggle-btn" :class="{ active: multipleVehicles === true }" @click="multipleVehicles = true">Yes</button>
-                <button class="toggle-btn" :class="{ active: multipleVehicles === false }" @click="multipleVehicles = false">No</button>
+                <button class="toggle-btn" :class="{ active: multipleVehicles === true }" @click="handleInput('multipleVehicles', true)">Yes</button>
+                <button class="toggle-btn" :class="{ active: multipleVehicles === false }" @click="handleInput('multipleVehicles', false)">No</button>
               </div>
             </div>
 
@@ -311,8 +346,8 @@
                 Any incidents (3 years)?
               </label>
               <div class="toggle-group">
-                <button class="toggle-btn" :class="{ active: hasIncidents === true }" @click="hasIncidents = true">Yes</button>
-                <button class="toggle-btn" :class="{ active: hasIncidents === false }" @click="hasIncidents = false">No</button>
+                <button class="toggle-btn" :class="{ active: hasIncidents === true }" @click="handleInput('hasIncidents', true)">Yes</button>
+                <button class="toggle-btn" :class="{ active: hasIncidents === false }" @click="handleInput('hasIncidents', false)">No</button>
               </div>
             </div>
           </div>
@@ -324,7 +359,16 @@
                 <span class="question-number">3</span>
                 Your age
               </label>
-              <input id="age-input" v-model.number="age" type="number" class="compact-input" placeholder="Enter your age" min="16" max="100" />
+              <input
+                id="age-input"
+                v-model.number="age"
+                type="number"
+                class="compact-input"
+                placeholder="Enter your age"
+                min="16"
+                max="100"
+                @blur="handleInput('age', age)"
+              />
             </div>
 
             <div class="question-block">
@@ -340,7 +384,10 @@
                   class="compact-input"
                   placeholder="Enter zip code"
                   maxlength="5"
-                  @input="detectState"
+                  @input="
+                    detectState();
+                    handleInput('zipCode', zipCode);
+                  "
                 />
                 <span v-if="detectedState" class="state-indicator">{{ detectedState }}</span>
               </div>
@@ -354,7 +401,7 @@
                 <span class="question-number">5</span>
                 Credit score range
               </label>
-              <select id="credit-select" v-model="creditScore" class="compact-select">
+              <select id="credit-select" v-model="creditScore" class="compact-select" @change="handleInput('creditScore', creditScore)">
                 <option value="">Select range</option>
                 <option value="excellent">Excellent (750+)</option>
                 <option value="good">Good (700-749)</option>
@@ -369,8 +416,8 @@
                 Are you a homeowner?
               </label>
               <div class="toggle-group">
-                <button class="toggle-btn" :class="{ active: isHomeowner === true }" @click="isHomeowner = true">Yes</button>
-                <button class="toggle-btn" :class="{ active: isHomeowner === false }" @click="isHomeowner = false">No</button>
+                <button class="toggle-btn" :class="{ active: isHomeowner === true }" @click="handleInput('isHomeowner', true)">Yes</button>
+                <button class="toggle-btn" :class="{ active: isHomeowner === false }" @click="handleInput('isHomeowner', false)">No</button>
               </div>
             </div>
           </div>
