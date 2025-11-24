@@ -8,6 +8,11 @@ export default defineEventHandler(async (event) => {
   if (!path.includes("car-insurance") && !path.startsWith("/insurance/") && path !== "/car-insurance/") {
     return;
   }
+  // Skip state validation for specific car-insurance sub-routes
+  if (path.startsWith("/car-insurance/rate-calculator")) {
+    return;
+  }
+
   // Handle car insurance state code redirects
   const pathStateCode = path.split("/")[2];
   if (path.includes("car-insurance") && pathStateCode) {
