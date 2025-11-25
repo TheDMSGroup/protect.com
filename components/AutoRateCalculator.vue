@@ -188,6 +188,7 @@
 
   const goToQuote = () => {
     mapUserInfo();
+    sendEngagementToGa("auto_rate_calculator_conversion");
     redirectWithParams("insure.protect.com", mapUserInfo());
   };
 
@@ -265,6 +266,8 @@
     showResults.value = false;
     calculatedRate.value = 0;
     isCalculating.value = false;
+
+    sendEngagementToGa("auto_rate_calculator_reset");
   };
 
   const handleInput = (variableName, value) => {
