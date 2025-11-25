@@ -120,3 +120,5 @@ For development questions or issues, refer to:
 - [Nuxt 3 Documentation](https://nuxt.com/docs)
 - [Bootstrap Vue Next Documentation](https://bootstrap-vue-next.github.io/bootstrap-vue-next/)
 - [Vue 3 Documentation](https://vuejs.org/)
+
+
