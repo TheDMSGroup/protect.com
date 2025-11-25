@@ -36,8 +36,10 @@
     </div>
     <div class="blog-article container">
       <div class="row">
-        <div class="col-lg-3 col-md-3 sidebar" />
-        <div class="col-lg-9 col-md-12">
+        <div class="col-lg-4 col-md-3 sidebar">
+          <ArticlesContentLinks :article-content="content" />
+        </div>
+        <div class="col-lg-8 col-md-12">
           <h1 class="article-title">{{ title }}</h1>
           <div v-if="excerpt && excerpt.length > 0" class="snippet">
             {{ excerpt }}
@@ -122,7 +124,7 @@
             </div> -->
             </div>
 
-            <div class="article-sidebar">
+            <div class="col-lg-3 col-md-3 article-sidebar">
               <div class="sidebar-section">
                 <span>Latest Articles</span>
                 <ul class="recent-articles">

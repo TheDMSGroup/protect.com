@@ -282,7 +282,6 @@
     };
     // Dynamically set the value if the variable exists
     if (variableMap[variableName]) {
-      console.log("Setting", variableName, "to", value);
       variableMap[variableName].value = value;
     }
 
@@ -297,7 +296,6 @@
       event: eventType,
       ...eventPayload,
     });
-    console.log("GA Event Sent:", eventType, eventPayload, proxy.dataLayer);
   };
 
   useHead({
