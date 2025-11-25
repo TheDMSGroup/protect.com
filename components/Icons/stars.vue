@@ -30,7 +30,7 @@ export default {
   },
 };
 </script>
-<style lang="scss"  scoped>
+<style lang="scss" scoped>
 svg {
   overflow: visible;
 }
@@ -41,7 +41,7 @@ svg {
   height: 20px;
   width: 20px;
 
-  fill: #03a57e;
+  fill: var(--accent-color, #03a57e);
   &.golden {
     fill: gold;
   }

@@ -6,7 +6,7 @@
           <div class="left-header" />
           <div class="logo">
             <NuxtLink to="/">
-              <img src="../public/assets/protect_logo.svg" alt="" srcset="" />
+              <img src="../public/assets/protect_logo.svg" alt="protect logo" srcset="" />
             </NuxtLink>
           </div>
           <div id="spacer" />

@@ -38,32 +38,20 @@
   </section>
 </template>
 
-<script>
-import { redirectWithParams } from '../../mixins/utilsMixin';
+<script setup>
+import { computed } from 'vue';
 
-export default {
-  name: 'MoneySavingTips',
-  components: {},
-  props: {
-    config: Object,
-    stateData: Object,
-  },
-  data() {
-    return {};
-  },
-  methods: {
-    formatCurrency(value) {
-      return new Intl.NumberFormat('en-US', {
-        style: 'currency',
-        currency: 'USD',
-        minimumFractionDigits: 0,
-      }).format(value);
-    },
-    getQuotes() {
-      redirectWithParams('https://insure.protect.com', { zipcode: this.zipcode });
-    },
-  },
-};
+const props = defineProps({
+  config: Object,
+  stateData: Object,
+  zipcode: String,
+});
+
+const getQuotes = computed(() => {
+  const baseUrl = 'https://insure.protect.com';
+  const params = new URLSearchParams({ zipcode: props.zipcode || '' });
+  return `${baseUrl}?${params.toString()}`;
+});
 </script>
 
 <style lang="scss" scoped>

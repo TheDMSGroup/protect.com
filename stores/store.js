@@ -29,10 +29,19 @@ export const useStore = defineStore("store", {
         },
       ],
     },
+    visitorInfo: {
+      zip: "",
+      city: "",
+      region: "",
+    },
     _stateValueMapCache: null, // Private cache
   }),
 
   actions: {
+    setVisitorInfo(info) {
+      this.visitorInfo = { ...this.visitorInfo, ...info };
+    },
+
     getStateValueMap() {
       // Return cached version if available
       if (this._stateValueMapCache) {
@@ -255,6 +264,11 @@ export const useStore = defineStore("store", {
           name: "Texas",
           abbreviation: "TX",
           slug: "texas",
+        },
+        {
+          name: "USA",
+          abbreviation: "USA",
+          slug: "usa",
         },
         {
           name: "Utah",
