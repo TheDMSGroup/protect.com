@@ -6,7 +6,7 @@
           <div class="left-header" />
           <div class="logo">
             <NuxtLink to="/">
-              <img src="../public/assets/protect_logo.svg" alt="" srcset="" />
+              <img src="../public/assets/protect_logo.svg" alt="protect logo" srcset="" />
             </NuxtLink>
           </div>
           <div id="spacer" />
@@ -14,34 +14,18 @@
             <nav class="d-none d-lg-block navigation">
               <ul>
                 <li>
-                  <!-- Don't use <NuxtLink/> here, we want full page refresh benefits from htmml anchor tag,
-                   otherwise the new query won't fire for updated content-->
-                  <NuxtLink
-                    :to="{
-                      name: 'car-insurance',
-                    }"
-                    >Car Insurance</NuxtLink
-                  >
+                  <NuxtLink to="/car-insurance">Car Insurance</NuxtLink>
+                </li>
+                <li>
+                  <NuxtLink to="/health-insurance">Health Insurance</NuxtLink>
+                </li>
+                <li>
+                  <NuxtLink to="/home-insurance">Home Insurance</NuxtLink>
                 </li>
                 <li>
                   <!-- Don't use <NuxtLink/> here, we want full page refresh benefits from htmml anchor tag,
                    otherwise the new query won't fire for updated content-->
-                  <NuxtLink
-                    :to="{
-                      name: 'health-insurance',
-                    }"
-                    >Health Insurance</NuxtLink
-                  >
-                </li>
-                <li>
-                  <!-- Don't use <NuxtLink/> here, we want full page refresh benefits from htmml anchor tag,
-                   otherwise the new query won't fire for updated content-->
-                  <NuxtLink
-                    :to="{
-                      name: 'home-insurance',
-                    }"
-                    >Home Insurance</NuxtLink
-                  >
+                  <NuxtLink to="/car-insurance/rate-calculator">Rate Calculator</NuxtLink>
                 </li>
                 <li>
                   <NuxtLink to="/articles">Articles</NuxtLink>

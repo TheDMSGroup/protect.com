@@ -62,7 +62,7 @@
 <template>
   <div class="container">
     <div class="row">
-      <div class="logo p-4">
+      <div class="logo p-4 col-5">
         <a style="cursor: pointer" @click="handleClearError()">
           <NuxtImg :src="`${assetsBaseUrl}/protect_logo.svg`" alt="Protect.com Logo" width="150" />
         </a>
@@ -129,6 +129,9 @@
     font-family: "Nunito Sans", sans-serif;
   }
 
+  .logo {
+    max-width: 200px;
+  }
   .error-container {
     width: 100%;
     margin: 0 auto;
