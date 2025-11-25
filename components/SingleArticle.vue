@@ -52,7 +52,7 @@
               </span>
               <span v-if="readTime" class="divider">|</span>
               <span v-if="readTime" class="read-time">
-                <img alt="time" src="../public/clock.jpg" />
+                <img alt="time" src="/assets/clock.jpg" />
                 {{ readTime }}
               </span>
             </span>
