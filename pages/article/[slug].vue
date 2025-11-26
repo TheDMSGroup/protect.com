@@ -64,18 +64,18 @@
     return { articleResult, error, pending };
   }
 
-  useHead({
-    title: title.value,
-    meta: [
-      {
-        name: "description",
-        content: excerpt.value,
-      },
-      {
-        name: "keywords",
-        content: metaKeywords.value.join(", "),
-      },
-    ],
+  useSeoMeta({
+    title: () => title.value,
+    description: () => excerpt.value,
+    keywords: () => metaKeywords.value.join(", "),
+    ogTitle: () => title.value,
+    ogDescription: () => excerpt.value,
+    ogImage: () => coverImage.value?.url || 'https://protect.com/img/protect-share.jpg',
+    ogType: 'article',
+    twitterCard: 'summary_large_image',
+    twitterTitle: () => title.value,
+    twitterDescription: () => excerpt.value,
+    twitterImage: () => coverImage.value?.url || 'https://protect.com/img/protect-share.jpg',
   });
 </script>
 <template>
