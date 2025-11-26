@@ -2,9 +2,8 @@
   <section>
     <div class="explore-cta-section">
       <div class="cta-container">
-        <div class="cta-left" aria-hidden="true" :style="{
-          background: `url(${getImage(stateData.state)}) no-repeat center center / cover`,
-        }">
+        <div class="cta-left" aria-hidden="true">
+          <img :src="getImage(stateData.state)" :alt="`${stateData.state} license plate`" class="license-plate-img" loading="lazy" />
         </div>
 
         <div class="cta-right">
@@ -125,6 +124,13 @@ const getImage = (image) => {
     justify-content: center;
     align-items: center;
     height: 100%;
+
+    .license-plate-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: var(--radius-lg);
+    }
   }
 
   .license-plate-wrapper {

@@ -6,7 +6,7 @@
         <div class="cta-primary-content">
           <div class="cta-left">
             <div class="cta-icon">
-              <img :src="svgPath" alt="SVG Icon" class="svg-icon" />
+              <img :src="svgPath" alt="SVG Icon" class="svg-icon" loading="lazy" />
             </div>
             <div class="cta-text">
               <h3>Save On Car Insurance!</h3>
@@ -25,7 +25,7 @@
                 </div>
                 <div class="form-disclaimer">
                   <span>
-                    <img :src="svgPath" alt="SVG Icon" class="cta-icon-inline svg-icon" />No spam, just quotes
+                    <img :src="svgPath" alt="SVG Icon" class="cta-icon-inline svg-icon" loading="lazy" />No spam, just quotes
                   </span>
                 </div>
               </div>

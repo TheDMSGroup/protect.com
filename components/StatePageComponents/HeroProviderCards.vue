@@ -10,16 +10,20 @@
 
     <!-- Preload critical images -->
     <link rel="preload" :href="svgPath" as="image" type="image/svg+xml" fetchpriority="high">
-    <link rel="preload" href="/assets/progressive-logo.png" as="image" type="image/png">
-    <link rel="preload" href="/assets/geico-logo.png" as="image" type="image/png">
-    <link rel="preload" href="/assets/statefarm-logo.png" as="image" type="image/png">
 
     <div class="provider-cards-stack hero-provider-stack" @click="goTo" role="button" tabindex="0" @keydown.enter="goTo" @keydown.space.prevent="goTo" aria-label="Get insurance quotes from top providers">
       <div class="provider-card hero-provider-card" :style="{ animationDelay: '.2s' }">
         <div class="hero-provider-logo">
-          <img src="/assets/progressive-logo.png" alt="Progressive" class="provider-logo-img"
+          <NuxtImg
+            src="/assets/progressive-logo.png"
+            alt="Progressive"
+            class="provider-logo-img"
+            width="120"
+            height="32"
+            format="webp"
             loading="eager"
-            fetchpriority="high" >
+            fetchpriority="high"
+          />
         </div>
         <div class="hero-provider-rating">
           <span class="reviews-text">Reviews</span>
@@ -38,9 +42,16 @@
 
       <div class="provider-card hero-provider-card" :style="{ animationDelay: '0.3s' }">
         <div class="hero-provider-logo">
-          <img src="/assets/geico-logo.png" alt="GEICO" class="provider-logo-img"
+          <NuxtImg
+            src="/assets/geico-logo.png"
+            alt="GEICO"
+            class="provider-logo-img"
+            width="120"
+            height="32"
+            format="webp"
             loading="eager"
-            fetchpriority="high" >
+            fetchpriority="high"
+          />
         </div>
         <div class="hero-provider-rating">
           <span class="reviews-text">Reviews</span>
@@ -59,9 +70,16 @@
 
       <div class="provider-card hero-provider-card" :style="{ animationDelay: '0.4s' }">
         <div class="hero-provider-logo">
-          <img src="/assets/statefarm-logo.png" alt="State Farm" class="provider-logo-img"
+          <NuxtImg
+            src="/assets/statefarm-logo.png"
+            alt="State Farm"
+            class="provider-logo-img"
+            width="120"
+            height="32"
+            format="webp"
             loading="eager"
-            fetchpriority="high" >
+            fetchpriority="high"
+          />
         </div>
         <div class="hero-provider-rating">
           <span class="reviews-text">Reviews</span>
