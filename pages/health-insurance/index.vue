@@ -20,7 +20,7 @@
           { name: 'Humana', src: 'provider-humana.png' },
           { name: 'AmBetter', src: 'ambetter-logo.png' },
           { name: 'aetna', src: 'provider-aetna.png' },
-          { name: 'Molina', src: 'molina-logo.svg' },
+          { name: 'Molina', src: 'molina-logo.png' },
         ]"
       >
         Compare top companies head-to-head and get the best rate.
