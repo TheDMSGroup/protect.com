@@ -4,8 +4,8 @@
       <h2 class="text-center mb-4">Frequently Asked Questions</h2>
       <div class="faq-list">
         <div v-for="(item, index) in faq" :key="index" class="faq-item">
-          <h3 v-html="preprocessText(item.question, item.links)"></h3>
-          <p v-html="preprocessText(item.answer, item.links)"></p>
+          <h3 v-html="preprocessText(item.question, item.links)" />
+          <p v-html="preprocessText(item.answer, item.links)" />
         </div>
       </div>
     </div>
