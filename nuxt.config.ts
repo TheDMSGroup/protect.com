@@ -3,15 +3,14 @@ export default defineNuxtConfig({
   compatibilityDate: "2025-07-15",
   devtools: { enabled: true },
   modules: ["@nuxtjs/sitemap", "@bootstrap-vue-next/nuxt", "@nuxt/image", "@pinia/nuxt", "@nuxt/eslint", "@nuxt/scripts"],
-  scripts: {
-    registry: {
-      googleTagManager: {
-        id: "GTM-MZPRQHZ", // Replace with your Google Tag Manager ID
-      },
-    },
+  features: {
+    inlineStyles: true,
   },
   app: {
     head: {
+      htmlAttrs: {
+        lang: "en",
+      },
       viewport: "width=device-width, initial-scale=1",
       charset: "utf-8",
       title: "Compare Insurance Quotes For Auto, Home & Health | Protect.com",
@@ -33,6 +32,17 @@ export default defineNuxtConfig({
         { name: "twitter:card", content: "summary_large_image" },
         { name: "twitter:creator", content: "@ProtectDotCom" },
       ],
+      link: [
+        { rel: "preconnect", href: "https://fonts.googleapis.com" },
+        { rel: "preconnect", href: "https://fonts.gstatic.com", crossorigin: "" },
+        {
+          rel: "stylesheet",
+          href: "https://fonts.googleapis.com/css2?family=Cantata+One&family=Nunito+Sans:wght@400;600;700&display=swap",
+          media: "print",
+          onload: "this.media='all'",
+        },
+      ],
+
     },
   },
   runtimeConfig: {
@@ -47,6 +57,50 @@ export default defineNuxtConfig({
     hostname: "https://protect.com",
     gzip: true,
     sources: ["/api/sitemap-urls"],
+  },
+  routeRules: {
+    // Static assets with content hash - cache for 1 year (immutable)
+    "/_nuxt/**": {
+      headers: {
+        "cache-control": "public, max-age=31536000, immutable",
+      },
+    },
+    // Images - cache for 1 year
+    "/img/**": {
+      headers: {
+        "cache-control": "public, max-age=31536000, immutable",
+      },
+    },
+    // Assets (license plates, state outlines, etc.) - cache for 1 year
+    "/assets/**": {
+      headers: {
+        "cache-control": "public, max-age=31536000, immutable",
+      },
+    },
+    // Fonts - cache for 1 year
+    "/fonts/**": {
+      headers: {
+        "cache-control": "public, max-age=31536000, immutable",
+      },
+    },
+    // GeoIP library - cache for 1 year
+    "/lib/**": {
+      headers: {
+        "cache-control": "public, max-age=31536000, immutable",
+      },
+    },
+    // API routes - no cache or short cache
+    "/api/**": {
+      headers: {
+        "cache-control": "no-cache, no-store, must-revalidate",
+      },
+    },
+    // HTML pages - short cache with revalidation
+    "/**": {
+      headers: {
+        "cache-control": "public, max-age=3600, s-maxage=86400, stale-while-revalidate=86400",
+      },
+    },
   },
   css: ["~/scss/main.scss"],
   vite: {
