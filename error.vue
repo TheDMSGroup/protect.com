@@ -60,7 +60,7 @@
 </script>
 
 <template>
-  <div class="container">
+  <main class="container">
     <div class="row">
       <div class="logo p-4 col-5">
         <a style="cursor: pointer" @click="handleClearError()">
@@ -115,7 +115,7 @@
         </div>
       </div>
     </div>
-  </div>
+  </main>
 </template>
 
 <style scoped lang="scss">

@@ -4,7 +4,7 @@
       <div class="row footer-columns">
         <div class="footer-column">
           <div class="logo">
-            <img alt="Protect logo" src="/assets/protect_logo_tm.svg" loading="lazy" />
+            <img alt="Protect.com Logo" src="/assets/protect_logo_tm.svg" width="115" height="22" loading="lazy" />
           </div>
           <ul>
             <li><NuxtLink to="/car-insurance">Auto Insurance</NuxtLink></li>
