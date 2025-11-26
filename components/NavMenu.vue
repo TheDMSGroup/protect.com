@@ -5,21 +5,21 @@
       <div class="container nav-container">
         <div class="nav-items" v-if="links.length > 0">
           <div class="nav-item" v-for="link in links" :key="link.label">
-            <h6><a @click="go(link.to)">{{ link.label }}</a></h6>
+            <h6><a :href="link.to" @click.prevent="go(link.to)">{{ link.label }}</a></h6>
             <ul class="nav-column" v-if="link && link.subLinks && link.subLinks.length > 0">
               <li v-for="subLink in link.subLinks" :key="subLink.label">
-                <a @click="go(subLink.to)">{{ subLink.label }}</a>
+                <a :href="subLink.to" @click.prevent="go(subLink.to)">{{ subLink.label }}</a>
               </li>
             </ul>
           </div>
         </div>
         <div class="latest-articles">
-          <h6><a @click="go('/articles/')">Latest Articles</a></h6>
+          <h6><a href="/articles/" @click.prevent="go('/articles/')">Latest Articles</a></h6>
           <ul class="nav-column">
             <li
             v-for="article in recentArticles"
             :key="article.urlSlug">
-              <a @click="go('/article/' + article.urlSlug + '/')">{{ article.title }}</a>
+              <a :href="'/article/' + article.urlSlug + '/'" @click.prevent="go('/article/' + article.urlSlug + '/')">{{ article.title }}</a>
             </li>
           </ul>
         </div>
