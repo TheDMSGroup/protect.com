@@ -1075,9 +1075,33 @@ const getQuotes = function () {
 };
 const parseCurrency = function(value) {
   if (!value) return 0;
+  // If already a number, return it
+  if (typeof value === 'number') return value;
   // Remove $ and commas, convert to number
-  return parseInt(value.replace(/[$,]/g, ''), 0) || 0;
+  return parseInt(String(value).replace(/[$,]/g, ''), 10) || 0;
 };
+
+// Set page meta for SEO with state-specific license plate as share image
+const getLicensePlateUrl = (stateName) => {
+  if (!stateName) return 'https://protect.com/img/protect-share.jpg';
+  const slug = stateName.replace(/\s/g, '').toLowerCase();
+  return `https://dev.protect.com/assets/states/license-plates/${slug}.jpg`;
+};
+
+useSeoMeta({
+  title: () => stateData.value ? `${stateData.value.state} Car Insurance - Compare Quotes | Protect.com` : 'Car Insurance - Compare Quotes | Protect.com',
+  description: () => stateData.value
+    ? `Compare car insurance quotes in ${stateData.value.state}. Average annual cost: ${formatCurrency(stateData.value.avgAnnualCost)}. Find the best rates in the ${stateData.value.nickname}.`
+    : 'Compare car insurance quotes from top providers. Save money with Protect.com.',
+  ogTitle: () => stateData.value ? `${stateData.value.state} Car Insurance - Compare Quotes` : 'Car Insurance - Compare Quotes',
+  ogDescription: () => stateData.value
+    ? `Find the best car insurance rates in ${stateData.value.state}. Average cost: ${formatCurrency(stateData.value.avgAnnualCost)}/year.`
+    : 'Compare car insurance quotes from top providers.',
+  ogImage: () => getLicensePlateUrl(stateData.value?.state),
+  ogType: 'website',
+  twitterCard: 'summary_large_image',
+  twitterImage: () => getLicensePlateUrl(stateData.value?.state),
+});
 
 // Mounted lifecycle hook
 onMounted(() => {
