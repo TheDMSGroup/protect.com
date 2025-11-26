@@ -7,11 +7,23 @@
   });
 
   // Destructure while maintaining reactivity
-  const { title, excerpt, content, date, readTime, author, coverImage, relatedArticles, vertical, subvertical } = toRefs(props.article);
+  const {
+    title,
+    excerpt,
+    content,
+    date,
+    readTime,
+    author,
+    coverImage,
+    relatedArticles,
+    vertical,
+    subvertical,
+    componentNames,
+    contentLinks,
+    recentArticles,
+  } = toRefs(props.article);
 
-  console.log("props.article:", props.article);
-  // For non-reactive values that don't change
-  const recentArticles = ref([]);
+  console.log("single article props:", props.article);
 </script>
 
 <template lang="html">
@@ -37,7 +49,7 @@
     <div class="blog-article container">
       <div class="row">
         <div class="col-lg-4 col-md-3 sidebar">
-          <ArticlesContentLinks :article-content="content" />
+          <ArticlesContentLinks :content-links="contentLinks" />
         </div>
         <div class="col-lg-8 col-md-12">
           <h1 class="article-title">{{ title }}</h1>
@@ -63,8 +75,7 @@
           </div>
           <div class="article-body">
             <div class="article-left">
-              <!-- eslint-disable-next-line vue/no-v-html -->
-              <div v-if="content" class="article-content" v-html="content.html" />
+              <ArticlesDynamicShell :component-names="componentNames" :content="content" />
               <ul class="related-articles">
                 <li v-for="relatedArticle in relatedArticles" :key="relatedArticle.title">
                   <NuxtLink :to="relatedArticle.urlSlug" class="related-article-link">

@@ -44,7 +44,7 @@
               </div>
               <div class="stat">
                 <div class="stat-value success">{{ formatCurrency(state.avgMonthlyCost) }}</div>
-                <div class="stat-label">Monthly Minimum</div>
+                <div class="stat-label">Avg. Monthly Minimum</div>
               </div>
               <div class="stat">
                 <div class="stat-value">{{ state.faultType }}</div>

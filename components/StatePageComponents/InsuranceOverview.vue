@@ -13,7 +13,7 @@
         </div>
         <div class="overview-stat">
           <div class="stat-value success">{{ formatCurrency(stateData.avgMonthlyCost) }}</div>
-          <div class="stat-label">Monthly Minimum</div>
+          <div class="stat-label">Average Monthly Minimum</div>
         </div>
         <div class="overview-stat" v-if="stateData.faultType">
           <div class="stat-value">{{ stateData.faultType }}</div>

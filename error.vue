@@ -299,20 +299,20 @@
     align-items: center;
     gap: 0.5rem;
     padding: 0.75rem 1.5rem;
-    color: $green;
+    color: $green-darker;
     text-decoration: none;
     font-weight: 600;
-    border: 2px solid $green;
+    border: 2px solid $green-darker;
     border-radius: 50px;
     transition: all 0.3s ease;
     font-size: 0.95rem;
 
     &:hover {
-      background-color: $green;
+      background-color: $green-darker;
       color: $white;
       text-decoration: none;
       transform: translateY(-1px);
-      box-shadow: 0 4px 12px rgba($green, 0.3);
+      box-shadow: 0 4px 12px rgba($green-darker, 0.3);
     }
 
     i {
