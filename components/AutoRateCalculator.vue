@@ -298,16 +298,6 @@
     });
   };
 
-  useHead({
-    title: "Auto Insurance Rate Calculator - Get Your Personalized Quote from Protect.com",
-    meta: [
-      {
-        name: "description",
-        content:
-          "Use our Auto Insurance Rate Calculator to get a personalized estimate based on your profile. Answer 6 quick questions and see how much you could save on car insurance today!",
-      },
-    ],
-  });
 </script>
 
 <template>
