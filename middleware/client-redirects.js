@@ -6,6 +6,11 @@ export default defineNuxtRouteMiddleware((to) => {
     return;
   }
 
+  // Skip state validation for specific car-insurance sub-routes
+  if (to.path.startsWith("/car-insurance/rate-calculator")) {
+    return;
+  }
+
   // Handle car insurance state code redirects
   const pathParts = to.path.split("/");
   const pathStateCode = pathParts[2];

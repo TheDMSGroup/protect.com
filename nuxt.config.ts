@@ -2,7 +2,14 @@
 export default defineNuxtConfig({
   compatibilityDate: "2025-07-15",
   devtools: { enabled: true },
-  modules: ["@nuxtjs/sitemap", "@bootstrap-vue-next/nuxt", "@nuxt/image", "@pinia/nuxt", "@nuxt/eslint"],
+  modules: ["@nuxtjs/sitemap", "@bootstrap-vue-next/nuxt", "@nuxt/image", "@pinia/nuxt", "@nuxt/eslint", "@nuxt/scripts"],
+  scripts: {
+    registry: {
+      googleTagManager: {
+        id: "GTM-MZPRQHZ", // Replace with your Google Tag Manager ID
+      },
+    },
+  },
   app: {
     head: {
       viewport: "width=device-width, initial-scale=1",
