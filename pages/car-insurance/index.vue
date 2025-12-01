@@ -50,6 +50,7 @@
       headline="Compare rates to save on auto insurance."
       subheadline="Get the best car insurance coverage at an affordable price."
       :zipcode-url="config.action"
+      :lazy-image="false"
     />
 
     <section id="top-companies">
@@ -97,11 +98,12 @@
     </section>
 
     <yellow-box-banner
-      headline="Accidents happen. You don’t have to compromise on auto insurance coverage to get a great rate."
-      content="If you’re an experienced driver or just getting behind the wheel,
+      headline="Accidents happen. You don't have to compromise on auto insurance coverage to get a great rate."
+      content="If you're an experienced driver or just getting behind the wheel,
         Protect.com can help find you the best car insurance policy that has the right coverage at an affordable price.
-        If you haven’t gotten a new auto insurance quote in the last 6 months, you could be missing out on potential savings."
+        If you haven't gotten a new auto insurance quote in the last 6 months, you could be missing out on potential savings."
       image="selfie-crash.png"
+      :lazy-image="true"
     />
 
     <breakpoint-image image="auto_bg.jpg" />
@@ -163,6 +165,7 @@
       subheadline="Discover how much you could can save on auto insurance with Protect.com."
       image="car_couple.png"
       :action="action"
+      :lazy-image="true"
     />
 
     <BlogFeed :show-categories="false" vertical="insurance" :sub-verticals="['auto-insurance']" />

@@ -11,6 +11,7 @@
       headline="Compare Health Insurance Quotes"
       subheadline="Protect your family with affordable coverage"
       :zipcode-url="zipCodeUrl"
+      :lazy-image="false"
     />
 
     <section id="top-companies">
@@ -43,6 +44,7 @@
         Compare plans with no commitment and discover how much you could be
         saving by getting quotes from multiple top health insurance providers. "
       image="yoga.png"
+      :lazy-image="true"
     />
 
     <breakpoint-image image="health_bg.jpg" />
@@ -118,6 +120,7 @@
         subheadline="Discover how much you could save with Protect. "
         image="doctor-patient.png"
         :action="action"
+        :lazy-image="true"
       />
     </section>
     <BlogFeed :show-categories="false" vertical="insurance" :sub-verticals="['health-insurance']" />

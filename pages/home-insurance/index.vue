@@ -14,6 +14,7 @@
       headline="Compare Home Insurance Quotes"
       subheadline="Protect your family with affordable coverage"
       :zipcode-url="zipcodeUrl"
+      :lazy-image="false"
     />
 
     <section id="top-companies">
@@ -45,6 +46,7 @@
       content="Don't compromise on coverage when shopping for homeowners insurance.
         Find the right policy that fits your unique home and budget. Shop and compare rates now."
       image="gardening-lady.png"
+      :lazy-image="true"
     />
 
     <breakpoint-image image="homeowners_bg.jpg" />
@@ -94,6 +96,7 @@
       subheadline="Discover how much you could save with Protect. "
       image="pet-family.png"
       :action="zipcodeUrl"
+      :lazy-image="true"
     />
 
     <BlogFeed :show-categories="false" vertical="insurance" :sub-verticals="['home-insurance']" />
