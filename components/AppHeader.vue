@@ -71,9 +71,9 @@
             <nav class="d-none d-lg-block navigation" :class="{ 'show-mobs': showNavMenuMobile }">
               <ul>
                 <li v-for="link in navLinks" :key="link.label">
-                  <a @click="go(link.to)">
+                  <NuxtLink :to="link.to">
                     {{ link.label }}
-                  </a>
+                  </NuxtLink>
                 </li>
               </ul>
             </nav>
@@ -122,8 +122,8 @@
             7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647
             2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
           </svg>
-          <NuxtLink to="/" @click="toggleMobileMenu" class="mobile-drawer-logo">
-            <IconsProtectShield/>
+          <NuxtLink to="/" @click="toggleMobileMenu" class="mobile-drawer-logo" aria-label="Go to homepage">
+            <LazyIconsProtectShield/>
           </NuxtLink>
         </div>
         <div v-for="link in navLinks" :key="link.label" class="item">

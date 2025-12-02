@@ -30,14 +30,14 @@
           </g>
         </svg>
       </button>
-      <MobileMenuDrawer
+      <LazyMobileMenuDrawer
         v-if="itemTwo.children"
         :item="itemTwo"
         :title="itemTwo.title"
         :id="`mmt${index}`"
         :ref="`mmt${index}`"
         :toggleMobileMenuSecondary="toggleMobileMenuSecondary">
-      </MobileMenuDrawer>
+      </LazyMobileMenuDrawer>
     </div>
   </aside>
 </template>

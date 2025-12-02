@@ -60,7 +60,7 @@
        <StatePageComponentsHowItWorks :stateData="stateData" :zipcode="zipcode" />
       <!-- Auto Rate Calculator Section -->
       <div class="calculator-section">
-        <AutoRateCalculator :componentProps="{ zipcode: zipcode }" />
+        <LazyAutoRateCalculator :componentProps="{ zipcode: zipcode }" />
       </div>
       <section class="methodology">
         <div class="container">

@@ -1,25 +1,25 @@
 <template>
   <div class="nav-menu-wrapper">
-    <SearchOverlay :id="'mobileSearchMenu'" v-if="showSearch" :toggleSearch="toggleSearch" />
+    <LazySearchOverlay :id="'mobileSearchMenu'" v-if="showSearch" :toggleSearch="toggleSearch" />
     <div class="nav-menu" v-if="showNavInner" >
       <div class="container nav-container">
         <div class="nav-items" v-if="links.length > 0">
           <div class="nav-item" v-for="link in links" :key="link.label">
-            <h6><a :href="link.to" @click.prevent="go(link.to)">{{ link.label }}</a></h6>
+            <h6><NuxtLink :to="link.to">{{ link.label }}</NuxtLink></h6>
             <ul class="nav-column" v-if="link && link.subLinks && link.subLinks.length > 0">
               <li v-for="subLink in link.subLinks" :key="subLink.label">
-                <a :href="subLink.to" @click.prevent="go(subLink.to)">{{ subLink.label }}</a>
+                <NuxtLink :to="subLink.to">{{ subLink.label }}</NuxtLink>
               </li>
             </ul>
           </div>
         </div>
         <div class="latest-articles">
-          <h6><a href="/articles/" @click.prevent="go('/articles/')">Latest Articles</a></h6>
+          <h6><NuxtLink to="/articles/">Latest Articles</NuxtLink></h6>
           <ul class="nav-column">
             <li
             v-for="article in recentArticles"
             :key="article.urlSlug">
-              <a :href="'/article/' + article.urlSlug + '/'" @click.prevent="go('/article/' + article.urlSlug + '/')">{{ article.title }}</a>
+              <NuxtLink :to="'/article/' + article.urlSlug + '/'">{{ article.title }}</NuxtLink>
             </li>
           </ul>
         </div>
@@ -35,7 +35,6 @@ import { useRoute } from 'vue-router';
 
 const props = defineProps({
   closeMenu: { type: Function, required: true },
-  go: { type: Function, required: true },
   showSearch: { type: Boolean, default: false },
   toggleSearch: { type: Function, required: true },
   showNavInner: { type: Boolean, default: false },
