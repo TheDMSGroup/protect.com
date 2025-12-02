@@ -3,10 +3,24 @@
     <b-container :class="{ 'right-image': imageAlign === 'right' }">
       <b-row>
         <b-col v-if="imageAlign === 'left'" cols="12" md="5" lg="7">
-          <NuxtImg class="image" :src="buildImageUrl(image)" />
+          <NuxtImg
+            class="image"
+            :src="buildImageUrl(image)"
+            :loading="lazyImage ? 'lazy' : 'eager'"
+            :fetchpriority="lazyImage ? 'low' : 'auto'"
+            decoding="async"
+            :preload="!lazyImage"
+          />
         </b-col>
         <b-col v-if="imageAlign === 'right'" cols="12" md="5" lg="7" class="d-block d-md-none d-lg-none d-xl-none">
-          <NuxtImg class="image" :src="buildImageUrl(image)" />
+          <NuxtImg
+            class="image"
+            :src="buildImageUrl(image)"
+            :loading="lazyImage ? 'lazy' : 'eager'"
+            :fetchpriority="lazyImage ? 'low' : 'auto'"
+            decoding="async"
+            :preload="!lazyImage"
+          />
         </b-col>
         <b-col cols="12" md="7" lg="5" class="wrapper">
           <h2>{{ headline }}</h2>
@@ -27,7 +41,14 @@
           </p>
         </b-col>
         <b-col v-if="imageAlign === 'right'" cols="12" md="5" lg="7" class="d-none d-md-block">
-          <NuxtImg class="image" :src="buildImageUrl(image)" />
+          <NuxtImg
+            class="image"
+            :src="buildImageUrl(image)"
+            :loading="lazyImage ? 'lazy' : 'eager'"
+            :fetchpriority="lazyImage ? 'low' : 'auto'"
+            decoding="async"
+            :preload="!lazyImage"
+          />
         </b-col>
       </b-row>
     </b-container>
@@ -60,6 +81,10 @@
     imageAlign: {
       type: String,
       default: "left",
+    },
+    lazyImage: {
+      type: Boolean,
+      default: true,
     },
   });
 

@@ -26,6 +26,7 @@
         card-image="home-1.png"
         large-col-size="7"
         card-position="left"
+        lazy-image="true"
       />
 
       <vertical-card-row
@@ -38,6 +39,7 @@
         large-col-size="7"
         card-image="home-2.png"
         card-position="right"
+        lazy-image="true"
       />
 
       <vertical-card-row
@@ -50,6 +52,7 @@
         card-image="home-3.png"
         large-col-size="7"
         card-position="left"
+        lazy-image="true"
       />
     </b-container>
 

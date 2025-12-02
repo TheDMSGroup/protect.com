@@ -6,6 +6,11 @@ export default defineNuxtConfig({
   features: {
     inlineStyles: true,
   },
+  image: {
+    quality: 80,
+    format: ["webp"],
+    preload: false,
+  },
   app: {
     head: {
       htmlAttrs: {
@@ -42,7 +47,6 @@ export default defineNuxtConfig({
           onload: "this.media='all'",
         },
       ],
-
     },
   },
   runtimeConfig: {
