@@ -126,7 +126,7 @@ export default {
   },
   data() {
     return {
-      site_name: this.$store.state.site_name,
+      site_name: 'protect.com',
       searchq: '',
       foundResults: false,
       results: [],
@@ -296,9 +296,6 @@ export default {
 </script>
 
 <style lang="scss">
-@import '../scss/bootstrap.scss';
-@import '../scss/_variables.scss';
-
 .search-overlay-wrapper {
   width: 100%;
   // height: 1250px;

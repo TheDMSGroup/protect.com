@@ -3,6 +3,9 @@ export default defineNuxtConfig({
   compatibilityDate: "2025-07-15",
   devtools: { enabled: true },
   modules: ["@nuxtjs/sitemap", "@bootstrap-vue-next/nuxt", "@nuxt/image", "@pinia/nuxt", "@nuxt/eslint", "@nuxt/scripts"],
+  bootstrapVueNext: {
+    css: false, // Disable automatic Bootstrap CSS import - we import only what we need in main.scss
+  },
   features: {
     inlineStyles: true,
   },
