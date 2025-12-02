@@ -29,53 +29,38 @@
   </div>
 </template>
 
-<script>
-import SearchOverlay from './SearchOverlay.vue';
+<script setup>
+import { ref, watch, computed } from 'vue';
+import { useRoute } from 'vue-router';
 
-export default {
-  name: 'NavMenu',
-  components: {
-    SearchOverlay,
-  },
-  props: {
-    closeMenu: { type: Function },
-    go: { type: Function },
-    showSearch: { type: Boolean },
-    toggleSearch: { type: Function },
-    showNavInner: { type: Boolean },
-    links: { type: Array },
-  },
-  data() {
-    return {
-      articlePath: window.location.pathname,
-    };
-  },
-  watch: {
-    $route() {
-      this.articlePath = window.location.pathname;
-    },
-  },
-  methods: {
-    goToAction() {
-      if (this.action.includes('#')) {
-        const element = document.querySelector(this.action);
-        element.scrollIntoView({ behavior: 'smooth', block: 'end', inline: 'nearest' });
-      } else {
-        this.$router.push(this.action);
-      }
-    },
-    headerColumnWidth(headerLength) {
-      return headerLength - 1 === 3 ? 6 : 4;
-    },
-  },
-  computed: {
-    recentArticles() {
-      const articles = this.$store.getters.getRecentArticlesData();
-      const limitFromConfig = this.$store.state.recentArticlesData.limit;
-      return articles.filter((article) => !this.articlePath.includes(article.urlSlug)).slice(0, limitFromConfig);
-    },
-  },
-};
+const props = defineProps({
+  closeMenu: { type: Function, required: true },
+  go: { type: Function, required: true },
+  showSearch: { type: Boolean, default: false },
+  toggleSearch: { type: Function, required: true },
+  showNavInner: { type: Boolean, default: false },
+  links: { type: Array, default: () => [] },
+  recentArticlesData: { type: Array, default: () => [] },
+});
+
+const route = useRoute();
+const articlePath = ref('');
+
+if (import.meta.client) {
+  articlePath.value = window.location.pathname;
+}
+
+watch(route, () => {
+  if (import.meta.client) {
+    articlePath.value = window.location.pathname;
+  }
+});
+
+const recentArticles = computed(() => {
+  return props.recentArticlesData
+    .filter((article) => !articlePath.value.includes(article.urlSlug))
+    .slice(0, 3);
+});
 
 </script>
 
