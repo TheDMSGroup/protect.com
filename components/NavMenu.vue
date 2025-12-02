@@ -1,25 +1,25 @@
 <template>
   <div class="nav-menu-wrapper">
-    <SearchOverlay :id="'mobileSearchMenu'" v-if="showSearch" :toggleSearch="toggleSearch" />
+    <LazySearchOverlay :id="'mobileSearchMenu'" v-if="showSearch" :toggleSearch="toggleSearch" />
     <div class="nav-menu" v-if="showNavInner" >
       <div class="container nav-container">
         <div class="nav-items" v-if="links.length > 0">
           <div class="nav-item" v-for="link in links" :key="link.label">
-            <h6><a :href="link.to" @click.prevent="go(link.to)">{{ link.label }}</a></h6>
+            <h6><NuxtLink :to="link.to">{{ link.label }}</NuxtLink></h6>
             <ul class="nav-column" v-if="link && link.subLinks && link.subLinks.length > 0">
               <li v-for="subLink in link.subLinks" :key="subLink.label">
-                <a :href="subLink.to" @click.prevent="go(subLink.to)">{{ subLink.label }}</a>
+                <NuxtLink :to="subLink.to">{{ subLink.label }}</NuxtLink>
               </li>
             </ul>
           </div>
         </div>
         <div class="latest-articles">
-          <h6><a href="/articles/" @click.prevent="go('/articles/')">Latest Articles</a></h6>
+          <h6><NuxtLink to="/articles/">Latest Articles</NuxtLink></h6>
           <ul class="nav-column">
             <li
             v-for="article in recentArticles"
             :key="article.urlSlug">
-              <a :href="'/article/' + article.urlSlug + '/'" @click.prevent="go('/article/' + article.urlSlug + '/')">{{ article.title }}</a>
+              <NuxtLink :to="'/article/' + article.urlSlug + '/'">{{ article.title }}</NuxtLink>
             </li>
           </ul>
         </div>
@@ -29,53 +29,37 @@
   </div>
 </template>
 
-<script>
-import SearchOverlay from './SearchOverlay.vue';
+<script setup>
+import { ref, watch, computed } from 'vue';
+import { useRoute } from 'vue-router';
 
-export default {
-  name: 'NavMenu',
-  components: {
-    SearchOverlay,
-  },
-  props: {
-    closeMenu: { type: Function },
-    go: { type: Function },
-    showSearch: { type: Boolean },
-    toggleSearch: { type: Function },
-    showNavInner: { type: Boolean },
-    links: { type: Array },
-  },
-  data() {
-    return {
-      articlePath: window.location.pathname,
-    };
-  },
-  watch: {
-    $route() {
-      this.articlePath = window.location.pathname;
-    },
-  },
-  methods: {
-    goToAction() {
-      if (this.action.includes('#')) {
-        const element = document.querySelector(this.action);
-        element.scrollIntoView({ behavior: 'smooth', block: 'end', inline: 'nearest' });
-      } else {
-        this.$router.push(this.action);
-      }
-    },
-    headerColumnWidth(headerLength) {
-      return headerLength - 1 === 3 ? 6 : 4;
-    },
-  },
-  computed: {
-    recentArticles() {
-      const articles = this.$store.getters.getRecentArticlesData();
-      const limitFromConfig = this.$store.state.recentArticlesData.limit;
-      return articles.filter((article) => !this.articlePath.includes(article.urlSlug)).slice(0, limitFromConfig);
-    },
-  },
-};
+const props = defineProps({
+  closeMenu: { type: Function, required: true },
+  showSearch: { type: Boolean, default: false },
+  toggleSearch: { type: Function, required: true },
+  showNavInner: { type: Boolean, default: false },
+  links: { type: Array, default: () => [] },
+  recentArticlesData: { type: Array, default: () => [] },
+});
+
+const route = useRoute();
+const articlePath = ref('');
+
+if (import.meta.client) {
+  articlePath.value = window.location.pathname;
+}
+
+watch(route, () => {
+  if (import.meta.client) {
+    articlePath.value = window.location.pathname;
+  }
+});
+
+const recentArticles = computed(() => {
+  return props.recentArticlesData
+    .filter((article) => !articlePath.value.includes(article.urlSlug))
+    .slice(0, 3);
+});
 
 </script>
 
