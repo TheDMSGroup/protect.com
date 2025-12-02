@@ -136,7 +136,7 @@
         background-color: #fff;
         position: relative;
         display: flex;
-        flex-wrap: wrap;
+        flex-wrap: nowrap;
         align-items: stretch;
         width: 100%;
         border-radius: 5px;
@@ -172,17 +172,8 @@
       fill: #c5c5c5;
     }
     .valid {
-      @include media-breakpoint-down(md) {
-        width: 100%;
-      }
       svg {
         fill: #3b54ba;
-      }
-    }
-
-    span {
-      @include media-breakpoint-down(md) {
-        width: 100%;
       }
     }
 
