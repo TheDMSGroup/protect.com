@@ -300,7 +300,7 @@ svg.elixr-icon.protect-shield {
 .header {
   margin: 10px auto 0px;
   background-color: $white;
-  z-index: 999;
+  z-index: 10000;
   // box-shadow: 0px 2px 2px 0px rgba(0,0,0,0.05);
   border-bottom: 1px solid #F1F1F1;
 
@@ -508,7 +508,7 @@ aside.drawer-nav {
 .drawerActive {
   .drawer-nav {
     transform: translateX(0);
-    z-index: 9999;
+    z-index: 99999;
     box-shadow: $box-shadow;
   }
 }
