@@ -54,9 +54,9 @@
           :alt="provider.name"
           format="webp"
           loading="lazy"
-          :width="provider.width"
-          :height="provider.height"
           :style="{
+            maxWidth: logoMaxWidth,
+            maxHeight: logoMaxHeight,
             margin: '0 auto',
           }"
         />
@@ -96,9 +96,10 @@
       justify-content: center;
 
       img {
-        max-width: 150px;
+        max-width: 100%;
 
         @include media-breakpoint-down(md) {
+          max-width: 80%;
           margin: auto;
           display: block;
         }
