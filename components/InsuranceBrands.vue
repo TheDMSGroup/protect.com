@@ -57,8 +57,6 @@
           :width="provider.width"
           :height="provider.height"
           :style="{
-            maxWidth: logoMaxWidth,
-            maxHeight: logoMaxHeight,
             margin: '0 auto',
           }"
         />
@@ -98,10 +96,9 @@
       justify-content: center;
 
       img {
-        max-width: 100%;
+        max-width: 150px;
 
         @include media-breakpoint-down(md) {
-          max-width: 80%;
           margin: auto;
           display: block;
         }
