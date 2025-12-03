@@ -57,11 +57,11 @@
     <section id="top-companies">
       <insurance-brands
         :providers-config="[
-          { name: 'Progressive', src: 'provider-progressive.png', width: '156', height: '34'},
-          { name: 'Geico', src: 'provider-geico.png', width: '156', height: '41' },
-          { name: 'Nationwide', src: 'provider-nationwide.png', width: '156', height: '66' },
-          { name: 'State Farm', src: 'provider-state-farm.png', width: '156', height: '22' },
-          { name: 'Liberty Mutual Insurance', src: 'provider-liberty.png', width: '156', height: '62' },
+          { name: 'Progressive', src: 'provider-progressive.png', width: '150', height: '32'},
+          { name: 'Geico', src: 'provider-geico.png', width: '150', height: '39' },
+          { name: 'Nationwide', src: 'provider-nationwide.png', width: '150', height: '64' },
+          { name: 'State Farm', src: 'provider-state-farm.png', width: '150', height: '21' },
+          { name: 'Liberty Mutual Insurance', src: 'provider-liberty.png', width: '150', height: '60' },
         ]"
       >
         Compare top companies head-to-head and get the best rate.
