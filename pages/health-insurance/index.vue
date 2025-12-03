@@ -113,7 +113,7 @@
     </section>
 
     <section>
-      <action-banner
+      <LazyActionBanner
         cta-type="zipcode-form"
         image_top="125"
         headline="Explore new policy options"
@@ -121,6 +121,7 @@
         image="doctor-patient.png"
         :action="action"
         :lazy-image="true"
+        :image-alt-description="'Woman and doctor discussing health insurance options in a medical office.'"
       />
     </section>
     <BlogFeed :show-categories="false" vertical="insurance" :sub-verticals="['health-insurance']" />
