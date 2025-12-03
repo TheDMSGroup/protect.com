@@ -42,7 +42,7 @@
           <b-row>
             <b-col class="headline-col" cols="12">
               <h1>{{ headline }}</h1>
-              <h2 v-if="!subheadlineType === 'small'">{{ subheadline }}</h2>
+              <h2 v-if="subheadlineType !== 'small'">{{ subheadline }}</h2>
               <p v-else>{{ subheadline }}</p>
             </b-col>
             <b-col v-if="ctaType" class="cta-col" cols="12">

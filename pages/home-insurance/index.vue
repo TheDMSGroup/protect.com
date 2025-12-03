@@ -89,7 +89,7 @@
       </b-container>
     </section>
 
-    <action-banner
+    <LazyActionBanner
       cta-type="zipcode-form"
       image_top="100"
       headline="Explore new policy options"
@@ -97,6 +97,7 @@
       image="pet-family.png"
       :action="zipcodeUrl"
       :lazy-image="true"
+      :image-alt-description="'Man with two cats, enjoying peace of mind in their home.'"
     />
 
     <BlogFeed :show-categories="false" vertical="insurance" :sub-verticals="['home-insurance']" />

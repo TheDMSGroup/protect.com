@@ -39,9 +39,13 @@
       type: Boolean,
       default: true,
     },
+    imageAltDescription: {
+      type: String,
+      required: true,
+    },
   });
 
-  const { containerClass, headline, subheadline, image, imageTop, ctaType, ctaConfig, action } = props;
+  const { containerClass, headline, subheadline, image, imageTop, ctaType, ctaConfig, action, imageAltDescription } = props;
 </script>
 
 <template>
@@ -59,6 +63,7 @@
                 :fetchpriority="lazyImage ? 'low' : 'auto'"
                 decoding="async"
                 :preload="!lazyImage"
+                :alt="imageAltDescription"
               />
             </div>
           </b-col>

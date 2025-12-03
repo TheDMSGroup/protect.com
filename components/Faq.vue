@@ -3,9 +3,9 @@
     <div class="container">
       <h2 class="text-center mb-4">Frequently Asked Questions</h2>
       <div class="faq-list">
-        <div v-for="(item, index) in faq" :key="index" class="faq-item">
-          <h3 v-html="preprocessText(item.question, item.links)" />
-          <p v-html="preprocessText(item.answer, item.links)" />
+        <div v-for="(item, index) in processedFaq" :key="index" class="faq-item">
+          <h3>{{ item.question }}</h3>
+          <div class="answer-content" v-html="item.answer" />
         </div>
       </div>
     </div>
@@ -33,6 +33,14 @@
 
   // Template ref for accessing the component element
   const faqSection = ref(null);
+
+  // Process FAQ items to add links - computed to ensure consistency between server and client
+  const processedFaq = computed(() => {
+    return props.faq.map((item) => ({
+      question: item.links && Array.isArray(item.links) && item.links.length > 0 ? preprocessTextForLinks(item.question, item.links) : item.question,
+      answer: item.links && Array.isArray(item.links) && item.links.length > 0 ? preprocessTextForLinks(item.answer, item.links) : item.answer,
+    }));
+  });
 
   // Computed property for JSON-LD structured data
   const faqJsonLd = computed(() => {
@@ -65,11 +73,6 @@
       ],
     };
   });
-
-  // Methods
-  const preprocessText = (text, linkText, linkDestination) => {
-    return preprocessTextForLinks(text, linkText, linkDestination);
-  };
 
   // Handle click events for FAQ links
   const handleLinkClick = (ev) => {

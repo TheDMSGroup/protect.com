@@ -15,6 +15,5 @@ export default defineNuxtPlugin(() => {
       event: "page_view",
       page_path: to.fullPath,
     });
-    console.log("GA Event Sent:", proxy.dataLayer);
   });
 });
