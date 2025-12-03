@@ -47,6 +47,7 @@
   <div id="auto-insurance" class="page">
     <sub-vertical-hero
       hero-image="auto-insurance-shield.jpg"
+      hero-image-alt="Woman carrying groceries out from the rear trunk of vehicle, with Protect logo sheild surrounding vehicle"
       headline="Compare rates to save on auto insurance."
       subheadline="Get the best car insurance coverage at an affordable price."
       :zipcode-url="config.action"
@@ -99,6 +100,7 @@
 
     <yellow-box-banner
       headline="Accidents happen. You don't have to compromise on auto insurance coverage to get a great rate."
+      image-alt="Young driver taking a selfie in front of a vehicle that has been in an accident."
       content="If you're an experienced driver or just getting behind the wheel,
         Protect.com can help find you the best car insurance policy that has the right coverage at an affordable price.
         If you haven't gotten a new auto insurance quote in the last 6 months, you could be missing out on potential savings."
@@ -106,7 +108,7 @@
       :lazy-image="true"
     />
 
-    <breakpoint-image image="auto_bg.jpg" />
+    <breakpoint-image image="auto_bg.webp" />
 
     <testimonial
       :testimonial-config="{
@@ -136,7 +138,7 @@
               </p>
             </b-col>
             <b-col cols="12" lg="6">
-              <NuxtImg :src="buildImageUrl('company-rank-collage-auto.jpg')" alt="Company Rankings" />
+              <NuxtImg :src="buildImageUrl('company-rank-collage-auto.jpg')" alt="Company Rankings" format="webp" loading="lazy" width="582"/>
             </b-col>
             <b-col cols="12" class="feed-wrapper">
               <rating-chart
@@ -162,6 +164,7 @@
       cta-type="zipcode-form"
       image_top="100"
       headline="Explore new auto insurance policy options."
+      imageAlt="A mother with a baby carrier standing behind a vehicle while the father steps around the vehicle to get something in the car"
       subheadline="Discover how much you could can save on auto insurance with Protect.com."
       image="car_couple.png"
       :action="action"

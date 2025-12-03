@@ -8,6 +8,10 @@
       type: String,
       default: "",
     },
+    heroImageAlt: {
+      type: String,
+      default: "",
+    },
     headline: {
       type: String,
       default: "",
@@ -59,10 +63,12 @@
               <NuxtImg
                 :src="heroImageSrc"
                 :loading="lazyImage ? 'lazy' : 'eager'"
-                :fetchpriority="lazyImage ? 'low' : 'auto'"
+                :fetchpriority="lazyImage ? 'low' : 'high'"
                 decoding="async"
                 :preload="!lazyImage"
                 sizes="sm:400px md:400px"
+                :alt="heroImageAlt"
+                format="webp"
               />
             </b-col>
           </b-row>
@@ -71,10 +77,12 @@
           <NuxtImg
             :src="heroImageSrc"
             :loading="lazyImage ? 'lazy' : 'eager'"
-            :fetchpriority="lazyImage ? 'low' : 'auto'"
+            :fetchpriority="lazyImage ? 'low' : 'high'"
             decoding="async"
             :preload="!lazyImage"
             sizes="md:475px lg:475px xl:475px"
+            :alt="heroImageAlt"
+            format="webp"
           />
         </div>
       </div>

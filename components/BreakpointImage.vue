@@ -8,10 +8,13 @@
     },
   });
 
+  const imageSrc = computed(() => buildImageUrl(props.image));
+
+  // Use Nuxt Image's useImage to get optimized URL for background
+  const img = useImage();
   const bgStyle = computed(() => {
-    const img = useImage();
-    const imgUrl = img(buildImageUrl(props.image)); // Adjust path as needed
-    return { backgroundImage: `url(${imgUrl})` };
+    const optimizedUrl = img(imageSrc.value, { format: 'webp', quality: 80 });
+    return { backgroundImage: `url(${optimizedUrl})` };
   });
 </script>
 
