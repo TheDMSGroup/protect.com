@@ -23,6 +23,14 @@
       type: String,
       required: true,
     },
+    imageWidth: {
+      type: Number,
+      default: 505,
+    },
+    imageHeight: {
+      type: Number,
+      default: 489,
+    },
     imageTop: {
       type: Number,
       default: 50,
@@ -45,7 +53,7 @@
     },
   });
 
-  const { containerClass, headline, subheadline, image, imageTop, ctaType, ctaConfig, action, imageAlt } = props;
+  const { containerClass, headline, subheadline, image, imageTop, ctaType, ctaConfig, action, imageAlt, imageWidth, imageHeight } = props;
 </script>
 
 <template>
@@ -64,6 +72,8 @@
                 decoding="async"
                 :preload="!lazyImage"
                 :alt="imageAlt"
+                :width="imageWidth"
+                :height="imageHeight"
               />
             </div>
           </b-col>
