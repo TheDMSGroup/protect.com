@@ -13,7 +13,18 @@
   const mapContainerRef = useTemplateRef("usMap");
   const smallStates = ref([]);
   const states = ref([]);
-  const mobileStatesLinkList = ref([]);
+  const excludedStates = [
+        {
+          id: "AK",
+          name: "Alaska",
+          slug: "alaska",
+        },
+        {
+          id: "HI",
+          name: "Hawaii",
+          slug: "hawaii",
+        },
+      ];
 
   //const focusedState = computed(() => null);
   const mapConfig = {
@@ -56,6 +67,7 @@
       ...detailMap.get(idItem.id),
     }));
     states.value = mergedStates;
+    states.value = states.value.concat(excludedStates);
 
     mergedStates.forEach((state) => {
       // Better approach - use SVG namespace
@@ -116,39 +128,12 @@
       }
     });
     smallStates.value = smallStates.value
-      .concat([
-        {
-          id: "AK",
-          name: "Alaska",
-          slug: "alaska",
-        },
-        {
-          id: "HI",
-          name: "Hawaii",
-          slug: "hawaii",
-        },
-      ])
+      .concat(excludedStates)
       .sort((a, b) => (a.id > b.id ? 1 : -1));
-    createMobileStatesLinkList(mergedStates);
     addEventsToStates();
   };
-  const createMobileStatesLinkList = (mergedStates) => {
-    mobileStatesLinkList.value = mergedStates
-      .map((state) => ({ id: state.id, name: state.name }))
-      .concat([
-        {
-          id: "AK",
-          name: "Alaska",
-          slug: "alaska",
-        },
-        {
-          id: "HI",
-          name: "Hawaii",
-          slug: "hawaii",
-        },
-      ])
-      .sort((a, b) => (a.name > b.name ? 1 : -1));
-  };
+
+  const mobileStatesLinkList = computed(() => [...states.value].sort((a, b) => (a.name > b.name ? 1 : -1)));
   const createStateMapUrl = (stateSlug) => {
     return generateRedirectUrl(`/car-insurance/${stateSlug}`, {}, router);
   };
@@ -1026,7 +1011,7 @@
       </b-col>
     </b-row>
     <b-row>
-      <b-col cols="12" md="7" class="mt-3 mx-auto state-list" v-if="mobileStatesLinkList && mobileStatesLinkList.length > 0">
+      <b-col cols="12" md="7" class="mt-3 mx-auto state-list" v-if="true">
         <div class="row">
           <div
             class="d-flex flex-column mx-0 my-1 state-list-item col-6"
