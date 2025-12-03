@@ -17,7 +17,6 @@
     stateValueMapping.find((state) => state.abbreviation === "AK"),
     stateValueMapping.find((state) => state.abbreviation === "HI"),
   ];
-  console.log("Excluded states:", excludedStates);
   //const focusedState = computed(() => null);
   const mapConfig = {
     fontSize: {
@@ -68,11 +67,8 @@
       a.setAttribute("aria-label", state.name);
       const groupParent = state.path.parentNode;
       Array.from(groupParent.children).forEach((child) => a.appendChild(child));
-      // a.appendChild(pathEl);
-      // console.log(a.children);
       groupParent.prepend(a);
       const currentStatePath = state.path;
-      //currentStatePath.style.fill = mapColor;
       const svgNS = "http://www.w3.org/2000/svg";
       const text = document.createElementNS(svgNS, "text");
       text.textContent = state.id;
