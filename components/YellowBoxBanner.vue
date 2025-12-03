@@ -11,6 +11,9 @@
             :fetchpriority="lazyImage ? 'low' : 'auto'"
             decoding="async"
             :preload="!lazyImage"
+            :width="imageWidth"
+            :height="imageHeight"
+            style="height: auto;"
           />
         </b-col>
         <b-col v-if="imageAlign === 'right'" cols="12" md="5" lg="7" class="d-block d-md-none d-lg-none d-xl-none">
@@ -22,6 +25,9 @@
             :fetchpriority="lazyImage ? 'low' : 'auto'"
             decoding="async"
             :preload="!lazyImage"
+            :width="imageWidth"
+            :height="imageHeight"
+            style="height: auto;"
           />
         </b-col>
         <b-col cols="12" md="7" lg="5" class="wrapper">
@@ -51,6 +57,9 @@
             :fetchpriority="lazyImage ? 'low' : 'auto'"
             decoding="async"
             :preload="!lazyImage"
+            :width="imageWidth"
+            :height="imageHeight"
+            style="height: auto;"
           />
         </b-col>
       </b-row>
@@ -68,6 +77,14 @@
     imageAlt: {
       type: String,
       default: "",
+    },
+    imageWidth: {
+      type: Number,
+      default: 624,
+    },
+    imageHeight: {
+      type: Number,
+      default: 722,
     },
     headline: {
       type: String,

@@ -32,7 +32,9 @@ const imageOverlap = computed(() => {
                 :alt="testimonialConfig.title"
                 format="webp"
                 loading="lazy"
-                width="200"
+                width="450"
+                height="604"
+                style="height: auto;"
               />
             </b-col>
             <b-col

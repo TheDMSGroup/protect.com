@@ -54,7 +54,8 @@
           :alt="provider.name"
           format="webp"
           loading="lazy"
-          width="412"
+          :width="provider.width"
+          :height="provider.height"
           :style="{
             maxWidth: logoMaxWidth,
             maxHeight: logoMaxHeight,

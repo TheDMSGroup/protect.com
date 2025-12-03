@@ -69,6 +69,9 @@
                 sizes="sm:400px md:400px"
                 :alt="heroImageAlt"
                 format="webp"
+                width="467"
+                height="520"
+                style="height: auto;"
               />
             </b-col>
           </b-row>
@@ -83,6 +86,9 @@
             sizes="md:475px lg:475px xl:475px"
             :alt="heroImageAlt"
             format="webp"
+            width="467"
+            height="520"
+            style="height: auto;"
           />
         </div>
       </div>

@@ -85,6 +85,12 @@ export default defineNuxtConfig({
         "cache-control": "public, max-age=31536000, immutable",
       },
     },
+    // Amplify optimized images - cache for 1 year
+    "/_amplify/image/**": {
+      headers: {
+        "cache-control": "public, max-age=31536000, immutable",
+      },
+    },
     // Assets (license plates, state outlines, etc.) - cache for 1 year
     "/assets/**": {
       headers: {

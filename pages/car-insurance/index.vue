@@ -57,11 +57,11 @@
     <section id="top-companies">
       <insurance-brands
         :providers-config="[
-          { name: 'Progressive', src: 'provider-progressive.png' },
-          { name: 'Geico', src: 'provider-geico.png' },
-          { name: 'Nationwide', src: 'provider-nationwide.png' },
-          { name: 'State Farm', src: 'provider-state-farm.png' },
-          { name: 'Liberty Mutual Insurance', src: 'provider-liberty.png' },
+          { name: 'Progressive', src: 'provider-progressive.png', width: '156', height: '34'},
+          { name: 'Geico', src: 'provider-geico.png', width: '156', height: '41' },
+          { name: 'Nationwide', src: 'provider-nationwide.png', width: '156', height: '66' },
+          { name: 'State Farm', src: 'provider-state-farm.png', width: '156', height: '22' },
+          { name: 'Liberty Mutual Insurance', src: 'provider-liberty.png', width: '156', height: '62' },
         ]"
       >
         Compare top companies head-to-head and get the best rate.
@@ -138,7 +138,7 @@
               </p>
             </b-col>
             <b-col cols="12" lg="6">
-              <NuxtImg :src="buildImageUrl('company-rank-collage-auto.jpg')" alt="Company Rankings" format="webp" loading="lazy" width="582"/>
+              <NuxtImg :src="buildImageUrl('company-rank-collage-auto.jpg')" alt="Company Rankings" format="webp" loading="lazy" width="582" height="332" style="height: auto;" />
             </b-col>
             <b-col cols="12" class="feed-wrapper">
               <rating-chart
