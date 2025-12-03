@@ -46,13 +46,11 @@
   });
 
   const update = (selectValue, selectText) => {
-    console.log("Selected value:", selectValue);
     // Run validation if provided
     if (props.validate) {
       const isValid = props.validate(selectValue);
       // Emit different events based on validation
       if (isValid) {
-        console.log("Valid selection:", selectValue);
         emit("selectUpdated:modelValue", selectValue);
         valid.value = true;
         selected.value = { value: selectValue, text: selectText };

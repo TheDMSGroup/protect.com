@@ -9,6 +9,18 @@ export default defineNuxtConfig({
   features: {
     inlineStyles: true,
   },
+  scripts: {
+    registry: {
+      googleTagManager: {
+        id: "GTM-MZPRQHZ", // Replace with your Google Tag Manager ID
+      },
+    },
+  },
+  image: {
+    quality: 80,
+    format: ["webp"],
+    preload: false,
+  },
   app: {
     head: {
       htmlAttrs: {
@@ -45,7 +57,6 @@ export default defineNuxtConfig({
           onload: "this.media='all'",
         },
       ],
-
     },
   },
   runtimeConfig: {

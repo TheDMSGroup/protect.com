@@ -51,6 +51,7 @@
       headline="Compare rates to save on auto insurance."
       subheadline="Get the best car insurance coverage at an affordable price."
       :zipcode-url="config.action"
+      :lazy-image="false"
     />
 
     <section id="top-companies">
@@ -98,12 +99,13 @@
     </section>
 
     <yellow-box-banner
-      headline="Accidents happen. You don’t have to compromise on auto insurance coverage to get a great rate."
-      content="If you’re an experienced driver or just getting behind the wheel,
-        Protect.com can help find you the best car insurance policy that has the right coverage at an affordable price.
-        If you haven’t gotten a new auto insurance quote in the last 6 months, you could be missing out on potential savings."
-      image="selfie-crash.png"
+      headline="Accidents happen. You don't have to compromise on auto insurance coverage to get a great rate."
       image-alt="Young driver taking a selfie in front of a vehicle that has been in an accident."
+      content="If you're an experienced driver or just getting behind the wheel,
+        Protect.com can help find you the best car insurance policy that has the right coverage at an affordable price.
+        If you haven't gotten a new auto insurance quote in the last 6 months, you could be missing out on potential savings."
+      image="selfie-crash.png"
+      :lazy-image="true"
     />
 
     <breakpoint-image image="auto_bg.webp" />
@@ -162,10 +164,11 @@
       cta-type="zipcode-form"
       image_top="100"
       headline="Explore new auto insurance policy options."
+      imageAlt="A mother with a baby carrier standing behind a vehicle while the father steps around the vehicle to get something in the car"
       subheadline="Discover how much you could can save on auto insurance with Protect.com."
       image="car_couple.png"
-      imageAlt="A mother with a baby carrier standing behind a vehicle while the father steps around the vehicle to get something in the car"
       :action="action"
+      :lazy-image="true"
     />
 
     <BlogFeed :show-categories="false" vertical="insurance" :sub-verticals="['auto-insurance']" />

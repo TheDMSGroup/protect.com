@@ -9,14 +9,15 @@
     icon: {
       type: String,
       required: false,
+      default: null,
     },
     value: {
       type: String,
       required: false,
+      default: null,
     },
   });
 
-  console.log(props);
   const hovered = ref(false);
   const iconComponentName = iconLoader(props?.icon || null);
 </script>
@@ -28,7 +29,7 @@
         <div class="button-label">
           <component class="button-label-icon" v-if="iconComponentName" :is="iconComponentName" />
           <div class="button-label-empty" v-else></div>
-          <span class="h4">{{ text }}</span>
+          <p>{{ text }}</p>
         </div>
         <div class="button-label-indicator">
           <div v-if="value">
@@ -62,8 +63,11 @@
       fill: #4153b3;
       margin: 10px 0;
     }
-    .h4 {
+    p {
       font-size: 18px;
+      line-height: 24px;
+      font-weight: 700;
+      color: #3b54ba;
       padding: 0;
     }
     &.noicon {
@@ -79,7 +83,7 @@
           .button-label-empty {
             flex-grow: 1;
           }
-          .h4 {
+          p {
             padding: 0 0 0 10px;
             color: white;
           }
@@ -96,8 +100,8 @@
       }
       .button-label {
         flex-grow: 12;
-        padding: 25px 5px 0 0;
-        .h4 {
+        padding: 0 5px 0 0;
+        p {
           max-width: 40%;
         }
       }

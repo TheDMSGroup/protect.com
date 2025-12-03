@@ -28,6 +28,10 @@
       type: Object,
       default: () => ({}),
     },
+    lazyImage: {
+      type: Boolean,
+      default: false,
+    },
   });
 
   console.log("SubVerticalHero props:", props);
@@ -56,12 +60,30 @@
               </slot>
             </b-col>
             <b-col cols="12" class="hero-img-sm">
-              <NuxtImg :src="heroImageSrc" :alt="heroImageAlt" fetchpriority="high" format="webp" width=""375/>
+              <NuxtImg
+                :src="heroImageSrc"
+                :loading="lazyImage ? 'lazy' : 'eager'"
+                :fetchpriority="lazyImage ? 'low' : 'high'"
+                decoding="async"
+                :preload="!lazyImage"
+                sizes="sm:400px md:400px"
+                :alt="heroImageAlt"
+                format="webp"
+              />
             </b-col>
           </b-row>
         </div>
         <div class="hero-right">
-          <NuxtImg :src="heroImageSrc" fetchpriority="high" :alt="heroImageAlt" format="webp" />
+          <NuxtImg
+            :src="heroImageSrc"
+            :loading="lazyImage ? 'lazy' : 'eager'"
+            :fetchpriority="lazyImage ? 'low' : 'high'"
+            decoding="async"
+            :preload="!lazyImage"
+            sizes="md:475px lg:475px xl:475px"
+            :alt="heroImageAlt"
+            format="webp"
+          />
         </div>
       </div>
     </div>
