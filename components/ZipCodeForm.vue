@@ -172,8 +172,17 @@
       fill: #c5c5c5;
     }
     .valid {
+      @include media-breakpoint-down(md) {
+        width: 100%;
+      }
       svg {
         fill: #3b54ba;
+      }
+    }
+
+    span {
+      @include media-breakpoint-down(md) {
+        width: 100%;
       }
     }
 

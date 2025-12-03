@@ -8,6 +8,10 @@
       type: String,
       default: "",
     },
+    heroImageAlt: {
+      type: String,
+      default: "",
+    },
     headline: {
       type: String,
       default: "",
@@ -52,12 +56,12 @@
               </slot>
             </b-col>
             <b-col cols="12" class="hero-img-sm">
-              <NuxtImg :src="heroImageSrc" />
+              <NuxtImg :src="heroImageSrc" :alt="heroImageAlt" fetchpriority="high" format="webp" width=""375/>
             </b-col>
           </b-row>
         </div>
         <div class="hero-right">
-          <NuxtImg :src="heroImageSrc" />
+          <NuxtImg :src="heroImageSrc" fetchpriority="high" :alt="heroImageAlt" format="webp" />
         </div>
       </div>
     </div>

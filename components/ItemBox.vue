@@ -28,7 +28,7 @@
         <div class="button-label">
           <component class="button-label-icon" v-if="iconComponentName" :is="iconComponentName" />
           <div class="button-label-empty" v-else></div>
-          <h4>{{ text }}</h4>
+          <span class="h4">{{ text }}</span>
         </div>
         <div class="button-label-indicator">
           <div v-if="value">
@@ -62,7 +62,7 @@
       fill: #4153b3;
       margin: 10px 0;
     }
-    h4 {
+    .h4 {
       font-size: 18px;
       padding: 0;
     }
@@ -79,7 +79,7 @@
           .button-label-empty {
             flex-grow: 1;
           }
-          h4 {
+          .h4 {
             padding: 0 0 0 10px;
             color: white;
           }
@@ -96,8 +96,8 @@
       }
       .button-label {
         flex-grow: 12;
-        padding: 0 5px 0 0;
-        h4 {
+        padding: 25px 5px 0 0;
+        .h4 {
           max-width: 40%;
         }
       }
