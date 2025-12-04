@@ -112,6 +112,7 @@
           :fetchpriority="lazyImage ? 'low' : 'auto'"
           decoding="async"
           :preload="!lazyImage"
+          fit="inside"
         />
       </b-col>
     </template>
@@ -135,6 +136,8 @@
       img {
         display: block;
         width: 100%;
+        max-width: 100%;
+        height: auto;
       }
     }
 

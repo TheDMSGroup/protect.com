@@ -53,7 +53,7 @@
     },
   });
 
-  const { containerClass, headline, subheadline, image, imageTop, ctaType, ctaConfig, action, imageAlt, imageWidth, imageHeight } = props;
+  const { containerClass, headline, subheadline, image, imageTop, ctaType, ctaConfig, action, imageAlt } = props;
 </script>
 
 <template>
@@ -72,8 +72,6 @@
                 decoding="async"
                 :preload="!lazyImage"
                 :alt="imageAlt"
-                :width="imageWidth"
-                :height="imageHeight"
               />
             </div>
           </b-col>

@@ -72,56 +72,56 @@ export default defineNuxtConfig({
     gzip: true,
     sources: ["/api/sitemap-urls"],
   },
-  routeRules: {
-    // Static assets with content hash - cache for 1 year (immutable)
-    "/_nuxt/**": {
-      headers: {
-        "cache-control": "public, max-age=31536000, immutable",
-      },
-    },
-    // Images - cache for 1 year
-    "/img/**": {
-      headers: {
-        "cache-control": "public, max-age=31536000, immutable",
-      },
-    },
-    // Amplify optimized images - cache for 1 year
-    "/_amplify/image/**": {
-      headers: {
-        "cache-control": "public, max-age=31536000, immutable",
-      },
-    },
-    // Assets (license plates, state outlines, etc.) - cache for 1 year
-    "/assets/**": {
-      headers: {
-        "cache-control": "public, max-age=31536000, immutable",
-      },
-    },
-    // Fonts - cache for 1 year
-    "/fonts/**": {
-      headers: {
-        "cache-control": "public, max-age=31536000, immutable",
-      },
-    },
-    // GeoIP library - cache for 1 year
-    "/lib/**": {
-      headers: {
-        "cache-control": "public, max-age=31536000, immutable",
-      },
-    },
-    // API routes - no cache or short cache
-    "/api/**": {
-      headers: {
-        "cache-control": "no-cache, no-store, must-revalidate",
-      },
-    },
-    // HTML pages - short cache with revalidation
-    "/**": {
-      headers: {
-        "cache-control": "public, max-age=3600, s-maxage=86400, stale-while-revalidate=86400",
-      },
-    },
-  },
+  // routeRules: {
+  //   // Static assets with content hash - cache for 1 year (immutable)
+  //   "/_nuxt/**": {
+  //     headers: {
+  //       "cache-control": "public, max-age=31536000, immutable",
+  //     },
+  //   },
+  //   // Images - cache for 1 year
+  //   "/img/**": {
+  //     headers: {
+  //       "cache-control": "public, max-age=31536000, immutable",
+  //     },
+  //   },
+  //   // Amplify optimized images - cache for 1 year
+  //   "/_amplify/image/**": {
+  //     headers: {
+  //       "cache-control": "public, max-age=31536000, immutable",
+  //     },
+  //   },
+  //   // Assets (license plates, state outlines, etc.) - cache for 1 year
+  //   "/assets/**": {
+  //     headers: {
+  //       "cache-control": "public, max-age=31536000, immutable",
+  //     },
+  //   },
+  //   // Fonts - cache for 1 year
+  //   "/fonts/**": {
+  //     headers: {
+  //       "cache-control": "public, max-age=31536000, immutable",
+  //     },
+  //   },
+  //   // GeoIP library - cache for 1 year
+  //   "/lib/**": {
+  //     headers: {
+  //       "cache-control": "public, max-age=31536000, immutable",
+  //     },
+  //   },
+  //   // API routes - no cache or short cache
+  //   "/api/**": {
+  //     headers: {
+  //       "cache-control": "no-cache, no-store, must-revalidate",
+  //     },
+  //   },
+  //   // HTML pages - short cache with revalidation
+  //   "/**": {
+  //     headers: {
+  //       "cache-control": "public, max-age=3600, s-maxage=86400, stale-while-revalidate=86400",
+  //     },
+  //   },
+  // },
   css: ["~/scss/main.scss"],
   vite: {
     css: {
