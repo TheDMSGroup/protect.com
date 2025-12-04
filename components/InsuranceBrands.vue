@@ -52,12 +52,18 @@
         <NuxtImg
           :src="buildImageUrl(`partners/${provider.src}`)"
           :alt="provider.name"
+          width="150"
+          height="75"
           format="webp"
           loading="lazy"
+          fetchpriority="low"
+          sizes="sm:50vw md:25vw lg:150px"
+          fit="inside"
           :style="{
+            width: '100%',
+            height: 'auto',
             maxWidth: logoMaxWidth,
             maxHeight: logoMaxHeight,
-            margin: '0 auto',
           }"
         />
       </b-col>

@@ -60,6 +60,9 @@
         <NuxtImg
           :src="buildImageUrl(cardImage)"
           :alt="title"
+          width="600"
+          height="450"
+          sizes="sm:100vw md:50vw lg:600px xl:600px"
           :loading="lazyImage ? 'lazy' : 'eager'"
           :fetchpriority="lazyImage ? 'low' : 'auto'"
           decoding="async"
@@ -102,6 +105,9 @@
         <NuxtImg
           :src="buildImageUrl(cardImage)"
           :alt="title"
+          width="600"
+          height="450"
+          sizes="sm:100vw md:50vw lg:600px xl:600px"
           :loading="lazyImage ? 'lazy' : 'eager'"
           :fetchpriority="lazyImage ? 'low' : 'auto'"
           decoding="async"
