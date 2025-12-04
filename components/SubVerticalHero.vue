@@ -37,7 +37,7 @@
   console.log("SubVerticalHero props:", props);
   console.log("zipcodeUrl value:", props.zipcodeUrl);
 
-  const { heroImage, headline, subheadline, zipcodeUrl, intermediaryModalOptions } = props;
+  const { heroImage, headline, subheadline, zipcodeUrl, intermediaryModalOptions, lazyImage } = props;
 
   const heroImageSrc = computed(() => {
     return `${assetsBaseUrl}/${heroImage}`;
@@ -65,7 +65,6 @@
                 :loading="lazyImage ? 'lazy' : 'eager'"
                 :fetchpriority="lazyImage ? 'low' : 'high'"
                 decoding="async"
-                :preload="!lazyImage"
                 sizes="sm:400px md:400px"
                 :alt="heroImageAlt"
                 format="webp"
@@ -82,7 +81,6 @@
             :loading="lazyImage ? 'lazy' : 'eager'"
             :fetchpriority="lazyImage ? 'low' : 'high'"
             decoding="async"
-            :preload="!lazyImage"
             sizes="md:475px lg:475px xl:475px"
             :alt="heroImageAlt"
             format="webp"

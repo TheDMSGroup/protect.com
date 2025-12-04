@@ -51,7 +51,6 @@
       headline="Compare rates to save on auto insurance."
       subheadline="Get the best car insurance coverage at an affordable price."
       :zipcode-url="config.action"
-      :lazy-image="false"
     />
 
     <section id="top-companies">
