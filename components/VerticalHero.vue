@@ -69,7 +69,7 @@
             width="700"
             height="800"
             sizes="sm:100vw md:50vw lg:45vw xl:700px"
-            style="height: auto; width: 100%"
+            style="height: auto"
             fetchpriority="high"
             fit="inside"
             format="webp"
@@ -136,7 +136,7 @@
         width: 55%;
         display: flex;
         flex-direction: column;
-        margin-top: 6em;
+        margin-top: 3em;
         text-align: left;
 
         @include media-breakpoint-down(lg) {
