@@ -16,7 +16,7 @@
   const excludedStates = [
     stateValueMapping.find((state) => state.abbreviation === "AK"),
     stateValueMapping.find((state) => state.abbreviation === "HI"),
-  ];
+  ].filter(Boolean).map((state) => ({ ...state, id: state.abbreviation }));
   //const focusedState = computed(() => null);
   const mapConfig = {
     fontSize: {
