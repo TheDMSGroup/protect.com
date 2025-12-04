@@ -63,7 +63,15 @@
           </b-row>
         </div>
         <div class="hero-right">
-          <NuxtImg :src="buildImageUrl(heroImage)" alt="Auto Insurance Shield" width="624" height="722" sizes="sm:100vw md:50vw lg:45vw xl:600px" style="height: auto;" />
+          <NuxtImg
+            :src="buildImageUrl(heroImage)"
+            alt="Auto Insurance Shield"
+            width="600"
+            height="700"
+            sizes="sm:100vw md:50vw lg:45vw xl:600px"
+            style="height: auto; width: 100%"
+            fetchpriority="high"
+          />
         </div>
       </div>
     </b-container>

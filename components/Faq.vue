@@ -121,6 +121,11 @@
       padding: var(--spacing-2xl);
       border: 1px solid var(--border-light);
 
+      a {
+        color: var(--primary-light);
+        text-decoration: underline;
+      }
+
       h3 {
         margin-bottom: var(--spacing-lg);
         color: var(--primary-color);

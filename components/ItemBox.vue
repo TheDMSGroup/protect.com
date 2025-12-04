@@ -94,9 +94,11 @@
       padding: 0 25px;
       height: 100%;
       flex-wrap: nowrap;
+      margin: 0;
       .button-label,
       .button-label-indicator {
         padding: 0;
+        width: auto;
       }
       .button-label {
         flex-grow: 12;
