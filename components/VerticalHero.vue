@@ -66,11 +66,13 @@
           <NuxtImg
             :src="buildImageUrl(heroImage)"
             alt="Auto Insurance Shield"
-            width="600"
-            height="700"
-            sizes="sm:100vw md:50vw lg:45vw xl:600px"
-            style="height: auto; width: 100%"
+            width="700"
+            height="800"
+            sizes="sm:100vw md:50vw lg:45vw xl:700px"
+            style="height: auto"
             fetchpriority="high"
+            fit="inside"
+            format="webp"
           />
         </div>
       </div>
@@ -134,7 +136,7 @@
         width: 55%;
         display: flex;
         flex-direction: column;
-        margin-top: 6em;
+        margin-top: 3em;
         text-align: left;
 
         @include media-breakpoint-down(lg) {

@@ -185,6 +185,8 @@
         text-align: left;
         font-size: 18px;
         background: #fff;
+        padding: 0.75em 1.25em;
+        border-bottom: 1px solid #e5e5e5;
         &:first-child {
           border-top-left-radius: 0;
           border-top-right-radius: 0;

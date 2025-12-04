@@ -122,7 +122,7 @@
       border: 1px solid var(--border-light);
 
       a {
-        color: var(--primary-light);
+        color: var(--primary-color);
         text-decoration: underline;
       }
 
@@ -138,7 +138,7 @@
       }
 
       p {
-        color: var(--text-secondary);
+        color: black;
         line-height: 1.7;
         margin: 0;
         font-size: 1.125rem;
