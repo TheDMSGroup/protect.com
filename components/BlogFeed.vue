@@ -94,6 +94,7 @@ export default {
     showCategories: { type: Boolean },
     vertical: { type: String },
     subVerticals: { type: Array },
+    articles: { type: Array, default: () => [] },
   },
   data() {
     return {
@@ -107,13 +108,18 @@ export default {
   },
   computed: {
     uniqueArticleTags() {
-      return this.$store.state.recentArticlesData.uniqueArticleTags;
+      return this.$store?.state?.recentArticlesData?.uniqueArticleTags || [];
     },
     recentArticles() {
+      // Use passed articles prop if available, otherwise fall back to store
+      if (this.articles && this.articles.length > 0) {
+        return this.articles;
+      }
       // const articles = this.$store.getters.getRecentArticlesData();
       // const limitFromConfig = this.$store.state.recentArticlesData.limit;
       // const filteredArticles = articles.filter((article) => this.subVerticals?.includes(article.subvertical));
       // return filteredArticles.filter((article) => !this.articlePath.includes(article.urlSlug)).slice(0, limitFromConfig);
+      return [];
     },
   },
 };

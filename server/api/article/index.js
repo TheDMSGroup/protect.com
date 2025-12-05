@@ -17,7 +17,6 @@ export default defineEventHandler(async (event) => {
           }
         }
         recentArticles: articles(
-          stage: DRAFT
           where: { urlSlug_not: $urlSlug, domain: protectCom }
           orderBy: publishedAt_DESC
           first: 4
