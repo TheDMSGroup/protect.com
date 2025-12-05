@@ -20,7 +20,7 @@
   const date = computed(() => article.value?.publishedAt || "");
   const readTime = computed(() => article.value?.readTime || "");
   const relatedArticles = computed(() => article.value?.relatedArticles || []);
-  const recentArticles = computed(() => article.value?.recentArticles || []);
+  const recentArticles = computed(() => articleResult.value?.recentArticles || []);
   const coverImage = computed(() => article.value?.coverImage || null);
   const subvertical = computed(() => article.value?.subvertical || "");
   const metaKeywords = computed(() => {
