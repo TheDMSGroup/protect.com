@@ -16,8 +16,15 @@ export default defineEventHandler(async (event) => {
             ...RelatedArticleFragment
           }
         }
+        recentArticles: articles(
+          where: { urlSlug_not: $urlSlug, domain: protectCom }
+          orderBy: publishedAt_DESC
+          first: 4
+        ) {
+          ...RelatedArticleFragment
+        }
       }
-      
+
       fragment ArticleDetailFragment on Article {
     id
         urlSlug
@@ -42,7 +49,7 @@ export default defineEventHandler(async (event) => {
           tagValue
         }
       }
-      
+
       fragment RelatedArticleFragment on Article {
         id
         urlSlug
@@ -306,6 +313,7 @@ export default defineEventHandler(async (event) => {
         contentParts: articleContent.contentParts,
         componentNames: articleContent.componentNames,
         contentLinks: articleContent.contentLinks,
+        recentArticles: article.recentArticles || [],
       };
     } catch (err) {
       // Log server-side for debugging

@@ -15,7 +15,7 @@
   <div class="blog-feed-item col-lg-3 col-md-6 col-sm-12">
     <NuxtLink :to="`/article/${urlSlug}`">
       <div class="col-md-12 article-image">
-        <img :src="imageUrl" />
+        <NuxtImg :src="imageUrl" alt/>
       </div>
 
       <div class="col-md-12 article-body">
