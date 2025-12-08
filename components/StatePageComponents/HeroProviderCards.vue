@@ -91,6 +91,8 @@
 </template>
 
 <script setup>
+import { redirectWithParams } from '~/composables/utils.js';
+
 const props = defineProps({
     config: Object,
     buttonAction: Function,
@@ -98,7 +100,6 @@ const props = defineProps({
     stateData: Object,
     zipcode: String,
   });
-// import { redirectWithParams } from '../../mixins/utilsMixin';
 
 const svgPath = computed(() => {
   return '/assets/states/outlines/icon-shield.png';
@@ -112,7 +113,7 @@ useHead({
 });
 
     const goTo = function() {
-      redirectWithParams('https://insure.protect.com', { zipcode });
+      redirectWithParams('https://insure.protect.com', { zipcode: props.zipcode });
     };
 
     const execute = function() {
@@ -265,7 +266,7 @@ useHead({
         display: flex;
         gap: 1px;
         .star-icon {
-          height: 12px;
+          height: 20px;
         }
       }
 
