@@ -125,7 +125,7 @@ $desktop: 1200px;
 
     @include mobile {
       grid-template-columns: 1fr;
-      gap: var(--spacing-2xl);
+      gap: 90px;
       text-align: left;
     }
   }

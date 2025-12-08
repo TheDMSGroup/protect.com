@@ -8,6 +8,10 @@
       type: String,
       default: "",
     },
+    heroImageAlt: {
+      type: String,
+      default: "",
+    },
     headline: {
       type: String,
       default: "",
@@ -24,12 +28,16 @@
       type: Object,
       default: () => ({}),
     },
+    lazyImage: {
+      type: Boolean,
+      default: false,
+    },
   });
 
   console.log("SubVerticalHero props:", props);
   console.log("zipcodeUrl value:", props.zipcodeUrl);
 
-  const { heroImage, headline, subheadline, zipcodeUrl, intermediaryModalOptions } = props;
+  const { heroImage, headline, subheadline, zipcodeUrl, intermediaryModalOptions, lazyImage } = props;
 
   const heroImageSrc = computed(() => {
     return `${assetsBaseUrl}/${heroImage}`;
@@ -52,12 +60,34 @@
               </slot>
             </b-col>
             <b-col cols="12" class="hero-img-sm">
-              <NuxtImg :src="heroImageSrc" />
+              <NuxtImg
+                :src="heroImageSrc"
+                :loading="lazyImage ? 'lazy' : 'eager'"
+                :fetchpriority="lazyImage ? 'low' : 'high'"
+                decoding="async"
+                sizes="sm:400px md:400px"
+                :alt="heroImageAlt"
+                format="webp"
+                width="467"
+                height="520"
+                style="height: auto;"
+              />
             </b-col>
           </b-row>
         </div>
         <div class="hero-right">
-          <NuxtImg :src="heroImageSrc" />
+          <NuxtImg
+            :src="heroImageSrc"
+            :loading="lazyImage ? 'lazy' : 'eager'"
+            :fetchpriority="lazyImage ? 'low' : 'high'"
+            decoding="async"
+            sizes="md:475px lg:475px xl:475px"
+            :alt="heroImageAlt"
+            format="webp"
+            width="467"
+            height="520"
+            style="height: auto;"
+          />
         </div>
       </div>
     </div>

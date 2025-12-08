@@ -52,6 +52,8 @@
         <NuxtImg
           :src="buildImageUrl(`partners/${provider.src}`)"
           :alt="provider.name"
+          format="webp"
+          loading="lazy"
           :style="{
             maxWidth: logoMaxWidth,
             maxHeight: logoMaxHeight,

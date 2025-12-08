@@ -1,35 +1,26 @@
 <template lang="html">
   <div
     class="rating-chart"
-    v-if="typeof carriers !== 'undefined' && carriers.length > 0"
-  >
+    v-if="(typeof carriers !== 'undefined' && carriers.length > 0)">
     <!-- headers -->
     <b-row class="rating-headers-row">
       <b-col
         class="header-cell"
-        :cols="
-          index === 0
-            ? headerColumnWidth(headers.length)
-            : Math.floor(
-                (12 - headerColumnWidth(headers.length)) / (headers.length - 1)
-              )
-        "
+        :cols="index === 0 ? headerColumnWidth(headers.length) : Math.floor((12-headerColumnWidth(headers.length))/(headers.length-1))"
         v-for="(header, index) in headers"
-        v-bind:key="header.label"
-      >
+        v-bind:key="header.label">
         <span v-for="(word, i) in header.label.split(' ')" :key="word">
           <span v-if="i + 1 !== header.label.split(' ').length">
-            {{ word }}
-          </span>
-          <span class="nowrap" v-else>
-            {{ word }}
-            <info-tooltip
-              v-if="header.tooltip && header.tooltip.message"
-              :target="header.tooltip.target + index"
-              :message="header.tooltip.message"
-            />
-          </span>
-        </span>
+           {{word}}
+         </span>
+         <span class="nowrap" v-else>
+           {{word}}
+           <!-- <info-tooltip
+            v-if="header.tooltip && header.tooltip.message"
+            :target="header.tooltip.target + index"
+            :message="header.tooltip.message" /> -->
+         </span>
+       </span>
       </b-col>
     </b-row>
     <!-- rows of the carriers -->
@@ -37,52 +28,37 @@
       v-for="(carrier, index) in carriers"
       :key="index"
       class="rating-content-row"
-      :class="index % 2 === 0 ? 'white' : ''"
-    >
+      :class="(index % 2 === 0) ? 'white' : ''">
       <b-col
         :class="hindex === 0 ? 'rating-cell carrier-name-cell' : 'rating-cell'"
-        :cols="hindex === 0 ? '12' : Math.floor(12 / (headers.length - 1))"
-        :lg="
-          hindex === 0
-            ? headers.length - 1 === 3
-              ? 6
-              : 4
-            : Math.floor((12 - 4) / (headers.length - 1))
-        "
+        :cols="hindex === 0 ? '12' : Math.floor((12)/(headers.length-1))"
+        :lg="hindex === 0 ? headers.length-1 === 3 ? 6 : 4 : Math.floor((12 - 4)/(headers.length-1))"
         v-for="(header, hindex) in headers"
-        :key="hindex + index + 'subheader'"
-      >
-        <div
-          class="cell-header"
-          v-if="!['lenderName', 'carrierName'].includes(header.name)"
-        >
-          <span v-for="(word, i) in header.label.split(' ')" :key="word">
-            <span v-if="i + 1 !== header.label.split(' ').length">
-              {{ word }}
-            </span>
-            <span class="nowrap" v-else>
-              {{ word }}
-              <info-tooltip
-                v-if="header.tooltip && header.tooltip.message"
-                :target="header.tooltip.target + index"
-                :message="header.tooltip.message"
-              />
-            </span>
-          </span>
-        </div>
+        :key="hindex + index + 'subheader'">
+       <div
+        class="cell-header"
+        v-if="!['lenderName', 'carrierName'].includes(header.name) ">
+        <span v-for="(word, i) in header.label.split(' ')" :key="word">
+          <span v-if="i + 1 !== header.label.split(' ').length">
+           {{word}}
+         </span>
+         <span class="nowrap" v-else>
+           {{word}}
+           <!-- <info-tooltip
+            v-if="header.tooltip && header.tooltip.message"
+            :target="header.tooltip.target + index"
+            :message="header.tooltip.message" /> -->
+         </span>
+       </span>
+
+       </div>
         <div class="cell-content">
-          <span
-            v-if="
-              carrier[header.name].includes('/') &&
-              carrier[header.name].split('/')[1].length > 3
-            "
-          >
+          <span v-if="carrier[header.name].includes('/') && carrier[header.name].split('/')[1].length > 3">
             <span class="d-block d-xl-none">
-              <sup>{{ carrier[header.name].split("/")[0] }}</sup
-              >/<sub>{{ carrier[header.name].split("/")[1] }}</sub>
+              <sup>{{carrier[header.name].split('/')[0]}}</sup>/<sub>{{carrier[header.name].split('/')[1]}}</sub>
             </span>
             <span class="d-none d-xl-block">
-              {{ carrier[header.name] }}
+              {{carrier[header.name]}}
             </span>
           </span>
           <span v-else>
@@ -105,10 +81,9 @@
                 size: 'lg',
                 variant: 'primary',
                 label: 'COMPARE RATES',
-                icon: 'arrow-right-short',
+                icon:'arrow-right-short',
                 click: goToAction,
-              }"
-            ></b-buttons>
+            }"></b-buttons>
           </b-col>
         </b-row>
       </div>
@@ -116,219 +91,193 @@
   </div>
 </template>
 
-<script>
-export default {
-  name: "RatingChart",
-  props: ["bannerHeadline", "action", "carriers"],
-  data() {
-    return {
-      headerDefinitions: {
-        carrierName: {
-          name: "carrierName",
-          label: "Carrier Name",
-        },
-        amBestScore: {
-          name: "amBestScore",
-          label: "AM Best Rating",
-          tooltip: {
-            target: "am-best-score-tooltip",
-            message:
-              "AM Best issues financial-strength ratings measuring insurance companies' " +
-              "ability to pay claims. The agency offers in-depth financial analysis reports to " +
-              "help people judge an insurer’s creditworthiness. (A higher score here is better)",
-          },
-        },
-        amBestRating: {
-          name: "amBestRating",
-          label: "AM Best Rating",
-          tooltip: {
-            target: "am-best-rating-tooltip",
-            message:
-              "AM Best is specialized in the rating of insurance and reinsurance companies." +
-              "Its scale includes 7 categories that range from A to C. Ratings can be supplemented " +
-              "with the signs (+) or (-) to specify the exact level or “Rating Notches”.",
-          },
-        },
-        jdPowerRating: {
-          name: "jdPowerRating",
-          label: "J.D. Power Rating",
-          tooltip: {
-            target: "jd-power-rating-tooltip",
-            message:
-              "J.D. Power rankings are your guide to finding which" +
-              "products or services ranked highest in J.D. Power Consumer Studies." +
-              "All rankings are based on the opinions of a sample of consumers from a variety of industries" +
-              "who have used or owned the product or service being rated. (A higher score here is better)",
-          },
-        },
-        jdPowerScore: {
-          name: "jdPowerScore",
-          label: "J.D. Power Score",
-          tooltip: {
-            target: "jd-power-score-tooltip",
-            message:
-              "J.D. Power rankings are your guide to finding which products or services ranked " +
-              "highest in J.D. Power Consumer Studies. All rankings are based on the opinions of a sample " +
-              "of consumers from a variety of industries who have used or owned the product or service " +
-              "being rated. (A higher score here is better)",
-          },
-        },
-        bbbScore: {
-          name: "bbbScore",
-          label: "BBB Score",
-          tooltip: {
-            target: "bbb-score-tooltip",
-            message:
-              "BBB ratings represent the BBB's opinion of how the business is " +
-              "likely to interact with its customers. The BBB rating is based on information BBB " +
-              "is able to obtain about the business, including complaints received from the public." +
-              "BBB seeks and uses information directly from businesses and from public data sources.",
-          },
-        },
-        naicScore: {
-          name: "naicScore",
-          label: "NAIC Score",
-          tooltip: {
-            target: "naic-score-tooltip",
-            message:
-              "The NAIC helps consumers research specific insurance companies, " +
-              "including any complaint data the NAIC has collected. Companies are scored on a " +
-              "national complaint index, which shows whether they've received more or fewer " +
-              "complaints than other insurers, after adjusting for market share. (A lower score here is better)",
-          },
-        },
-        lenderName: {
-          name: "lenderName",
-          label: "Lender Name",
-        },
-        minCreditScore: {
-          name: "minCreditScore",
-          label: "Min. Credit Score",
-          tooltip: {
-            target: "mincredit-score-tooltip",
-            message:
-              "Qualifying buyers can find lenders offering conventional loans with " +
-              "down payments as low as 3%. If you qualify for a VA loan some lenders offer 0% down on new purchases.",
-          },
-        },
-        minDownPayment: {
-          name: "minDownPayment",
-          label: "Min. Down Payment",
-          tooltip: {
-            target: "min-downpayment-tooltip",
-            message:
-              "Conventional loans typically will require a minimum FICO® credit score of 620. " +
-              "If you qualify for a VA loan some lenders minimum FICO® credit score can be as low as 580.",
-          },
-        },
-      },
-    };
+<script setup>
+const props = defineProps({
+  bannerHeadline: {
+    type: String,
+    default: '',
   },
-  methods: {
-    goToAction() {
-      if (this.action.includes("#")) {
-        const element = document.querySelector(this.action);
-        element.scrollIntoView({
-          behavior: "smooth",
-          block: "end",
-          inline: "nearest",
-        });
-      } else {
-        /* this.$router.push(this.action); */
-        window.location.href = this.action;
-      }
-    },
-    headerColumnWidth(headerLength) {
-      return headerLength - 1 === 3 ? 6 : 4;
-    },
-    testDataForVertical(carrierData, targetKeys) {
-      if (carrierData) {
-        /* filter the array for any values that are undefined */
-        const hasMissingKeys = targetKeys.filter((key) => !carrierData[key]);
-        /* If hasMissingKeys array has items in it, this set of carrier data is not a match. The below expression will return false and we move on to the next vertical of data
-         */
-        return hasMissingKeys.length === 0;
-      }
-      return false;
-    },
+  action: {
+    type: String,
+    default: '',
   },
-  computed: {
-    vertical() {
-      const carrier = this.carriers[0];
-      let vertical = "autoInsurance";
+  carriers: {
+    type: Array,
+    default: () => [],
+  },
+});
 
-      if (
-        this.testDataForVertical(carrier, [
-          "amBestRating",
-          "jdPowerRating",
-          "bbbScore",
-          "naicScore",
-        ])
-      ) {
-        vertical = "autoInsurance";
-      } else if (
-        this.testDataForVertical(carrier, [
-          "minCreditScore",
-          "minDownPayment",
-          "bbbScore",
-        ])
-      ) {
-        vertical = "mortgage";
-      } else if (
-        this.testDataForVertical(carrier, [
-          "amBestRating",
-          "bbbScore",
-          "jdPowerScore",
-        ])
-      ) {
-        vertical = "medicare";
-      }
-      console.log(vertical);
-      return vertical;
-    },
-    headers() {
-      let desiredHeaders = [];
-      switch (this.vertical) {
-        case "mortgage":
-          desiredHeaders = [
-            this.headerDefinitions.lenderName,
-            this.headerDefinitions.minCreditScore,
-            this.headerDefinitions.bbbScore,
-            this.headerDefinitions.minDownPayment,
-          ];
-          break;
-        case "medicare":
-          desiredHeaders = [
-            this.headerDefinitions.carrierName,
-            this.headerDefinitions.amBestRating,
-            this.headerDefinitions.bbbScore,
-            this.headerDefinitions.jdPowerScore,
-          ];
-          break;
-        case "autoInsurance":
-        default:
-          desiredHeaders = [
-            this.headerDefinitions.carrierName,
-            this.headerDefinitions.amBestRating,
-            this.headerDefinitions.jdPowerRating,
-            this.headerDefinitions.bbbScore,
-            this.headerDefinitions.naicScore,
-          ];
-      }
-      return desiredHeaders;
+const headerDefinitions = {
+  carrierName: {
+    name: 'carrierName',
+    label: 'Carrier Name',
+  },
+  amBestScore: {
+    name: 'amBestScore',
+    label: 'AM Best Rating',
+    tooltip: {
+      target: 'am-best-score-tooltip',
+      message: "AM Best issues financial-strength ratings measuring insurance companies' " +
+        'ability to pay claims. The agency offers in-depth financial analysis reports to ' +
+        "help people judge an insurer's creditworthiness. (A higher score here is better)",
     },
   },
+  amBestRating: {
+    name: 'amBestRating',
+    label: 'AM Best Rating',
+    tooltip: {
+      target: 'am-best-rating-tooltip',
+      message: 'AM Best is specialized in the rating of insurance and reinsurance companies.' +
+        'Its scale includes 7 categories that range from A to C. Ratings can be supplemented ' +
+        'with the signs (+) or (-) to specify the exact level or "Rating Notches".',
+    },
+  },
+  jdPowerRating: {
+    name: 'jdPowerRating',
+    label: 'J.D. Power Rating',
+    tooltip: {
+      target: 'jd-power-rating-tooltip',
+      message: 'J.D. Power rankings are your guide to finding which' +
+        'products or services ranked highest in J.D. Power Consumer Studies.' +
+        'All rankings are based on the opinions of a sample of consumers from a variety of industries' +
+        'who have used or owned the product or service being rated. (A higher score here is better)',
+    },
+  },
+  jdPowerScore: {
+    name: 'jdPowerScore',
+    label: 'J.D. Power Score',
+    tooltip: {
+      target: 'jd-power-score-tooltip',
+      message: 'J.D. Power rankings are your guide to finding which products or services ranked ' +
+        'highest in J.D. Power Consumer Studies. All rankings are based on the opinions of a sample ' +
+        'of consumers from a variety of industries who have used or owned the product or service ' +
+        'being rated. (A higher score here is better)',
+    },
+  },
+  bbbScore: {
+    name: 'bbbScore',
+    label: 'BBB Score',
+    tooltip: {
+      target: 'bbb-score-tooltip',
+      message: "BBB ratings represent the BBB's opinion of how the business is " +
+        'likely to interact with its customers. The BBB rating is based on information BBB ' +
+        'is able to obtain about the business, including complaints received from the public.' +
+        'BBB seeks and uses information directly from businesses and from public data sources.',
+    },
+  },
+  naicScore: {
+    name: 'naicScore',
+    label: 'NAIC Score',
+    tooltip: {
+      target: 'naic-score-tooltip',
+      message: 'The NAIC helps consumers research specific insurance companies, ' +
+        "including any complaint data the NAIC has collected. Companies are scored on a " +
+        "national complaint index, which shows whether they've received more or fewer " +
+        'complaints than other insurers, after adjusting for market share. (A lower score here is better)',
+    },
+  },
+  lenderName: {
+    name: 'lenderName',
+    label: 'Lender Name',
+  },
+  minCreditScore: {
+    name: 'minCreditScore',
+    label: 'Min. Credit Score',
+    tooltip: {
+      target: 'mincredit-score-tooltip',
+      message: 'Qualifying buyers can find lenders offering conventional loans with ' +
+        'down payments as low as 3%. If you qualify for a VA loan some lenders offer 0% down on new purchases.',
+    },
+  },
+  minDownPayment: {
+    name: 'minDownPayment',
+    label: 'Min. Down Payment',
+    tooltip: {
+      target: 'min-downpayment-tooltip',
+      message: 'Conventional loans typically will require a minimum FICO® credit score of 620. ' +
+        'If you qualify for a VA loan some lenders minimum FICO® credit score can be as low as 580.',
+    },
+  },
+};
+
+const testDataForVertical = (carrierData, targetKeys) => {
+  if (carrierData) {
+    const hasMissingKeys = targetKeys.filter((key) => !carrierData[key]);
+    return hasMissingKeys.length === 0;
+  }
+  return false;
+};
+
+const vertical = computed(() => {
+  const carrier = props.carriers[0];
+  let verticalType = 'autoInsurance';
+
+  if (testDataForVertical(carrier, ['amBestRating', 'jdPowerRating', 'bbbScore', 'naicScore'])) {
+    verticalType = 'autoInsurance';
+  } else if (testDataForVertical(carrier, ['minCreditScore', 'minDownPayment', 'bbbScore'])) {
+    verticalType = 'mortgage';
+  } else if (testDataForVertical(carrier, ['amBestRating', 'bbbScore', 'jdPowerScore'])) {
+    verticalType = 'medicare';
+  }
+  return verticalType;
+});
+
+const headers = computed(() => {
+  let desiredHeaders = [];
+  switch (vertical.value) {
+    case 'mortgage':
+      desiredHeaders = [
+        headerDefinitions.lenderName,
+        headerDefinitions.minCreditScore,
+        headerDefinitions.bbbScore,
+        headerDefinitions.minDownPayment,
+      ];
+      break;
+    case 'medicare':
+      desiredHeaders = [
+        headerDefinitions.carrierName,
+        headerDefinitions.amBestRating,
+        headerDefinitions.bbbScore,
+        headerDefinitions.jdPowerScore,
+      ];
+      break;
+    case 'autoInsurance':
+    default:
+      desiredHeaders = [
+        headerDefinitions.carrierName,
+        headerDefinitions.amBestRating,
+        headerDefinitions.jdPowerRating,
+        headerDefinitions.bbbScore,
+        headerDefinitions.naicScore,
+      ];
+  }
+  return desiredHeaders;
+});
+
+const headerColumnWidth = (headerLength) => {
+  return headerLength - 1 === 3 ? 6 : 4;
+};
+
+const goToAction = () => {
+  if (props.action.includes('#')) {
+    const element = document.querySelector(props.action);
+    element?.scrollIntoView({ behavior: 'smooth', block: 'end', inline: 'nearest' });
+  } else {
+    window.location.href = props.action;
+  }
 };
 </script>
 
 <style lang="scss">
 .rating-chart {
-  margin-top: 50px;
-  @include media-breakpoint-down(md) {
-    padding: 0 15px;
-  }
+
+
+margin-top: 50px;
+@include media-breakpoint-down(md) {
+  padding: 0 15px;
+}
   .nowrap {
-    white-space: nowrap;
+      white-space: nowrap;
   }
   .rating-headers-row {
     padding: 25px 0;
@@ -347,7 +296,7 @@ export default {
   .rating-content-row {
     padding: 35px 0;
     flex-wrap: wrap;
-
+    display: flex;
     @include media-breakpoint-down(md) {
       padding: 0;
       background: #fff;
@@ -362,17 +311,20 @@ export default {
         display: flex;
         flex-direction: column;
         justify-content: space-between;
+
       }
       .cell-header {
         display: none;
 
         @include media-breakpoint-down(md) {
-          display: block;
+          display: flex;
+          flex-direction: column;
           font-size: 1rem;
           color: #3b54ba;
           line-height: 1.2;
           font-weight: 500;
           margin-bottom: 25px;
+
         }
       }
       .cell-content {
@@ -408,10 +360,7 @@ export default {
       margin-top: -250px;
       height: 275px;
       width: 100%;
-      background-image: linear-gradient(
-        rgba(255, 555, 555, 0),
-        rgba(249, 249, 249, 1)
-      );
+      background-image: linear-gradient(rgba(255,555,555,0), rgba(249,249,249,1));
       z-index: 0;
     }
     .banner {

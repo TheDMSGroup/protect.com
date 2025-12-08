@@ -42,14 +42,14 @@
           <b-row>
             <b-col class="headline-col" cols="12">
               <h1>{{ headline }}</h1>
-              <h2 v-if="!subheadlineType === 'small'">{{ subheadline }}</h2>
+              <h2 v-if="subheadlineType !== 'small'">{{ subheadline }}</h2>
               <p v-else>{{ subheadline }}</p>
             </b-col>
             <b-col v-if="ctaType" class="cta-col" cols="12">
               <b-row v-if="ctaType && ctaType == 'buttons'" class="btn-row">
                 <b-col v-for="(btn, index) in ctaConfig.options" :key="index" cols="12" lg="6">
                   <NuxtLink class="vertical-btn" :to="'/' + btn.value">
-                    <NuxtImg :src="buildImageUrl(btn.icon)" :alt="btn.text" />
+                    <!-- <NuxtImg :src="buildImageUrl(btn.icon)" :alt="btn.text" width="785" height="780"/> -->
                     <p class="btn-title">
                       {{ btn.text }}
                     </p>
@@ -63,7 +63,7 @@
           </b-row>
         </div>
         <div class="hero-right">
-          <NuxtImg :src="buildImageUrl(heroImage)" alt="Identity Shield" />
+          <NuxtImg :src="buildImageUrl(heroImage)" alt="Auto Insurance Shield" width="624" height="722" sizes="sm:100vw md:50vw lg:45vw xl:600px" style="height: auto;" />
         </div>
       </div>
     </b-container>

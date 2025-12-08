@@ -9,6 +9,18 @@ export default defineNuxtConfig({
   features: {
     inlineStyles: true,
   },
+  scripts: {
+    registry: {
+      googleTagManager: {
+        id: "GTM-MZPRQHZ", // Replace with your Google Tag Manager ID
+      },
+    },
+  },
+  image: {
+    quality: 80,
+    format: ["webp"],
+    preload: false,
+  },
   app: {
     head: {
       htmlAttrs: {
@@ -45,7 +57,6 @@ export default defineNuxtConfig({
           onload: "this.media='all'",
         },
       ],
-
     },
   },
   runtimeConfig: {
@@ -70,6 +81,12 @@ export default defineNuxtConfig({
     },
     // Images - cache for 1 year
     "/img/**": {
+      headers: {
+        "cache-control": "public, max-age=31536000, immutable",
+      },
+    },
+    // Amplify optimized images - cache for 1 year
+    "/_amplify/image/**": {
       headers: {
         "cache-control": "public, max-age=31536000, immutable",
       },

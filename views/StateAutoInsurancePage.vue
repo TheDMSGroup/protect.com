@@ -1119,11 +1119,6 @@ onMounted(() => {
 .state-insurance-page,
 .loading,
 .error {
-  min-height: 6525px;
-
-  @include mobile {
-    min-height: 10000px;
-  }
 }
 
 .loading {

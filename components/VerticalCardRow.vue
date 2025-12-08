@@ -1,5 +1,7 @@
 <script setup>
   import { buildImageUrl } from "@/composables/images";
+  import { redirectWithParams, preprocessTextForLinks } from "@/composables/utils";
+
   const props = defineProps({
     cardImage: {
       type: String,
@@ -33,15 +35,21 @@
       type: String,
       default: "left",
     },
+    lazyImage: {
+      type: Boolean,
+      default: true,
+    },
   });
 
-  const { cardImage, title, description, links, buttonLabel, buttonDestination, largeColSize, cardPosition } = props;
+  const router = useRouter();
+
   const goToRoute = (route) => {
-    redirectWithParams(route, {}, this.$router);
+    redirectWithParams(route, {}, router);
   };
+
   const preprocessDescription = () => {
-    if (!description) return "";
-    return preprocessTextForLinks(description, links);
+    if (!props.description) return "";
+    return preprocessTextForLinks(props.description, props.links);
   };
 </script>
 
@@ -49,7 +57,14 @@
   <b-row class="vertical_card_row">
     <template v-if="cardPosition === 'left'">
       <b-col cols="12" :lg="12 - Number(largeColSize)" class="img_col">
-        <NuxtImg :src="buildImageUrl(cardImage)" />
+        <NuxtImg
+          :src="buildImageUrl(cardImage)"
+          :alt="title"
+          :loading="lazyImage ? 'lazy' : 'eager'"
+          :fetchpriority="lazyImage ? 'low' : 'auto'"
+          decoding="async"
+          :preload="!lazyImage"
+        />
       </b-col>
       <b-col cols="12" :lg="largeColSize" class="content_col">
         <h2>{{ title }}</h2>
@@ -84,7 +99,14 @@
         />
       </b-col>
       <b-col cols="12" :lg="12 - Number(largeColSize)" class="img_col">
-        <NuxtImg :src="buildImageUrl(cardImage)" />
+        <NuxtImg
+          :src="buildImageUrl(cardImage)"
+          :alt="title"
+          :loading="lazyImage ? 'lazy' : 'eager'"
+          :fetchpriority="lazyImage ? 'low' : 'auto'"
+          decoding="async"
+          :preload="!lazyImage"
+        />
       </b-col>
     </template>
   </b-row>

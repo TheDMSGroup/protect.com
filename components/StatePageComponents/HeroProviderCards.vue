@@ -8,9 +8,6 @@
     }"
     >
 
-    <!-- Preload critical images -->
-    <link rel="preload" :href="svgPath" as="image" type="image/svg+xml" fetchpriority="high">
-
     <div class="provider-cards-stack hero-provider-stack" @click="goTo" role="button" tabindex="0" @keydown.enter="goTo" @keydown.space.prevent="goTo" aria-label="Get insurance quotes from top providers">
       <div class="provider-card hero-provider-card" :style="{ animationDelay: '.2s' }">
         <div class="hero-provider-logo">
@@ -94,6 +91,8 @@
 </template>
 
 <script setup>
+import { redirectWithParams } from '~/composables/utils.js';
+
 const props = defineProps({
     config: Object,
     buttonAction: Function,
@@ -101,14 +100,20 @@ const props = defineProps({
     stateData: Object,
     zipcode: String,
   });
-// import { redirectWithParams } from '../../mixins/utilsMixin';
 
 const svgPath = computed(() => {
   return '/assets/states/outlines/icon-shield.png';
 });
 
+// Preload the background image to prevent layout shift
+useHead({
+  link: [
+    { rel: 'preload', href: '/assets/states/outlines/icon-shield.png', as: 'image', fetchpriority: 'high' }
+  ]
+});
+
     const goTo = function() {
-      redirectWithParams('https://insure.protect.com', { zipcode });
+      redirectWithParams('https://insure.protect.com', { zipcode: props.zipcode });
     };
 
     const execute = function() {
@@ -142,6 +147,7 @@ const svgPath = computed(() => {
 
   .hero-right {
       background-size: cover;
+      min-height: 350px; // Reserve space to prevent layout shift
     &.tx {
       background-size: contain;
     }
@@ -153,6 +159,7 @@ const svgPath = computed(() => {
       padding: 0px;
       margin: 60px auto 0;
       height: 216px;
+      min-height: 216px;
     }
 
     // Shield background behind provider cards
@@ -259,7 +266,7 @@ const svgPath = computed(() => {
         display: flex;
         gap: 1px;
         .star-icon {
-          height: 12px;
+          height: 20px;
         }
       }
 

@@ -19,6 +19,18 @@
       type: String,
       required: true,
     },
+    imageAlt: {
+      type: String,
+      required: true,
+    },
+    imageWidth: {
+      type: Number,
+      default: 505,
+    },
+    imageHeight: {
+      type: Number,
+      default: 489,
+    },
     imageTop: {
       type: Number,
       default: 50,
@@ -35,9 +47,13 @@
       type: String,
       default: "",
     },
+    lazyImage: {
+      type: Boolean,
+      default: true,
+    },
   });
 
-  const { containerClass, headline, subheadline, image, imageTop, ctaType, ctaConfig, action } = props;
+  const { containerClass, headline, subheadline, image, imageTop, ctaType, ctaConfig, action, imageAlt, imageWidth, imageHeight } = props;
 </script>
 
 <template>
@@ -48,7 +64,17 @@
         <b-row>
           <b-col cols="12" md="6">
             <div class="compare-photo">
-              <NuxtImg :style="'top: -' + imageTop + 'px; margin-top: -' + imageTop + 'px;'" :src="`${assetsBaseUrl}/${image}`" />
+              <NuxtImg
+                :style="'top: -' + imageTop + 'px; margin-top: -' + imageTop + 'px;'"
+                :src="`${assetsBaseUrl}/${image}`"
+                :loading="lazyImage ? 'lazy' : 'eager'"
+                :fetchpriority="lazyImage ? 'low' : 'auto'"
+                decoding="async"
+                :preload="!lazyImage"
+                :alt="imageAlt"
+                :width="imageWidth"
+                :height="imageHeight"
+              />
             </div>
           </b-col>
           <b-col cols="12" md="6">

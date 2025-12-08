@@ -153,11 +153,13 @@
           color: #495057;
           text-align: center;
           white-space: nowrap;
+          background-color: white;
         }
         .input-group-prepend {
           display: flex;
         }
         label {
+          color: #495057; // Darker color for better contrast (WCAG AA compliant)
           @include media-breakpoint-between(sm, lg) {
             font-size: 1rem;
           }
@@ -165,6 +167,11 @@
         input {
           border: none;
           height: 78px;
+          color: #212529; // Dark text for input value
+
+          &::placeholder {
+            color: #495057; // WCAG AA compliant placeholder
+          }
         }
       }
     }
@@ -172,8 +179,17 @@
       fill: #c5c5c5;
     }
     .valid {
+      @include media-breakpoint-down(md) {
+        width: 100%;
+      }
       svg {
         fill: #3b54ba;
+      }
+    }
+
+    span {
+      @include media-breakpoint-down(md) {
+        width: 100%;
       }
     }
 

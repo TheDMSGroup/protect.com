@@ -165,6 +165,26 @@
         </div>
       </div>
     </div>
+
+    <div class="latest-articles-feed">
+      <div class="feed-container container">
+        <span>Latest Articles</span>
+        <div class="blog-feed">
+          <div class="container">
+            <div class="row feed-posts">
+              <!-- TO DO: make posts dynamic when possible -->
+              <div class="post">
+                <BlogFeedItem
+                  v-for="recentArticle in recentArticles"
+                  :key="recentArticle.urlSlug"
+                  :article="recentArticle"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -417,6 +437,35 @@
             }
           }
 
+          .latest-articles-section {
+            margin-top: 3em;
+            padding-top: 2em;
+            border-top: 1px solid $gray;
+
+            .latest-articles-title {
+              font-size: 1.5rem;
+              font-weight: 600;
+              margin-bottom: 1.5em;
+              color: $gray-dark;
+            }
+
+            .latest-articles-grid {
+              display: flex;
+              flex-wrap: wrap;
+              margin: 0 -15px;
+
+              :deep(.blog-feed-item) {
+                width: 50%;
+                padding: 0 15px;
+                margin-bottom: 30px;
+
+                @include media-breakpoint-down(sm) {
+                  width: 100%;
+                }
+              }
+            }
+          }
+
           .author-info {
             display: flex;
             margin-top: 4em;
@@ -550,5 +599,31 @@
         fill: $green;
       }
     }
+    .latest-articles-feed {
+    width: 100%;
+    margin: 4em 0 0;
+
+    .feed-container {
+      border-top: 3px solid $blue;
+      padding: 0.5em 0 0 0;
+
+      @include media-breakpoint-down(md) {
+        border: 0;
+      }
+
+      span {
+        color: $blue;
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.875em;
+        display: block;
+
+        @include media-breakpoint-down(md) {
+          display: none;
+        }
+      }
+    }
   }
+  }
+
 </style>
