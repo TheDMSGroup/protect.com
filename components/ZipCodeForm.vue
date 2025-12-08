@@ -153,6 +153,7 @@
           color: #495057;
           text-align: center;
           white-space: nowrap;
+          background-color: white;
         }
         .input-group-prepend {
           display: flex;

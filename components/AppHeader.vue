@@ -343,19 +343,18 @@ svg.elixr-icon.protect-shield {
     align-items: center;
     //margin-left: 10px;
     margin-right: 15px;
+    height: 30px;
     a {
-      width: 115px;
-
       img {
-        max-width: 115px;
+        height: 22px;
+        margin-top: 5px;
       }
     }
     @include media-breakpoint-between(lg, xxl) {
       a {
-        width: 174px;
-
         img {
-          max-width: 174px;
+          height: 30px;
+          margin-top: 10px;
         }
       }
     }
