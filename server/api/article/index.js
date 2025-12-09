@@ -285,16 +285,41 @@ export default defineEventHandler(async (event) => {
         }
 
         const html = result || "";
-
+        console.log("Rendered HTML for node:", html);
         // Check if it's a component marker
         const componentMatch = html.match(componentRegex);
         if (componentMatch) {
           const componentName = componentMatch[1];
           componentNames.push(componentName);
+
+          // Split on the component marker to get text before and after
+          const parts = html.split(componentRegex);
+          const textBefore = parts[0]?.trim();
+          const textAfter = parts[2]?.trim(); // Index 2 because regex groups: [before, componentName, after]
+
+          // Add text before component if it exists
+          if (textBefore) {
+            contentParts.push({
+              type: "text",
+              content: textBefore,
+              tag: node.type,
+            });
+          }
+
+          // Add the component
           contentParts.push({
             type: "component",
             name: componentName,
           });
+
+          // Add text after component if it exists
+          if (textAfter) {
+            contentParts.push({
+              type: "text",
+              content: textAfter,
+              tag: node.type,
+            });
+          }
         } else if (html) {
           contentParts.push({
             type: "text",
