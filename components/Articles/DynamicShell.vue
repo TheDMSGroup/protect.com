@@ -19,7 +19,7 @@
       type: Array,
       required: true,
     },
-    componentNames: {
+    components: {
       type: Array,
       default: () => [],
     },
@@ -29,14 +29,15 @@
 
   // Inline composable to load components synchronously on both server and client
   const useDynamicComponents = async () => {
-    const promises = props.componentNames.map(async (componentName) => {
-      if (!loadedComponents.value[componentName]) {
+    const promises = props.components.map(async (component) => {
+      console.log(`Attempting to load component: ${component.name}`);
+      if (!loadedComponents.value[component.name]) {
         try {
-          const component = await useArticleComponentLoader(componentName);
-          loadedComponents.value[componentName] = component;
-          console.log(`✅ Loaded component: ${componentName}`);
+          const componentRef = await useArticleComponentLoader(component.name);
+          loadedComponents.value[component.name] = componentRef;
+          console.log(`✅ Loaded component: ${component.name}`);
         } catch (error) {
-          console.error(`❌ Failed to load ${componentName}:`, error);
+          console.error(`❌ Failed to load ${component.name}:`, error);
         }
       }
     });
@@ -44,6 +45,8 @@
     await Promise.all(promises);
   };
   await useDynamicComponents();
+
+  console.log("Loaded Components:", loadedComponents.value);
 
   function generateComponentProps(componentName) {
     // Add component-specific props
@@ -67,8 +70,12 @@
 
   const componentProps = computed(() => {
     const propsMap = {};
-    props.componentNames.forEach((componentName) => {
-      propsMap[componentName] = generateComponentProps(componentName);
+    props.components.forEach((component) => {
+      if (Object.keys(component.props).length === 0) {
+        propsMap[component.name] = generateComponentProps(component.name);
+      } else {
+        propsMap[component.name] = component.props;
+      }
     });
     return propsMap;
   });

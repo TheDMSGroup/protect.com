@@ -16,7 +16,15 @@
   const content = computed(() => {
     return articleResult.value?.contentParts || [];
   });
-  const componentNames = computed(() => articleResult.value?.componentNames || []);
+  const components = computed(
+    () =>
+      articleResult.value?.contentParts
+        .map((part) => {
+          if (part.type === "component") return part;
+        })
+        .filter(Boolean) || []
+  );
+  console.log("Article Components:", components.value);
   const contentLinks = computed(() => articleResult.value?.contentLinks || []);
   const author = computed(() => article.value?.author || {});
   const date = computed(() => article.value?.publishedAt || "");
@@ -108,7 +116,7 @@
         coverImage,
         vertical,
         subvertical,
-        componentNames,
+        components,
         contentLinks,
       }"
     />

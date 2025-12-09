@@ -18,7 +18,7 @@
     relatedArticles,
     vertical,
     subvertical,
-    componentNames,
+    components,
     contentLinks,
     recentArticles,
   } = toRefs(props.article);
@@ -75,7 +75,7 @@
           </div>
           <div class="article-body">
             <div class="article-left">
-              <ArticlesDynamicShell :component-names="componentNames" :content="content" />
+              <ArticlesDynamicShell :components="components" :content="content" />
               <ul class="related-articles">
                 <li v-for="relatedArticle in relatedArticles" :key="relatedArticle.title">
                   <NuxtLink :to="relatedArticle.urlSlug" class="related-article-link">
@@ -174,11 +174,7 @@
             <div class="row feed-posts">
               <!-- TO DO: make posts dynamic when possible -->
               <div class="post">
-                <BlogFeedItem
-                  v-for="recentArticle in recentArticles"
-                  :key="recentArticle.urlSlug"
-                  :article="recentArticle"
-                />
+                <BlogFeedItem v-for="recentArticle in recentArticles" :key="recentArticle.urlSlug" :article="recentArticle" />
               </div>
             </div>
           </div>
@@ -600,30 +596,29 @@
       }
     }
     .latest-articles-feed {
-    width: 100%;
-    margin: 4em 0 0;
+      width: 100%;
+      margin: 4em 0 0;
 
-    .feed-container {
-      border-top: 3px solid $blue;
-      padding: 0.5em 0 0 0;
-
-      @include media-breakpoint-down(md) {
-        border: 0;
-      }
-
-      span {
-        color: $blue;
-        font-weight: 600;
-        text-transform: uppercase;
-        font-size: 0.875em;
-        display: block;
+      .feed-container {
+        border-top: 3px solid $blue;
+        padding: 0.5em 0 0 0;
 
         @include media-breakpoint-down(md) {
-          display: none;
+          border: 0;
+        }
+
+        span {
+          color: $blue;
+          font-weight: 600;
+          text-transform: uppercase;
+          font-size: 0.875em;
+          display: block;
+
+          @include media-breakpoint-down(md) {
+            display: none;
+          }
         }
       }
     }
   }
-  }
-
 </style>
