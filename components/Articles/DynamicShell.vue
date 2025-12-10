@@ -19,7 +19,7 @@
       type: Array,
       required: true,
     },
-    componentNames: {
+    components: {
       type: Array,
       default: () => [],
     },
@@ -29,14 +29,15 @@
 
   // Inline composable to load components synchronously on both server and client
   const useDynamicComponents = async () => {
-    const promises = props.componentNames.map(async (componentName) => {
-      if (!loadedComponents.value[componentName]) {
+    const promises = props.components.map(async (component) => {
+      console.log(`Attempting to load component: ${component.name}`);
+      if (!loadedComponents.value[component.name]) {
         try {
-          const component = await useArticleComponentLoader(componentName);
-          loadedComponents.value[componentName] = component;
-          console.log(`✅ Loaded component: ${componentName}`);
+          const componentRef = await useArticleComponentLoader(component.name);
+          loadedComponents.value[component.name] = componentRef;
+          console.log(`✅ Loaded component: ${component.name}`);
         } catch (error) {
-          console.error(`❌ Failed to load ${componentName}:`, error);
+          console.error(`❌ Failed to load ${component.name}:`, error);
         }
       }
     });
@@ -45,33 +46,46 @@
   };
   await useDynamicComponents();
 
+  console.log("Loaded Components:", loadedComponents.value);
+
   function generateComponentProps(componentName) {
     // Add component-specific props
-    if (componentName === "Faq") {
-      return {
-        faq: [
-          {
-            question: "What is Protect.com?",
-            answer:
-              "Protect.com is your one-stop destination for discovering savings on car insurance. We built this site to help people compare different quotes from top providers without having to fill out dozens of forms. We show you providers that we think offer you the lowest rates based on your vehicle and lifecycle, taking the guesswork out of the auto insurance buying process.",
-          },
-          {
-            question: "How did we gather this info?",
-            answer:
-              "Protect.com is your one-stop destination for discovering savings on car insurance. We built this site to help people compare different quotes from top providers without having to fill out dozens of forms. We show you providers that we think offer you the lowest rates based on your vehicle and lifecycle, taking the guesswork out of the auto insurance buying process.",
-          },
-        ],
-      };
+    switch (componentName) {
+      case "Faq":
+        return {
+          faq: [
+            {
+              question: "What is Protect.com?",
+              answer:
+                "Protect.com is your one-stop destination for discovering savings on car insurance. We built this site to help people compare different quotes from top providers without having to fill out dozens of forms. We show you providers that we think offer you the lowest rates based on your vehicle and lifecycle, taking the guesswork out of the auto insurance buying process.",
+            },
+            {
+              question: "How did we gather this info?",
+              answer:
+                "Protect.com is your one-stop destination for discovering savings on car insurance. We built this site to help people compare different quotes from top providers without having to fill out dozens of forms. We show you providers that we think offer you the lowest rates based on your vehicle and lifecycle, taking the guesswork out of the auto insurance buying process.",
+            },
+          ],
+        };
+      case "ZipCodeForm":
+        return {
+          action: "insure.protect.com",
+        };
+      default:
+        return {};
     }
   }
 
   const componentProps = computed(() => {
     const propsMap = {};
-    props.componentNames.forEach((componentName) => {
-      propsMap[componentName] = generateComponentProps(componentName);
+    props.components.forEach((component) => {
+      // Generate fallback props if no props are provided
+      if (Object.keys(component.props).length === 0) {
+        propsMap[component.name] = generateComponentProps(component.name);
+      } else {
+        // use props passed down
+        propsMap[component.name] = component.props;
+      }
     });
     return propsMap;
   });
-
-  console.log("Component Props:", componentProps.value);
 </script>

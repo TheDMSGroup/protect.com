@@ -6,6 +6,8 @@
   //extract article data from cache or API
   const { articleResult, error } = await useArticleFromCacheOrApi();
 
+  console.log("Article Result:", articleResult);
+
   //reactive computed properties for article data
   const article = computed(() => articleResult.value?.response.article || {});
   const title = computed(() => article.value?.title || "");
@@ -14,7 +16,15 @@
   const content = computed(() => {
     return articleResult.value?.contentParts || [];
   });
-  const componentNames = computed(() => articleResult.value?.componentNames || []);
+  const components = computed(
+    () =>
+      articleResult.value?.contentParts
+        .map((part) => {
+          if (part.type === "component") return part;
+        })
+        .filter(Boolean) || []
+  );
+  console.log("Article Components:", components.value);
   const contentLinks = computed(() => articleResult.value?.contentLinks || []);
   const author = computed(() => article.value?.author || {});
   const date = computed(() => article.value?.publishedAt || "");
@@ -70,12 +80,12 @@
     keywords: () => metaKeywords.value.join(", "),
     ogTitle: () => title.value,
     ogDescription: () => excerpt.value,
-    ogImage: () => coverImage.value?.url || 'https://protect.com/img/protect-share.jpg',
-    ogType: 'article',
-    twitterCard: 'summary_large_image',
+    ogImage: () => coverImage.value?.url || "https://protect.com/img/protect-share.jpg",
+    ogType: "article",
+    twitterCard: "summary_large_image",
     twitterTitle: () => title.value,
     twitterDescription: () => excerpt.value,
-    twitterImage: () => coverImage.value?.url || 'https://protect.com/img/protect-share.jpg',
+    twitterImage: () => coverImage.value?.url || "https://protect.com/img/protect-share.jpg",
   });
 </script>
 <template>
@@ -106,7 +116,7 @@
         coverImage,
         vertical,
         subvertical,
-        componentNames,
+        components,
         contentLinks,
       }"
     />

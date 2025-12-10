@@ -93,7 +93,10 @@ export default defineEventHandler(async (event) => {
         return article;
       }
 
-      const componentRegex = /!!component_(\w+)!!/;
+      // Updated regex to match: {{component_Name, |{props: 'here'}| }}
+      // Captures: component name and optional props object
+      // Made more flexible to handle spaces and nested content
+      const componentRegex = /\{\{component_(\w+)(?:,\s*\|([^|]+)\|)?\s*\}\}/g;
 
       // Helper function to extract headings from AST (always runs)
       const extractHeadings = (nodes) => {
@@ -285,16 +288,77 @@ export default defineEventHandler(async (event) => {
         }
 
         const html = result || "";
+        console.log("Rendered HTML for node:", html);
 
-        // Check if it's a component marker
-        const componentMatch = html.match(componentRegex);
-        if (componentMatch) {
-          const componentName = componentMatch[1];
-          componentNames.push(componentName);
-          contentParts.push({
-            type: "component",
-            name: componentName,
+        // Check if it's a component marker with the new pattern
+        // Pattern: {{component_Name, |{props}| }}
+        let match;
+        const componentMatches = [];
+
+        // Reset regex lastIndex for global flag
+        componentRegex.lastIndex = 0;
+
+        while ((match = componentRegex.exec(html)) !== null) {
+          componentMatches.push({
+            fullMatch: match[0],
+            componentName: match[1],
+            propsString: match[2], // Can be undefined if no props
+            index: match.index,
           });
+        }
+
+        if (componentMatches.length > 0) {
+          let lastIndex = 0;
+
+          componentMatches.forEach((componentMatch) => {
+            const { fullMatch, componentName, propsString, index } = componentMatch;
+
+            componentNames.push(componentName);
+
+            // Add text before this component
+            if (index > lastIndex) {
+              const textBefore = html.substring(lastIndex, index).trim();
+              if (textBefore) {
+                contentParts.push({
+                  type: "text",
+                  content: textBefore,
+                  tag: node.type,
+                });
+              }
+            }
+
+            // Parse props if they exist
+            let props = {};
+            if (propsString) {
+              try {
+                // Remove leading/trailing whitespace and parse JSON
+                props = JSON.parse(propsString.trim());
+              } catch (e) {
+                console.error(`Failed to parse props for component ${componentName}:`, propsString, e);
+              }
+            }
+
+            // Add the component with props
+            contentParts.push({
+              type: "component",
+              name: componentName,
+              props: props,
+            });
+
+            lastIndex = index + fullMatch.length;
+          });
+
+          // Add any remaining text after the last component
+          if (lastIndex < html.length) {
+            const textAfter = html.substring(lastIndex).trim();
+            if (textAfter) {
+              contentParts.push({
+                type: "text",
+                content: textAfter,
+                tag: node.type,
+              });
+            }
+          }
         } else if (html) {
           contentParts.push({
             type: "text",
