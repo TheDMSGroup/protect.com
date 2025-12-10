@@ -217,6 +217,10 @@
       justify-content: center;
       height: 100%;
       font-size: 22px;
+
+      @include media-breakpoint-down(md) {
+        font-size: 16px;
+      }
       color: #666666;
       &:focus {
         border: none;
