@@ -148,20 +148,13 @@
         padding: 15px;
         order: 2;
       }
-
-      h2 {
-        font-size: 60px;
-
-        @include media-breakpoint-down(xl) {
-          font-size: 40px;
-        }
-      }
       p {
-        font-size: 31px;
+        font-size: 22px;
         font-weight: 400;
 
-        @include media-breakpoint-down(xl) {
-          font-size: 20px;
+        @include media-breakpoint-down(md) {
+          font-size: 1.25rem;
+          line-height: 1.75rem;
         }
       }
       .btn {

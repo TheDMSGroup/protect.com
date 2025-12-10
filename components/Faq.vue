@@ -109,6 +109,12 @@
     padding: var(--spacing-4xl) 0;
     background: var(--background-color);
 
+    .container {
+      @include media-breakpoint-down(sm) {
+        padding: 0;
+      }
+    }
+
     .faq-list {
       display: flex;
       flex-direction: column;
@@ -119,6 +125,9 @@
       background: var(--surface-color);
       border-radius: var(--radius-lg);
       padding: var(--spacing-2xl);
+      @include media-breakpoint-down(md) {
+        padding: var(--spacing-lg);
+      }
       border: 1px solid var(--border-light);
 
       a {

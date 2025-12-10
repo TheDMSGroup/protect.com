@@ -86,6 +86,7 @@
     background-color: $gray-light;
     width: 100%;
     overflow: hidden;
+    min-height: 760px;
 
     .container {
       z-index: -1;
