@@ -3,9 +3,14 @@ import { stateMapping, redirectRules, getOfficialSlug } from "~/utils/redirect-c
 export default defineEventHandler(async (event) => {
   const url = getRequestURL(event);
   const path = url.pathname;
-
+  console.log(path);
   // Early return for non-relevant paths
-  if (!path.includes("car-insurance") && !path.startsWith("/insurance/") && path !== "/car-insurance/") {
+  if (!path.startsWith("/insurance/") && !path.includes("car-insurance") && path !== "/car-insurance/") {
+    return;
+  }
+
+  // Skip articles paths entirely
+  if (path.startsWith("/articles/")) {
     return;
   }
   // Skip state validation for specific car-insurance sub-routes
@@ -26,7 +31,7 @@ export default defineEventHandler(async (event) => {
 
     // Check if it's a state code (2 chars) or USA (3 chars uppercase)
     const upperSubPath = carInsuranceSubPath.toUpperCase();
-    const isStateCode = (carInsuranceSubPath.length === 2 || carInsuranceSubPath === 'USA');
+    const isStateCode = carInsuranceSubPath.length === 2 || carInsuranceSubPath === "USA";
 
     if (isStateCode && stateMapping[upperSubPath]) {
       const stateName = stateMapping[upperSubPath];
@@ -55,7 +60,7 @@ export default defineEventHandler(async (event) => {
     }
 
     // If slug has hyphens, redirect to non-hyphenated version
-    if (carInsuranceSubPath.includes('-')) {
+    if (carInsuranceSubPath.includes("-")) {
       const newPath = `/car-insurance/${officialSlug}`;
 
       setHeader(event, "Cache-Control", "public, max-age=86400");

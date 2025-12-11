@@ -6,8 +6,6 @@
   //extract article data from cache or API
   const { articleResult, error } = await useArticleFromCacheOrApi();
 
-  console.log("Article Result:", articleResult);
-
   //reactive computed properties for article data
   const article = computed(() => articleResult.value?.response.article || {});
   const title = computed(() => article.value?.title || "");
@@ -24,7 +22,7 @@
         })
         .filter(Boolean) || []
   );
-  console.log("Article Components:", components.value);
+
   const contentLinks = computed(() => articleResult.value?.contentLinks || []);
   const author = computed(() => article.value?.author || {});
   const date = computed(() => article.value?.publishedAt || "");
@@ -39,11 +37,8 @@
 
   //inline composable to fetch article with caching
   async function useArticleFromCacheOrApi() {
-    const cacheKey = computed(() => {
-      const key = `articles-${vertical}-${route.params.slug}`;
-      console.log("🔑 Cache key:", key);
-      return key;
-    });
+    const cacheKey = `articles-${vertical}-${route.params.slug}`;
+    console.log("🔑 Cache key:", cacheKey);
 
     const nuxtApp = useNuxtApp();
 
@@ -60,7 +55,9 @@
         return result;
       },
       {
-        watch: [() => route.params.slug],
+        server: true,
+        lazy: false,
+        //watch: [() => route.params.slug],
         getCachedData(key) {
           const cacheHit = nuxtApp.payload.data[key] || nuxtApp.static.data[key];
           if (cacheHit) {

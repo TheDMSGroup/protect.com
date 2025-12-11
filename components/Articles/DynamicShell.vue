@@ -25,7 +25,8 @@
     },
   });
   // Store loaded components - load immediately for SSR
-  const loadedComponents = ref({});
+  //use shallowRef so we don't have deep reactivity on each components, only on the top level object
+  const loadedComponents = shallowRef({});
 
   // Inline composable to load components synchronously on both server and client
   const useDynamicComponents = async () => {
@@ -35,7 +36,6 @@
         try {
           const componentRef = await useArticleComponentLoader(component.name);
           loadedComponents.value[component.name] = componentRef;
-          console.log(`✅ Loaded component: ${component.name}`);
         } catch (error) {
           console.error(`❌ Failed to load ${component.name}:`, error);
         }
@@ -46,45 +46,11 @@
   };
   await useDynamicComponents();
 
-  console.log("Loaded Components:", loadedComponents.value);
-
-  function generateComponentProps(componentName) {
-    // Add component-specific props
-    switch (componentName) {
-      case "Faq":
-        return {
-          faq: [
-            {
-              question: "What is Protect.com?",
-              answer:
-                "Protect.com is your one-stop destination for discovering savings on car insurance. We built this site to help people compare different quotes from top providers without having to fill out dozens of forms. We show you providers that we think offer you the lowest rates based on your vehicle and lifecycle, taking the guesswork out of the auto insurance buying process.",
-            },
-            {
-              question: "How did we gather this info?",
-              answer:
-                "Protect.com is your one-stop destination for discovering savings on car insurance. We built this site to help people compare different quotes from top providers without having to fill out dozens of forms. We show you providers that we think offer you the lowest rates based on your vehicle and lifecycle, taking the guesswork out of the auto insurance buying process.",
-            },
-          ],
-        };
-      case "ZipCodeForm":
-        return {
-          action: "insure.protect.com",
-        };
-      default:
-        return {};
-    }
-  }
-
   const componentProps = computed(() => {
     const propsMap = {};
     props.components.forEach((component) => {
-      // Generate fallback props if no props are provided
-      if (Object.keys(component.props).length === 0) {
-        propsMap[component.name] = generateComponentProps(component.name);
-      } else {
-        // use props passed down
-        propsMap[component.name] = component.props;
-      }
+      //no need to set fallbacks here, they are handled during parsing in /server/api/article/index.js
+      propsMap[component.name] = component.componentProps;
     });
     return propsMap;
   });

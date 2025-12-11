@@ -9,18 +9,13 @@
     },
     vertical: {
       type: String,
-      default: "",
+      default: "insurance",
     },
     subvertical: {
       type: String,
       default: "",
     },
   });
-
-  console.log(props.subvertical);
-
-  // Use route parameters to watch for navigation changes
-  const route = useRoute();
 
   //dropdown
   const store = useStore();
@@ -49,9 +44,6 @@
   const resetTags = async () => {
     userFilterSelectionSubvertical.value = "";
     page.value = 1;
-
-    // Navigate back to articles-vertical route
-    await navigateTo({ path: `/articles/${props.vertical}`, params: { vertical: props.vertical } }, { replace: true });
   };
 
   //static value of how many articles to show per page
@@ -101,13 +93,10 @@
   const blogFeed = useTemplateRef("blogFeed");
 
   // Clear user filter selection when route changes
-  watch(
-    () => route.fullPath,
-    () => {
-      paginationStart.value = 0;
-      userFilterSelectionSubvertical.value = "";
-    }
-  );
+  watchEffect(() => {
+    paginationStart.value = 0;
+    userFilterSelectionSubvertical.value = "";
+  });
 </script>
 <template lang="html">
   <div ref="blogFeed" class="blog-feed-wrapper">

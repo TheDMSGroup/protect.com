@@ -22,8 +22,6 @@
     contentLinks,
     recentArticles,
   } = toRefs(props.article);
-
-  console.log("single article props:", props.article);
 </script>
 
 <template lang="html">

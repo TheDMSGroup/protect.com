@@ -5,7 +5,10 @@ export default defineNuxtRouteMiddleware((to) => {
   if (!to.path.includes("car-insurance") && !to.path.startsWith("/insurance/") && to.path !== "/car-insurance/") {
     return;
   }
-
+  // Skip articles paths entirely
+  if (to.path.startsWith("/articles/")) {
+    return;
+  }
   // Skip state validation for specific car-insurance sub-routes
   if (to.path.startsWith("/car-insurance/rate-calculator")) {
     return;
