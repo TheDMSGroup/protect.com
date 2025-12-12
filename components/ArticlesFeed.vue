@@ -91,12 +91,6 @@
 
   // keep ref to blog feed for scrolling
   const blogFeed = useTemplateRef("blogFeed");
-
-  // Clear user filter selection when route changes
-  watchEffect(() => {
-    paginationStart.value = 0;
-    userFilterSelectionSubvertical.value = "";
-  });
 </script>
 <template lang="html">
   <div ref="blogFeed" class="blog-feed-wrapper">

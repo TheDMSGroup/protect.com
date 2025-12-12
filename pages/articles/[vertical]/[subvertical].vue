@@ -16,9 +16,6 @@
   // Get route for dynamic params
   const route = useRoute();
 
-  console.log(route.fullPath);
-
-  // Create computed properties that gracefully handle route params
   const domain = "protectCom";
 
   const articleType = "article";
