@@ -13,7 +13,7 @@ export const useStore = defineStore("store", {
       categories: [
         {
           name: "Car Insurance",
-          value: "auto-insurance",
+          value: "car-insurance",
         },
         {
           name: "Health Insurance",

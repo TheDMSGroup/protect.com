@@ -68,6 +68,7 @@
               $700 on their car insurance by comparing insurance rates from multiple companies.
               Some drivers can even cut their monthly payment in half by switching carriers while bundling
               home and auto insurance."
+        button-label="COMPARE PLANS NOW"
         button-destination="insure.protect.com"
         card-image="home-1.png"
         large-col-size="7"
@@ -81,6 +82,7 @@
         deep to find the best car insurance rates for every life stage and situation. Whether
         you need liability coverage, collision coverage, or full coverage, we'll help you
         find the perfect policy."
+        button-label="COMPARE PLANS NOW"
         button-destination="insure.protect.com"
         large-col-size="7"
         card-image="home-2.png"
@@ -94,6 +96,7 @@
         as if it were our own. We use real data from licensed insurance agents and carriers,
         customer reviews, and unbiased sources to help you get the complete picture of each
         insurance company and policy."
+        button-label="COMPARE PLANS NOW"
         button-destination="insure.protect.com"
         card-image="home-3.png"
         large-col-size="7"

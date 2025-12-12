@@ -8,14 +8,14 @@
 
   const { urlSlug, coverImage, title, excerpt } = props.article;
 
-  const imageUrl = coverImage?.url;
+  const imageUrl = coverImage?.url || "/assets/default-article-image.jpg";
 </script>
 
 <template lang="html">
   <div class="blog-feed-item col-lg-3 col-md-6 col-sm-12">
     <NuxtLink :to="`/article/${urlSlug}`">
-      <div class="col-md-12 article-image">
-        <NuxtImg :src="imageUrl" alt/>
+      <div v-if="imageUrl" class="col-md-12 article-image">
+        <NuxtImg :src="imageUrl" alt />
       </div>
 
       <div class="col-md-12 article-body">

@@ -1,27 +1,36 @@
 <!-- Catch all route for routes like /articles or /articles/insurance -->
 <script setup>
+  // Only match routes with 1 or 2 segments after /articles
+  definePageMeta({
+    validate: (route) => {
+      const segments = route.path.split("/").filter(Boolean);
+      // Match /articles or /articles/vertical (1 or 2 segments)
+      // But NOT /articles/vertical/subvertical (that's handled by [subvertical].vue)
+      return segments.length >= 1 && segments.length <= 2;
+    },
+  });
+  console.log("In [...slug].vue");
   //import { useArticlesStore } from "@/stores/articles.js";
   // Handle all article routes dynamically
   const route = useRoute();
-  const slug = ref(route.params.slug[0] || "insurance");
+  const slug = ref((route.params.slug && route.params.slug[0]) || "insurance");
 
   const vertical = computed(() => {
-    return slug.value;
+    return slug.value || "insurance";
   });
+
   // Subvertical page logic
   const domain = computed(() => {
     return route.query.domain || '"protectCom"';
   });
 
-  const articleType = computed(() => {
-    return route.query.articleType || "article";
-  });
-
-  const cacheKey = computed(() => {
-    const key = `articles-${vertical.value}`;
-    console.log("🔑 Cache key:", key);
-    return key;
-  });
+  let cacheKey = `articles`;
+  let url = `/api/articles?domain=${domain.value}`;
+  if (vertical.value) {
+    cacheKey += `-${vertical.value}`;
+    url += `&vertical=${vertical.value}`;
+  }
+  console.log("🔑 [...slug].vue Cache key:", cacheKey);
 
   const nuxtApp = useNuxtApp();
   const {
@@ -31,16 +40,19 @@
   } = await useAsyncData(
     cacheKey,
     async () => {
-      const url = `/api/articles?domain=${domain.value}&articleType=${articleType.value}&vertical=${vertical.value}`;
       console.log("🌐 Making API request:", url);
       const result = await $fetch(url);
       return result;
     },
     {
-      watch: [() => domain.value, () => articleType.value, () => vertical.value],
+      server: true,
+      lazy: false,
+      //watch: [() => domain.value, () => articleType.value, () => vertical.value],
       getCachedData(key) {
         const cacheHit = nuxtApp.payload.data[key] || nuxtApp.static.data[key];
-        console.log("✅ Using cached data for key:", key, cacheHit);
+        if (cacheHit) {
+          console.log("✅ Using cached data for key:", key);
+        }
         return cacheHit;
       },
     }

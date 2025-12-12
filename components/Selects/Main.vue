@@ -69,7 +69,7 @@
     menu.value = !menu.value;
   };
 
-  const iconComponentName = ref(iconLoader(currentIcon?.value || null));
+  const iconComponentName = shallowRef(iconLoader(currentIcon?.value || null));
 
   watch(
     () => currentIcon.value,

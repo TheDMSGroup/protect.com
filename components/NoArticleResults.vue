@@ -28,7 +28,7 @@
           <li><NuxtLink to="/articles/insurance">All Insurance Articles</NuxtLink></li>
           <li><NuxtLink to="/articles/insurance/health-insurance">Health Insurance</NuxtLink></li>
           <li><NuxtLink to="/articles/insurance/home-insurance">Home Insurance</NuxtLink></li>
-          <li><NuxtLink to="/articles/insurance/auto-insurance">Car Insurance</NuxtLink></li>
+          <li><NuxtLink to="/articles/insurance/car-insurance">Car Insurance</NuxtLink></li>
         </ul>
       </div>
 

@@ -7,6 +7,32 @@ export default defineEventHandler(async (event) => {
 
   console.log("Fetching article with urlSlug:", urlSlug);
 
+  function generateFallbackProps(componentName) {
+    // Add component-specific props
+    switch (componentName) {
+      case "Faq":
+        return {
+          faq: [
+            {
+              question: "What is Protect.com?",
+              answer:
+                "Protect.com is your one-stop destination for discovering savings on car insurance. We built this site to help people compare different quotes from top providers without having to fill out dozens of forms. We show you providers that we think offer you the lowest rates based on your vehicle and lifecycle, taking the guesswork out of the auto insurance buying process.",
+            },
+            {
+              question: "How did we gather this info?",
+              answer:
+                "Protect.com is your one-stop destination for discovering savings on car insurance. We built this site to help people compare different quotes from top providers without having to fill out dozens of forms. We show you providers that we think offer you the lowest rates based on your vehicle and lifecycle, taking the guesswork out of the auto insurance buying process.",
+            },
+          ],
+        };
+      case "ZipCodeForm":
+        return {
+          action: "insure.protect.com",
+        };
+      default:
+        return {};
+    }
+  }
   const getSingleArticle = async () => {
     const graphqlQuery = `
       query GetArticleBySlugAndRelatedArticles($urlSlug: String!) {
@@ -102,7 +128,6 @@ export default defineEventHandler(async (event) => {
       const extractHeadings = (nodes) => {
         const headingsList = [];
         const levelMap = { one: 1, two: 2, three: 3, four: 4, five: 5, six: 6 };
-        console.log("Nodes for heading extraction:", nodes);
 
         const generateHeading = (headingNode) => {
           const level = headingNode.type.split("-")[1];
@@ -113,7 +138,6 @@ export default defineEventHandler(async (event) => {
           return { text, id, level: headingLevel };
         };
         nodes.forEach((node) => {
-          console.log("Extracting heading from node:", node);
           if (node.type.startsWith("heading-") || (node.children.length === 1 && node.children[0].bold && node.children[0].text.length > 0)) {
             headingsList.push(generateHeading(node));
           }
@@ -288,7 +312,6 @@ export default defineEventHandler(async (event) => {
         }
 
         const html = result || "";
-        console.log("Rendered HTML for node:", html);
 
         // Check if it's a component marker with the new pattern
         // Pattern: {{component_Name, |{props}| }}
@@ -334,7 +357,9 @@ export default defineEventHandler(async (event) => {
                 // Remove leading/trailing whitespace and parse JSON
                 props = JSON.parse(propsString.trim());
               } catch (e) {
-                console.error(`Failed to parse props for component ${componentName}:`, propsString, e);
+                //generate fallback on parse error either from malformed JSON or no props passed
+                props = generateFallbackProps(componentName);
+                console.warn(`Failed to parse props for component ${componentName}:`, propsString, e, "Fallback props will be used.");
               }
             }
 
@@ -342,7 +367,7 @@ export default defineEventHandler(async (event) => {
             contentParts.push({
               type: "component",
               name: componentName,
-              props: props,
+              componentProps: props,
             });
 
             lastIndex = index + fullMatch.length;
