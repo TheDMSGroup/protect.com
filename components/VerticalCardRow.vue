@@ -72,8 +72,9 @@
       <b-col cols="12" :lg="largeColSize" class="content_col">
         <h2>{{ title }}</h2>
         <p v-html="preprocessDescription()"></p>
-        <b-buttons
+        <ButtonsMain
           class=""
+          :disabled="false"
           :config="{
             click: goToRoute,
             clickParam: buttonDestination,
@@ -89,8 +90,9 @@
       <b-col cols="12" :lg="largeColSize" class="content_col">
         <h2>{{ title }}</h2>
         <p v-html="preprocessDescription()"></p>
-        <b-buttons
+        <ButtonsMain
           class=""
+          :disabled="false"
           :config="{
             click: goToRoute,
             clickParam: buttonDestination,
