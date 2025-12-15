@@ -32,7 +32,7 @@ export default {
 
 <style scoped>
 .geo-pin {
-  max-height: 24px;
-  width: auto;
+  min-height: 24px;
+  width: 33px;
 }
 </style>
