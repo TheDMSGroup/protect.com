@@ -1,4 +1,17 @@
 <script setup>
+
+  useSeoMeta({
+    title: () => "Compare Auto Insurance Rates & Get Side-by-Side Quotes",
+    description: () => " Get free car insurance quotes from the top companies and compare side-by-side to find the best deals. Start saving on your monthly payment with Protect.com.",
+    ogTitle: () => "Compare Auto Insurance Rates & Get Side-by-Side Quotes",
+    ogDescription: () => " Get free car insurance quotes from the top companies and compare side-by-side to find the best deals. Start saving on your monthly payment with Protect.com.",
+    ogImage: () => "https://stage.protect.com/img/protect-share.dabdad17.jpg",
+    ogType: "article",
+    twitterCard: "summary_large_image",
+    twitterTitle: () => "Compare Auto Insurance Rates & Get Side-by-Side Quotes",
+    twitterDescription: () => " Get free car insurance quotes from the top companies and compare side-by-side to find the best deals. Start saving on your monthly payment with Protect.com.",
+    twitterImage: () => "https://stage.protect.com/img/protect-share.dabdad17.jpg",
+  });
   const compareRateConfig = {
     options: [
       {

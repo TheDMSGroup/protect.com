@@ -1,8 +1,31 @@
 <script setup>
+  import { useStore } from "~/stores/store";
+
+  const store = useStore();
+
+  useSeoMeta({
+    title: () => "Compare Auto Insurance Rates & Get Side-by-Side Quotes",
+    description: () => " Get free car insurance quotes from the top companies and compare side-by-side to find the best deals. Start saving on your monthly payment with Protect.com.",
+    ogTitle: () => "Compare Auto Insurance Rates & Get Side-by-Side Quotes",
+    ogDescription: () => " Get free car insurance quotes from the top companies and compare side-by-side to find the best deals. Start saving on your monthly payment with Protect.com.",
+    ogImage: () => "https://stage.protect.com/img/protect-share.dabdad17.jpg",
+    ogType: "article",
+    twitterCard: "summary_large_image",
+    twitterTitle: () => "Compare Auto Insurance Rates & Get Side-by-Side Quotes",
+    twitterDescription: () => " Get free car insurance quotes from the top companies and compare side-by-side to find the best deals. Start saving on your monthly payment with Protect.com.",
+    twitterImage: () => "https://stage.protect.com/img/protect-share.dabdad17.jpg",
+  });
   import { buildImageUrl } from "@/composables/images.js";
 
+  const action = computed(() => {
+    let surveyUrl = 'https://insure.protect.com/';
+    if (store.visitorInfo?.ueid) {
+      surveyUrl = surveyUrl + '?ueid=' + store.visitorInfo.ueid;
+    }
+    return surveyUrl;
+  });
+
   const config = {
-    action: "https://insure.protect.com/",
     carriers: [
       {
         carrierName: "Progressive",
@@ -50,7 +73,7 @@
       hero-image-alt="Woman carrying groceries out from the rear trunk of vehicle, with Protect logo sheild surrounding vehicle"
       headline="Compare rates to save on auto insurance."
       subheadline="Get the best car insurance coverage at an affordable price."
-      :zipcode-url="config.action"
+      :zipcode-url="action"
     />
 
     <section id="top-companies">
@@ -150,7 +173,7 @@
             <b-col cols="12" class="feed-wrapper">
               <rating-chart
                 banner-headline="Compare Over 30 Top Auto Insurance Providers Head-to-head."
-                :action="config.action"
+                :action="action"
                 :carriers="config.carriers"
               />
             </b-col>

@@ -1070,7 +1070,14 @@ const formatCurrency = function (value) {
 };
 const getQuotes = function () {
   if (zipcode.value.length === 5) {
-    redirectWithParams('https://insure.protect.com', { zipcode: zipcode.value });
+    var options = {
+      zipcode: zipcode.value,
+    };
+
+    if (store.visitorInfo?.ueid) {
+      options.ueid = store.visitorInfo.ueid;
+    }
+    redirectWithParams('https://insure.protect.com', options);
   }
 };
 const parseCurrency = function(value) {
