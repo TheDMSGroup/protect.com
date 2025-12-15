@@ -3,7 +3,7 @@ export default defineNuxtPlugin(() => {
 
   // Function to parse GeoIP2 info
   const parseGeoInfo = () => {
-    if (typeof window !== 'undefined' && window.geoip2) {
+    if (typeof window !== 'undefined' && window.geoip2 && typeof window.geoip2.city === 'function') {
       return window.geoip2;
     }
     return false;
