@@ -30,6 +30,11 @@ const imageOverlap = computed(() => {
               <NuxtImg
                 :src="`${assetsBaseUrl}/testimonials/${testimonialConfig.image}`"
                 :alt="testimonialConfig.title"
+                format="webp"
+                loading="lazy"
+                width="450"
+                height="604"
+                style="height: auto;"
               />
             </b-col>
             <b-col
@@ -39,7 +44,7 @@ const imageOverlap = computed(() => {
               "
             >
               <h2>{{ testimonialConfig.title }}</h2>
-              <h4>{{ testimonialConfig.subhead }}</h4>
+              <span class="h4">{{ testimonialConfig.subhead }}</span>
               <p>{{ testimonialConfig.quote }}</p>
               <small class="byline">{{ testimonialConfig.byline }}</small>
             </b-col>

@@ -1,4 +1,4 @@
-export const preprocessTextForLinks = (fullText, linkData, className) => {
+export const preprocessTextForLinks = (fullText, linkData, className = "") => {
   if (!fullText) return "";
   if (!linkData || !Array.isArray(linkData) || linkData.length === 0) {
     return fullText;
@@ -8,13 +8,12 @@ export const preprocessTextForLinks = (fullText, linkData, className) => {
     let link;
     if (linkObj.text && linkObj.destination) {
       if (["mailto:", "tel:"].some((prefix) => linkObj.destination.startsWith(prefix))) {
-        link = `<a href="${linkObj.destination}" class="${className}">${linkObj.text}</a>`;
+        link = `<a href="${linkObj.destination}"${className ? ` class="${className}"` : ""}>${linkObj.text}</a>`;
       } else {
-        link = `<a href="${linkObj.destination}" class="${className}">
-                  ${linkObj.text}
-                </a>`;
+        link = `<a href="${linkObj.destination}"${className ? ` class="${className}"` : ""}>${linkObj.text}</a>`;
       }
-      processedFullText = processedFullText.replaceAll(linkObj.text, link);
+      // Use replace with regex g flag instead of replaceAll for better compatibility
+      processedFullText = processedFullText.replace(new RegExp(linkObj.text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "g"), link);
     }
   });
   return processedFullText;

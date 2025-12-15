@@ -13,15 +13,14 @@
 
   // Reactive data
   const zipcode = ref("");
-
   // Router for navigation
   const router = useRouter();
 
-  // Methods
   const submit = () => {
     console.log(props.action);
-    if (props.action.includes("http")) {
-      const actionUrl = new URL(props.action);
+    // Check if action is an external URL (http/https) or contains a domain name
+    if (props.action.includes("http") || props.action.includes(".")) {
+      const actionUrl = new URL(props.action.startsWith("http") ? props.action : `https://${props.action}`);
       actionUrl.searchParams.set("zipcode", zipcode.value);
 
       window.location.href = actionUrl;
@@ -31,29 +30,35 @@
         query: { zipcode: zipcode.value },
       });
     }
+  }; // callabcks for emitted events from the input
+  const handleValidInput = (inputValue) => {
+    zipcode.value = inputValue;
+  };
+  const handleInvalidInput = () => {
+    // Clear zipcode on invalid input
+    zipcode.value = "";
   };
 
-  const set = (field, value) => {
-    if (field === "zipcode") {
-      zipcode.value = value;
-    }
-  };
-
-  const validateZip = () => {
-    if (zipcode.value) {
-      const re = /\d{5}/;
-      return re.test(zipcode.value);
+  // declare whatever validation function you need
+  const validateZip = (inputValue) => {
+    if (inputValue) {
+      const re = /^\d{5}$/;
+      return re.test(inputValue);
     }
     return false;
   };
+  // Computed for button disabled state
+  const isButtonDisabled = computed(() => {
+    const disabled = !zipcode.value || zipcode.value === "";
+    return disabled;
+  });
 </script>
 
 <template>
   <form class="zipcode-form" :action="action" method="GET" @submit.prevent @submit="submit">
     <InputsMain
-      :state="true"
-      :valid="validateZip()"
-      @input="set('zipcode', $event.target.value)"
+      :validate="validateZip"
+      :valid="!!zipcode"
       :value="zipcode"
       :config="{
         label: 'Enter your zip code',
@@ -64,9 +69,11 @@
         model: zipcode,
         type: 'number',
       }"
-    ></InputsMain>
+      @input-updated:model-value="handleValidInput"
+      @input-invalid:model-value="handleInvalidInput"
+    />
     <ButtonsMain
-      :disabled="!validateZip()"
+      :disabled="isButtonDisabled"
       :config="{
         type: 'submit',
         size: 'lg',
@@ -74,7 +81,7 @@
         label: 'CONTINUE',
         icon: 'arrow-right-short',
       }"
-    ></ButtonsMain>
+    />
   </form>
 </template>
 
@@ -128,7 +135,7 @@
         background-color: #fff;
         position: relative;
         display: flex;
-        flex-wrap: wrap;
+        flex-wrap: nowrap;
         align-items: stretch;
         width: 100%;
         border-radius: 5px;
@@ -145,11 +152,13 @@
           color: #495057;
           text-align: center;
           white-space: nowrap;
+          background-color: white;
         }
         .input-group-prepend {
           display: flex;
         }
         label {
+          color: #495057; // Darker color for better contrast (WCAG AA compliant)
           @include media-breakpoint-between(sm, lg) {
             font-size: 1rem;
           }
@@ -157,6 +166,11 @@
         input {
           border: none;
           height: 78px;
+          color: #212529; // Dark text for input value
+
+          &::placeholder {
+            color: #495057; // WCAG AA compliant placeholder
+          }
         }
       }
     }

@@ -8,27 +8,26 @@
     }"
     >
 
-    <!-- Preload critical images -->
-    <link rel="preload" :href="svgPath" as="image" type="image/svg+xml" fetchpriority="high">
-    <link rel="preload" href="../../assets/progressive-logo.png" as="image" type="image/png">
-    <link rel="preload" href="../../assets/geico-logo.png" as="image" type="image/png">
-    <link rel="preload" href="../../assets/statefarm-logo.png" as="image" type="image/png">
-
-    <div class="provider-cards-stack hero-provider-stack" @click="goTo">
+    <div class="provider-cards-stack hero-provider-stack" @click="goTo" role="button" tabindex="0" @keydown.enter="goTo" @keydown.space.prevent="goTo" aria-label="Get insurance quotes from top providers">
       <div class="provider-card hero-provider-card" :style="{ animationDelay: '.2s' }">
         <div class="hero-provider-logo">
-          <img src="../../assets/progressive-logo.png" alt="Progressive" class="provider-logo-img"
+          <NuxtImg
+            src="/assets/progressive-logo.png"
+            alt="Progressive"
+            class="provider-logo-img"
+            format="webp"
             loading="eager"
-            fetchpriority="high" >
+            fetchpriority="high"
+          />
         </div>
         <div class="hero-provider-rating">
           <span class="reviews-text">Reviews</span>
           <div class="stars">
-            <star-icon font-scale=".9"></star-icon>
-            <star-icon font-scale=".9"></star-icon>
-            <star-icon font-scale=".9"></star-icon>
-            <star-icon font-scale=".9"></star-icon>
-            <star-icon font-scale=".9"></star-icon>
+            <IconsStars font-scale=".9"></IconsStars>
+            <IconsStars font-scale=".9"></IconsStars>
+            <IconsStars font-scale=".9"></IconsStars>
+            <IconsStars font-scale=".9"></IconsStars>
+            <IconsStars font-scale=".9"></IconsStars>
           </div>
         </div>
         <div class="hero-provider-button">
@@ -38,18 +37,23 @@
 
       <div class="provider-card hero-provider-card" :style="{ animationDelay: '0.3s' }">
         <div class="hero-provider-logo">
-          <img src="../../assets/geico-logo.png" alt="GEICO" class="provider-logo-img"
+          <NuxtImg
+            src="/assets/geico-logo.png"
+            alt="GEICO"
+            class="provider-logo-img"
+            format="webp"
             loading="eager"
-            fetchpriority="high" >
+            fetchpriority="high"
+          />
         </div>
         <div class="hero-provider-rating">
           <span class="reviews-text">Reviews</span>
           <div class="stars">
-            <star-icon font-scale=".9"></star-icon>
-            <star-icon font-scale=".9"></star-icon>
-            <star-icon font-scale=".9"></star-icon>
-            <star-icon font-scale=".9"></star-icon>
-            <star-icon font-scale=".9"></star-icon>
+            <IconsStars font-scale=".9"></IconsStars>
+            <IconsStars font-scale=".9"></IconsStars>
+            <IconsStars font-scale=".9"></IconsStars>
+            <IconsStars font-scale=".9"></IconsStars>
+            <IconsStars font-scale=".9"></IconsStars>
           </div>
         </div>
         <div class="hero-provider-button">
@@ -59,18 +63,23 @@
 
       <div class="provider-card hero-provider-card" :style="{ animationDelay: '0.4s' }">
         <div class="hero-provider-logo">
-          <img src="../../assets/statefarm-logo.png" alt="State Farm" class="provider-logo-img"
+          <NuxtImg
+            src="/assets/statefarm-logo.png"
+            alt="State Farm"
+            class="provider-logo-img"
+            format="webp"
             loading="eager"
-            fetchpriority="high" >
+            fetchpriority="high"
+          />
         </div>
         <div class="hero-provider-rating">
           <span class="reviews-text">Reviews</span>
           <div class="stars">
-            <star-icon font-scale=".9"></star-icon>
-            <star-icon font-scale=".9"></star-icon>
-            <star-icon font-scale=".9"></star-icon>
-            <star-icon font-scale=".9"></star-icon>
-            <star-icon font-scale=".9"></star-icon>
+            <IconsStars font-scale=".9"></IconsStars>
+            <IconsStars font-scale=".9"></IconsStars>
+            <IconsStars font-scale=".9"></IconsStars>
+            <IconsStars font-scale=".9"></IconsStars>
+            <IconsStars font-scale=".9"></IconsStars>
           </div>
         </div>
         <div class="hero-provider-button">
@@ -81,67 +90,64 @@
   </div>
 </template>
 
-<script>
-import StarIcon from '../../assets/icons/stars.vue';
-import { redirectWithParams } from '../../mixins/utilsMixin';
+<script setup>
+import { redirectWithParams } from '~/composables/utils.js';
 
-const availableIcons = {
-  StarIcon,
-};
-export default {
-  name: 'HeroProviderCards',
-  components: {
-    ...availableIcons,
-  },
-  props: {
+const props = defineProps({
     config: Object,
     buttonAction: Function,
     disabled: Boolean,
     stateData: Object,
     zipcode: String,
-  },
-  computed: {
-    svgPath() {
-      // return require(`../../assets/states/outlines/${this.stateData.state.replace(/\s/g, '').toLowerCase()}.svg`);
-      return require('../../assets/states/outlines/icon-shield.png');
-    },
-  },
-  methods: {
-    goTo() {
-      redirectWithParams('https://insure.protect.com', { zipcode: this.zipcode });
-    },
-    execute() {
-      if (this.config.click) {
-        if (this.config.clickParam !== 'undefined') {
-          this.config.click(this.config.clickParam);
+  });
+
+const svgPath = computed(() => {
+  return '/assets/states/outlines/icon-shield.png';
+});
+
+// Preload the background image to prevent layout shift
+useHead({
+  link: [
+    { rel: 'preload', href: '/assets/states/outlines/icon-shield.png', as: 'image', fetchpriority: 'high' }
+  ]
+});
+
+    const goTo = function() {
+      redirectWithParams('https://insure.protect.com', { zipcode: props.zipcode });
+    };
+
+    const execute = function() {
+      if (config.click) {
+        if (config.clickParam !== 'undefined') {
+          config.click(config.clickParam);
         } else {
-          this.config.click();
+          config.click();
         }
       }
-    },
-    getImage(image) {
-      try {
-        if (image) {
-          // Attempt to load specific image
-          return require('../../assets/states/outlines/icon-' + image.replace(/\s/g, '').toLowerCase() + '.png');
-        }
-        // Default to shield icon if no image provided
-        return require('../../assets/states/outlines/icon-shield.png');
-      } catch (error) {
-        // Fallback if image doesn't exist
-        console.warn('Image not found: ' + image + ', using default shield icon');
-        return require('../../assets/states/outlines/icon-shield.png');
-      }
-    },
-  },
-};
+    };
+    // const getImage = function() {
+    //   try {
+    //     if (image) {
+    //       // Attempt to load specific image
+    //       return require('/assets/states/outlines/icon-' + image.replace(/\s/g, '').toLowerCase() + '.png');
+    //     }
+    //     // Default to shield icon if no image provided
+    //     return require('/assets/states/outlines/icon-shield.png');
+    //   } catch (error) {
+    //     // Fallback if image doesn't exist
+    //     console.warn('Image not found: ' + image + ', using default shield icon');
+    //     return require('/assets/states/outlines/icon-shield.png');
+    //   }
+    // };
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
+
   @import '../../scss/variables';
 
   .hero-right {
       background-size: cover;
+      min-height: 350px; // Reserve space to prevent layout shift
     &.tx {
       background-size: contain;
     }
@@ -153,6 +159,7 @@ export default {
       padding: 0px;
       margin: 60px auto 0;
       height: 216px;
+      min-height: 216px;
     }
 
     // Shield background behind provider cards
@@ -258,6 +265,9 @@ export default {
         font-size: 0.875rem;
         display: flex;
         gap: 1px;
+        .star-icon {
+          height: 20px;
+        }
       }
 
       .reviews-text {

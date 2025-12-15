@@ -11,11 +11,7 @@
             <ul>
               <span v-for="(tag, index) in uniqueArticleTags" :key="index">
                 <li>
-                  <a
-                    class="top-category-tags"
-                    :href="`/articles/${tag.urlSlug}`"
-                    >{{ tag.name }}</a
-                  >
+                  <a class="top-category-tags" :href="`/articles/${tag.urlSlug}`">{{ tag.name }}</a>
                 </li>
               </span>
               <li><router-link to="/articles">View All</router-link></li>
@@ -25,34 +21,22 @@
             <h4>Top Topics</h4>
             <ul>
               <li>
-                <router-link to="/insurance/auto-insurance"
-                  >Auto Insurance</router-link
-                >
+                <router-link to="/insurance/car-insurance">Auto Insurance</router-link>
               </li>
               <li>
-                <router-link to="/insurance/life-insurance"
-                  >Life Insurance</router-link
-                >
+                <router-link to="/insurance/life-insurance">Life Insurance</router-link>
               </li>
               <li>
-                <router-link to="/insurance/home-insurance"
-                  >Home Insurance</router-link
-                >
+                <router-link to="/insurance/home-insurance">Home Insurance</router-link>
               </li>
               <li>
-                <router-link to="/insurance/pet-insurance"
-                  >Pet Insurance</router-link
-                >
+                <router-link to="/insurance/pet-insurance">Pet Insurance</router-link>
               </li>
               <li>
-                <router-link to="/insurance/burial-insurance"
-                  >Burial Insurance</router-link
-                >
+                <router-link to="/insurance/burial-insurance">Burial Insurance</router-link>
               </li>
               <li>
-                <router-link to="/insurance/health-insurance"
-                  >Health Insurance</router-link
-                >
+                <router-link to="/insurance/health-insurance">Health Insurance</router-link>
               </li>
             </ul>
           </div>
@@ -88,152 +72,158 @@
 </template>
 
 <script>
-export default {
-  name: "BlogFeed",
-  props: {
-    showCategories: { type: Boolean },
-    vertical: { type: String },
-    subVerticals: { type: Array },
-  },
-  data() {
-    return {
-      //articlePath: window.location.pathname,
-    };
-  },
-  watch: {
-    $route() {
-      //this.articlePath = window.location.pathname;
+  export default {
+    name: "BlogFeed",
+    props: {
+      showCategories: { type: Boolean },
+      vertical: { type: String },
+      subVerticals: { type: Array },
+      articles: { type: Array, default: () => [] },
     },
-  },
-  computed: {
-    uniqueArticleTags() {
-      return this.$store.state.recentArticlesData.uniqueArticleTags;
+    data() {
+      return {
+        //articlePath: window.location.pathname,
+      };
     },
-    recentArticles() {
-      // const articles = this.$store.getters.getRecentArticlesData();
-      // const limitFromConfig = this.$store.state.recentArticlesData.limit;
-      // const filteredArticles = articles.filter((article) => this.subVerticals?.includes(article.subvertical));
-      // return filteredArticles.filter((article) => !this.articlePath.includes(article.urlSlug)).slice(0, limitFromConfig);
+    watch: {
+      $route() {
+        //this.articlePath = window.location.pathname;
+      },
     },
-  },
-};
+    computed: {
+      uniqueArticleTags() {
+        return this.$store?.state?.recentArticlesData?.uniqueArticleTags || [];
+      },
+      recentArticles() {
+        // Use passed articles prop if available, otherwise fall back to store
+        if (this.articles && this.articles.length > 0) {
+          return this.articles;
+        }
+        // const articles = this.$store.getters.getRecentArticlesData();
+        // const limitFromConfig = this.$store.state.recentArticlesData.limit;
+        // const filteredArticles = articles.filter((article) => this.subVerticals?.includes(article.subvertical));
+        // return filteredArticles.filter((article) => !this.articlePath.includes(article.urlSlug)).slice(0, limitFromConfig);
+        return [];
+      },
+    },
+  };
 </script>
 
 <style lang="scss">
-.blog-feed {
-  width: 100%;
-  text-align: left;
+  .blog-feed {
+    width: 100%;
+    text-align: left;
 
-  a:hover {
-    text-decoration: none;
-  }
-
-  @include media-breakpoint-down(md) {
-    padding: 0 1em;
-  }
-
-  .feed-categories {
-    display: flex;
-    padding: 2em 0;
-    margin-top: 6em;
-
-    @include media-breakpoint-down(lg) {
-      margin-top: 2em;
-      padding-bottom: 0;
-      flex-wrap: wrap;
+    a:hover {
+      text-decoration: none;
     }
 
-    .feed-left {
-      width: 42%;
-      margin-left: 15px;
-
-      @include media-breakpoint-down(md) {
-        width: 100%;
-        margin-bottom: 2em;
-        margin-left: 0;
-      }
-
-      h2 {
-        color: $blue-light;
-        font-size: 3em;
-        line-height: 1.3em;
-
-        @include media-breakpoint-down(sm) {
-          font-size: 2.25em;
-        }
-      }
+    @include media-breakpoint-down(md) {
+      padding: 0 1em;
     }
 
-    .feed-right {
-      width: 54%;
+    .feed-categories {
       display: flex;
-      justify-content: flex-end;
+      padding: 2em 0;
+      margin-top: 6em;
 
-      @include media-breakpoint-down(md) {
-        justify-content: flex-start;
-        width: 100%;
+      @include media-breakpoint-down(lg) {
+        margin-top: 2em;
+        padding-bottom: 0;
         flex-wrap: wrap;
       }
 
-      .category {
-        width: 33%;
-        margin-top: 5px;
+      .feed-left {
+        width: 42%;
+        margin-left: 15px;
 
         @include media-breakpoint-down(md) {
-          margin-bottom: 1.5em;
-          margin-top: 0;
-        }
-        @include media-breakpoint-down(sm) {
           width: 100%;
+          margin-bottom: 2em;
+          margin-left: 0;
         }
 
-        a {
-          color: $blue;
+        h2 {
+          color: $blue-light;
+          font-size: 3em;
+          line-height: 1.3em;
+
+          @include media-breakpoint-down(sm) {
+            font-size: 2.25em;
+          }
+        }
+      }
+
+      .feed-right {
+        width: 54%;
+        display: flex;
+        justify-content: flex-end;
+
+        @include media-breakpoint-down(md) {
+          justify-content: flex-start;
+          width: 100%;
+          flex-wrap: wrap;
         }
 
-        h4 {
-          color: $gray-dark;
-          font-size: 1.9em;
-          font-weight: 600;
-          margin-bottom: 0.4em;
-        }
+        .category {
+          width: 33%;
+          margin-top: 5px;
 
-        ul {
-          list-style: none;
-          margin: 0;
-          padding: 0;
+          @include media-breakpoint-down(md) {
+            margin-bottom: 1.5em;
+            margin-top: 0;
+          }
+          @include media-breakpoint-down(sm) {
+            width: 100%;
+          }
 
-          li {
-            a {
-              text-transform: capitalize;
-              font-size: 19px;
+          a {
+            color: $blue;
+          }
+
+          h4 {
+            color: $gray-dark;
+            font-size: 1.9em;
+            font-weight: 600;
+            margin-bottom: 0.4em;
+          }
+
+          ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+
+            li {
+              a {
+                text-transform: capitalize;
+                font-size: 19px;
+              }
             }
           }
         }
       }
     }
-  }
 
-  .feed-posts {
-    display: flex;
-    justify-content: space-between;
-    padding: 3em 0 10.5em;
-
-    @include media-breakpoint-down(md) {
-      flex-wrap: wrap;
-      padding: 1em 0;
-    }
-
-    .post {
+    .feed-posts {
       display: flex;
-      flex-wrap: wrap;
-      width: 100%;
+      justify-content: space-between;
+      padding: 3em 0 10.5em;
 
       @include media-breakpoint-down(md) {
-        width: 100%;
         flex-wrap: wrap;
+        padding: 1em 0;
+      }
+
+      .post {
+        display: flex;
+        flex-wrap: wrap;
+        width: 100%;
+
+        @include media-breakpoint-down(md) {
+          width: 100%;
+          flex-wrap: wrap;
+        }
       }
     }
   }
-}
 </style>

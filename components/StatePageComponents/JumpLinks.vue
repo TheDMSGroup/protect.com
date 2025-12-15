@@ -2,14 +2,17 @@
   <section>
     <div class="explore-cta-section">
       <div class="cta-container">
-        <div class="cta-left" aria-hidden="true" :style="{
-          background: `url(${getImage(stateData.state)}) no-repeat center center / cover`,
-        }">
+        <div class="cta-left" aria-hidden="true">
+          <img :src="getImage(stateData.state)" :alt="`${stateData.state} license plate`" class="license-plate-img" loading="lazy" />
         </div>
 
         <div class="cta-right">
           <h3 class="cta-title">What are the best car insurance companies in {{ stateData.stateAbbreviation }}?</h3>
-          <p>
+          <p v-if="stateData.jumpLink">
+            {{ stateData.jumpLink }}
+          </p>
+          <p v-else>
+
             Instead of focusing solely on the cheapest companies, we look at the full picture — offering a balance
             between the most affordable pricing, coverage types, and the provider's reputation. We prioritize providers
             known for exceptional customer service, ensuring you're not just getting a good rate, but reliable support
@@ -57,7 +60,7 @@
           </div> -->
         </div>
       </div>
-      <div class="bottom-cta-bar" @click="getQuotes">
+      <div class="bottom-cta-bar" @click="getQuotes" role="button" tabindex="0" @keydown.enter="getQuotes" @keydown.space.prevent="getQuotes" :aria-label="`Compare and save on car insurance in ${stateData.state}`">
         <div class="bottom-cta-content">
           <div class="circular-container">
             <div class="circle-background">
@@ -71,45 +74,30 @@
   </section>
 </template>
 
-<script>
-import { redirectWithParams } from '../../mixins/utilsMixin';
+<script setup>
+import { computed } from 'vue';
 
-export default {
-  name: 'JumpLinks',
-  components: {},
-  props: {
-    config: Object,
-    stateData: Object,
-    zipcode: String,
-  },
-  data() {
-    return {};
-  },
-  computed: {
-    svgPath() {
-      return require(`../../assets/states/outlines/${this.stateData.state.replace(/\s/g, '').toLowerCase()}.svg`);
-    },
-  },
-  methods: {
-    getQuotes() {
-      redirectWithParams('https://insure.protect.com', { zipcode: this.zipcode });
-    },
-    getImage(image) {
-      const desiredImage = image.replace(/\s/g, '').toLowerCase();
-      try {
-        if (desiredImage) {
-          // Attempt to load specific image
-          return require('../../assets/states/license-plates/' + desiredImage + '.jpg');
-        }
-        // Default to shield icon if no image provided
-        return require('../../assets/states/license-plates/california.jpg');
-      } catch (error) {
-        // Fallback if image doesn't exist
-        console.warn('Image not found: ' + desiredImage + ', using default shield icon');
-        return require('../../assets/states/license-plates/california.jpg');
-      }
-    },
-  },
+const props = defineProps({
+  config: Object,
+  stateData: Object,
+  zipcode: String,
+});
+
+const svgPath = computed(() => {
+  const stateName = props.stateData.state.replace(/\s/g, '').toLowerCase();
+  return `/assets/states/outlines/${stateName}.svg`;
+});
+
+const getQuotes = () => {
+  const baseUrl = 'https://insure.protect.com';
+  const params = new URLSearchParams({ zipcode: props.zipcode || '' });
+  window.location.href = `${baseUrl}?${params.toString()}`;
+};
+
+const getImage = (image) => {
+  const desiredImage = image.replace(/\s/g, '').toLowerCase();
+  // Return path from public folder
+  return `/assets/states/license-plates/${desiredImage}.jpg`;
 };
 </script>
 
@@ -136,6 +124,13 @@ export default {
     justify-content: center;
     align-items: center;
     height: 100%;
+
+    .license-plate-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: var(--radius-lg);
+    }
   }
 
   .license-plate-wrapper {

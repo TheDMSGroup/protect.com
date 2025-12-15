@@ -11,6 +11,7 @@
       headline="Compare Health Insurance Quotes"
       subheadline="Protect your family with affordable coverage"
       :zipcode-url="zipCodeUrl"
+      :lazy-image="false"
     />
 
     <section id="top-companies">
@@ -20,7 +21,7 @@
           { name: 'Humana', src: 'provider-humana.png' },
           { name: 'AmBetter', src: 'ambetter-logo.png' },
           { name: 'aetna', src: 'provider-aetna.png' },
-          { name: 'Molina', src: 'molina-logo.svg' },
+          { name: 'Molina', src: 'molina-logo.png' },
         ]"
       >
         Compare top companies head-to-head and get the best rate.
@@ -43,6 +44,7 @@
         Compare plans with no commitment and discover how much you could be
         saving by getting quotes from multiple top health insurance providers. "
       image="yoga.png"
+      :lazy-image="true"
     />
 
     <breakpoint-image image="health_bg.jpg" />
@@ -111,13 +113,15 @@
     </section>
 
     <section>
-      <action-banner
+      <LazyActionBanner
         cta-type="zipcode-form"
         image_top="125"
         headline="Explore new policy options"
         subheadline="Discover how much you could save with Protect. "
         image="doctor-patient.png"
         :action="action"
+        :lazy-image="true"
+        :image-alt-description="'Woman and doctor discussing health insurance options in a medical office.'"
       />
     </section>
     <BlogFeed :show-categories="false" vertical="insurance" :sub-verticals="['health-insurance']" />

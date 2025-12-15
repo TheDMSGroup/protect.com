@@ -144,6 +144,7 @@ export default {
       align-items: center;
 
       @include media-breakpoint-down(sm) {
+        margin-top: 20px;
         width: 100%;
       }
 

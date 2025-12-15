@@ -1,85 +1,118 @@
+<script setup>
+  const compareRateConfig = {
+    options: [
+      {
+        value: {
+          icon: "car",
+          value: "car-insurance",
+        },
+        text: "Car Insurance",
+      },
+      {
+        value: {
+          icon: "home",
+          value: "home-insurance",
+        },
+        text: "Home Insurance",
+      },
+      {
+        value: {
+          icon: "health-insurance",
+          value: "health-insurance",
+        },
+        text: "Health Insurance",
+      },
+    ],
+    icon: "scales",
+    name: "compareYourRateDropdownMain",
+    placeholderText: "Compare rates for...",
+  };
+</script>
+
 <template>
   <div>
-    <!-- <Hero :compareRateConfig="compareRateConfig" /> -->
-    <LazyHomeContent />
-    <div class="grey-bg">
+    <vertical-hero
+      hero-image="protect_main_hero_flat.png"
+      headline="Compare home, health, and car insurance rates today"
+      subheadline="Start saving money and take the stress out of finding the best insurance rates by letting us
+      instantly shop the top home, health, and auto insurance companies for you."
+      subheadline-type="small"
+      :cta-type="'rates-dropdown'"
+      :hero-class="'home-seo-hero'"
+      :cta-config="{
+        options: [
+          {
+            value: {
+              icon: 'car',
+              value: 'car-insurance',
+            },
+            text: 'Car Insurance',
+          },
+          {
+            value: {
+              icon: 'health-insurance',
+              value: 'health-insurance',
+            },
+            text: 'Health Insurance',
+          },
+          {
+            value: {
+              icon: 'home',
+              value: 'home-insurance',
+            },
+            text: 'Home Insurance',
+          },
+        ],
+        icon: 'scales',
+        name: 'compareYourRateDropdown',
+        placeholderText: 'Compare rates for...',
+        label: 'Compare Your Rate Selections',
+        description: 'Select a category you would like to find more info about',
+      }"
+    />
+
+    <section id="top-companies">
+      <insurance-brands
+        :providers-config="[
+          { name: 'Progressive', src: 'provider-progressive.png' },
+          { name: 'Geico', src: 'provider-geico.png' },
+          { name: 'Nationwide', src: 'provider-nationwide.png' },
+          { name: 'State Farm', src: 'provider-state-farm.png' },
+          { name: 'Liberty Mutual Insurance', src: 'provider-liberty.png' },
+        ]"
+      >
+        Compare personalized insurance quotes in minutes
+      </insurance-brands>
+    </section>
+
+    <item-box-group first-box-text="Looking for additional coverage?" :items="compareRateConfig.options" />
+    <b-container>
+      <b-row class="justify-content-center mb-4 pb-4">
+        <b-col cols="12" md="10" class="text-center">
+          <p class="lead">
+            Get personalized, free quotes from multiple insurance providers with a single click and compare premiums, deductibles, and coverage side
+            by side.
+          </p>
+        </b-col>
+      </b-row>
+    </b-container>
+
+    <HomeContentSEO />
+
+    <div>
       <LazyActionBanner
-        ctaType="rates-dropdown"
-        :ctaConfig="compareRateConfig"
+        cta-type="rates-dropdown"
+        :cta-config="compareRateConfig"
         image_top="150"
+        name="calculateYourNewRate"
         headline="Calculate your new rate"
         subheadline="Discover how much you can save with Protect.com."
         image="dad-bike.png"
+        image-alt="dad riding a bike with a child in a carrier on the rear and a puppy in the front basket"
         container-class="dad-bike"
+        :lazy-image="true"
+        image-alt-description="Dad riding a bike with a child in a carrier on the rear and a puppy in the front basket"
       />
     </div>
-    <!-- <BlogFeed :showCategories="true" /> -->
-
-    <JoinNewsletter />
-
   </div>
 </template>
-
-<script setup>
-const props = defineProps({
-  title: String,
-  description: String,
-  keywords: String,
-});
-
-useHead({
-  title: () => props.title,
-  meta: [
-    { name: 'description', content: () => props.description },
-    { name: 'keywords', content: () => props.keywords },
-    { property: 'og:description', content: () => props.description }
-  ],
-});
-
-const compareRateConfig = ref({
-  options: [
-    {
-      value: {
-        icon: 'car-icon',
-        value: 'insurance',
-      },
-      text: 'Insurance',
-    },
-    {
-      value: {
-        icon: 'home-icon',
-        value: 'home-security',
-      },
-      text: 'Home Security',
-    },
-    {
-      value: {
-        icon: 'home-warranty-icon',
-        value: 'warranty',
-      },
-      text: 'Warranty',
-    },
-    {
-      value: {
-        icon: 'identity-icon',
-        value: 'identity',
-      },
-      text: 'Identity',
-    },
-  ],
-  icon: 'scales-icon',
-  name: 'compareYourRateDropdown',
-  placeholderText: 'Compare rates for...',
-});
-</script>
-
-<style scoped lang="scss">
-@import '../scss/_variables.scss';
-
-.grey-bg {
-  background-color: #f8f8f8;
-  // top: 2.5em;
-  position: relative;
-  // margin-bottom: 2.5em;
-}
-</style>

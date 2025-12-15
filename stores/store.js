@@ -10,11 +10,38 @@ export const useStore = defineStore("store", {
       apiUrl: "https://us-west-2.cdn.hygraph.com/content/ckwzg7tk528a001z4e7z0bqi0/master",
       domain: "protectCom",
       articleType: "article",
+      categories: [
+        {
+          name: "Car Insurance",
+          value: "car-insurance",
+        },
+        {
+          name: "Health Insurance",
+          value: "health-insurance",
+        },
+        {
+          name: "Home Insurance",
+          value: "home-insurance",
+        },
+        {
+          name: "Medicare",
+          value: "medicare",
+        },
+      ],
+    },
+    visitorInfo: {
+      zip: "",
+      city: "",
+      region: "",
     },
     _stateValueMapCache: null, // Private cache
   }),
 
   actions: {
+    setVisitorInfo(info) {
+      this.visitorInfo = { ...this.visitorInfo, ...info };
+    },
+
     getStateValueMap() {
       // Return cached version if available
       if (this._stateValueMapCache) {
@@ -237,6 +264,11 @@ export const useStore = defineStore("store", {
           name: "Texas",
           abbreviation: "TX",
           slug: "texas",
+        },
+        {
+          name: "USA",
+          abbreviation: "USA",
+          slug: "usa",
         },
         {
           name: "Utah",

@@ -8,6 +8,10 @@
       type: String,
       default: "",
     },
+    heroImageAlt: {
+      type: String,
+      default: "",
+    },
     headline: {
       type: String,
       default: "",
@@ -24,12 +28,16 @@
       type: Object,
       default: () => ({}),
     },
+    lazyImage: {
+      type: Boolean,
+      default: false,
+    },
   });
 
   console.log("SubVerticalHero props:", props);
   console.log("zipcodeUrl value:", props.zipcodeUrl);
 
-  const { heroImage, headline, subheadline, zipcodeUrl, intermediaryModalOptions } = props;
+  const { heroImage, headline, subheadline, zipcodeUrl, intermediaryModalOptions, lazyImage } = props;
 
   const heroImageSrc = computed(() => {
     return `${assetsBaseUrl}/${heroImage}`;
@@ -46,18 +54,40 @@
               <h1>{{ headline }}</h1>
               <h2>{{ subheadline }}</h2>
             </b-col>
-            <b-col class="cta-col" cols="12" sm="6" md="6" lg="12">
+            <b-col class="cta-col" cols="12">
               <slot name="formactions">
                 <ZipCodeForm :intermediary-modal-options="intermediaryModalOptions" :action="zipcodeUrl" />
               </slot>
             </b-col>
-            <b-col cols="12" sm="6" class="d-block d-lg-none">
-              <NuxtImg :src="heroImageSrc" />
+            <b-col cols="12" class="hero-img-sm">
+              <NuxtImg
+                :src="heroImageSrc"
+                :loading="lazyImage ? 'lazy' : 'eager'"
+                :fetchpriority="lazyImage ? 'low' : 'high'"
+                decoding="async"
+                sizes="sm:400px md:400px"
+                :alt="heroImageAlt"
+                format="webp"
+                width="467"
+                height="520"
+                style="height: auto;"
+              />
             </b-col>
           </b-row>
         </div>
         <div class="hero-right">
-          <NuxtImg :src="heroImageSrc" />
+          <NuxtImg
+            :src="heroImageSrc"
+            :loading="lazyImage ? 'lazy' : 'eager'"
+            :fetchpriority="lazyImage ? 'low' : 'high'"
+            decoding="async"
+            sizes="md:475px lg:475px xl:475px"
+            :alt="heroImageAlt"
+            format="webp"
+            width="467"
+            height="520"
+            style="height: auto;"
+          />
         </div>
       </div>
     </div>
@@ -72,40 +102,32 @@
     height: 700px;
     overflow: hidden;
 
-    @include media-breakpoint-down(lg) {
-      height: 500px;
+    @include media-breakpoint-between(xl, lg) {
+      height: 800px;
     }
     @include media-breakpoint-down(md) {
-      height: 750px;
-    }
-    @include media-breakpoint-down(sm) {
-      height: 650px;
-    }
-    @include media-breakpoint-down(xs) {
       height: 1100px;
     }
-
     .container {
       z-index: -1;
     }
 
+    .hero-img-sm {
+      display: none;
+      max-width: 400px;
+      width: 100%;
+      margin: 0 auto;
+      @include media-breakpoint-down(md) {
+        display: block;
+      }
+    }
     .hero {
       display: flex;
-      justify-content: space-between;
+      justify-content: center;
       width: 100%;
-      height: 700px;
+      height: 100%;
 
-      @include media-breakpoint-down(lg) {
-        height: 500px;
-      }
-      @include media-breakpoint-down(md) {
-        height: 750px;
-      }
-      @include media-breakpoint-down(sm) {
-        height: 650px;
-      }
       @include media-breakpoint-down(xs) {
-        height: 1100px;
         flex-wrap: wrap;
       }
 
@@ -175,10 +197,10 @@
         width: 40%;
         display: flex;
         justify-content: center;
-        align-items: center;
+        align-items: start;
+        padding-top: 3em;
 
         @include media-breakpoint-down(lg) {
-          padding-top: 3em;
           align-items: flex-start;
         }
         @include media-breakpoint-down(md) {
@@ -200,11 +222,11 @@
     border-radius: 150%;
     position: relative;
     height: 250px;
-    top: -62px;
+    top: 50px;
     left: -7%;
     z-index: 0;
 
-    @include media-breakpoint-down(xs) {
+    @include media-breakpoint-down(md) {
       width: 140%;
       left: -20%;
     }

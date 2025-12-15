@@ -4,7 +4,12 @@ export default defineEventHandler(async (event) => {
 
   // Get query parameters from the request
   const query = getQuery(event);
-  const { vertical, subvertical, domain = '"protectCom"', articleType = "article" } = query;
+  const { vertical, domain = '"protectCom"', articleType = "article" } = query;
+  let subvertical = query.subvertical || "";
+
+  if (subvertical === "car-insurance") {
+    subvertical = "auto-insurance";
+  }
 
   if (!domain) {
     throw createError({
@@ -68,10 +73,14 @@ export default defineEventHandler(async (event) => {
     }
 
     if (subvertical && subvertical !== "") {
-      variables.subvertical = `${subvertical}-insurance`;
+      if (subvertical.endsWith("-insurance")) {
+        variables.subvertical = subvertical;
+      } else {
+        variables.subvertical = `${subvertical}-insurance`;
+      }
     }
 
-    console.log("GraphQL Query:", graphqlQuery);
+    //console.log("GraphQL Query:", graphqlQuery);
     console.log("Variables:", variables);
     const options = {
       method: "POST",
@@ -85,7 +94,7 @@ export default defineEventHandler(async (event) => {
     };
     try {
       const { data: articlesFeed } = await $fetch(apiUrl, options);
-      console.log("Fetched articles:", articlesFeed);
+      //console.log("Fetched articles:", articlesFeed);
       return articlesFeed;
     } catch (err) {
       // Log server-side for debugging

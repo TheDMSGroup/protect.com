@@ -1,51 +1,27 @@
 <script setup>
-  const route = useRoute();
-
-  const {
-    data: articleResult,
-    pending,
-    error,
-  } = await useAsyncData("article", () => $fetch(`/api/article/?urlSlug=${route.params.slug}`), {
-    watch: [() => route.params.slug, () => route.fullPath],
-  });
-
-  // Create a computed that reactively gets articles from the API response
-  const article = computed(() => {
-    return articleResult.value?.article || {};
-  });
-
-  // Create extended pending state to prevent flashing
-  const extendedPending = ref(false);
-  const minLoadingTime = 800; // milliseconds
-
-  // Watch for pending state changes
-  watch(
-    pending,
-    (isPending) => {
-      if (isPending) {
-        // Start loading immediately
-        extendedPending.value = true;
-      } else {
-        // Delay hiding loading state
-        setTimeout(() => {
-          extendedPending.value = false;
-        }, minLoadingTime);
-      }
+  const props = defineProps({
+    article: {
+      type: Object,
+      required: true,
     },
-    { immediate: true }
-  );
+  });
 
-  const title = computed(() => article.value?.title || "");
-  const excerpt = computed(() => article.value?.excerpt || "");
-  const content = computed(() => article.value?.content || null);
-  const author = computed(() => article.value?.author || {});
-  const date = computed(() => article.value?.publishedAt || "");
-  const readTime = computed(() => article.value?.readTime || "");
-  const relatedArticles = computed(() => article.value?.relatedArticles || []);
-  const recentArticles = computed(() => article.value?.recentArticles || []);
-  const coverImage = computed(() => article.value?.coverImage || null);
-  const vertical = computed(() => article.value?.vertical || "");
-  const subvertical = computed(() => article.value?.subvertical || "");
+  // Destructure while maintaining reactivity
+  const {
+    title,
+    excerpt,
+    content,
+    date,
+    readTime,
+    author,
+    coverImage,
+    relatedArticles,
+    vertical,
+    subvertical,
+    components,
+    contentLinks,
+    recentArticles,
+  } = toRefs(props.article);
 </script>
 
 <template lang="html">
@@ -55,11 +31,13 @@
         <div class="container">
           <span class="links">
             <NuxtLink to="/articles/">Articles</NuxtLink>
-            <span class="arrow" v-if="vertical">></span>
-            <NuxtLink v-if="vertical" :to="`/articles/${vertical}`" class="article-slug">{{ vertical }}</NuxtLink>
-            <span class="arrow" v-if="subvertical">></span>
+            <span v-if="vertical" class="arrow">></span>
+            <NuxtLink v-if="vertical" :to="`/articles/${vertical}`" class="article-slug">{{
+              vertical[0].toUpperCase() + vertical.slice(1)
+            }}</NuxtLink>
+            <span v-if="subvertical" class="arrow">></span>
             <NuxtLink v-if="subvertical" :to="`/articles/${vertical}/${subvertical}`" class="article-slug">
-              {{ subvertical }}
+              {{ subvertical[0].toUpperCase() + subvertical.slice(1) }}
             </NuxtLink>
           </span>
         </div>
@@ -67,31 +45,24 @@
       <!-- <span class="advertiser-disclosure">Advertiser Disclosure</span> -->
     </div>
     <div class="blog-article container">
-      <div v-if="error" class="alert alert-danger">
-        <strong>Error loading article.</strong>
-        <div v-if="error.statusMessage">{{ error.statusMessage }}</div>
-        <div v-else>{{ error.message || String(error) }}</div>
-      </div>
-
-      <div v-else-if="extendedPending" class="loading">
-        <LoadingSkeletonArticle />
-      </div>
-      <div class="row" v-else-if="!error">
-        <div class="col-lg-3 col-md-3 sidebar"></div>
-        <div class="col-lg-9 col-md-12">
+      <div class="row">
+        <div class="col-lg-4 col-md-3 sidebar">
+          <ArticlesContentLinks :content-links="contentLinks" />
+        </div>
+        <div class="col-lg-8 col-md-12">
           <h1 class="article-title">{{ title }}</h1>
           <div v-if="excerpt && excerpt.length > 0" class="snippet">
             {{ excerpt }}
           </div>
-          <p class="author" v-if="date && date.length > 0">
+          <p v-if="date && date.length > 0" class="author">
             <span v-if="author && author.name.length > 0">{{ author.name }} <span class="divider">|</span></span>
             <span class="mobile-second-line">
               <span class="date">
                 {{ date }}
               </span>
-              <span class="divider" v-if="readTime">|</span>
-              <span class="read-time" v-if="readTime">
-                <img alt="time" src="../public/clock.jpg" />
+              <span v-if="readTime" class="divider">|</span>
+              <span v-if="readTime" class="read-time">
+                <img alt="time" src="/assets/clock.jpg" />
                 {{ readTime }}
               </span>
             </span>
@@ -102,11 +73,11 @@
           </div>
           <div class="article-body">
             <div class="article-left">
-              <div class="article-content" v-if="content" v-html="content.html"></div>
+              <ArticlesDynamicShell :components="components" :content="content" />
               <ul class="related-articles">
-                <li v-for="article in relatedArticles" :key="article.title">
-                  <NuxtLink :to="article.urlSlug" class="related-article-link">
-                    {{ article.title }}
+                <li v-for="relatedArticle in relatedArticles" :key="relatedArticle.title">
+                  <NuxtLink :to="relatedArticle.urlSlug" class="related-article-link">
+                    {{ relatedArticle.title }}
                     <svg class="green-right-arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 14.45 12.6">
                       <g>
                         <path
@@ -162,13 +133,13 @@
             </div> -->
             </div>
 
-            <div class="article-sidebar">
+            <div class="col-lg-3 col-md-3 article-sidebar">
               <div class="sidebar-section">
                 <span>Latest Articles</span>
                 <ul class="recent-articles">
-                  <li v-for="article in recentArticles" :key="article.urlSlug">
-                    <NuxtLink :to="'/article/' + article.urlSlug">
-                      {{ article.title }}
+                  <li v-for="recentArticle in recentArticles" :key="recentArticle.urlSlug">
+                    <NuxtLink :to="'/article/' + recentArticle.urlSlug">
+                      {{ recentArticle.title }}
                       <svg class="green-right-arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 14.45 12.6">
                         <g>
                           <path
@@ -191,16 +162,26 @@
           </div>
         </div>
       </div>
-      <div v-else class="no-results">No article found.</div>
+    </div>
+
+    <div class="latest-articles-feed">
+      <div class="feed-container container">
+        <span>Latest Articles</span>
+        <div class="blog-feed">
+          <div class="container">
+            <div class="row feed-posts">
+              <!-- TO DO: make posts dynamic when possible -->
+              <div class="post">
+                <BlogFeedItem v-for="recentArticle in recentArticles" :key="recentArticle.urlSlug" :article="recentArticle" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
 
-<script>
-  export default {
-    props: ["articleConfig"],
-  };
-</script>
 <style lang="scss" scoped>
   .blog-article-wrapper {
     a {
@@ -450,6 +431,35 @@
             }
           }
 
+          .latest-articles-section {
+            margin-top: 3em;
+            padding-top: 2em;
+            border-top: 1px solid $gray;
+
+            .latest-articles-title {
+              font-size: 1.5rem;
+              font-weight: 600;
+              margin-bottom: 1.5em;
+              color: $gray-dark;
+            }
+
+            .latest-articles-grid {
+              display: flex;
+              flex-wrap: wrap;
+              margin: 0 -15px;
+
+              :deep(.blog-feed-item) {
+                width: 50%;
+                padding: 0 15px;
+                margin-bottom: 30px;
+
+                @include media-breakpoint-down(sm) {
+                  width: 100%;
+                }
+              }
+            }
+          }
+
           .author-info {
             display: flex;
             margin-top: 4em;
@@ -581,6 +591,31 @@
       height: 20px;
       path {
         fill: $green;
+      }
+    }
+    .latest-articles-feed {
+      width: 100%;
+      margin: 4em 0 0;
+
+      .feed-container {
+        border-top: 3px solid $blue;
+        padding: 0.5em 0 0 0;
+
+        @include media-breakpoint-down(md) {
+          border: 0;
+        }
+
+        span {
+          color: $blue;
+          font-weight: 600;
+          text-transform: uppercase;
+          font-size: 0.875em;
+          display: block;
+
+          @include media-breakpoint-down(md) {
+            display: none;
+          }
+        }
       }
     }
   }

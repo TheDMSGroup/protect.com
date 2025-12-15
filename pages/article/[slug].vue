@@ -1,4 +1,121 @@
-<script setup></script>
+<script setup>
+  const route = useRoute();
+
+  const vertical = "insurance";
+
+  //extract article data from cache or API
+  const { articleResult, error } = await useArticleFromCacheOrApi();
+
+  //reactive computed properties for article data
+  const article = computed(() => articleResult.value?.response.article || {});
+  const title = computed(() => article.value?.title || "");
+  const excerpt = computed(() => article.value?.excerpt || "");
+  //check if article has dynamic components
+  const content = computed(() => {
+    return articleResult.value?.contentParts || [];
+  });
+  const components = computed(
+    () =>
+      articleResult.value?.contentParts
+        .map((part) => {
+          if (part.type === "component") return part;
+        })
+        .filter(Boolean) || []
+  );
+
+  const contentLinks = computed(() => articleResult.value?.contentLinks || []);
+  const author = computed(() => article.value?.author || {});
+  const date = computed(() => article.value?.publishedAt || "");
+  const readTime = computed(() => article.value?.readTime || "");
+  const relatedArticles = computed(() => article.value?.relatedArticles || []);
+  const recentArticles = computed(() => articleResult.value?.recentArticles || []);
+  const coverImage = computed(() => article.value?.coverImage || null);
+  const subvertical = computed(() => article.value?.subvertical || "");
+  const metaKeywords = computed(() => {
+    return article.value?.keywords || ["article", "protect.com", vertical, subvertical.value.split("-").join(" ")].filter(Boolean);
+  });
+
+  //inline composable to fetch article with caching
+  async function useArticleFromCacheOrApi() {
+    const cacheKey = `articles-${vertical}-${route.params.slug}`;
+    console.log("🔑 Cache key:", cacheKey);
+
+    const nuxtApp = useNuxtApp();
+
+    const {
+      data: articleResult,
+      error,
+      pending,
+    } = await useAsyncData(
+      cacheKey,
+      async () => {
+        const url = `/api/article/?urlSlug=${route.params.slug}`;
+        console.log("🌐 Making API request:", url);
+        const result = await $fetch(url);
+        return result;
+      },
+      {
+        server: true,
+        lazy: false,
+        //watch: [() => route.params.slug],
+        getCachedData(key) {
+          const cacheHit = nuxtApp.payload.data[key] || nuxtApp.static.data[key];
+          if (cacheHit) {
+            console.log("✅ Using cached data for key:", key, cacheHit);
+          }
+          return cacheHit;
+        },
+      }
+    );
+
+    return { articleResult, error, pending };
+  }
+
+  useSeoMeta({
+    title: () => title.value,
+    description: () => excerpt.value,
+    keywords: () => metaKeywords.value.join(", "),
+    ogTitle: () => title.value,
+    ogDescription: () => excerpt.value,
+    ogImage: () => coverImage.value?.url || "https://protect.com/img/protect-share.jpg",
+    ogType: "article",
+    twitterCard: "summary_large_image",
+    twitterTitle: () => title.value,
+    twitterDescription: () => excerpt.value,
+    twitterImage: () => coverImage.value?.url || "https://protect.com/img/protect-share.jpg",
+  });
+</script>
 <template>
-  <SingleArticle />
+  <div v-if="error" class="alert alert-danger">
+    <strong>Error loading article.</strong>
+    <div v-if="error.statusMessage">{{ error.statusMessage }}</div>
+  </div>
+  <div v-else-if="!article || Object.keys(article).length === 0" class="alert alert-warning">
+    <NoArticleResults
+      :title="`Article Not Found`"
+      :category="vertical"
+      :subcategory="subvertical"
+      :back-link="`/articles/${vertical}/${subvertical}`"
+      :back-text="`Browse All ${vertical.replace(/\b\w/g, (l) => l.toUpperCase())} Articles`"
+    />
+  </div>
+  <div v-else>
+    <SingleArticle
+      :article="{
+        title,
+        excerpt,
+        content,
+        author,
+        date,
+        readTime,
+        relatedArticles,
+        recentArticles,
+        coverImage,
+        vertical,
+        subvertical,
+        components,
+        contentLinks,
+      }"
+    />
+  </div>
 </template>

@@ -9,15 +9,15 @@ export function iconLoader(name) {
     return;
   }
   try {
-    console.log("Loading icon component:", name);
+    // console.log("Loading icon component:", name);
     const dynamicComponent = defineAsyncComponent(async () => {
       try {
         const component = await import(`~/components/Icons/${name}.vue`);
-        console.log(`✅ Successfully loaded icon: ${name}`);
+        //console.log(`✅ Successfully loaded icon: ${name}`);
         return component;
       } catch (error) {
-        console.error(`❌ Error loading icon component "${name}":`, error);
-        console.error("Is the icon properly named and located in ~/components/?");
+        //console.error(`❌ Error loading icon component "${name}":`, error);
+        console.error("Is the icon properly named and located in ~/components/?", error);
 
         // Return a fallback component instead of throwing
         return {

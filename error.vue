@@ -60,9 +60,9 @@
 </script>
 
 <template>
-  <div class="container">
+  <main class="container">
     <div class="row">
-      <div class="logo p-4">
+      <div class="logo p-4 col-5">
         <a style="cursor: pointer" @click="handleClearError()">
           <NuxtImg :src="`${assetsBaseUrl}/protect_logo.svg`" alt="Protect.com Logo" width="150" />
         </a>
@@ -115,7 +115,7 @@
         </div>
       </div>
     </div>
-  </div>
+  </main>
 </template>
 
 <style scoped lang="scss">
@@ -129,6 +129,9 @@
     font-family: "Nunito Sans", sans-serif;
   }
 
+  .logo {
+    max-width: 200px;
+  }
   .error-container {
     width: 100%;
     margin: 0 auto;
@@ -296,20 +299,20 @@
     align-items: center;
     gap: 0.5rem;
     padding: 0.75rem 1.5rem;
-    color: $green;
+    color: $green-darker;
     text-decoration: none;
     font-weight: 600;
-    border: 2px solid $green;
+    border: 2px solid $green-darker;
     border-radius: 50px;
     transition: all 0.3s ease;
     font-size: 0.95rem;
 
     &:hover {
-      background-color: $green;
+      background-color: $green-darker;
       color: $white;
       text-decoration: none;
       transform: translateY(-1px);
-      box-shadow: 0 4px 12px rgba($green, 0.3);
+      box-shadow: 0 4px 12px rgba($green-darker, 0.3);
     }
 
     i {
