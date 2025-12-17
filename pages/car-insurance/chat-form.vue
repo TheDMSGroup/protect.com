@@ -148,36 +148,42 @@
             <p>Click any card to get started with that provider</p>
           </div>
 
-          <div class="results-list">
-            <a
-              v-for="bid in apiResults.bids"
+          <div id="mastodon-results-container" :data-mastodon-auction-id="apiResults.auction_id || ''">
+            <div
+              v-for="(bid, index) in apiResults.bids"
               :key="bid.bid_id"
-              :href="bid.click_url"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="result-card"
+              class="offer-container"
+              :class="{ featured: index === 0 || bid.exclusive }"
+              @click="openOffer(bid.click_url)"
             >
-              <div class="card-content">
+              <div v-if="index === 0 || bid.exclusive" class="banner-wrapper">
+                <p>Featured Offer</p>
+              </div>
+              <div class="logo-wrapper">
                 <img
                   :src="bid.image_url"
                   :alt="`${bid.buyer_name} logo`"
-                  class="provider-logo"
+                  class="offer-image"
                   @error="(e) => e.target.style.display = 'none'"
                 />
-                <div class="card-details">
-                  <div class="card-header">
-                    <h3>{{ bid.buyer_name }}</h3>
-                    <span v-if="bid.exclusive" class="exclusive-badge">EXCLUSIVE</span>
-                  </div>
-                  <p class="provider-url">{{ bid.display_url }}</p>
-                  <p class="provider-headline">{{ bid.headline }}</p>
-                  <div class="provider-description" v-html="bid.description" />
-                  <button class="quote-button">
-                    Get Quote from {{ bid.buyer_name }}
-                  </button>
-                </div>
               </div>
-            </a>
+              <div class="offer-description">
+                <h4 class="headline">{{ bid.headline || bid.buyer_name }}</h4>
+                <div class="description" v-html="bid.description" />
+              </div>
+              <div class="button-wrapper">
+                <a
+                  :href="bid.click_url"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="offer-button"
+                  @click.stop
+                >
+                  View Now
+                </a>
+              </div>
+              <div v-if="bid.pixel" class="pixel-wrapper" v-html="bid.pixel" />
+            </div>
           </div>
         </div>
 
@@ -268,10 +274,12 @@
 </template>
 
 <script setup>
-import { ref, reactive, watch, nextTick } from 'vue'
+import { ref, reactive, watch, nextTick, onMounted } from 'vue'
 import { useVehicleApi } from '~/composables/useVehicleApi'
+import { useMastodonApi } from '~/composables/useMastodonApi'
 
 const { getMakes, getModels, getYears, findMatch } = useVehicleApi()
+const { submitLead, buildLeadPayload } = useMastodonApi()
 const vehicleYears = getYears()
 const availableMakes = ref([])
 const availableModels = ref([])
@@ -305,13 +313,19 @@ const steps = [
   { id: 'contact', label: 'Contact' }
 ]
 
-// Lifecycle
-if (process.client) {
-  setTimeout(() => {
-    addBotMessage("Hi! I'm here to help you get a quote for your auto insurance. I'll guide you through a few questions to find you the best rate. Ready to get started?", false, ['Yes', 'No, I\'d rather talk to someone on the phone'])
-    currentQuestion.value = { type: 'welcome', expecting: 'confirmation' }
-  }, 500)
-}
+// Lifecycle - use onMounted to avoid hydration mismatch
+onMounted(() => {
+  // Check for previewfeed URL param to show mock results immediately
+  const urlParams = new URLSearchParams(window.location.search)
+  if (urlParams.get('previewfeed') === 'true') {
+    apiResults.value = getMockResults()
+  } else {
+    setTimeout(() => {
+      addBotMessage("Hi! I'm here to help you get a quote for your auto insurance. I'll guide you through a few questions to find you the best rate. Ready to get started?", false, ['Yes', 'No, I\'d rather talk to someone on the phone'])
+      currentQuestion.value = { type: 'welcome', expecting: 'confirmation' }
+    }, 500)
+  }
+})
 
 watch(messages, () => {
   nextTick(() => {
@@ -833,26 +847,90 @@ const repeatCurrentQuestion = () => {
   // Add logic to repeat questions
 }
 
-const submitToApi = () => {
+const getMockResults = () => ({
+  bids: [
+    {
+      bid_id: 1,
+      buyer_name: "Progressive",
+      exclusive: true,
+      headline: "Drivers who save by switching to Progressive save $946 on average",
+      description: "<ul><li>Safe Driver Discount</li><li>24/7 Claims Service</li><li>Bundle & Save</li></ul>",
+      display_url: "www.progressive.com",
+      image_url: "https://product.impressure.io/build/images/providers/progressive.png",
+      click_url: "#"
+    },
+    {
+      bid_id: 2,
+      buyer_name: "GEICO",
+      exclusive: false,
+      headline: "15 minutes could save you 15% or more on car insurance",
+      description: "<ul><li>Multi-Policy Discount</li><li>Good Driver Discount</li><li>24/7 Service</li></ul>",
+      display_url: "www.geico.com",
+      image_url: "https://product.impressure.io/build/images/providers/state-farm.png",
+      click_url: "#"
+    }
+  ]
+})
+
+const openOffer = (url) => {
+  if (url) {
+    window.open(url, '_blank', 'noopener,noreferrer')
+  }
+}
+
+const submitToApi = async () => {
   isLoadingResults.value = true
 
-  setTimeout(() => {
-    apiResults.value = {
-      bids: [
-        {
-          bid_id: 1,
-          buyer_name: "Progressive",
-          exclusive: true,
-          headline: "Drivers who save by switching to Progressive save $946 on average",
-          description: "<ul><li>Safe Driver Discount</li><li>24/7 Claims Service</li><li>Bundle & Save</li></ul>",
-          display_url: "www.progressive.com",
-          image_url: "https://via.placeholder.com/200x80/0066CC/FFFFFF?text=Progressive",
-          click_url: "#"
-        }
-      ]
+  try {
+    // Check for mastodonoff URL parameter
+    const urlParams = new URLSearchParams(window.location.search)
+    const useMockData = urlParams.get('mastodonoff') === 'true'
+
+    // Build the payload from form data
+    const payload = buildLeadPayload(formData, {
+      // Add any additional options here (UTM params, etc.)
+    })
+
+    console.log('Mastodon API Request Payload:', payload)
+
+    let result
+    if (useMockData) {
+      console.log('Using mock Mastodon API data (mastodonoff=true)')
+      // Simulate API delay
+      await new Promise(resolve => setTimeout(resolve, 1500))
+      result = getMockResults()
+    } else {
+      // Submit to Mastodon API
+      result = await submitLead(payload)
     }
+
+    console.log('Mastodon API Response:', result)
+
+    if (result && result.bids && result.bids.length > 0) {
+      apiResults.value = result
+      // On mobile, scroll results section to top of screen
+      nextTick(() => {
+        if (window.innerWidth < 768) {
+          setTimeout(() => {
+            const resultsSection = document.querySelector('.results-section')
+            if (resultsSection) {
+              resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' })
+            }
+          }, 100)
+        }
+      })
+    } else {
+      // Fallback if no bids returned
+      addBotMessage("We couldn't find any quotes at this time. Please try again later or call us for assistance.")
+      messages.value.push({ type: 'phone', number: '800-555-5555' })
+    }
+  } catch (err) {
+    console.error('Error submitting to API:', err)
+    addBotMessage("Something went wrong while getting your quotes. Please try again or call us for assistance.")
+    messages.value.push({ type: 'phone', number: '800-555-5555' })
+  } finally {
     isLoadingResults.value = false
-  }, 2000)
+  }
 }
 </script>
 
@@ -1039,23 +1117,34 @@ const submitToApi = () => {
 .main-container {
   flex: 1;
   min-height: 0;
-  overflow: hidden;
+  overflow-y: auto;
   max-width: 72rem;
   margin: 0 auto;
   width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+@media (min-width: 768px) {
+  .main-container {
+    overflow: hidden;
+  }
 }
 
 .content-wrapper {
-  height: 100%;
-  max-height: 90%;
+  flex: 1;
+  min-height: 0;
   display: flex;
+  flex-direction: column;
   gap: 1rem;
   padding: 1rem;
-  min-height: 0;
 }
 
 @media (min-width: 768px) {
   .content-wrapper {
+    flex-direction: row;
+    height: 100%;
+    max-height: 90%;
     gap: 1.5rem;
     padding: 1.5rem;
   }
@@ -1072,11 +1161,26 @@ const submitToApi = () => {
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
   border: 1px solid #e5e7eb;
   transition: all 0.3s;
+  max-height: calc(100vh - 180px);
+}
+
+@media (min-width: 768px) {
+  .chat-section {
+    max-height: none;
+  }
 }
 
 .chat-section.split-view {
-  width: 50%;
+  width: 100%;
   flex: none;
+  max-height: 60vh;
+}
+
+@media (min-width: 768px) {
+  .chat-section.split-view {
+    width: 50%;
+    max-height: none;
+  }
 }
 
 .chat-header {
@@ -1360,7 +1464,7 @@ const submitToApi = () => {
 
 /* Results Section */
 .results-section {
-  width: 50%;
+  width: 100%;
   display: flex;
   flex-direction: column;
   background: white;
@@ -1368,6 +1472,16 @@ const submitToApi = () => {
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
   border: 1px solid #e5e7eb;
   overflow-y: auto;
+  flex-shrink: 0;
+  margin-bottom: 80px;
+}
+
+@media (min-width: 768px) {
+  .results-section {
+    width: 50%;
+    flex-shrink: 1;
+    margin-bottom: 0;
+  }
 }
 
 .results-header {
@@ -1389,108 +1503,145 @@ const submitToApi = () => {
   margin: 0;
 }
 
-.results-list {
+#mastodon-results-container {
   padding: 1rem;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
+  --mainColor: #009073;
 }
 
-.result-card {
-  border: 2px solid #e5e7eb;
-  border-radius: 0.5rem;
-  padding: 1rem;
-  text-decoration: none;
-  transition: all 0.15s;
+.offer-container {
+  padding: 38px 20px 20px 20px;
+  border: 1px solid #009073;
+  margin-bottom: 20px;
+  border-radius: 4px;
   cursor: pointer;
-}
-
-.result-card:hover {
-  border-color: #3b82f6;
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-}
-
-.card-content {
+  position: relative;
   display: flex;
-  align-items: flex-start;
-  gap: 1rem;
-}
-
-.provider-logo {
-  width: 8rem;
-  height: auto;
-  object-fit: contain;
-}
-
-.card-details {
-  flex: 1;
-}
-
-.card-header {
-  display: flex;
-  align-items: center;
   justify-content: space-between;
-  margin-bottom: 0.5rem;
+  align-items: center;
+  gap: 15px;
 }
 
-.card-header h3 {
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: #111827;
-  margin: 0;
+.offer-container div {
+  display: inline-block;
 }
 
-.exclusive-badge {
-  padding: 0.25rem 0.5rem;
-  background-color: #fef3c7;
-  color: #854d0e;
-  font-size: 0.75rem;
-  font-weight: 600;
-  border-radius: 0.25rem;
+.offer-container.featured {
+  border-color: #009073;
 }
 
-.provider-url {
-  font-size: 1rem;
-  color: #4b5563;
-  margin: 0 0 0.25rem 0;
-}
-
-.provider-headline {
-  font-size: 1.125rem;
-  font-weight: 600;
-  color: #2563eb;
-  margin: 0 0 0.75rem 0;
-}
-
-.provider-description {
-  font-size: 1rem;
-  color: #374151;
-  margin-bottom: 1rem;
-}
-
-.provider-description ul {
-  margin: 0;
-  padding-left: 1.5rem;
-}
-
-.provider-description li {
-  margin-bottom: 0.25rem;
-}
-
-.quote-button {
+.offer-container.featured .banner-wrapper {
+  background-color: #009073;
   width: 100%;
-  padding: 0.75rem 1.5rem;
-  background-color: #2563eb;
-  color: white;
-  border: none;
-  border-radius: 0.5rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color 0.15s;
+  position: absolute;
+  top: 0;
+  left: 0;
+  padding: 5px 0;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  border-radius: 3px 3px 0px 0px;
 }
 
-.quote-button:hover {
-  background-color: #1d4ed8;
+.offer-container.featured .banner-wrapper p {
+  color: #fff;
+  margin: 0;
+  padding: 0;
+  text-align: left;
+  font-weight: 600;
+  margin-left: 10px;
+}
+
+.logo-wrapper {
+  display: inline-block;
+  background-color: #fff;
+  padding: 5px;
+  border: 1px solid #c9c9c9;
+  border-radius: 2px;
+  box-shadow: 2px 2px #c9c9c9;
+  vertical-align: top;
+  width: 20%;
+  margin-left: 15px;
+}
+
+.offer-image {
+  width: 100%;
+  vertical-align: middle;
+}
+
+.offer-description {
+  width: 42%;
+  margin: 10px 0 0 0;
+}
+
+.offer-description .headline {
+  font-family: "Nunito Sans", sans-serif;
+  font-size: 18px;
+  margin: 0;
+  padding: 0;
+  color: #009073;
+  font-weight: 600;
+}
+
+.offer-description .description {
+  font-size: 13px;
+  padding: 0;
+  margin: 5px 0 0;
+}
+
+.button-wrapper {
+  width: 20%;
+}
+
+.button-wrapper .offer-button {
+  display: block;
+  width: 100%;
+  height: 45px;
+  padding: 0;
+  color: #fff;
+  font-weight: 800;
+  border-radius: 5px;
+  border: 1px solid var(--mainColor);
+  background-color: var(--mainColor);
+  cursor: pointer;
+  letter-spacing: -1px;
+  text-decoration: none;
+  text-align: center;
+  line-height: 45px;
+  font-size: 14px;
+}
+
+.button-wrapper .offer-button:hover {
+  background-color: #007a62;
+  border-color: #007a62;
+}
+
+.pixel-wrapper {
+  height: 1px;
+  display: block;
+}
+
+@media screen and (max-width: 768px) {
+  .offer-container {
+    flex-direction: column;
+  }
+
+  .offer-container .button-wrapper,
+  .offer-container .button-wrapper .offer-button {
+    width: 100%;
+  }
+
+  .offer-container .offer-description {
+    display: none;
+  }
+
+  .logo-wrapper {
+    padding: 5px;
+    border: 1px solid #c9c9c9;
+    border-radius: 2px;
+    width: 100%;
+    box-shadow: none;
+    margin: 0;
+  }
 }
 
 /* Summary Panel */
@@ -1611,4 +1762,8 @@ const submitToApi = () => {
 .checkmark {
   font-size: 1.125rem;
 }
+</style>
+
+<style scoped>
+
 </style>
