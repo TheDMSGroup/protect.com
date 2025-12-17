@@ -10,7 +10,7 @@ export default defineNuxtRouteMiddleware((to) => {
     return;
   }
   // Skip state validation for specific car-insurance sub-routes
-  if (to.path.startsWith("/car-insurance/rate-calculator")) {
+  if (to.path.startsWith("/car-insurance/rate-calculator") || to.path.startsWith("/car-insurance/chat-form")) {
     return;
   }
 
