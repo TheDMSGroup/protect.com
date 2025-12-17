@@ -105,6 +105,18 @@
                 {{ reply }}
               </button>
             </div>
+
+            <!-- Search Suggestions (for make/model typeahead) -->
+            <div v-if="searchSuggestions.length > 0 && !apiResults" class="quick-replies">
+              <button
+                v-for="(suggestion, idx) in searchSuggestions"
+                :key="idx"
+                @click="handleQuickReply(suggestion)"
+                class="quick-reply-btn"
+              >
+                {{ suggestion }}
+              </button>
+            </div>
           </div>
 
           <!-- Input -->
@@ -112,8 +124,12 @@
             <input
               v-model="inputValue"
               @keypress.enter="handleSend"
-              type="text"
-              placeholder="Type your answer..."
+              @input="handleSearchInput"
+              @keypress="handleKeypress"
+              :type="['vehicle_year', 'vehicle_count'].includes(currentQuestion?.type) ? 'tel' : 'text'"
+              :inputmode="['vehicle_year', 'vehicle_count'].includes(currentQuestion?.type) ? 'numeric' : 'text'"
+              :pattern="['vehicle_year', 'vehicle_count'].includes(currentQuestion?.type) ? '[0-9]*' : undefined"
+              :placeholder="getInputPlaceholder()"
               class="input-field"
             />
             <button @click="handleSend" class="send-button">
@@ -253,6 +269,13 @@
 
 <script setup>
 import { ref, reactive, watch, nextTick } from 'vue'
+import { useVehicleApi } from '~/composables/useVehicleApi'
+
+const { getMakes, getModels, getYears, findMatch } = useVehicleApi()
+const vehicleYears = getYears()
+const availableMakes = ref([])
+const availableModels = ref([])
+const searchSuggestions = ref([])
 
 const messages = ref([])
 const inputValue = ref('')
@@ -337,17 +360,80 @@ const handleSend = () => {
   processResponse(inputValue.value)
   inputValue.value = ''
   quickReplies.value = []
+  searchSuggestions.value = []
   awaitingAnswer.value = false
 }
 
 const handleQuickReply = (reply) => {
   addUserMessage(reply)
   processResponse(reply)
+  inputValue.value = ''
   quickReplies.value = []
+  searchSuggestions.value = []
   awaitingAnswer.value = false
 }
 
-const processResponse = (response) => {
+const handleSearchInput = () => {
+  const query = inputValue.value.trim().toLowerCase()
+
+  // Only show suggestions for make/model questions
+  if (!['vehicle_make', 'vehicle_model'].includes(currentQuestion.value?.type)) {
+    searchSuggestions.value = []
+    return
+  }
+
+  if (!query) {
+    // Show priority makes when empty
+    if (currentQuestion.value?.type === 'vehicle_make') {
+      searchSuggestions.value = availableMakes.value.slice(0, 6)
+    } else if (currentQuestion.value?.type === 'vehicle_model') {
+      searchSuggestions.value = availableModels.value.slice(0, 6)
+    }
+    return
+  }
+
+  // Filter based on current question type
+  let list = []
+  if (currentQuestion.value?.type === 'vehicle_make') {
+    list = availableMakes.value
+  } else if (currentQuestion.value?.type === 'vehicle_model') {
+    list = availableModels.value
+  }
+
+  // Find matches (starts with or contains)
+  const startsWithMatches = list.filter(item => item.toLowerCase().startsWith(query))
+  const containsMatches = list.filter(item => !item.toLowerCase().startsWith(query) && item.toLowerCase().includes(query))
+
+  // Combine: startsWith first, then contains, limit to 6
+  searchSuggestions.value = [...startsWithMatches, ...containsMatches].slice(0, 6)
+}
+
+const getInputPlaceholder = () => {
+  if (currentQuestion.value?.type === 'vehicle_count') {
+    return 'Enter number of vehicles...'
+  }
+  if (currentQuestion.value?.type === 'vehicle_year') {
+    return 'Enter year (e.g. 2022)...'
+  }
+  if (currentQuestion.value?.type === 'vehicle_make') {
+    return 'Type to search makes...'
+  }
+  if (currentQuestion.value?.type === 'vehicle_model') {
+    return 'Type to search models...'
+  }
+  return 'Type your answer...'
+}
+
+const handleKeypress = (event) => {
+  if (['vehicle_year', 'vehicle_count'].includes(currentQuestion.value?.type)) {
+    // Only allow numeric input
+    if (!/[0-9]/.test(event.key)) {
+      event.preventDefault()
+    }
+  }
+}
+
+const processResponse = async (response) => {
   // Simplified for demo - add full logic here
   const lowerResponse = response.toLowerCase()
 
@@ -374,13 +460,29 @@ const processResponse = (response) => {
   if (currentStep.value === 'vehicles') {
     if (currentQuestion.value?.type === 'vehicle_count') {
       const count = response === '4+' ? 4 : parseInt(response)
+
+      // Validate vehicle count
+      if (isNaN(count) || count < 1 || count > 10) {
+        setTimeout(() => {
+          addBotMessage(`Please enter a valid number of vehicles (1-10).`)
+        }, 400)
+        return
+      }
+
       // Initialize vehicles array
       for (let i = 0; i < count; i++) {
         formData.vehicles.push({ year: '', make: '', model: '' })
       }
 
+      // Add multi-vehicle discount if more than 1 vehicle
+      if (count > 1) {
+        addDiscount('Multi-Vehicle Discount')
+      }
+
+      // Show recent years as quick replies
+      const recentYears = vehicleYears.slice(0, 6).map(String)
       setTimeout(() => {
-        addBotMessage(`Great! Let's get the details for vehicle 1. What year is your vehicle?`, false, ['2024', '2023', '2022', '2021', '2020', 'Older'])
+        addBotMessage(`Great! Let's get the details for vehicle 1. What year is your vehicle?`, false, recentYears)
         currentQuestion.value = { type: 'vehicle_year', vehicleIndex: 0 }
       }, 800)
       return
@@ -388,34 +490,104 @@ const processResponse = (response) => {
 
     if (currentQuestion.value?.type === 'vehicle_year') {
       const idx = currentQuestion.value.vehicleIndex
-      formData.vehicles[idx].year = response === 'Older' ? '2019' : response
+      const yearNum = parseInt(response)
+      const currentYear = new Date().getFullYear() + 1
+      const minYear = currentYear - 40
+
+      // Validate year is within range
+      if (isNaN(yearNum) || yearNum < minYear || yearNum > currentYear) {
+        setTimeout(() => {
+          addBotMessage(`Please enter a valid year between ${minYear} and ${currentYear}.`)
+        }, 400)
+        return
+      }
+
+      formData.vehicles[idx].year = response
+
+      // Fetch makes from API
+      addBotMessage(`Looking up makes for ${formData.vehicles[idx].year}...`)
+      const makes = await getMakes(formData.vehicles[idx].year)
+      availableMakes.value = makes
+
+      // Initialize search suggestions with top makes
+      searchSuggestions.value = makes.slice(0, 6)
 
       setTimeout(() => {
-        addBotMessage(`What's the make of your ${formData.vehicles[idx].year} vehicle?`, false, ['Toyota', 'Honda', 'Ford', 'Chevrolet', 'Other'])
+        addBotMessage(`What's the make of your ${formData.vehicles[idx].year} vehicle? Type to search or select below:`)
         currentQuestion.value = { type: 'vehicle_make', vehicleIndex: idx }
-      }, 800)
+      }, 300)
       return
     }
 
     if (currentQuestion.value?.type === 'vehicle_make') {
       const idx = currentQuestion.value.vehicleIndex
-      formData.vehicles[idx].make = response
+
+      // Try exact match first, then auto-select if only one option available
+      let matchedMake = findMatch(response, availableMakes.value)
+      if (!matchedMake && searchSuggestions.value.length === 1) {
+        matchedMake = searchSuggestions.value[0]
+      }
+      // If no input and only one make available, auto-select it
+      if (!matchedMake && !response.trim() && availableMakes.value.length === 1) {
+        matchedMake = availableMakes.value[0]
+      }
+
+      if (!matchedMake) {
+        setTimeout(() => {
+          addBotMessage(`Sorry, "${response}" isn't in our list. Please select a make from the suggestions or type to search.`)
+          searchSuggestions.value = availableMakes.value.slice(0, 6)
+        }, 400)
+        return
+      }
+
+      formData.vehicles[idx].make = matchedMake
+
+      // Fetch models from API
+      addBotMessage(`Looking up models for ${formData.vehicles[idx].year} ${formData.vehicles[idx].make}...`)
+      const models = await getModels(formData.vehicles[idx].year, formData.vehicles[idx].make)
+      availableModels.value = models
+
+      // Initialize search suggestions with top models
+      searchSuggestions.value = models.slice(0, 6)
 
       setTimeout(() => {
-        addBotMessage(`And what model is your ${formData.vehicles[idx].year} ${formData.vehicles[idx].make}?`)
+        addBotMessage(`And what model is your ${formData.vehicles[idx].year} ${formData.vehicles[idx].make}? Type to search or select below:`)
         currentQuestion.value = { type: 'vehicle_model', vehicleIndex: idx }
-      }, 800)
+      }, 300)
       return
     }
 
     if (currentQuestion.value?.type === 'vehicle_model') {
       const idx = currentQuestion.value.vehicleIndex
-      formData.vehicles[idx].model = response
+
+      // Try exact match first, then auto-select if only one option available
+      let matchedModel = findMatch(response, availableModels.value)
+      if (!matchedModel && searchSuggestions.value.length === 1) {
+        matchedModel = searchSuggestions.value[0]
+      }
+      // If no input and only one model available, auto-select it
+      if (!matchedModel && !response.trim() && availableModels.value.length === 1) {
+        matchedModel = availableModels.value[0]
+      }
+
+      if (!matchedModel) {
+        setTimeout(() => {
+          addBotMessage(`Sorry, "${response}" isn't in our list. Please select a model from the suggestions or type to search.`)
+          searchSuggestions.value = availableModels.value.slice(0, 6)
+        }, 400)
+        return
+      }
+
+      formData.vehicles[idx].model = matchedModel
+
+      // Clear suggestions
+      searchSuggestions.value = []
 
       // Check if there are more vehicles to add
       if (idx < formData.vehicles.length - 1) {
+        const recentYears = vehicleYears.slice(0, 6).map(String)
         setTimeout(() => {
-          addBotMessage(`${getNextEmoji()} Got it! Now let's get the details for vehicle ${idx + 2}. What year is it?`, true, ['2024', '2023', '2022', '2021', '2020', 'Older'])
+          addBotMessage(`${getNextEmoji()} Got it! Now let's get the details for vehicle ${idx + 2}. What year is it?`, true, recentYears)
           currentQuestion.value = { type: 'vehicle_year', vehicleIndex: idx + 1 }
         }, 800)
       } else {
@@ -424,6 +596,7 @@ const processResponse = (response) => {
           addBotMessage(`${getNextEmoji()} Excellent! Now let's talk about the drivers. How many drivers will be on this policy?`, true, ['1', '2', '3', '4+'])
           currentStep.value = 'drivers'
           currentQuestion.value = { type: 'driver_count' }
+          searchSuggestions.value = []
         }, 800)
       }
       return
