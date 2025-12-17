@@ -9,18 +9,10 @@
         :cols="index === 0 ? headerColumnWidth(headers.length) : Math.floor((12-headerColumnWidth(headers.length))/(headers.length-1))"
         v-for="(header, index) in headers"
         v-bind:key="header.label">
-        <span v-for="(word, i) in header.label.split(' ')" :key="word">
-          <span v-if="i + 1 !== header.label.split(' ').length">
-           {{word}}
-         </span>
-         <span class="nowrap" v-else>
-           {{word}}
-           <!-- <info-tooltip
-            v-if="header.tooltip && header.tooltip.message"
-            :target="header.tooltip.target + index"
-            :message="header.tooltip.message" /> -->
-         </span>
-       </span>
+        <template v-for="(word, i) in header.label.split(' ')" :key="word + i">
+          <template v-if="i + 1 !== header.label.split(' ').length"><span>{{word}}</span></template>
+          <span class="nowrap" v-else> {{word}} <InfoTooltip v-if="header.tooltip && header.tooltip.message" :message="header.tooltip.message" :target="header.tooltip.target + index" /></span>
+        </template>
       </b-col>
     </b-row>
     <!-- rows of the carriers -->
@@ -38,19 +30,10 @@
        <div
         class="cell-header"
         v-if="!['lenderName', 'carrierName'].includes(header.name) ">
-        <span v-for="(word, i) in header.label.split(' ')" :key="word">
-          <span v-if="i + 1 !== header.label.split(' ').length">
-           {{word}}
-         </span>
-         <span class="nowrap" v-else>
-           {{word}}
-           <!-- <info-tooltip
-            v-if="header.tooltip && header.tooltip.message"
-            :target="header.tooltip.target + index"
-            :message="header.tooltip.message" /> -->
-         </span>
-       </span>
-
+        <template v-for="(word, i) in header.label.split(' ')" :key="word + i">
+          <template v-if="i + 1 !== header.label.split(' ').length"> {{word}} </template>
+          <span class="nowrap" v-else> {{word}} <InfoTooltip v-if="header.tooltip && header.tooltip.message" :message="header.tooltip.message" :target="header.tooltip.target + index" /></span>
+        </template>
        </div>
         <div class="cell-content">
           <span v-if="carrier[header.name].includes('/') && carrier[header.name].split('/')[1].length > 3">
@@ -289,10 +272,21 @@ margin-top: 50px;
     .header-cell {
       font-size: 1rem;
       color: #3b54ba;
-      line-height: 1.2;
+      line-height: 1.4;
       font-weight: 500;
+      span {
+        margin: 2px;
+      }
+      span.nowrap {
+        width: 100%;
+        display: flex;
+      }
+      .tool-tip {
+        margin: 0 2px;
+      }
     }
   }
+
   .rating-content-row {
     padding: 35px 0;
     flex-wrap: wrap;
