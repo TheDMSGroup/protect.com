@@ -14,7 +14,7 @@ export default defineEventHandler(async (event) => {
     return;
   }
   // Skip state validation for specific car-insurance sub-routes
-  if (path.startsWith("/car-insurance/rate-calculator")) {
+  if (path.startsWith("/car-insurance/rate-calculator") || path.startsWith("/car-insurance/chat-form")) {
     return;
   }
 
