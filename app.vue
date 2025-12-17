@@ -77,11 +77,12 @@ function getTrafficSource(referrer, urlParams = null) {
 // Run on client side only
 onMounted(() => {
   const urlParams = new URLSearchParams(window.location.search);
-  const trafficSource = getTrafficSource(document.referrer, urlParams);
-  if (trafficSource) {
-    store.setVisitorInfo({ ueid: trafficSource });
-  }
-});
+  // Disable for now
+  // const trafficSource = getTrafficSource(document.referrer, urlParams);
+  // if (trafficSource) {
+  //   store.setVisitorInfo({ ueid: trafficSource });
+  // }
+  });
 </script>
 <template>
   <div id="protectApp">
