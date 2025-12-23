@@ -62,6 +62,7 @@ export default defineNuxtConfig({
   runtimeConfig: {
     // Private keys (only available on server-side)
     graphqlApiUrl: process.env.GRAPHQL_API_URL || "https://us-west-2.cdn.hygraph.com/content/ckwzg7tk528a001z4e7z0bqi0/master",
+    mastodonApiKey: process.env.MASTODON_API_KEY || "",
     // Public keys (exposed to client-side)
     public: {
       // Add any public config here if needed
