@@ -9,8 +9,12 @@
  */
 
 import { ref } from 'vue'
+import { useStore } from '~/stores/store'
+
+const MASTODON_API_URL = 'https://matching.platform.ue.co/ping'
 
 export const useMastodonApi = () => {
+  const store = useStore()
   const loading = ref(false)
   const error = ref(null)
 
@@ -24,11 +28,11 @@ export const useMastodonApi = () => {
     error.value = null
 
     try {
-      // Call our server API route to keep the API key secure
-      const response = await fetch('/api/mastodon/ping', {
+      const response = await fetch(MASTODON_API_URL, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${store.mastodonApiKey}`
         },
         body: JSON.stringify(leadData)
       })
