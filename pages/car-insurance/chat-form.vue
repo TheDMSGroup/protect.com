@@ -142,7 +142,7 @@
         </div>
 
         <!-- Results Section -->
-        <MastodonResults v-if="apiResults" :results="apiResults" />
+        <MastodonFeedTopMatchStar v-if="apiResults" :results="apiResults" />
 
         <!-- Summary Panel -->
         <div v-if="!apiResults" class="summary-panel">
