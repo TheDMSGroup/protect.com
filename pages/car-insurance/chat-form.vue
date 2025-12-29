@@ -126,9 +126,9 @@
               @keypress.enter="handleSend"
               @input="handleSearchInput"
               @keypress="handleKeypress"
-              :type="['vehicle_year', 'vehicle_count'].includes(currentQuestion?.type) ? 'tel' : 'text'"
-              :inputmode="['vehicle_year', 'vehicle_count'].includes(currentQuestion?.type) ? 'numeric' : 'text'"
-              :pattern="['vehicle_year', 'vehicle_count'].includes(currentQuestion?.type) ? '[0-9]*' : undefined"
+              :type="currentQuestion?.type === 'vehicle_count' ? 'tel' : 'text'"
+              :inputmode="currentQuestion?.type === 'vehicle_count' ? 'numeric' : 'text'"
+              :pattern="currentQuestion?.type === 'vehicle_count' ? '[0-9]*' : undefined"
               :placeholder="getInputPlaceholder()"
               class="input-field"
             />
@@ -142,7 +142,7 @@
         </div>
 
         <!-- Results Section -->
-        <MastodonResults v-if="apiResults" :results="apiResults" />
+        <MastodonFeedTopMatchStar v-if="apiResults" :results="apiResults" />
 
         <!-- Summary Panel -->
         <div v-if="!apiResults" class="summary-panel">
@@ -292,6 +292,56 @@ watch(messages, () => {
   })
 }, { deep: true })
 
+/**
+ * Convert 2-digit year to 4-digit year based on context
+ * @param {number} twoDigitYear - The 2-digit year (0-99)
+ * @param {string} context - 'vehicle' (past 40 years) or 'age' (15-115 years old)
+ * @returns {number} - The 4-digit year
+ */
+const expandTwoDigitYear = (twoDigitYear, context = 'vehicle') => {
+  const currentYear = new Date().getFullYear()
+  const currentCentury = Math.floor(currentYear / 100) * 100 // 2000
+  const lastCentury = currentCentury - 100 // 1900
+
+  if (context === 'vehicle') {
+    // Vehicles: accept past 40 years only
+    const minYear = currentYear - 40
+    const year2000s = currentCentury + twoDigitYear // e.g., 2023
+    const year1900s = lastCentury + twoDigitYear // e.g., 1923
+
+    // Prefer 2000s if valid, otherwise 1900s
+    if (year2000s >= minYear && year2000s <= currentYear + 1) {
+      return year2000s
+    }
+    if (year1900s >= minYear && year1900s <= currentYear + 1) {
+      return year1900s
+    }
+    // Default to 2000s even if invalid (validation will catch it)
+    return year2000s
+  }
+
+  if (context === 'age') {
+    // Age: person must be 15-115 years old
+    const year2000s = currentCentury + twoDigitYear
+    const year1900s = lastCentury + twoDigitYear
+
+    const age2000s = currentYear - year2000s
+    const age1900s = currentYear - year1900s
+
+    // Check which century gives a valid age (15-115)
+    if (age2000s >= 15 && age2000s <= 115) {
+      return year2000s
+    }
+    if (age1900s >= 15 && age1900s <= 115) {
+      return year1900s
+    }
+    // Default to whichever is closer to valid range
+    return age2000s >= 0 ? year2000s : year1900s
+  }
+
+  return currentCentury + twoDigitYear
+}
+
 const getStepStatus = (stepId) => {
   const stepOrder = ['vehicles', 'drivers', 'insurance', 'contact']
   const currentIndex = stepOrder.indexOf(currentStep.value)
@@ -384,7 +434,7 @@ const getInputPlaceholder = () => {
     return 'Enter number of vehicles...'
   }
   if (currentQuestion.value?.type === 'vehicle_year') {
-    return 'Enter year (e.g. 2022)...'
+    return 'e.g. 2020 or 2020 Honda Pilot...'
   }
   if (currentQuestion.value?.type === 'vehicle_make') {
     return 'Type to search makes...'
@@ -396,17 +446,33 @@ const getInputPlaceholder = () => {
 }
 
 const handleKeypress = (event) => {
-  if (['vehicle_year', 'vehicle_count'].includes(currentQuestion.value?.type)) {
-    // Only allow numeric input
-    if (!/[0-9]/.test(event.key)) {
+  if (currentQuestion.value?.type === 'vehicle_count') {
+    // Allow letters if user is typing special phrases like "agent", "representative", etc.
+    const currentInput = (inputValue.value + event.key).toLowerCase()
+
+    // Words that could start a special phrase
+    const specialWords = ['agent', 'representative', 'talk', 'speak', 'real', 'person', 'human', 'call', 'phone', 'help']
+
+    // Check if what they're typing could be the start of a special word
+    const couldBeSpecialPhrase = specialWords.some(word =>
+      word.startsWith(currentInput) || currentInput.split(/\s+/).some(typed => word.startsWith(typed) || typed.startsWith(word.substring(0, typed.length)))
+    )
+
+    // Only block non-numeric if not typing a special phrase
+    if (!/[0-9]/.test(event.key) && !couldBeSpecialPhrase) {
       event.preventDefault()
     }
   }
+  // vehicle_year now allows letters for smart input like "2020 Honda Pilot"
 }
-
 const processResponse = async (response) => {
-  // Simplified for demo - add full logic here
   const lowerResponse = response.toLowerCase()
+
+  // Check for off-topic questions first
+  if (awaitingAnswer.value) {
+    const handled = handleOffTopicQuestion(response)
+    if (handled) return
+  }
 
   if (currentStep.value === 'welcome') {
     if (lowerResponse.includes('phone') || lowerResponse.includes('no')) {
@@ -453,7 +519,7 @@ const processResponse = async (response) => {
       // Show recent years as quick replies
       const recentYears = vehicleYears.slice(0, 6).map(String)
       setTimeout(() => {
-        addBotMessage(`Great! Let's get the details for vehicle 1. What year is your vehicle?`, false, recentYears)
+        addBotMessage(`Great! Let's get the details for vehicle 1. You can type the year, or enter your full vehicle like "2020 Honda Pilot".`, false, recentYears)
         currentQuestion.value = { type: 'vehicle_year', vehicleIndex: 0 }
       }, 800)
       return
@@ -461,19 +527,137 @@ const processResponse = async (response) => {
 
     if (currentQuestion.value?.type === 'vehicle_year') {
       const idx = currentQuestion.value.vehicleIndex
-      const yearNum = parseInt(response)
       const currentYear = new Date().getFullYear() + 1
       const minYear = currentYear - 40
 
-      // Validate year is within range
-      if (isNaN(yearNum) || yearNum < minYear || yearNum > currentYear) {
-        setTimeout(() => {
-          addBotMessage(`Please enter a valid year between ${minYear} and ${currentYear}.`)
-        }, 400)
-        return
+      // Smart vehicle detection - check for year (4-digit or 2-digit) with optional make/model
+      // Match 4-digit year (1985-2026) OR 2-digit year at start followed by text
+      const fourDigitMatch = response.match(/\b(19|20)\d{2}\b/)
+      const twoDigitMatch = response.match(/^(\d{1,2})\s+(.+)/)
+
+      let year = null
+      let afterYear = ''
+
+      if (fourDigitMatch) {
+        year = parseInt(fourDigitMatch[0])
+        afterYear = response.substring(response.indexOf(fourDigitMatch[0]) + 4).trim()
+      } else if (twoDigitMatch) {
+        // "16 Honda Pilot" - expand 2-digit year
+        const twoDigit = parseInt(twoDigitMatch[1])
+        if (twoDigit >= 0 && twoDigit <= 99) {
+          year = expandTwoDigitYear(twoDigit, 'vehicle')
+          afterYear = twoDigitMatch[2].trim()
+        }
       }
 
-      formData.vehicles[idx].year = response
+      if (year !== null) {
+        // Validate year
+        if (year < minYear || year > currentYear) {
+          setTimeout(() => {
+            addBotMessage(`Please enter a valid year between ${minYear} and ${currentYear}.`)
+          }, 400)
+          return
+        }
+
+        const words = afterYear.split(/\s+/).filter(w => w)
+
+        if (words.length >= 1) {
+          // User provided year + make (and possibly model)
+          const make = words[0]
+          const model = words.slice(1).join(' ') || ''
+
+          // Validate make against API
+          const makes = await getMakes(year)
+          const matchedMake = findMatch(make, makes)
+
+          if (matchedMake) {
+            formData.vehicles[idx].year = year.toString()
+            formData.vehicles[idx].make = matchedMake
+
+            if (model) {
+              // Validate model against API
+              const models = await getModels(year, matchedMake)
+              const matchedModel = findMatch(model, models)
+
+              if (matchedModel) {
+                formData.vehicles[idx].model = matchedModel
+
+                // Check if there are more vehicles to add
+                if (idx < formData.vehicles.length - 1) {
+                  const recentYears = vehicleYears.slice(0, 6).map(String)
+                  setTimeout(() => {
+                    addBotMessage(`${getNextEmoji()} Perfect! Added your ${year} ${matchedMake} ${matchedModel}. Now let's get vehicle ${idx + 2}. Enter the year or full vehicle.`, true, recentYears)
+                    currentQuestion.value = { type: 'vehicle_year', vehicleIndex: idx + 1 }
+                  }, 800)
+                } else {
+                  setTimeout(() => {
+                    addBotMessage(`${getNextEmoji()} Perfect! Added your ${year} ${matchedMake} ${matchedModel}. Now let's talk about the drivers. How many drivers will be on this policy?`, true, ['1', '2', '3', '4+'])
+                    currentStep.value = 'drivers'
+                    currentQuestion.value = { type: 'driver_count' }
+                    searchSuggestions.value = []
+                  }, 800)
+                }
+                return
+              } else {
+                // Model not found, ask for model
+                const models = await getModels(year, matchedMake)
+                availableModels.value = models
+                searchSuggestions.value = models.slice(0, 6)
+                setTimeout(() => {
+                  addBotMessage(`Got your ${year} ${matchedMake}! I couldn't find "${model}" though. What model is it?`)
+                  currentQuestion.value = { type: 'vehicle_model', vehicleIndex: idx }
+                }, 400)
+                return
+              }
+            } else {
+              // No model provided, ask for it
+              const models = await getModels(year, matchedMake)
+              availableModels.value = models
+              searchSuggestions.value = models.slice(0, 6)
+              setTimeout(() => {
+                addBotMessage(`Got your ${year} ${matchedMake}! What model is it?`)
+                currentQuestion.value = { type: 'vehicle_model', vehicleIndex: idx }
+              }, 400)
+              return
+            }
+          } else {
+            // Make not found, ask for make
+            availableMakes.value = makes
+            searchSuggestions.value = makes.slice(0, 6)
+            formData.vehicles[idx].year = year.toString()
+            setTimeout(() => {
+              addBotMessage(`Got ${year}! I couldn't find "${make}" though. What make is your vehicle?`)
+              currentQuestion.value = { type: 'vehicle_make', vehicleIndex: idx }
+            }, 400)
+            return
+          }
+        }
+
+        // Just year provided (no make/model text after)
+        formData.vehicles[idx].year = year.toString()
+      } else {
+        // No pattern matched - try parsing as just a number
+        let yearNum = parseInt(response)
+        if (isNaN(yearNum)) {
+          setTimeout(() => {
+            addBotMessage(`Please enter a valid year between ${minYear} and ${currentYear}.`)
+          }, 400)
+          return
+        }
+
+        // Convert 2-digit year to 4-digit
+        if (yearNum >= 0 && yearNum <= 99) {
+          yearNum = expandTwoDigitYear(yearNum, 'vehicle')
+        }
+
+        if (yearNum < minYear || yearNum > currentYear) {
+          setTimeout(() => {
+            addBotMessage(`Please enter a valid year between ${minYear} and ${currentYear}.`)
+          }, 400)
+          return
+        }
+        formData.vehicles[idx].year = yearNum.toString()
+      }
 
       // Fetch makes from API
       addBotMessage(`Looking up makes for ${formData.vehicles[idx].year}...`)
@@ -558,7 +742,7 @@ const processResponse = async (response) => {
       if (idx < formData.vehicles.length - 1) {
         const recentYears = vehicleYears.slice(0, 6).map(String)
         setTimeout(() => {
-          addBotMessage(`${getNextEmoji()} Got it! Now let's get the details for vehicle ${idx + 2}. What year is it?`, true, recentYears)
+          addBotMessage(`${getNextEmoji()} Got it! Now let's get the details for vehicle ${idx + 2}. Enter the year or full vehicle.`, true, recentYears)
           currentQuestion.value = { type: 'vehicle_year', vehicleIndex: idx + 1 }
         }, 800)
       } else {
@@ -578,6 +762,17 @@ const processResponse = async (response) => {
   if (currentStep.value === 'drivers') {
     if (currentQuestion.value?.type === 'driver_count') {
       const count = response === '4+' ? 4 : parseInt(response)
+
+      // Validate driver count
+      if (isNaN(count) || count < 1 || count > 10) {
+        setTimeout(() => {
+          addBotMessage(`Please enter a valid number of drivers (1-10).`, false, ['1', '2', '3', '4+'])
+        }, 400)
+        return
+      }
+
+      // Clear existing drivers and add new ones
+      formData.drivers.length = 0
       for (let i = 0; i < count; i++) {
         formData.drivers.push({ firstName: '', lastName: '', dob: '', gender: '', married: '', military: '', employed: '' })
       }
@@ -613,7 +808,20 @@ const processResponse = async (response) => {
 
     if (currentQuestion.value?.type === 'driver_dob') {
       const idx = currentQuestion.value.driverIndex
-      formData.drivers[idx].dob = response
+
+      // Parse and potentially expand 2-digit year in DOB
+      let dob = response
+      const dobParts = response.split('/')
+      if (dobParts.length === 3) {
+        let year = parseInt(dobParts[2])
+        // If 2-digit year, expand it for age context
+        if (year >= 0 && year <= 99) {
+          year = expandTwoDigitYear(year, 'age')
+          dob = `${dobParts[0]}/${dobParts[1]}/${year}`
+        }
+      }
+
+      formData.drivers[idx].dob = dob
 
       setTimeout(() => {
         addBotMessage(`What's ${formData.drivers[idx].firstName}'s gender?`, false, ['Male', 'Female'])
@@ -799,10 +1007,143 @@ const processResponse = async (response) => {
     }
   }
 }
+const handleOffTopicQuestion = (question) => {
+  const lowerQ = question.toLowerCase()
 
-const repeatCurrentQuestion = () => {
-  // Add logic to repeat questions
+  // Check if user wants to talk to a person
+  const wantsAgent = lowerQ.includes('agent') ||
+    lowerQ.includes('representative') ||
+    lowerQ.includes('talk to someone') ||
+    lowerQ.includes('speak to someone') ||
+    lowerQ.includes('real person') ||
+    lowerQ.includes('human') ||
+    lowerQ.includes('call me') ||
+    lowerQ.includes('phone call')
+
+  if (wantsAgent) {
+    setTimeout(() => {
+      addBotMessage("No problem! I'd be happy to connect you with someone. Give us a call at:")
+    }, 800)
+    setTimeout(() => {
+      messages.value.push({ type: 'phone', number: '800-555-5555' })
+    }, 1600)
+    return true
+  }
+
+  const profanityWords = ['fuck', 'shit', 'damn', 'hell', 'ass', 'bitch', 'bastard', 'crap']
+  const hasProfanity = profanityWords.some(word => lowerQ.includes(word))
+
+  if (hasProfanity) {
+    setTimeout(() => {
+      addBotMessage("Kiss your mother with that mouth? 😊 Let's keep things professional and get you the best rates.")
+    }, 800)
+    setTimeout(() => {
+      repeatCurrentQuestion()
+    }, 1600)
+    return true
+  }
+
+  const questionWords = ['what', 'when', 'why', 'where', 'how', 'does', 'do', 'did', 'who', 'which', 'can', 'could', 'would', 'will', 'should']
+  const startsWithQuestion = questionWords.some(word => lowerQ.startsWith(word + ' ') || lowerQ.startsWith(word + "'"))
+  const hasQuestionMark = question.includes('?')
+
+  if (lowerQ.includes('rate') || lowerQ.includes('price') || lowerQ.includes('cost') || lowerQ.includes('much') || lowerQ.includes('expensive') || lowerQ.includes('cheap')) {
+    setTimeout(() => {
+      addBotMessage("Great question! Once we finish gathering your information, you'll be matched with top insurance providers who will give you customized quotes based on your specific situation.")
+    }, 800)
+    setTimeout(() => {
+      repeatCurrentQuestion()
+    }, 1600)
+    return true
+  }
+
+  if (startsWithQuestion || hasQuestionMark) {
+    if (lowerQ.includes('why') && (lowerQ.includes('need') || lowerQ.includes('important') || lowerQ.includes('ask'))) {
+      setTimeout(() => {
+        addBotMessage("Great question! Each detail helps us match you with providers who can offer the most accurate rates for your specific situation.")
+      }, 800)
+      setTimeout(() => {
+        repeatCurrentQuestion()
+      }, 1600)
+      return true
+    }
+
+    setTimeout(() => {
+      addBotMessage("I'm here to help you get matched with insurance providers who will give you customized quotes!")
+    }, 800)
+    setTimeout(() => {
+      repeatCurrentQuestion()
+    }, 1600)
+    return true
+  }
+
+  return false
 }
+const repeatCurrentQuestion = () => {
+  const idx = currentQuestion.value?.vehicleIndex || currentQuestion.value?.driverIndex || 0
+
+  switch(currentQuestion.value?.type) {
+    case 'vehicle_count':
+      addBotMessage("How many vehicles would you like to insure?", false, ['1', '2', '3', '4+'])
+      break
+    case 'vehicle_info':
+      addBotMessage(`What's vehicle #${idx + 1}? (You can type like "2020 Honda Pilot")`)
+      break
+    case 'add_another_vehicle':
+      addBotMessage("Would you like to add another vehicle?", false, ['No, that\'s all', 'Yes, add another'])
+      break
+    case 'driver_count':
+      addBotMessage("How many drivers will be on this policy?", false, ['1', '2', '3', '4+'])
+      break
+    case 'driver_first_name':
+      if (idx === 0) {
+        addBotMessage(`Let's start with your first name!`)
+      } else {
+        addBotMessage(`What's driver #${idx + 1}'s first name?`)
+      }
+      break
+    case 'driver_dob':
+      if (idx === 0) {
+        addBotMessage(`What's your date of birth? (MM/DD/YYYY)`)
+      } else {
+        addBotMessage(`What's their date of birth? (MM/DD/YYYY)`)
+      }
+      break
+    case 'driver_gender':
+      addBotMessage(`What's your gender?`, false, ['Male', 'Female', 'Non-binary'])
+      break
+    case 'driver_employed':
+      addBotMessage(`Are you currently employed?`, false, ['Yes', 'No'])
+      break
+    case 'driver_marital':
+      addBotMessage(`What's your marital status?`, false, ['Single', 'Married', 'Divorced', 'Widowed'])
+      break
+    case 'current_company':
+      addBotMessage("Select below OR type in your provider:", false, ['AAA', 'Allstate', 'American Family', 'Geico', 'Progressive', 'State Farm', 'The General'])
+      break
+    case 'coverage_length':
+      addBotMessage("How long have you been continuously covered with insurance?", false, ['Less than 1 year', '1-2 years', '3-5 years', '5+ years'])
+      break
+    case 'commute_miles':
+      addBotMessage("How many miles is your daily commute? (one way)", false, ['<5', '5-10', '10+', 'Not sure'])
+      break
+    case 'military':
+      addBotMessage("Do you have a military affiliation?", false, ['Active', 'Veteran', 'Family', 'None'])
+      break
+    case 'homeowner':
+      addBotMessage("Are you a homeowner?", false, ['Yes', 'No'])
+      break
+    case 'accidents':
+      addBotMessage("Have you had any accidents in the last 3 years?", false, ['Yes', 'No'])
+      break
+    case 'duis':
+      addBotMessage("Have you had any DUIs in the last 5 years?", false, ['Yes', 'No'])
+      break
+    default:
+      addBotMessage("Let's continue with the next question.")
+  }
+}
+
 
 const getMockResults = () => ({
   bids: [
