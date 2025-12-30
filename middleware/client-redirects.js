@@ -1,4 +1,4 @@
-import { stateMapping, redirectRules } from "~/utils/redirect-contants";
+import { stateMapping, redirectRules, carInsuranceSubRoutes } from "~/utils/redirect-contants";
 
 export default defineNuxtRouteMiddleware((to) => {
   // Early return optimization
@@ -10,7 +10,7 @@ export default defineNuxtRouteMiddleware((to) => {
     return;
   }
   // Skip state validation for specific car-insurance sub-routes
-  if (to.path.startsWith("/car-insurance/rate-calculator") || to.path.startsWith("/car-insurance/chat-form")) {
+  if (carInsuranceSubRoutes.some((subRoute) => to.path.startsWith(`/car-insurance/${subRoute}`))) {
     return;
   }
 

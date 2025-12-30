@@ -55,14 +55,14 @@ export const stateMapping = {
 // Create reverse lookup map for efficient slug validation
 // Maps normalized slugs (without hyphens) to official slugs (with hyphens)
 export const reverseSlugMap = Object.values(stateMapping).reduce((acc, slug) => {
-  const normalized = slug.replace(/-/g, ''); // 'new-york' -> 'newyork'
+  const normalized = slug.replace(/-/g, ""); // 'new-york' -> 'newyork'
   acc[normalized] = slug; // Store: 'newyork' -> 'new-york'
   return acc;
 }, {});
 
 // Helper function to get official slug from any variant
 export function getOfficialSlug(inputSlug) {
-  const normalized = inputSlug.toLowerCase().replace(/-/g, '');
+  const normalized = inputSlug.toLowerCase().replace(/-/g, "");
   return reverseSlugMap[normalized];
 }
 
@@ -71,3 +71,5 @@ export const redirectRules = [
   { from: "/insurance/home", to: "/home-insurance", code: 301 },
   { from: "/insurance/health", to: "/health-insurance", code: 301 },
 ];
+
+export const carInsuranceSubRoutes = ["rate-calculator", "chat-form", "bundle"];
