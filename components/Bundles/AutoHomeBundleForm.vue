@@ -4,11 +4,11 @@
       <label>Are you a homeowner?</label>
       <div class="radio-group">
         <div class="radio-option">
-          <input id="yes" v-model="homeowner" type="radio" name="homeowner" value="yes" required />
+          <input id="yes" v-model="homeowner" type="radio" name="homeowner" value="Yes" required />
           <label for="yes">Yes</label>
         </div>
         <div class="radio-option">
-          <input id="no" v-model="homeowner" type="radio" name="homeowner" value="no" required />
+          <input id="no" v-model="homeowner" type="radio" name="homeowner" value="No" required />
           <label for="no">No</label>
         </div>
       </div>
@@ -37,8 +37,8 @@
       return;
     }
     emit("submit-form", {
-      home_ownership: homeowner.value === "yes" ? true : false,
-      bundle_automatic_optin: homeowner.value === "yes" ? true : false,
+      homeowner: homeowner.value,
+      bundle: homeowner.value === "Yes" ? true : false,
     });
   };
 </script>

@@ -14,10 +14,11 @@
         </div>
 
         <div class="form-card">
-          <h5 class="form-header">Get Your Bundle Quote</h5>
-          <p class="form-subtitle">See how much you could save in under 2 minutes</p>
-
-          <component :is="formComponent" v-if="formComponent" :action="content.formAction" @submit-form="handleFormSubmit" />
+          <div class="form-content">
+            <h5 class="form-header">Get Your Bundle Quote</h5>
+            <p class="form-subtitle">See how much you could save in under 2 minutes</p>
+            <component :is="formComponent" :action="content.formAction" @submit-form="handleFormSubmit" />
+          </div>
         </div>
       </section>
     </b-container>
@@ -206,16 +207,26 @@
 
   /* Hero Section */
   .hero {
-    min-height: 90vh;
+    min-height: 60vh;
     display: grid;
     grid-template-columns: 1.5fr 1fr;
     gap: 3rem;
-    padding: 6rem 0;
+    padding: 7rem 0;
     align-items: center;
     position: relative;
 
     @include media-breakpoint-down(md) {
       margin-top: 0px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .hero-content {
+      @include media-breakpoint-down(md) {
+        display: flex;
+        flex-direction: column;
+        order: 2;
+      }
     }
 
     h1 {
@@ -284,6 +295,10 @@
     margin-bottom: 1.5rem;
     text-transform: uppercase;
     animation: slideInLeft 1s ease-out 0.2s backwards;
+
+    @include media-breakpoint-down(md) {
+      max-width: 170px;
+    }
   }
 
   h1 {
@@ -307,14 +322,48 @@
   .form-card {
     background: white;
     padding: 2rem;
+    min-height: 457px;
     border-radius: 24px;
     box-shadow: 0 20px 60px rgba(10, 22, 40, 0.12);
     position: relative;
-    z-index: 2;
     animation: slideInRight 1s ease-out 0.5s backwards;
 
     @include media-breakpoint-down(md) {
       padding: 2rem 1.5rem;
+    }
+
+    --gradientSpacing: -5px;
+
+    .form-content::before {
+      content: "";
+      position: absolute;
+      top: var(--gradientSpacing);
+      left: var(--gradientSpacing);
+      right: var(--gradientSpacing);
+      bottom: var(--gradientSpacing);
+      background: linear-gradient(120deg, $bundle-blue-light, darken($bundle-blue, 10%));
+      background-size: 200% 200%;
+      border-radius: 28px;
+      z-index: -1;
+      animation: gradientShift 6s ease infinite alternate 0.5s backwards, fadeInBorder 1s ease-out 1.5s backwards;
+    }
+  }
+
+  @keyframes fadeInBorder {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes gradientShift {
+    0% {
+      background-position: 0% 0%;
+    }
+    100% {
+      background-position: 100% 0%;
     }
   }
 
@@ -332,7 +381,7 @@
   .form-card .form-header {
     font-weight: 600;
     margin-bottom: 0.5rem;
-    color: $bundle-blue-light;
+    color: $bundle-blue;
     display: block;
     margin: 10px auto;
   }
@@ -363,7 +412,7 @@
     left: 0;
     right: 0;
     height: 4px;
-    background: linear-gradient(90deg, $blue, $blue-light, $blue);
+    background: linear-gradient(90deg, $blue, $bundle-blue-light, $blue);
   }
 
   .section-header {

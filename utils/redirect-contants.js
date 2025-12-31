@@ -72,4 +72,4 @@ export const redirectRules = [
   { from: "/insurance/health", to: "/health-insurance", code: 301 },
 ];
 
-export const carInsuranceSubRoutes = ["rate-calculator", "chat-form", "bundle"];
+export const carInsuranceSubRoutes = ["rate-calculator", "chat-form", "discounts"];
