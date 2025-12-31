@@ -3,7 +3,10 @@
     <section class="hero">
       <div class="hero-content">
         <span class="hero-label">Smart Savings</span>
-        <h1>Bundle {{ content.type }}.<br />Save <span class="hero-highlight">Big</span>.</h1>
+        <h1>
+          <span>Bundle {{ content.type }}.</span>
+          <span> Save <span class="hero-highlight">Big</span>.</span>
+        </h1>
         <p class="hero-subtitle">
           {{ content.subheader }}
         </p>
@@ -17,7 +20,7 @@
       </div>
     </section>
 
-    <section class="savings-section" id="savings">
+    <section id="savings" class="savings-section">
       <div class="section-header">
         <div class="section-label">The Bundle Advantage</div>
         <h2 class="section-title">{{ upperCaseDescriptor }} Save More When They Bundle</h2>
@@ -56,7 +59,7 @@
       </div>
     </section>
 
-    <section class="ways-to-save" id="ways">
+    <section id="ways" class="ways-to-save">
       <div class="section-header">
         <div class="section-label">Maximize Your Savings</div>
         <h2 class="section-title">Other Ways to Save on Insurance</h2>
@@ -102,81 +105,15 @@
       </div>
     </section>
 
-    <section ref="faqSection" class="faq-section" id="faq">
+    <section id="faq" class="faq-section">
       <div class="section-header">
         <div class="section-label">Common Questions</div>
         <h2 class="section-title">Why Bundle Your Insurance?</h2>
       </div>
-
-      <div class="faq-container">
-        <div class="faq-item">
-          <div class="faq-question">What are the benefits of bundling {{ content.type }} insurance?</div>
-          <div class="faq-answer">
-            <p>
-              Bundling offers multiple benefits: significant cost savings averaging {{ content.stats.averageSavings }} per year, simplified policy
-              management with one provider and one renewal date, streamlined claims process, potential for higher coverage limits, and enhanced
-              customer service. Most customers also appreciate having a single point of contact for all their insurance needs.
-            </p>
-          </div>
-        </div>
-
-        <div class="faq-item">
-          <div class="faq-question">How much can I actually save by bundling?</div>
-          <div class="faq-answer">
-            <p>
-              Bundling discounts typically range from {{ content.stats.discountRange }} on your total insurance premiums. The average homeowner saves
-              {{ content.stats.averageSavings }} annually, though your actual savings depend on factors like your location, coverage amounts,
-              insurance provider, and claims history. Many customers find the convenience alone worth switching to a bundled policy.
-            </p>
-          </div>
-        </div>
-
-        <!-- Most faq in this page can be generic, but we can pass custom ones and render if we have them -->
-        <div v-for="(faq, index) in content.customFaq" :key="index" class="faq-item">
-          <div class="faq-question">{{ faq.question }}</div>
-          <div class="faq-answer">
-            <p>
-              {{ faq.answer }}
-            </p>
-          </div>
-        </div>
-
-        <div class="faq-item">
-          <div class="faq-question">Will bundling affect my coverage quality?</div>
-          <div class="faq-answer">
-            <p>
-              Not at all. Bundling doesn't compromise coverage—you'll receive the same quality protection whether policies are bundled or separate. In
-              fact, many providers offer enhanced coverage options exclusively for bundled customers. You can still customize each policy
-              independently to meet your specific needs while enjoying the discount benefits.
-            </p>
-          </div>
-        </div>
-
-        <div class="faq-item">
-          <div class="faq-question">What if I need to file a claim on one policy?</div>
-          <div class="faq-answer">
-            <p>
-              Filing a claim on one bundled policy works just like separate policies—each policy is handled independently. However, bundled customers
-              often experience faster claims processing because all their information is in one system. Additionally, having both policies with one
-              provider can prevent coverage gaps and ensure smoother coordination if a single incident affects both your auto and home.
-            </p>
-          </div>
-        </div>
-
-        <div class="faq-item">
-          <div class="faq-question">Can I switch providers if I'm already insured separately?</div>
-          <div class="faq-answer">
-            <p>
-              Yes! Switching to bundled coverage is straightforward. Most insurance providers will help you transition both policies, often timing
-              them to coincide with your current renewal dates to avoid cancellation fees. Many customers find the substantial savings make switching
-              well worth any minor hassle. Just make sure you have new coverage in place before canceling existing policies.
-            </p>
-          </div>
-        </div>
-      </div>
+      <FaqAccordion :content="content" />
     </section>
 
-    <section class="cta-section" id="compare">
+    <section id="compare" class="cta-section">
       <div class="cta-content">
         <h2>Ready to Start Saving?</h2>
         <p>Compare quotes from top insurance providers and see how much you could save by bundling your {{ content.type }} insurance today.</p>
@@ -189,6 +126,7 @@
 <script setup>
   import { useBundleComponentLoader } from "@/composables/useBundleComponentLoader.js";
   import { redirectWithParams } from "@/composables/utils.js";
+
   const props = defineProps({
     content: {
       type: Object,
@@ -216,7 +154,6 @@
   });
 
   const fadeCardContainer = ref(null);
-  const faqSection = ref(null);
 
   const handleFormSubmit = (formData) => {
     redirectWithParams(props.content.formAction ?? "https://insure.protect.com/", formData);
@@ -243,26 +180,6 @@
         observer.observe(el);
       });
     }
-
-    if (faqSection.value) {
-      // FAQ Accordion
-      faqSection.value.querySelectorAll(".faq-question").forEach((question) => {
-        question.addEventListener("click", () => {
-          const item = question.parentElement;
-          const isActive = item.classList.contains("active");
-
-          // Close all items
-          faqSection.value.querySelectorAll(".faq-item").forEach((faq) => {
-            faq.classList.remove("active");
-          });
-
-          // Open clicked item if it wasn't active
-          if (!isActive) {
-            item.classList.add("active");
-          }
-        });
-      });
-    }
   });
 
   // // Smooth scrolling
@@ -278,19 +195,18 @@
   //     }
   //   });
   // });
-
-  console.log("BundlePage content:", props.content);
 </script>
 
 <style scoped lang="scss">
   @import "../scss/bundlepages.scss";
+
   /* Hero Section */
   .hero {
     margin-top: 80px;
     min-height: 90vh;
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 4rem;
+    grid-template-columns: 1.5fr 1fr;
+    gap: 10rem;
     padding: 6rem 5%;
     align-items: center;
     position: relative;
@@ -298,6 +214,20 @@
 
     @include media-breakpoint-down(md) {
       margin-top: 0px;
+    }
+
+    h1 {
+      span {
+        display: block;
+        font-family: inherit;
+        font-size: inherit;
+        color: inherit;
+      }
+      .hero-highlight {
+        display: inline-block;
+        color: $blue-light;
+        position: relative;
+      }
     }
   }
 
@@ -361,14 +291,6 @@
     margin-bottom: 1.5rem;
     color: $blue;
     animation: slideInLeft 1s ease-out 0.3s backwards;
-  }
-
-  .hero-highlight {
-    color: $blue-light;
-    position: relative;
-    display: inline-block;
-    font-family: inherit;
-    font-size: inherit;
   }
 
   .hero-subtitle {
@@ -448,7 +370,7 @@
   }
 
   .section-label {
-    color: $blue-light;
+    color: $bundle-blue-light;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 2px;
@@ -459,6 +381,9 @@
   .savings-section {
     .section-title {
       color: white;
+    }
+    .section-label {
+      color: $bundle-blue-lighter;
     }
   }
 
@@ -578,70 +503,6 @@
       color: $bundle-gray;
       line-height: 1.6;
     }
-  }
-
-  /* FAQ Section */
-  .faq-section {
-    padding: 8rem 5%;
-    background: linear-gradient(180deg, $gray-light 0%, white 100%);
-  }
-
-  .faq-container {
-    max-width: 900px;
-    margin: 0 auto;
-  }
-
-  .faq-item {
-    background: white;
-    border-radius: 16px;
-    margin-bottom: 1.5rem;
-    overflow: hidden;
-    border: 2px solid #f3f4f6;
-    transition: all 0.3s;
-  }
-
-  .faq-item:hover {
-    border-color: $blue;
-  }
-
-  .faq-question {
-    padding: 2rem;
-    cursor: pointer;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-weight: 700;
-    color: $blue;
-    user-select: none;
-  }
-
-  .faq-question::after {
-    content: "+";
-    font-size: 2rem;
-    color: $blue;
-    transition: transform 0.3s;
-  }
-
-  .faq-item.active .faq-question::after {
-    transform: rotate(45deg);
-  }
-
-  .faq-answer {
-    max-height: 0;
-    overflow: hidden;
-    transition: max-height 0.4s ease-out, padding 0.4s ease-out;
-    padding: 0 2rem;
-  }
-
-  .faq-item.active .faq-answer {
-    max-height: 500px;
-    padding: 0 2rem 2rem 2rem;
-  }
-
-  .faq-answer p {
-    color: $bundle-gray;
-    line-height: 1.8;
-    font-size: 1.05rem;
   }
 
   /* CTA Section */

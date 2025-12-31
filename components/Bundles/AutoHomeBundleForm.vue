@@ -8,7 +8,7 @@
           <label for="yes">Yes</label>
         </div>
         <div class="radio-option">
-          <input id="no" v-model="homeowner" type="radio" name="homeowner" value="no" />
+          <input id="no" v-model="homeowner" type="radio" name="homeowner" value="no" required />
           <label for="no">No</label>
         </div>
       </div>
@@ -33,6 +33,9 @@
   const homeowner = ref("");
 
   const submitForm = () => {
+    if (!homeowner.value) {
+      return;
+    }
     emit("submit-form", {
       home_ownership: homeowner.value === "yes" ? true : false,
       bundle_automatic_optin: homeowner.value === "yes" ? true : false,

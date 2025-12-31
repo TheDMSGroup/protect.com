@@ -56,3 +56,15 @@ $widthDesktop: 992px;
     @content;
   }
 }
+
+  @mixin media-breakpoint-down($breakpoint) {
+    @if $breakpoint == sm {
+      @media (max-width: 575px) {
+        @content;
+      }
+    } @else if $breakpoint == md {
+      @media (max-width: 767px) {
+        @content;
+      }
+    }
+  }
