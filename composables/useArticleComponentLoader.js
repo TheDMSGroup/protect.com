@@ -5,7 +5,7 @@ const componentRegistry = {
   // Article components
   ZipCodeForm: () => import("~/components/ZipCodeForm.vue"),
   AutoRateCalculator: () => import("~/components/AutoRateCalculator.vue"),
-  Faq: () => import("~/components/Faq.vue"),
+  Faq: () => import("~/components/Faq/Main.vue"),
 
   // Add more components as needed
   // ExampleComponent: () => import('~/components/ExampleComponent.vue'),
