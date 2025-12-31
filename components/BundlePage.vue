@@ -69,43 +69,45 @@
         <p class="section-description">Beyond bundling, discover additional opportunities to reduce your insurance premiums.</p>
       </div>
 
-      <div class="ways-grid">
-        <div class="way-card fade-in">
-          <div class="way-icon">🎖️</div>
-          <h3>Military Discounts</h3>
-          <p>Active duty, veterans, and military families often qualify for special discounts ranging from 5% to 15%.</p>
-        </div>
+      <b-container>
+        <div class="ways-grid">
+          <div class="way-card fade-in">
+            <div class="way-icon">🎖️</div>
+            <h3>Military Discounts</h3>
+            <p>Active duty, veterans, and military families often qualify for special discounts ranging from 5% to 15%.</p>
+          </div>
 
-        <div class="way-card fade-in">
-          <div class="way-icon">🛡️</div>
-          <h3>Safe Driver Rewards</h3>
-          <p>Maintain a clean driving record and qualify for safe driver discounts that can save you up to 20% on premiums.</p>
-        </div>
+          <div class="way-card fade-in">
+            <div class="way-icon">🛡️</div>
+            <h3>Safe Driver Rewards</h3>
+            <p>Maintain a clean driving record and qualify for safe driver discounts that can save you up to 20% on premiums.</p>
+          </div>
 
-        <div class="way-card fade-in">
-          <div class="way-icon">📱</div>
-          <h3>Usage-Based Insurance</h3>
-          <p>Install a telematics device or use a mobile app to track your driving habits and save up to 30% with safe driving.</p>
-        </div>
+          <div class="way-card fade-in">
+            <div class="way-icon">📱</div>
+            <h3>Usage-Based Insurance</h3>
+            <p>Install a telematics device or use a mobile app to track your driving habits and save up to 30% with safe driving.</p>
+          </div>
 
-        <div class="way-card fade-in">
-          <div class="way-icon">👥</div>
-          <h3>Multiple Drivers</h3>
-          <p>Adding multiple drivers to your policy can result in multi-car discounts of 10% to 25% per vehicle.</p>
-        </div>
+          <div class="way-card fade-in">
+            <div class="way-icon">👥</div>
+            <h3>Multiple Drivers</h3>
+            <p>Adding multiple drivers to your policy can result in multi-car discounts of 10% to 25% per vehicle.</p>
+          </div>
 
-        <div class="way-card fade-in">
-          <div class="way-icon">🏠</div>
-          <h3>Home Security Systems</h3>
-          <p>Protect your home with security systems and smoke detectors to earn discounts of 5% to 20% on home insurance.</p>
-        </div>
+          <div class="way-card fade-in">
+            <div class="way-icon">🏠</div>
+            <h3>Home Security Systems</h3>
+            <p>Protect your home with security systems and smoke detectors to earn discounts of 5% to 20% on home insurance.</p>
+          </div>
 
-        <div class="way-card fade-in">
-          <div class="way-icon">💳</div>
-          <h3>Pay in Full</h3>
-          <p>Pay your annual premium upfront instead of monthly installments to save on administrative fees and earn discounts.</p>
+          <div class="way-card fade-in">
+            <div class="way-icon">💳</div>
+            <h3>Pay in Full</h3>
+            <p>Pay your annual premium upfront instead of monthly installments to save on administrative fees and earn discounts.</p>
+          </div>
         </div>
-      </div>
+      </b-container>
     </section>
 
     <section id="faq" class="faq-section">
@@ -514,10 +516,14 @@
 
   .ways-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    grid-template-columns: repeat(3, 1fr);
     gap: 2rem;
     max-width: 1400px;
     margin: 0 auto;
+
+    @include media-breakpoint-down(md) {
+      grid-template-columns: 1fr;
+    }
   }
 
   .way-card {
