@@ -66,5 +66,17 @@ $widthDesktop: 992px;
       @media (max-width: 767px) {
         @content;
       }
+    }@else if $breakpoint == lg {
+      @media (max-width: 991px) {
+        @content;
+      }
+    } @else if $breakpoint == xl {
+      @media (max-width: 1199px) {
+        @content;
+      }
+    } @else if $breakpoint == xxl {
+      @media (max-width: 1399px) {
+        @content;
+      }
     }
   }
