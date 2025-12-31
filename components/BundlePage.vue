@@ -1,24 +1,26 @@
 <template>
   <div ref="fadeCardContainer">
-    <section class="hero">
-      <div class="hero-content">
-        <span class="hero-label">Smart Savings</span>
-        <h1>
-          <span>Bundle {{ content.type }}.</span>
-          <span> Save <span class="hero-highlight">Big</span>.</span>
-        </h1>
-        <p class="hero-subtitle">
-          {{ content.subheader }}
-        </p>
-      </div>
+    <b-container>
+      <section class="hero">
+        <div class="hero-content">
+          <span class="hero-label">Smart Savings</span>
+          <h1>
+            <span>Bundle {{ content.type }}.</span>
+            <span> Save <span class="hero-highlight">Big</span>.</span>
+          </h1>
+          <p class="hero-subtitle">
+            {{ content.subheader }}
+          </p>
+        </div>
 
-      <div class="form-card">
-        <h3>Get Your Bundle Quote</h3>
-        <p class="form-subtitle">See how much you could save in under 2 minutes</p>
+        <div class="form-card">
+          <h5 class="form-header">Get Your Bundle Quote</h5>
+          <p class="form-subtitle">See how much you could save in under 2 minutes</p>
 
-        <component :is="formComponent" v-if="formComponent" :action="content.formAction" @submit-form="handleFormSubmit" />
-      </div>
-    </section>
+          <component :is="formComponent" v-if="formComponent" :action="content.formAction" @submit-form="handleFormSubmit" />
+        </div>
+      </section>
+    </b-container>
 
     <section id="savings" class="savings-section">
       <div class="section-header">
@@ -110,7 +112,9 @@
         <div class="section-label">Common Questions</div>
         <h2 class="section-title">Why Bundle Your Insurance?</h2>
       </div>
-      <FaqAccordion :content="content" />
+      <b-container>
+        <FaqAccordion :content="content" />
+      </b-container>
     </section>
 
     <section id="compare" class="cta-section">
@@ -202,15 +206,13 @@
 
   /* Hero Section */
   .hero {
-    margin-top: 80px;
     min-height: 90vh;
     display: grid;
     grid-template-columns: 1.5fr 1fr;
-    gap: 10rem;
-    padding: 6rem 5%;
+    gap: 3rem;
+    padding: 6rem 0;
     align-items: center;
     position: relative;
-    overflow: hidden;
 
     @include media-breakpoint-down(md) {
       margin-top: 0px;
@@ -304,7 +306,7 @@
   /* Form Card */
   .form-card {
     background: white;
-    padding: 3rem;
+    padding: 2rem;
     border-radius: 24px;
     box-shadow: 0 20px 60px rgba(10, 22, 40, 0.12);
     position: relative;
@@ -327,11 +329,12 @@
     }
   }
 
-  .form-card h3 {
-    font-family: "Cantata One", serif;
-    font-weight: 400;
+  .form-card .form-header {
+    font-weight: 600;
     margin-bottom: 0.5rem;
-    color: $blue;
+    color: $bundle-blue-light;
+    display: block;
+    margin: 10px auto;
   }
 
   .form-subtitle {
