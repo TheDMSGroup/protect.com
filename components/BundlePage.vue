@@ -1,5 +1,5 @@
 <template>
-  <main ref="fadeCardContainer">
+  <div ref="fadeCardContainer">
     <section class="hero">
       <div class="hero-content">
         <span class="hero-label">Smart Savings</span>
@@ -183,7 +183,7 @@
         <a href="#" class="cta-btn" @click.prevent="handleFormSubmit">Get Free Quotes</a>
       </div>
     </section>
-  </main>
+  </div>
 </template>
 
 <script setup>
@@ -373,7 +373,7 @@
 
   .hero-subtitle {
     font-size: 1.3rem;
-    color: $gray;
+    color: $bundle-gray;
     margin-bottom: 3rem;
     line-height: 1.6;
     animation: slideInLeft 1s ease-out 0.4s backwards;
@@ -413,7 +413,7 @@
   }
 
   .form-subtitle {
-    color: $gray;
+    color: $bundle-gray;
     margin-bottom: 2rem;
     font-size: 1rem;
   }
@@ -488,7 +488,7 @@
   }
 
   .savings-card {
-    background: rgba(255, 255, 255, 0.25);
+    background: rgba(255, 255, 255, 0.15);
     backdrop-filter: blur(10px);
     padding: 3rem;
     border-radius: 20px;
@@ -509,7 +509,7 @@
       font-family: "Cantata One", serif;
       font-size: 3.5rem;
       font-weight: 400;
-      color: $blue;
+      color: #7caaff;
       margin-bottom: 0.5rem;
 
       @include media-breakpoint-down(sm) {
@@ -559,7 +559,7 @@
     .way-icon {
       width: 60px;
       height: 60px;
-      background: $blue-lighter;
+      background: lighten($bundle-blue-lighter, 3%);
       border: 2px solid $blue-light;
       border-radius: 12px;
       display: flex;
@@ -575,7 +575,7 @@
     }
 
     p {
-      color: $gray;
+      color: $bundle-gray;
       line-height: 1.6;
     }
   }
@@ -639,7 +639,7 @@
   }
 
   .faq-answer p {
-    color: $gray;
+    color: $bundle-gray;
     line-height: 1.8;
     font-size: 1.05rem;
   }
