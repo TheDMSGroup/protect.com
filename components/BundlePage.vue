@@ -4,7 +4,7 @@
       <span class="links">
         <NuxtLink to="/car-insurance/discounts/">Discounts</NuxtLink>
         <span class="arrow">></span>
-        <NuxtLink :to="`/car-insurance/bundle`" class="article-slug">Bundle</NuxtLink>
+        <NuxtLink :to="`/car-insurance/discounts/bundle`" class="article-slug">Bundle</NuxtLink>
       </span>
     </div>
   </div>

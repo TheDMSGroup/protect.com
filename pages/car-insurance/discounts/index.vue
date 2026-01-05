@@ -16,7 +16,7 @@
         <a href="https://insure.protect.com/" class="cta-button primary" @click.prevent="goToForm()">Get Your Free Quotes</a>
       </b-col>
 
-      <b-col cols="12" lg="5" class="hero-img d-flex align-items-center justify-content-center">
+      <b-col cols="12" lg="5" class="hero-img d-flex align-items-center justify-content-center fade-in">
         <NuxtImg
           class="hero-image"
           :src="buildImageUrl('mobile-phone-quotes.png')"
@@ -53,7 +53,7 @@
 
       <!-- Category 1: Policy & Loyalty Discounts -->
       <Transition name="fade" mode="out-in">
-        <div v-if="currentTab === 'policy-loyalty'" id="policy-loyalty" class="discount-category">
+        <div v-show="currentTab === 'policy-loyalty'" id="policy-loyalty" class="discount-category">
           <h3>1. Policy & Loyalty Discounts</h3>
           <p class="category-description">These savings are based on how you manage your account and how long you've been a customer.</p>
 
@@ -95,7 +95,7 @@
 
       <!-- Category 2: Safe Driving & Habits Discounts -->
       <Transition name="fade" mode="out-in">
-        <div v-if="currentTab === 'safe-driving'" id="safe-driving" class="discount-category">
+        <div v-show="currentTab === 'safe-driving'" id="safe-driving" class="discount-category">
           <h3>2. Safe Driving & Habits Discounts</h3>
           <p class="category-description">Your behavior on the road is the biggest factor in your premium cost.</p>
 
@@ -133,7 +133,7 @@
 
       <!-- Category 3: Driver Profile & Lifestyle Discounts -->
       <Transition name="fade" mode="out-in">
-        <div v-if="currentTab === 'driver-profile'" id="driver-profile" class="discount-category">
+        <div v-show="currentTab === 'driver-profile'" id="driver-profile" class="discount-category">
           <h3>3. Driver Profile & Lifestyle Discounts</h3>
           <p class="category-description">Who you are, where you work, and your life milestones can trigger lower rates.</p>
 
@@ -178,7 +178,7 @@
 
       <!-- Category 4: Vehicle Equipment & Technology Discounts -->
       <Transition name="fade" mode="out-in">
-        <div v-if="currentTab === 'vehicle-equipment'" id="vehicle-equipment" class="discount-category">
+        <div v-show="currentTab === 'vehicle-equipment'" id="vehicle-equipment" class="discount-category">
           <h3>4. Vehicle Equipment & Technology Discounts</h3>
           <p class="category-description">The safety and security features of your car can work in your favor.</p>
 
@@ -304,7 +304,7 @@
 
   .hero-section {
     padding: 4rem 0;
-    max-width: 1600px;
+    max-width: 1400px;
     margin: 0 auto;
 
     @include media-breakpoint-down(md) {
