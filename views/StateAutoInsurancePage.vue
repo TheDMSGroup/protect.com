@@ -109,7 +109,6 @@
   const zipcode = ref("");
 
   // import axios from 'axios';
-  import "../scss/stateautoinsurance.scss";
 
   const stateInsuranceStats = [
     {

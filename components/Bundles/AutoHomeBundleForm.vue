@@ -1,20 +1,20 @@
 <template>
-  <form id="bundleForm" @submit.prevent="submitForm">
+  <form id="bundleForm">
     <div class="form-question">
       <label>Are you a homeowner?</label>
       <div class="radio-group">
         <div class="radio-option">
-          <input id="yes" v-model="homeowner" type="radio" name="homeowner" value="Yes" required />
+          <input id="yes" v-model="homeowner" type="radio" name="homeowner" value="Yes" required @change="submitForm" />
           <label for="yes">Yes</label>
         </div>
         <div class="radio-option">
-          <input id="no" v-model="homeowner" type="radio" name="homeowner" value="No" required />
+          <input id="no" v-model="homeowner" type="radio" name="homeowner" value="No" required @change="submitForm" />
           <label for="no">No</label>
         </div>
       </div>
     </div>
 
-    <button type="submit" class="submit-btn">Compare Quotes</button>
+    <!-- <button type="submit" class="submit-btn">Compare Quotes</button> -->
 
     <div class="form-footer">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -48,6 +48,9 @@
 
   .form-question {
     margin-bottom: 2.5rem;
+    @include media-breakpoint-down(md) {
+      margin-bottom: 1.5rem;
+    }
   }
 
   .form-question label {
@@ -126,5 +129,9 @@
     align-items: center;
     justify-content: center;
     gap: 0.5rem;
+
+    @include media-breakpoint-down(md) {
+      margin-top: 0;
+    }
   }
 </style>
