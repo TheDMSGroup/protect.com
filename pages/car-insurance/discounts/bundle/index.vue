@@ -47,4 +47,17 @@
 
     return { bundleResult, error, pending };
   }
+
+  useSeoMeta({
+    title: bundleResult.value?.seo?.title || "Bundle and Save on Car Insurance | Protect.com",
+    description:
+      bundleResult.value?.seo?.metaDescription ||
+      "Discover how bundling your car insurance with other policies can lead to significant savings. Learn more about bundle discounts today.",
+    ogTitle: bundleResult.value?.seo?.ogTitle || "",
+    ogDescription: bundleResult.value?.seo?.ogDescription || "",
+    ogImage: bundleResult.value?.seo?.ogImage || "",
+    twitterTitle: bundleResult.value?.seo?.twitterTitle || "",
+    twitterDescription: bundleResult.value?.seo?.twitterDescription || "",
+    twitterImage: bundleResult.value?.seo?.twitterImage || "",
+  });
 </script>
