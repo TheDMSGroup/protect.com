@@ -1,20 +1,32 @@
 <template>
+  <div class="breadcrumbs">
+    <div class="container">
+      <span class="links">
+        <NuxtLink to="/car-insurance/discounts/">Discounts</NuxtLink>
+        <span class="arrow">></span>
+        <NuxtLink :to="`/car-insurance/bundle`" class="article-slug">Bundle</NuxtLink>
+      </span>
+    </div>
+  </div>
   <div ref="fadeCardContainer">
     <b-container>
       <section class="hero">
         <div class="hero-content">
           <span class="hero-label">Smart Savings</span>
-          <h1>
-            <span>Bundle {{ content.type }}.</span>
+          <h1 class="d-none d-md-block">
+            <span>Bundle {{ content.type }} Insurance.</span>
             <span> Save <span class="hero-highlight">Big</span>.</span>
           </h1>
           <p class="hero-subtitle">
             {{ content.subheader }}
           </p>
         </div>
-
-        <div class="form-card">
-          <div class="form-content">
+        <h1 class="d-block d-md-none">
+          <span>Bundle {{ content.type }} Insurance.</span>
+          <span> Save <span class="hero-highlight">Big</span>.</span>
+        </h1>
+        <div class="form-content">
+          <div class="form-card">
             <h5 class="form-header">Get Your Bundle Quote</h5>
             <p class="form-subtitle">See how much you could save in under 2 minutes</p>
             <component :is="formComponent" :action="content.formAction" @submit-form="handleFormSubmit" />
@@ -132,6 +144,7 @@
 
 <script setup>
   import { useBundleComponentLoader } from "@/composables/useBundleComponentLoader.js";
+  import { useScrollFade } from "@/composables/useScrollFade.js";
   import { redirectWithParams } from "@/composables/utils.js";
 
   const props = defineProps({
@@ -162,51 +175,84 @@
 
   const fadeCardContainer = ref(null);
 
+  useScrollFade(fadeCardContainer);
+
   const handleFormSubmit = (formData) => {
     redirectWithParams(props.content.formAction ?? "https://insure.protect.com/", formData);
   };
-
-  onMounted(() => {
-    // Scroll animations
-    const observerOptions = {
-      threshold: 0.1,
-      rootMargin: "0px 0px -100px 0px",
-    };
-
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add("visible");
-        }
-      });
-    }, observerOptions);
-
-    // Find all fade-in elements across the entire component
-    if (fadeCardContainer.value) {
-      fadeCardContainer.value.querySelectorAll(".fade-in").forEach((el) => {
-        observer.observe(el);
-      });
-    }
-  });
-
-  // // Smooth scrolling
-  // document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
-  //   anchor.addEventListener("click", function (e) {
-  //     e.preventDefault();
-  //     const target = document.querySelector(this.getAttribute("href"));
-  //     if (target) {
-  //       target.scrollIntoView({
-  //         behavior: "smooth",
-  //         block: "start",
-  //       });
-  //     }
-  //   });
-  // });
 </script>
 
 <style scoped lang="scss">
   @import "../scss/bundlepages.scss";
 
+  .breadcrumbs {
+    position: relative;
+    background-color: $white;
+    width: 100%;
+    bottom: 0;
+    height: 80px;
+    text-transform: capitalize;
+    background-color: $gray-light;
+    display: flex;
+    align-items: center;
+
+    @include media-breakpoint-down(md) {
+      height: auto;
+      padding: 1em 0.5em;
+      font-size: 0.875em;
+    }
+    @include media-breakpoint-down(xs) {
+      position: relative;
+    }
+
+    a {
+      color: $gray-dark;
+    }
+
+    .container {
+      display: flex;
+      flex-wrap: wrap;
+
+      .links {
+        width: 85%;
+        position: relative;
+
+        @include media-breakpoint-down(md) {
+          width: 100%;
+        }
+        .arrow {
+          margin: 0 8px;
+        }
+
+        .custom-select {
+          border: 0;
+          background-color: $gray-light;
+          color: $gray-dark;
+        }
+      }
+    }
+  }
+  .container {
+    @include media-breakpoint-down(md) {
+      padding: 0 1.25rem;
+    }
+
+    section {
+      .container {
+        padding: 0;
+      }
+    }
+  }
+  h3 {
+    @include media-breakpoint-down(sm) {
+      font-size: 1.5rem;
+    }
+  }
+  p {
+    @include media-breakpoint-down(sm) {
+      font-size: 1rem;
+    }
+  }
   /* Hero Section */
   .hero {
     min-height: 60vh;
@@ -219,6 +265,8 @@
 
     @include media-breakpoint-down(md) {
       margin-top: 0px;
+      padding: 3.5rem 0;
+      gap: 1.5rem;
       display: flex;
       flex-direction: column;
     }
@@ -274,17 +322,6 @@
     animation: slideInLeft 1s ease-out;
   }
 
-  @keyframes slideInLeft {
-    from {
-      opacity: 0;
-      transform: translateX(-40px);
-    }
-    to {
-      opacity: 1;
-      transform: translateX(0);
-    }
-  }
-
   .hero-label {
     display: inline-block;
     background: $blue-light;
@@ -321,77 +358,67 @@
   }
 
   /* Form Card */
-  .form-card {
-    background: white;
-    padding: 2rem;
-    min-height: 457px;
-    border-radius: 24px;
-    box-shadow: 0 20px 60px rgba(10, 22, 40, 0.12);
-    position: relative;
-    animation: slideInRight 1s ease-out 0.5s backwards;
-
-    @include media-breakpoint-down(md) {
-      padding: 2rem 1.5rem;
-    }
-
+  .form-content {
     --gradientSpacing: -5px;
+    overflow: hidden;
+    padding: calc(var(--gradientSpacing) * -1);
+    border-radius: 26px;
 
-    .form-content::before {
-      content: "";
-      position: absolute;
-      top: var(--gradientSpacing);
-      left: var(--gradientSpacing);
-      right: var(--gradientSpacing);
-      bottom: var(--gradientSpacing);
-      background: linear-gradient(120deg, $bundle-blue-light, darken($bundle-blue, 10%));
-      background-size: 200% 200%;
-      border-radius: 28px;
-      z-index: -1;
-      animation: gradientShift 6s ease infinite alternate 0.5s backwards, fadeInBorder 1s ease-out 1.5s backwards;
-    }
-  }
+    .form-card {
+      min-height: 425px;
+      border-radius: 24px;
+      box-shadow: 0 20px 60px rgba(10, 22, 40, 0.12);
+      position: relative;
+      animation: slideInRight 1s ease-out 0.5s backwards;
+      padding: 2rem 2.5rem;
+      position: relative;
+      background: white;
 
-  @keyframes fadeInBorder {
-    from {
-      opacity: 0;
-    }
-    to {
-      opacity: 1;
-    }
-  }
+      @include media-breakpoint-down(md) {
+        padding: 1rem;
+        min-height: 400px;
+      }
 
-  @keyframes gradientShift {
-    0% {
-      background-position: 0% 0%;
-    }
-    100% {
-      background-position: 100% 0%;
-    }
-  }
+      &::before {
+        content: "";
+        position: absolute;
+        width: 200%;
+        height: 200%;
+        top: -50%;
+        left: -50%;
+        background: radial-gradient(
+          circle at top left,
+          lighten($bundle-blue-light, 40%),
+          $bundle-blue-light,
+          $bundle-blue,
+          $blue,
+          darken($blue, 10%)
+        );
+        background-size: 100% 100%;
+        border-radius: 100%;
+        z-index: -1;
+        animation: gradientShift 6s ease infinite 0.5s backwards, fadeInBorder 1s ease-out 1.5s backwards;
 
-  @keyframes slideInRight {
-    from {
-      opacity: 0;
-      transform: translateX(40px);
+        @include media-breakpoint-down(md) {
+          width: 1020px;
+          height: 1020px;
+        }
+      }
     }
-    to {
-      opacity: 1;
-      transform: translateX(0);
+
+    .form-card .form-header {
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      color: $bundle-blue;
+      display: block;
+      margin: 10px auto;
     }
-  }
 
-  .form-card .form-header {
-    font-weight: 600;
-    margin-bottom: 0.5rem;
-    color: $bundle-blue;
-    display: block;
-    margin: 10px auto;
-  }
-
-  .form-subtitle {
-    color: $bundle-gray;
-    margin-bottom: 2rem;
-    font-size: 1rem;
+    .form-subtitle {
+      color: $bundle-gray;
+      margin-bottom: 2rem;
+      font-size: 1rem;
+    }
   }
 
   /* Savings Section */
@@ -492,7 +519,7 @@
       margin-bottom: 0.5rem;
 
       @include media-breakpoint-down(sm) {
-        font-size: 3rem;
+        font-size: 2rem;
       }
     }
     h3 {
@@ -629,31 +656,5 @@
       box-shadow: 0 16px 40px rgba(0, 102, 204, 0.5);
       transform: translateY(-2px);
     }
-  }
-
-  /* Responsive */
-  @media (max-width: 968px) {
-    .hero {
-      grid-template-columns: 1fr;
-      padding: 4rem 5%;
-    }
-
-    .section-title {
-    }
-
-    .savings-amount {
-    }
-  }
-
-  /* Scroll Animations */
-  .fade-in {
-    opacity: 0;
-    transform: translateY(30px);
-    transition: opacity 0.8s, transform 0.8s;
-  }
-
-  .fade-in.visible {
-    opacity: 1;
-    transform: translateY(0);
   }
 </style>

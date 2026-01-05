@@ -64,11 +64,20 @@
   ul {
     list-style: none;
     display: flex;
+    flex-wrap: nowrap;
     justify-content: space-between;
     gap: 1rem;
     padding: 0;
     border-bottom: 2px solid #e5e7eb;
     position: relative;
+
+    @include media-breakpoint-down(md) {
+      overflow-x: auto;
+      scrollbar-width: thin;
+      -ms-overflow-style: auto;
+      border-bottom: 0;
+      padding-bottom: 12px;
+    }
 
     .indicator {
       position: absolute;
@@ -77,6 +86,10 @@
       height: 4px;
       transition: left 0.3s ease, width 0.3s ease;
       background-color: $blue;
+
+      @include media-breakpoint-down(md) {
+        bottom: 12px;
+      }
     }
   }
 
@@ -84,6 +97,11 @@
     cursor: pointer;
     padding: 0.5rem 1rem;
 
+    @include media-breakpoint-down(md) {
+      font-size: 0.875rem;
+      padding: 0.5rem;
+      min-width: 100px;
+    }
     &.active {
       font-weight: bold;
       color: $blue;

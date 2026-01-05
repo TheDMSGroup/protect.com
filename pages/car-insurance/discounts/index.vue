@@ -1,8 +1,8 @@
 <template>
-  <div class="discounts-page">
+  <div ref="discountsPage" class="discounts-page">
     <!-- Hero Section -->
     <section class="hero-section row">
-      <b-col cols="12" lg="7" class="text-lg-left">
+      <b-col cols="12" lg="7" class="text-lg-left hero-content">
         <h1>Maximize Your Savings: The Ultimate List of Car Insurance Discounts in&nbsp;2026</h1>
         <p class="intro-text">
           Most drivers are eligible for at least three to five different discounts, yet many never claim them. Whether you've recently improved your
@@ -16,7 +16,7 @@
         <a href="https://insure.protect.com/" class="cta-button primary" @click.prevent="goToForm()">Get Your Free Quotes</a>
       </b-col>
 
-      <b-col cols="12" lg="5" class="d-flex align-items-center justify-content-center">
+      <b-col cols="12" lg="5" class="hero-img d-flex align-items-center justify-content-center">
         <NuxtImg
           class="hero-image"
           :src="buildImageUrl('mobile-phone-quotes.png')"
@@ -31,12 +31,12 @@
     </section>
 
     <!-- Video Section -->
-    <section class="video-container mt-4 pt-4">
+    <section class="video-container mt-4 pt-4 fade-in">
       <YouTubeEmbed :video-id="'VUeM2v_CLzg'" class="video-container" />
     </section>
 
     <!-- Discounts List Section -->
-    <section class="discounts-section">
+    <section class="discounts-section fade-in">
       <h2>List of Common Car Insurance Discounts</h2>
 
       <NavigationTabs
@@ -237,9 +237,11 @@
         <div class="how-it-works">
           <h3>How it Works:</h3>
           <ol>
-            <li><strong>Enter Your Zip Code:</strong> Start with your location to see local availability.</li>
-            <li><strong>Compare in Real-Time:</strong> See quotes from the nation's top insurers side-by-side.</li>
-            <li><strong>Unlock Hidden Discounts:</strong> Our tool identifies the providers most likely to reward your specific driving profile.</li>
+            <li class="fade-in"><strong>Enter Your Zip Code:</strong> Start with your location to see local availability.</li>
+            <li class="fade-in"><strong>Compare in Real-Time:</strong> See quotes from the nation's top insurers side-by-side.</li>
+            <li class="fade-in">
+              <strong>Unlock Hidden Discounts:</strong> Our tool identifies the providers most likely to reward your specific driving profile.
+            </li>
           </ol>
         </div>
 
@@ -251,6 +253,7 @@
 
 <script setup>
   import { redirectWithParams } from "@/composables/utils.js";
+  import { useScrollFade } from "@/composables/useScrollFade.js";
 
   useSeoMeta({
     title: "Maximize Your Savings: The Ultimate List of Car Insurance Discounts in 2026 | Protect.com",
@@ -271,6 +274,10 @@
 
   const currentTab = ref("policy-loyalty");
   const previousTab = ref(null);
+
+  const discountsPage = ref(null);
+  useScrollFade(discountsPage);
+
   const switchTab = (tab) => {
     previousTab.value = currentTab.value;
     currentTab.value = tab;
@@ -282,19 +289,27 @@
 </script>
 
 <style scoped lang="scss">
+  @import "../../../scss/bundlepages.scss";
   section {
     max-width: 1100px;
     width: 90%;
     margin: 0 auto;
   }
+
   .discounts-page {
-    padding: 3rem 0;
+    @include media-breakpoint-up(md) {
+      padding: 4rem 0;
+    }
   }
 
   .hero-section {
     padding: 4rem 0;
     max-width: 1600px;
     margin: 0 auto;
+
+    @include media-breakpoint-down(md) {
+      padding: 2rem 0;
+    }
     h1 {
       margin-bottom: 2rem;
 
@@ -302,6 +317,9 @@
         max-width: 700px;
         font-size: 3.75rem;
       }
+    }
+    .hero-content {
+      animation: slideInLeft 1s ease-out;
     }
 
     .intro-text {
@@ -338,9 +356,10 @@
       height: auto;
       margin: 0 auto;
       display: block;
+      animation: slideInRight 1s ease-out;
 
       @include mobile {
-        max-width: 300px;
+        display: none;
       }
     }
 
