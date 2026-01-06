@@ -122,7 +122,7 @@
       </b-container>
     </section>
 
-    <section id="faq" class="faq-section">
+    <section id="faq" class="faq-section mb-4 pb-4">
       <div class="section-header">
         <div class="section-label">Common Questions</div>
         <h2 class="section-title">Why Bundle Your Insurance?</h2>
@@ -132,11 +132,11 @@
       </b-container>
     </section>
 
-    <section id="compare" class="cta-section">
+    <section id="compare" class="cta-section mt-4">
       <div class="cta-content">
         <h2>Ready to Start Saving?</h2>
         <p>Compare quotes from top insurance providers and see how much you could save by bundling your {{ content.type }} insurance today.</p>
-        <a href="#" class="cta-btn" @click.prevent="handleFormSubmit">Get Free Quotes</a>
+        <a :href="content.formAction ?? 'https://insure.protect.com/'" class="cta-btn" @click.prevent="handleFormSubmit">Get Free Quotes</a>
       </div>
     </section>
   </div>

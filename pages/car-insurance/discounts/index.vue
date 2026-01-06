@@ -16,16 +16,15 @@
         <a href="https://insure.protect.com/" class="cta-button primary" @click.prevent="goToForm()">Get Your Free Quotes</a>
       </b-col>
 
-      <b-col cols="12" lg="5" class="hero-img d-flex align-items-center justify-content-center fade-in">
+      <b-col cols="12" lg="5" class="hero-img d-flex align-items-center justify-content-center">
         <NuxtImg
           class="hero-image"
-          :src="buildImageUrl('mobile-phone-quotes.png')"
+          :src="buildImageUrl('mobile-phone-quotes.jpg')"
           alt="Car Insurance Discounts"
           loading="eager"
           decoding="async"
-          :preload="true"
           format="webp"
-          sizes="(max-width: 768px) 100vw, 400px"
+          sizes="(max-width: 767px) 1px, 500px"
         />
       </b-col>
     </section>
