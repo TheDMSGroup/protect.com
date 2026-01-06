@@ -18,6 +18,7 @@ Vue 3, and Bootstrap Vue Next.
   - [`/mixins`](#5-mixins)
 - [Styling](#styling)
 - [API Integration](#api-integration)
+- [Data Flow](#data-flow)
 - [Useful Composables](#useful-composables)
   - [buildImageUrl](#buildimageurl-imagesjs)
   - [iconLoader](#iconloader-iconsjs)
@@ -150,7 +151,7 @@ New endpoints should be placed in `/server/api/{context}/index.js`
 See [here](/pages/article/[slug].vue) (useArticleFromCacheOrApi). for an example. 
 Ensure to follow the pattern defined in `useArticleFromCacheOrApi` as it leverages both our custom api endpoint and Nuxt's built in caching mechanisms. 
 
-Prefer to use API endpoints within your page, rather than a component. See [`pages/article/[slug].vue`](pages/article/[slug].vue)
+Prefer to use API endpoints within your page, rather than a component. See [`pages/article/[slug].vue`](pages/article/[slug].vue) and [Data Flow](#data-flow)
 
 Sticking point: Your cache key must be unique to each type of API call, or else Nuxt cannot effectively cache your requests. Example: 
 ```javascript
@@ -159,6 +160,128 @@ const cacheKey = `articles-${vertical}-${route.params.slug}`;
 ```
 
 The above code will generate a cache key unique to the vertical and article slug, so the next time a user navgiates to `some-unque-article-slug` in the session, the cache can be used rather than another API request. 
+
+## Data Flow
+
+This project strives to adhere to the unidirectional data flow paradigm (one-way data flow), or "Props down, events up". This ensures we can track where our data comes from, and not mutate state or data from a child component lower in the tree.
+
+Examples: 
+
+[`pages/article/[slug].vue`](pages/article/[slug].vue)
+
+The API is called at the top of the component structure (inside our page), and the resulting data is passed down into the child component
+
+```html
+  <template>
+    <!--Props are passed down to UI component-->
+    <SingleArticle :article="article"/>
+  </template>
+
+  <script setup>
+      //extract article data from cache or API
+      const { articleResult, error } = await useArticleFromCacheOrApi();
+
+      //reactive computed properties for article data
+      const article = computed(() => articleResult.value?.response.article || {});
+  </script>
+```
+
+--------
+#### Navigation Tabs Usage (Parent)
+
+[pages/car-insurance/discounts/index.vue](pages/car-insurance/discounts/index.vue)
+
+Notice how we pass all data that controls the child component down as props. We don't pass callback functions, we will rely on emitted events propegating up from the child. We listen for those events using `@update:active-tab="switchTab"`
+
+```html
+  <template>
+      <div>
+        Page content...
+        <NavigationTabs
+          :tabs="[
+            { label: 'Policy & Loyalty', target: 'policy-loyalty' },
+            { label: 'Safe Driving & Habits', target: 'safe-driving' },
+            { label: 'Driver Profile & Lifestyle', target: 'driver-profile' },
+            { label: 'Vehicle Equipment & Technology', target: 'vehicle-equipment' },
+          ]"
+          :active-tab="currentTab"
+          :previous-tab="'policy-loyalty'"
+          @update:active-tab="switchTab"
+        />
+
+      <!-- Category 1: Policy & Loyalty Discounts -->
+        <div v-show="currentTab === 'policy-loyalty'" id="policy-loyalty" class="discount-category">
+          <h3>1. Policy & Loyalty Discounts</h3>
+          <p class="category-description">These savings are based on how you manage your account and how long you've been a customer.</p>
+        </div>
+
+      <!-- Category 2: Safe Driving & Habits Discounts -->
+        <div v-show="currentTab === 'safe-driving'" id="safe-driving" class="discount-category">
+          <h3>2. Safe Driving & Habits Discounts</h3>
+          <p class="category-description">Your behavior on the road is the biggest factor in your premium cost.</p>
+        </div>
+      <!-- Category 3: Driver Profile & Lifestyle Discounts -->
+        <div v-show="currentTab === 'driver-profile'" id="driver-profile" class="discount-category">
+          <h3>3. Driver Profile & Lifestyle Discounts</h3>
+          <p class="category-description">Who you are, where you work, and your life milestones can trigger lower rates.</p>
+        </div>
+      <!-- Category 4: Vehicle Equipment & Technology Discounts -->
+        <div v-show="currentTab === 'vehicle-equipment'" id="vehicle-equipment" class="discount-category">
+          <h3>4. Vehicle Equipment & Technology Discounts</h3>
+          <p class="category-description">The safety and security features of your car can work in your favor.</p>
+        </div>
+      </div>
+  </template>
+  <script setup>
+    const previousTab = ref(null);
+    const currentTab = ref('privacy-policy');
+
+    const switchTab = (tab) => {
+      previousTab.value = currentTab.value;
+      currentTab.value = tab;
+    };
+  </script>
+```
+
+
+
+#### Navigation Tab Code (Child)
+
+[/components/Navigation/Tabs.vue](/components/Navigation/Tabs.vue)
+
+Notice how we accept all incoming params from our parent component as props. We make no logical decisions, and do not rely on any expected layout, names, ids, etc. We simply accept props as the single source of truth, and emit an event back up when something changes using `@click="$emit('update:activeTab', tab.target)"`. This helps with the mental model of the component, avoiding accidental prop mutation, and creating more re-usable components that aren't bound to strict logic.
+
+```html
+<template>
+  <ul ref="tabList">
+    <li v-for="(tab, index) in tabs" :key="tab.name" :ref="(el) => setTabRef(el, index)" :class="{ active: tab.target === activeTab }">
+      <button @click="$emit('update:activeTab', tab.target)">{{ tab.label }}</button>
+    </li>
+    <span class="indicator" :style="{ left: indicatorLeft, width: indicatorWidth }" />
+  </ul>
+</template>
+
+<script setup>
+  const props = defineProps({
+    tabs: {
+      type: Array,
+      required: true,
+    },
+    activeTab: {
+      type: String,
+      required: true,
+    },
+    previousTab: {
+      type: String,
+      required: true,
+    },
+  });
+
+  defineEmits(["update:activeTab"]);
+</script>
+
+```
+
 
 ## Useful composables
 
