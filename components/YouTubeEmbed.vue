@@ -1,25 +1,25 @@
 <template>
-  <div v-if="interacted" class="youtube-embed" ref="youtubeEmbed">
+  <div v-if="interacted" ref="youtubeEmbed" class="youtube-embed">
     <iframe
       :src="`https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1`"
-      :title="videoTitle"
+      :title="title"
       frameborder="0"
       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
       allowfullscreen
     />
   </div>
-  <div v-else class="video-thumbnail" @click="updateInteracted" style="position: relative; cursor: pointer">
+  <div v-else class="video-thumbnail" style="position: relative; cursor: pointer" @click="updateInteracted">
     <div class="title-overlay">
       <div class="icon">
         <IconsProtectShield />
       </div>
-      <span v-if="!isMobile">{{ videoTitle }}</span>
-      <span v-if="isMobile">{{ videoTitleTruncated }}</span>
+      <span v-if="!isMobile">{{ title }}</span>
+      <span v-if="isMobile">{{ titleTruncated }}</span>
     </div>
     <picture>
       <source media="(min-width: 768px)" :srcset="`https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`" />
       <source media="(min-width: 480px)" :srcset="`https://img.youtube.com/vi/${videoId}/sddefault.jpg`" />
-      <img :src="`https://img.youtube.com/vi/${videoId}/hqdefault.jpg`" :alt="videoTitle" style="width: 100%; height: auto; display: block" />
+      <img :src="`https://img.youtube.com/vi/${videoId}/hqdefault.jpg`" :alt="title" style="width: 100%; height: auto; display: block" />
     </picture>
     <div
       style="
@@ -45,41 +45,41 @@
     },
     title: {
       type: String,
-      default: "YouTube video player",
+      required: true,
     },
   });
 
   const interacted = ref(false);
   const youtubeEmbed = ref(null);
-  const videoTitle = ref(props.title);
   const isMobile = ref(false);
 
-  const videoTitleTruncated = computed(() => {
-    if (videoTitle.value.length > 60) {
-      return videoTitle.value.slice(0, 20) + "...";
+  const titleTruncated = computed(() => {
+    if (props.title.length > 60) {
+      return props.title.slice(0, 20) + "...";
     }
-    return videoTitle.value;
+    return props.title;
   });
 
+  const sendVideoEngagementToGa = (eventType, eventPayload) => {
+    const { proxy } = useScriptGoogleTagManager();
+    proxy.dataLayer.push({
+      event: eventType,
+      ...eventPayload,
+    });
+  };
   const updateInteracted = () => {
     interacted.value = true;
+    sendVideoEngagementToGa("video_interaction", {
+      video_id: props.videoId,
+      video_title: props.title,
+      interaction_type: "play",
+    });
   };
 
   // Fetch video title from YouTube oEmbed API
   onMounted(async () => {
     // Initialize isMobile
     isMobile.value = window.innerWidth <= 768;
-
-    try {
-      const response = await fetch(`https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${props.videoId}&format=json`);
-      const data = await response.json();
-      if (data.title) {
-        videoTitle.value = data.title;
-      }
-    } catch (error) {
-      console.warn("Failed to fetch YouTube video title:", error);
-      // Falls back to the prop title
-    }
 
     // ResizeObserver to update isMobile dynamically
     const resizeObserver = new ResizeObserver(() => {

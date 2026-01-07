@@ -30,8 +30,8 @@
     </section>
 
     <!-- Video Section -->
-    <section class="video-container mt-4 pt-4 fade-in">
-      <YouTubeEmbed :video-id="'VUeM2v_CLzg'" class="video-container" />
+    <section v-if="videoResult && !error" class="video-container mt-4 pt-4 fade-in">
+      <YouTubeEmbed :video-id="videoId" :title="title" class="video-container" />
     </section>
 
     <!-- Discounts List Section -->
@@ -254,6 +254,53 @@
   import { redirectWithParams } from "@/composables/utils.js";
   import { useScrollFade } from "@/composables/useScrollFade.js";
 
+  const videoId = "VUeM2v_CLzg";
+  const { videoResult, error } = await useYoutubeVideoTitle(videoId);
+
+  console.log("Video Result:", videoResult.value, "Error:", error.value);
+
+  const title = computed(() => videoResult.value?.title);
+
+  async function useYoutubeVideoTitle(videoId) {
+    const cacheKey = `ytembed-${videoId}`;
+    console.log("🔑 Cache key:", cacheKey);
+
+    const nuxtApp = useNuxtApp();
+
+    const {
+      data: videoResult,
+      error,
+      pending,
+    } = await useAsyncData(
+      cacheKey,
+      async () => {
+        try {
+          const url = `/api/youtubeEmbed/?videoId=${videoId}`;
+          console.log("🌐 Making API request:", url);
+          const result = await $fetch(url);
+          return result;
+        } catch (err) {
+          console.error("❌ API error:", err);
+          throw err;
+        }
+      },
+      {
+        server: true,
+        lazy: false,
+        //watch: [() => route.params.slug],
+        getCachedData(key) {
+          const cacheHit = nuxtApp.payload.data[key] || nuxtApp.static.data[key];
+          if (cacheHit) {
+            console.log("✅ Using cached data for key:", key, cacheHit);
+          }
+          return cacheHit;
+        },
+      }
+    );
+
+    return { videoResult, error, pending };
+  }
+
   useSeoMeta({
     title: "Maximize Your Savings: The Ultimate List of Car Insurance Discounts in 2026 | Protect.com",
     description:
@@ -317,9 +364,9 @@
         font-size: 3.75rem;
       }
     }
-    .hero-content {
-      animation: slideInLeft 0.25s ease-out;
-    }
+    // .hero-content {
+    //   animation: slideInLeft 0.25s ease-out;
+    // }
 
     .intro-text {
       font-size: 1.1rem;
@@ -355,7 +402,7 @@
       height: auto;
       margin: 0 auto;
       display: block;
-      animation: slideInRight 0.25s ease-out;
+      // animation: slideInRight 0.25s ease-out;
 
       @include mobile {
         display: none;
