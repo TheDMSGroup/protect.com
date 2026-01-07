@@ -318,7 +318,7 @@
       }
     }
     .hero-content {
-      animation: slideInLeft 1s ease-out;
+      animation: slideInLeft 0.25s ease-out;
     }
 
     .intro-text {
@@ -355,7 +355,7 @@
       height: auto;
       margin: 0 auto;
       display: block;
-      animation: slideInRight 1s ease-out;
+      animation: slideInRight 0.25s ease-out;
 
       @include mobile {
         display: none;

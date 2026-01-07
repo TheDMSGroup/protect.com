@@ -27,9 +27,12 @@
         </h1>
         <div class="form-content">
           <div class="form-card">
-            <h5 class="form-header">Get Your Bundle Quote</h5>
+            <h2 class="form-header">Get Your Bundle Quote</h2>
             <p class="form-subtitle">See how much you could save in under 2 minutes</p>
-            <component :is="formComponent" :action="content.formAction" @submit-form="handleFormSubmit" />
+            <BundlesAutoHomeBundleForm :action="content.formAction" @submit-form="handleFormSubmit" />
+
+            <!--Dynmically render component based on bundle type, it tanked pagespeed so using static for now-->
+            <!-- <component :is="formComponent" :action="content.formAction" @submit-form="handleFormSubmit" /> -->
           </div>
         </div>
       </section>
@@ -410,6 +413,7 @@
       font-weight: 600;
       margin-bottom: 0.5rem;
       color: $bundle-blue;
+      font-size: 2.5rem;
       display: block;
       margin: 10px auto;
     }
