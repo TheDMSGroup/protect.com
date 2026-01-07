@@ -1,10 +1,12 @@
 <template>
-  <ul ref="tabList">
-    <li v-for="(tab, index) in tabs" :key="tab.name" :ref="(el) => setTabRef(el, index)" :class="{ active: tab.target === activeTab }">
-      <button @click="$emit('update:activeTab', tab.target)">{{ tab.label }}</button>
-    </li>
+  <div class="tabs-container">
+    <ul ref="tabList">
+      <li v-for="(tab, index) in tabs" :key="tab.name" :ref="(el) => setTabRef(el, index)" :class="{ active: tab.target === activeTab }">
+        <button @click="$emit('update:activeTab', tab.target)">{{ tab.label }}</button>
+      </li>
+    </ul>
     <span class="indicator" :style="{ left: indicatorLeft, width: indicatorWidth }" />
-  </ul>
+  </div>
 </template>
 
 <script setup>
@@ -61,23 +63,10 @@
 </script>
 
 <style scoped lang="scss">
-  ul {
-    list-style: none;
-    display: flex;
-    flex-wrap: nowrap;
-    justify-content: space-between;
-    gap: 1rem;
-    padding: 0;
-    border-bottom: 2px solid #e5e7eb;
+  .tabs-container {
     position: relative;
-
-    @include media-breakpoint-down(md) {
-      overflow-x: auto;
-      scrollbar-width: thin;
-      -ms-overflow-style: auto;
-      border-bottom: 0;
-      padding-bottom: 12px;
-    }
+    width: 100%;
+    margin-bottom: 1rem;
 
     .indicator {
       position: absolute;
@@ -91,28 +80,46 @@
         bottom: 12px;
       }
     }
-  }
 
-  li {
-    cursor: pointer;
-    padding: 0.5rem 1rem;
+    ul {
+      list-style: none;
+      display: flex;
+      flex-wrap: nowrap;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: 0;
+      border-bottom: 2px solid #e5e7eb;
 
-    @include media-breakpoint-down(md) {
-      font-size: 0.875rem;
-      padding: 0.5rem;
-      min-width: 100px;
+      @include media-breakpoint-down(md) {
+        overflow-x: auto;
+        scrollbar-width: thin;
+        -ms-overflow-style: auto;
+        border-bottom: 0;
+        padding-bottom: 12px;
+      }
     }
-    &.active {
-      font-weight: bold;
-      color: $blue;
+
+    li {
+      cursor: pointer;
+      padding: 0.5rem 1rem;
+
+      @include media-breakpoint-down(md) {
+        font-size: 0.875rem;
+        padding: 0.5rem;
+        min-width: 100px;
+      }
+      &.active {
+        font-weight: bold;
+        color: $blue;
+      }
     }
-  }
-  button {
-    background: none;
-    border: none;
-    font: inherit;
-    cursor: pointer;
-    padding: 0;
-    color: inherit;
+    button {
+      background: none;
+      border: none;
+      font: inherit;
+      cursor: pointer;
+      padding: 0;
+      color: inherit;
+    }
   }
 </style>

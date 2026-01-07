@@ -27,9 +27,12 @@
         </h1>
         <div class="form-content">
           <div class="form-card">
-            <h5 class="form-header">Get Your Bundle Quote</h5>
+            <h2 class="form-header">Get Your Bundle Quote</h2>
             <p class="form-subtitle">See how much you could save in under 2 minutes</p>
-            <component :is="formComponent" :action="content.formAction" @submit-form="handleFormSubmit" />
+            <BundlesAutoHomeBundleForm :action="content.formAction" @submit-form="handleFormSubmit" />
+
+            <!--Dynmically render component based on bundle type, it tanked pagespeed so using static for now-->
+            <!-- <component :is="formComponent" :action="content.formAction" @submit-form="handleFormSubmit" /> -->
           </div>
         </div>
       </section>
@@ -319,7 +322,7 @@
   .hero-content {
     position: relative;
     z-index: 2;
-    animation: slideInLeft 1s ease-out;
+    // animation: slideInLeft 1s ease-out;
   }
 
   .hero-label {
@@ -333,7 +336,7 @@
     letter-spacing: 0.5px;
     margin-bottom: 1.5rem;
     text-transform: uppercase;
-    animation: slideInLeft 1s ease-out 0.2s backwards;
+    // animation: slideInLeft 1s ease-out 0.2s backwards;
 
     @include media-breakpoint-down(md) {
       max-width: 170px;
@@ -346,7 +349,7 @@
     line-height: 1.1;
     margin-bottom: 1.5rem;
     color: $blue;
-    animation: slideInLeft 1s ease-out 0.3s backwards;
+    // animation: slideInLeft 1s ease-out 0.3s backwards;
   }
 
   .hero-subtitle {
@@ -354,7 +357,7 @@
     color: $bundle-gray;
     margin-bottom: 3rem;
     line-height: 1.6;
-    animation: slideInLeft 1s ease-out 0.4s backwards;
+    // animation: slideInLeft 1s ease-out 0.4s backwards;
   }
 
   /* Form Card */
@@ -369,7 +372,7 @@
       border-radius: 24px;
       box-shadow: 0 20px 60px rgba(10, 22, 40, 0.12);
       position: relative;
-      animation: slideInRight 1s ease-out 0.5s backwards;
+      // animation: slideInRight 1s ease-out 0.5s backwards;
       padding: 2rem 2.5rem;
       position: relative;
       background: white;
@@ -410,6 +413,7 @@
       font-weight: 600;
       margin-bottom: 0.5rem;
       color: $bundle-blue;
+      font-size: 2.5rem;
       display: block;
       margin: 10px auto;
     }

@@ -34,7 +34,7 @@ $bundle-gray: #4d4d4d;
 
     /* Scroll Animations */
   .fade-in {
-    opacity: 0;
+    opacity: 0.15;
     transform: translateY(30px);
     transition: opacity 0.8s, transform 0.8s;
   }
