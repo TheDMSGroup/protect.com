@@ -7,9 +7,8 @@
       </div>
 
       <div class="tips-grid">
-        <div class="tip-card">
-          <a :href="getQuotes" target="_blank">
-          <div data-v-01e33d74="" class="tip-star-overlay">
+        <div class="tip-card clickable" @click="openQuotes">
+          <div class="tip-star-overlay">
             <IconsStars classes="star-icon golden"></IconsStars>
           </div>
           <div class="tip-icon">
@@ -17,7 +16,6 @@
           </div>
           <h3>Compare Regularly</h3>
           <p>Shop around annually to ensure you're getting the best rates</p>
-          </a>
         </div>
         <div class="tip-card">
           <div class="tip-icon">
@@ -60,7 +58,9 @@
         </div>
       </div>
       <div class="cta-container">
-        <a :href="getQuotes" target="_blank"><button class="compare-btn">COMPARE QUOTES</button></a>
+        <ClientOnly>
+          <a :href="getQuotes" target="_blank"><button class="compare-btn">COMPARE QUOTES</button></a>
+        </ClientOnly>
       </div>
     </div>
   </section>
@@ -78,20 +78,22 @@ const props = defineProps({
 });
 
 const getQuotes = computed(() => {
+  var options = {};
   if (props.zipcode?.length === 5) {
-    var options = {
-      zipcode: props.zipcode,
-    };
-
+    options.zipcode = props.zipcode;
     if (store.visitorInfo?.ueid) {
       options.ueid = store.visitorInfo.ueid;
     }
     if (store.visitorInfo?.mst) {
       options.mst = store.visitorInfo.mst;
     }
-    return generateRedirectUrl("https://insure.protect.com", options);
   }
+  return generateRedirectUrl("https://insure.protect.com", options);
 });
+
+const openQuotes = () => {
+  window.open(getQuotes.value, '_blank');
+};
 
 const getImage = (image) => {
   const desiredImage = image.replace(/\s/g, '').toLowerCase();
@@ -136,6 +138,10 @@ const getImage = (image) => {
     text-align: center;
     border: 1px solid var(--border-light);
     transition: all 0.3s ease;
+
+    &.clickable {
+      cursor: pointer;
+    }
 
     &:hover {
       box-shadow: var(--shadow-lg);

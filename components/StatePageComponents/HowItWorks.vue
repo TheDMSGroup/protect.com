@@ -32,7 +32,9 @@
         </div>
       </div>
       <div class="cta-container">
-        <a :href="getQuotes" target="_blank"><button class="compare-btn">COMPARE QUOTES</button></a>
+        <ClientOnly>
+          <a :href="getQuotes" target="_blank"><button class="compare-btn">COMPARE QUOTES</button></a>
+        </ClientOnly>
       </div>
     </div>
   </section>
@@ -50,18 +52,17 @@ const props = defineProps({
 });
 
 const getQuotes = computed(() => {
+  var options = {};
   if (props.zipcode?.length === 5) {
-    var options = {
-      zipcode: props.zipcode,
-    };
+    options.zipcode = props.zipcode;
     if (store.visitorInfo?.ueid) {
       options.ueid = store.visitorInfo.ueid;
     }
     if (store.visitorInfo?.mst) {
       options.mst = store.visitorInfo.mst;
     }
-    return generateRedirectUrl("https://insure.protect.com", options);
   }
+  return generateRedirectUrl("https://insure.protect.com", options);
 });
 </script>
 
