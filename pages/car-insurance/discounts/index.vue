@@ -30,12 +30,12 @@
     </section>
 
     <!-- Video Section -->
-    <section v-if="videoResult && !error" class="video-container mt-4 pt-4 fade-in">
+    <section v-if="videoResult && !error" class="video-container mt-4 pt-4">
       <YouTubeEmbed :video-id="videoId" :title="title" class="video-container" />
     </section>
 
     <!-- Discounts List Section -->
-    <section class="discounts-section fade-in">
+    <section class="discounts-section">
       <h2>List of Common Car Insurance Discounts</h2>
 
       <NavigationTabs
@@ -236,9 +236,9 @@
         <div class="how-it-works">
           <h3>How it Works:</h3>
           <ol>
-            <li class="fade-in"><strong>Enter Your Zip Code:</strong> Start with your location to see local availability.</li>
-            <li class="fade-in"><strong>Compare in Real-Time:</strong> See quotes from the nation's top insurers side-by-side.</li>
-            <li class="fade-in">
+            <li class=""><strong>Enter Your Zip Code:</strong> Start with your location to see local availability.</li>
+            <li class=""><strong>Compare in Real-Time:</strong> See quotes from the nation's top insurers side-by-side.</li>
+            <li class="">
               <strong>Unlock Hidden Discounts:</strong> Our tool identifies the providers most likely to reward your specific driving profile.
             </li>
           </ol>
@@ -252,7 +252,7 @@
 
 <script setup>
   import { redirectWithParams } from "@/composables/utils.js";
-  import { useScrollFade } from "@/composables/useScrollFade.js";
+  // import { useScrollFade } from "@/composables/useScrollFade.js";
 
   const videoId = "VUeM2v_CLzg";
   const { videoResult, error } = await useYoutubeVideoTitle(videoId);
@@ -322,7 +322,7 @@
   const previousTab = ref(null);
 
   const discountsPage = ref(null);
-  useScrollFade(discountsPage);
+  // useScrollFade(discountsPage);
 
   const switchTab = (tab) => {
     previousTab.value = currentTab.value;
