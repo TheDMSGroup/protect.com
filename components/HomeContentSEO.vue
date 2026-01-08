@@ -106,7 +106,7 @@
     </b-container>
 
     <b-container>
-      <Faq :faq="faq" />
+      <FaqMain :faq="faq" />
     </b-container>
   </div>
 </template>

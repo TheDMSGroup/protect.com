@@ -1,4 +1,4 @@
-import { stateMapping, redirectRules, getOfficialSlug } from "~/utils/redirect-contants";
+import { stateMapping, redirectRules, getOfficialSlug, carInsuranceSubRoutes } from "~/utils/redirect-contants";
 
 export default defineEventHandler(async (event) => {
   const url = getRequestURL(event);
@@ -14,7 +14,7 @@ export default defineEventHandler(async (event) => {
     return;
   }
   // Skip state validation for specific car-insurance sub-routes
-  if (path.startsWith("/car-insurance/rate-calculator")) {
+  if (carInsuranceSubRoutes.some((subRoute) => path.startsWith(`/car-insurance/${subRoute}`))) {
     return;
   }
 

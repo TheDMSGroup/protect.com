@@ -13,8 +13,8 @@
 </template>
 
 <script setup>
-  import { preprocessTextForLinks, redirectWithParams } from "@/composables/utils.js";
-
+  import { redirectWithParams } from "@/composables/utils.js";
+  import { useFaq } from "@/composables/useFaq.js";
   // Props
   const props = defineProps({
     faq: {
@@ -28,51 +28,14 @@
     name: "FaqSection",
   });
 
+  // composable to manage faq data
+  const processedFaq = useFaq(props);
+
   // Router
   const router = useRouter();
 
   // Template ref for accessing the component element
   const faqSection = ref(null);
-
-  // Process FAQ items to add links - computed to ensure consistency between server and client
-  const processedFaq = computed(() => {
-    return props.faq.map((item) => ({
-      question: item.links && Array.isArray(item.links) && item.links.length > 0 ? preprocessTextForLinks(item.question, item.links) : item.question,
-      answer: item.links && Array.isArray(item.links) && item.links.length > 0 ? preprocessTextForLinks(item.answer, item.links) : item.answer,
-    }));
-  });
-
-  // Computed property for JSON-LD structured data
-  const faqJsonLd = computed(() => {
-    if (!props.faq) return null;
-
-    return {
-      "@context": "https://schema.org",
-      "@type": "FAQPage",
-      mainEntity: props.faq.map((item) => ({
-        "@type": "Question",
-        name: item.question,
-        acceptedAnswer: {
-          "@type": "Answer",
-          text: item.answer.replaceAll(/<[^>]*>/g, ""),
-        },
-      })),
-    };
-  });
-
-  // Server-side head management for JSON-LD - critical for SEO and AI parsing
-  useHead(() => {
-    if (!faqJsonLd.value) return {};
-
-    return {
-      script: [
-        {
-          type: "application/ld+json",
-          innerHTML: JSON.stringify(faqJsonLd.value),
-        },
-      ],
-    };
-  });
 
   // Handle click events for FAQ links
   const handleLinkClick = (ev) => {
@@ -101,8 +64,20 @@
   });
 </script>
 
-<style lang="scss">
-  @import "../scss/stateautoinsurance.scss";
+<style lang="scss" scoped>
+  // Local CSS variables needed for this component
+  :root {
+    --primary-color: #1e40af;
+    --background-color: #ffffff;
+    --surface-color: #f8fafc;
+    --border-light: #f1f5f9;
+    --spacing-lg: 1.5rem;
+    --spacing-xl: 2rem;
+    --spacing-2xl: 2.5rem;
+    --spacing-4xl: 4rem;
+    --radius-lg: 0.5rem;
+    --spacing-md: 1rem;
+  }
 
   // FAQ Section
   .faq-section {

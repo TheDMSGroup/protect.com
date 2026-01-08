@@ -2,18 +2,16 @@
 // All components must be registered here to be included in server payload
 
 const componentRegistry = {
-  // Article components
-  ZipCodeForm: () => import("~/components/ZipCodeForm.vue"),
-  AutoRateCalculator: () => import("~/components/AutoRateCalculator.vue"),
-  Faq: () => import("~/components/Faq/Main.vue"),
+  // Bundle components
+  AutoHomeBundleForm: () => import("~/components/Bundles/AutoHomeBundleForm.vue"),
 
   // Add more components as needed
   // ExampleComponent: () => import('~/components/ExampleComponent.vue'),
 };
 
-export async function useArticleComponentLoader(name) {
+export async function useBundleComponentLoader(name) {
   if (!name) {
-    console.warn("Article component name not specified");
+    console.warn("Bundle component name not specified");
     return null;
   }
 
