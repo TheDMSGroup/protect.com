@@ -39,6 +39,8 @@
 
 <script setup>
 import { computed, ref } from 'vue';
+import { useStore } from "../stores/store";
+const store = useStore();
 
 const props = defineProps({
   config: {
@@ -69,12 +71,17 @@ const svgPath = computed(() => {
 
 const getQuotes = () => {
   if (localZipcode.value.length === 5) {
-    navigateTo(`https://insure.protect.com?zipcode=${localZipcode.value}`, {
-      external: true,
-      open: {
-        target: '_blank'
-      }
-    });
+    var options = {
+      zipcode: localZipcode.value,
+    };
+
+    if (store.visitorInfo?.ueid) {
+      options.ueid = store.visitorInfo.ueid;
+    }
+    if (store.visitorInfo?.mst) {
+      options.mst = store.visitorInfo.mst;
+    }
+    redirectWithParams("https://insure.protect.com", options);
   }
 };
 </script>
