@@ -147,7 +147,7 @@
 
 <script setup>
   import { useBundleComponentLoader } from "@/composables/useBundleComponentLoader.js";
-  import { useScrollFade } from "@/composables/useScrollFade.js";
+  // import { useScrollFade } from "@/composables/useScrollFade.js";
   import { redirectWithParams } from "@/composables/utils.js";
 
   const props = defineProps({
@@ -178,7 +178,7 @@
 
   const fadeCardContainer = ref(null);
 
-  useScrollFade(fadeCardContainer);
+  // useScrollFade(fadeCardContainer);
 
   const handleFormSubmit = (formData) => {
     redirectWithParams(props.content.formAction ?? "https://insure.protect.com/", formData);
