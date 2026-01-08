@@ -35,6 +35,7 @@ export const useStore = defineStore("store", {
       city: "",
       region: "",
       ueid: null,
+      mst: null,
     },
     _stateValueMapCache: null, // Private cache
   }),
