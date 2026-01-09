@@ -21,7 +21,9 @@
                 <div class="form-row">
                   <IconsGeoPin class="left-icon" />
                   <input type="text" v-model="localZipcode" placeholder="Zip Code" class="zipcode-input" maxlength="5" />
-                  <button @click="getQuotes" class="compare-btn">COMPARE QUOTES</button>
+                  <ClientOnly>
+                    <button @click="getQuotes" class="compare-btn">COMPARE QUOTES</button>
+                  </ClientOnly>
                 </div>
                 <div class="form-disclaimer">
                   <span>
@@ -39,6 +41,8 @@
 
 <script setup>
 import { computed, ref } from 'vue';
+import { useStore } from "../stores/store";
+const store = useStore();
 
 const props = defineProps({
   config: {
@@ -68,14 +72,18 @@ const svgPath = computed(() => {
 });
 
 const getQuotes = () => {
+  var options = {};
   if (localZipcode.value.length === 5) {
-    navigateTo(`https://insure.protect.com?zipcode=${localZipcode.value}`, {
-      external: true,
-      open: {
-        target: '_blank'
-      }
-    });
+    options.zipcode = localZipcode.value;
+    if (store.visitorInfo?.ueid) {
+      options.ueid = store.visitorInfo.ueid;
+    }
+    if (store.visitorInfo?.mst) {
+      options.mst = store.visitorInfo.mst;
+    }
   }
+  redirectWithParams("https://insure.protect.com", options);
+
 };
 </script>
 

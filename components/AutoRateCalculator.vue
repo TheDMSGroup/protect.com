@@ -516,7 +516,7 @@
             </div> -->
 
             <div class="cta-section">
-              <button class="cta-primary" @click="goToQuote()">Get Official Quote <externalLink /></button>
+              <button class="cta-primary" @click="goToQuote()">Get Official Quote</button>
               <button class="cta-secondary" @click="resetCalculator">Start Over</button>
             </div>
           </div>

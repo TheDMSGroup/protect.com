@@ -19,7 +19,7 @@ export const preprocessTextForLinks = (fullText, linkData, className = "") => {
   return processedFullText;
 };
 export const generateRedirectUrl = (route, paramsToAppend) => {
-  const params = new URLSearchParams(window.location.search);
+  const params = new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '');
   Object.keys(paramsToAppend).forEach((key) => {
     if (paramsToAppend[key] !== undefined && paramsToAppend[key] !== null) {
       params.set(key, paramsToAppend[key]);
