@@ -1,3 +1,5 @@
+import { useStore } from "../stores/store";
+
 export const preprocessTextForLinks = (fullText, linkData, className = "") => {
   if (!fullText) return "";
   if (!linkData || !Array.isArray(linkData) || linkData.length === 0) {
@@ -19,12 +21,20 @@ export const preprocessTextForLinks = (fullText, linkData, className = "") => {
   return processedFullText;
 };
 export const generateRedirectUrl = (route, paramsToAppend) => {
-  const params = new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '');
+  const store = useStore();
+  const params = new URLSearchParams(typeof window !== "undefined" ? window.location.search : "");
   Object.keys(paramsToAppend).forEach((key) => {
     if (paramsToAppend[key] !== undefined && paramsToAppend[key] !== null) {
       params.set(key, paramsToAppend[key]);
     }
   });
+
+  if (store.visitorInfo?.ueid) {
+    params.set("ueid", store.visitorInfo.ueid);
+  }
+  if (store.visitorInfo?.mst) {
+    params.set("mst", store.visitorInfo.mst);
+  }
   const paramsString = params.toString();
   let url;
   const communicationProtocols = ["mailto:", "tel:"];
@@ -46,6 +56,7 @@ export const generateRedirectUrl = (route, paramsToAppend) => {
 };
 export const redirectWithParams = (route, { ...paramsToAppend }, router = null) => {
   const fullUrl = generateRedirectUrl(route, paramsToAppend);
+  console.log("Redirecting to:", fullUrl);
   if (!route.startsWith("/")) {
     window.open(fullUrl, "_blank");
   } else {
