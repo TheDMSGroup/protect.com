@@ -50,6 +50,7 @@
   background: var(--background-color);
   padding: var(--spacing-4xl) 0;
   position: relative;
+  overflow-x: hidden;
 
   @include mobile {
     padding: 20px 0;
@@ -63,13 +64,21 @@
 
     @include mobile {
       grid-template-columns: 1fr;
-      gap: 90px;
-      text-align: left;
+      gap: 40px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
   }
 
   .hero-left {
     color: #0C2C67;
+
+    @include mobile {
+      width: 100%;
+      text-align: center;
+    }
 
     h1 {
       font-size: 2.5rem;
@@ -95,10 +104,6 @@
         font-size: 1rem;
         margin-bottom: var(--spacing-lg);
       }
-    }
-    @include mobile {
-      max-width: 100%;
-      width: 100%;
     }
   }
 
@@ -180,8 +185,10 @@
 
           .zipcode-input, .compare-btn {
             width: 100%;
+            max-width: 100%;
             margin-right: 0;
             margin-bottom: 10px;
+            box-sizing: border-box;
           }
         .form-disclaimer {
           top: 55px;
