@@ -287,7 +287,6 @@
 
     sendEngagementToGa("auto_rate_calculator_interaction", {
       variable: variableName,
-      value: value,
     });
   };
   const sendEngagementToGa = (eventType, eventPayload) => {
@@ -297,7 +296,6 @@
       ...eventPayload,
     });
   };
-
 </script>
 
 <template>

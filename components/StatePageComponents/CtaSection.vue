@@ -26,9 +26,7 @@
                   </ClientOnly>
                 </div>
                 <div class="form-disclaimer">
-                  <span>
-                    <img :src="svgPath" alt="SVG Icon" class="cta-icon-inline svg-icon" loading="lazy" />No spam, just quotes
-                  </span>
+                  <span> <img :src="svgPath" alt="SVG Icon" class="cta-icon-inline svg-icon" loading="lazy" />No spam, just quotes </span>
                 </div>
               </div>
             </div>
@@ -40,345 +38,338 @@
 </template>
 
 <script setup>
-import { computed, ref } from 'vue';
-import { useStore } from "../stores/store";
-const store = useStore();
+  import { computed, ref } from "vue";
 
-const props = defineProps({
-  config: {
-    type: Object,
-    default: () => ({})
-  },
-  stateData: {
-    type: Object,
-    default: () => ({})
-  },
-  zipcode: {
-    type: String,
-    default: ''
-  }
-});
+  const props = defineProps({
+    config: {
+      type: Object,
+      default: () => ({}),
+    },
+    stateData: {
+      type: Object,
+      default: () => ({}),
+    },
+    zipcode: {
+      type: String,
+      default: "",
+    },
+  });
 
-// Local zipcode ref to handle v-model
-const localZipcode = ref(props.zipcode);
+  // Local zipcode ref to handle v-model
+  const localZipcode = ref(props.zipcode);
 
-// Watch for prop changes
-watch(() => props.zipcode, (newValue) => {
-  localZipcode.value = newValue;
-});
-
-const svgPath = computed(() => {
-  return '/assets/states/outlines/icon-shield.png';
-});
-
-const getQuotes = () => {
-  var options = {};
-  if (localZipcode.value.length === 5) {
-    options.zipcode = localZipcode.value;
-    if (store.visitorInfo?.ueid) {
-      options.ueid = store.visitorInfo.ueid;
+  // Watch for prop changes
+  watch(
+    () => props.zipcode,
+    (newValue) => {
+      localZipcode.value = newValue;
     }
-    if (store.visitorInfo?.mst) {
-      options.mst = store.visitorInfo.mst;
-    }
-  }
-  redirectWithParams("https://insure.protect.com", options);
+  );
 
-};
+  const svgPath = computed(() => {
+    return "/assets/states/outlines/icon-shield.png";
+  });
+
+  const getQuotes = () => {
+    const options = {};
+    if (localZipcode.value.length === 5) {
+      options.zipcode = localZipcode.value;
+    }
+    redirectWithParams("https://insure.protect.com", options);
+  };
 </script>
 
 <style lang="scss" scoped>
-@import '../../scss/variables';
+  @import "../../scss/variables";
 
-// Footer CTA Section
-.footer-cta-section {
-  .cta-primary {
-    background: #0C2C67;
-    padding: var(--spacing-3xl) 0;
-
-    @include mobile {
-      padding: var(--spacing-xl) 0;
-    }
-    .cta-primary-content {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 0 var(--spacing-lg);
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: var(--spacing-3xl);
-      align-items: center;
-
-      .cta-left {
-        display: flex;
-        align-items: center;
-        gap: var(--spacing-lg);
-
-        .cta-icon {
-          width: 60px;
-          height: 60px;
-          background: rgba(255, 255, 255, 0.2);
-          border-radius: 50%;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-size: 1.5rem;
-          color: white;
-          flex-shrink: 0;
-          img {
-            height: 100%;
-            padding: 20%;
-            filter: invert(0);
-          }
-
-          @include mobile {
-            display: none;
-          }
-        }
-
-        .cta-text {
-          h3 {
-            color: white;
-            font-size: 1.875rem;
-            font-weight: 700 !important;
-            margin-bottom: var(--spacing-xs);
-            font-family: 'Nunito Sans', sans-serif;
-          }
-
-          p {
-            color: rgba(255, 255, 255, 0.9);
-            font-size: 1rem;
-            margin: 0;
-          }
-        }
-      }
-
-      .cta-right {
-        .cta-form {
-          display: flex;
-          flex-direction: column;
-          gap: var(--spacing-md);
-              color: white;
-
-          .form-section {
-            text-align: center;
-
-            p {
-              color: white;
-              font-size: 1.125rem;
-              margin-bottom: var(--spacing-md);
-            }
-
-            .input-group {
-              display: flex;
-              gap: var(--spacing-sm);
-
-              input {
-                flex: 1;
-                padding: var(--spacing-md);
-                border: none;
-                border-radius: var(--radius-md);
-                font-size: 1rem;
-
-                &:focus {
-                  outline: 2px solid #fff;
-                  outline-offset: 2px;
-                }
-              }
-
-              button {
-                background: #10b981;
-                color: white;
-                border: none;
-                padding: var(--spacing-md) var(--spacing-xl);
-                border-radius: var(--radius-md);
-                font-weight: 700;
-                font-size: 1rem;
-                cursor: pointer;
-                transition: background-color 0.3s ease;
-                white-space: nowrap;
-
-                &:hover {
-                  background: #059669;
-                }
-              }
-            }
-
-            .disclaimer {
-              display: flex;
-              align-items: center;
-              justify-content: center;
-              gap: var(--spacing-xs);
-              margin-top: var(--spacing-md);
-              color: rgba(255, 255, 255, 0.8);
-              font-size: 0.875rem;
-
-              .check-icon {
-                color: #10b981;
-                font-size: 1rem;
-              }
-            }
-          }
-        }
-      }
+  // Footer CTA Section
+  .footer-cta-section {
+    .cta-primary {
+      background: #0c2c67;
+      padding: var(--spacing-3xl) 0;
 
       @include mobile {
-        grid-template-columns: 1fr;
-        text-align: center;
-        gap: var(--spacing-xl);
+        padding: var(--spacing-xl) 0;
+      }
+      .cta-primary-content {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 var(--spacing-lg);
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: var(--spacing-3xl);
+        align-items: center;
 
         .cta-left {
-          justify-content: center;
-          gap: 10px;
-
-          .cta-text h3 {
-            font-size: 1.5rem;
-          }
-        }
-
-        // .cta-right .cta-form .form-section .input-group {
-        //   flex-direction: column;
-        // }
-        .form-row {
           display: flex;
-          gap: 5px;
-          flex-direction: column;
-          width: 100%;
-          input {
-            margin: 0;
+          align-items: center;
+          gap: var(--spacing-lg);
+
+          .cta-icon {
+            width: 60px;
+            height: 60px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+            flex-shrink: 0;
+            img {
+              height: 100%;
+              padding: 20%;
+              filter: invert(0);
+            }
+
+            @include mobile {
+              display: none;
+            }
+          }
+
+          .cta-text {
+            h3 {
+              color: white;
+              font-size: 1.875rem;
+              font-weight: 700 !important;
+              margin-bottom: var(--spacing-xs);
+              font-family: "Nunito Sans", sans-serif;
+            }
+
+            p {
+              color: rgba(255, 255, 255, 0.9);
+              font-size: 1rem;
+              margin: 0;
+            }
           }
         }
-          .cta-icon-inline {
-            margin-bottom: 4px;
-          }
-      }
-    }
-  }
 
-  .cta-companies {
-    background: #f8f9fa;
-    padding: var(--spacing-2xl) 0;
+        .cta-right {
+          .cta-form {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-md);
+            color: white;
 
-    .companies-content {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 0 var(--spacing-lg);
-      text-align: center;
+            .form-section {
+              text-align: center;
 
-      h4 {
-        color: #666;
-        font-size: 1.125rem;
-        font-weight: 600;
-        margin-bottom: var(--spacing-lg);
-        font-family: 'Nunito Sans', sans-serif;
-      }
+              p {
+                color: white;
+                font-size: 1.125rem;
+                margin-bottom: var(--spacing-md);
+              }
 
-      .companies-logos {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        gap: var(--spacing-2xl);
-        margin-bottom: var(--spacing-lg);
-        flex-wrap: wrap;
+              .input-group {
+                display: flex;
+                gap: var(--spacing-sm);
 
-        .company-logo {
-          font-weight: bold;
-          font-size: 1.125rem;
+                input {
+                  flex: 1;
+                  padding: var(--spacing-md);
+                  border: none;
+                  border-radius: var(--radius-md);
+                  font-size: 1rem;
 
-          &:nth-child(1) span {
-            color: #1e40af; // Progressive blue
-            font-style: italic;
-          }
+                  &:focus {
+                    outline: 2px solid #fff;
+                    outline-offset: 2px;
+                  }
+                }
 
-          &:nth-child(2) span {
-            color: #059669; // GEICO green
-            font-weight: 800;
-          }
+                button {
+                  background: #10b981;
+                  color: white;
+                  border: none;
+                  padding: var(--spacing-md) var(--spacing-xl);
+                  border-radius: var(--radius-md);
+                  font-weight: 700;
+                  font-size: 1rem;
+                  cursor: pointer;
+                  transition: background-color 0.3s ease;
+                  white-space: nowrap;
 
-          &:nth-child(3) span {
-            color: #1e40af; // Nationwide blue
-            font-weight: 700;
-          }
+                  &:hover {
+                    background: #059669;
+                  }
+                }
+              }
 
-          &:nth-child(4) span {
-            color: #dc2626; // State Farm red
-            font-weight: 700;
-          }
+              .disclaimer {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: var(--spacing-xs);
+                margin-top: var(--spacing-md);
+                color: rgba(255, 255, 255, 0.8);
+                font-size: 0.875rem;
 
-          &:nth-child(5) span {
-            color: #1e40af; // Liberty Mutual blue
-            font-weight: 600;
+                .check-icon {
+                  color: #10b981;
+                  font-size: 1rem;
+                }
+              }
+            }
           }
         }
 
         @include mobile {
-          gap: var(--spacing-lg);
+          grid-template-columns: 1fr;
+          text-align: center;
+          gap: var(--spacing-xl);
 
-          .company-logo {
-            font-size: 1rem;
+          .cta-left {
+            justify-content: center;
+            gap: 10px;
+
+            .cta-text h3 {
+              font-size: 1.5rem;
+            }
+          }
+
+          // .cta-right .cta-form .form-section .input-group {
+          //   flex-direction: column;
+          // }
+          .form-row {
+            display: flex;
+            gap: 5px;
+            flex-direction: column;
+            width: 100%;
+            input {
+              margin: 0;
+            }
+          }
+          .cta-icon-inline {
+            margin-bottom: 4px;
           }
         }
       }
+    }
 
-      .companies-disclaimer {
-        color: #888;
-        font-size: 0.75rem;
-        line-height: 1.4;
-        max-width: 800px;
+    .cta-companies {
+      background: #f8f9fa;
+      padding: var(--spacing-2xl) 0;
+
+      .companies-content {
+        max-width: 1200px;
         margin: 0 auto;
+        padding: 0 var(--spacing-lg);
+        text-align: center;
+
+        h4 {
+          color: #666;
+          font-size: 1.125rem;
+          font-weight: 600;
+          margin-bottom: var(--spacing-lg);
+          font-family: "Nunito Sans", sans-serif;
+        }
+
+        .companies-logos {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          gap: var(--spacing-2xl);
+          margin-bottom: var(--spacing-lg);
+          flex-wrap: wrap;
+
+          .company-logo {
+            font-weight: bold;
+            font-size: 1.125rem;
+
+            &:nth-child(1) span {
+              color: #1e40af; // Progressive blue
+              font-style: italic;
+            }
+
+            &:nth-child(2) span {
+              color: #059669; // GEICO green
+              font-weight: 800;
+            }
+
+            &:nth-child(3) span {
+              color: #1e40af; // Nationwide blue
+              font-weight: 700;
+            }
+
+            &:nth-child(4) span {
+              color: #dc2626; // State Farm red
+              font-weight: 700;
+            }
+
+            &:nth-child(5) span {
+              color: #1e40af; // Liberty Mutual blue
+              font-weight: 600;
+            }
+          }
+
+          @include mobile {
+            gap: var(--spacing-lg);
+
+            .company-logo {
+              font-size: 1rem;
+            }
+          }
+        }
+
+        .companies-disclaimer {
+          color: #888;
+          font-size: 0.75rem;
+          line-height: 1.4;
+          max-width: 800px;
+          margin: 0 auto;
+        }
       }
     }
   }
-}
 
-    .zipcode-input {
-      flex: 1;
-      border: 2px solid var(--border-color);
-      padding: 10px 40px;
-      border-radius: 3px;
-      font-size: 1rem;
-      background: white;
-      color: var(--text-primary);
-      margin-right: 10px;
+  .zipcode-input {
+    flex: 1;
+    border: 2px solid var(--border-color);
+    padding: 10px 40px;
+    border-radius: 3px;
+    font-size: 1rem;
+    background: white;
+    color: var(--text-primary);
+    margin-right: 10px;
 
-      &::placeholder {
-        color: var(--text-muted);
-        font-style: italic;
-      }
+    &::placeholder {
+      color: var(--text-muted);
+      font-style: italic;
+    }
 
-      &:focus {
-        outline: none;
-        border-color: var(--primary-color);
-      }
+    &:focus {
+      outline: none;
+      border-color: var(--primary-color);
     }
-    .compare-btn {
-      background: #007A5F;
-      color: white;
-      border: none;
-      padding: 14px 20px;
-      border-radius: 3px;
-      font-weight: 700;
-      font-size: 0.875rem;
-      cursor: pointer;
-      transition: all 0.3s ease;
+  }
+  .compare-btn {
+    background: #007a5f;
+    color: white;
+    border: none;
+    padding: 14px 20px;
+    border-radius: 3px;
+    font-weight: 700;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
 
-      &:hover {
-        background: var(--accent-hover);
-        transform: translateY(-1px);
-      }
+    &:hover {
+      background: var(--accent-hover);
+      transform: translateY(-1px);
     }
-    .form-disclaimer {
-      margin-top: 10px;
-    }
-    img.cta-icon-inline {
-        height: 15px;
-        padding-right: 5px;
-        width: auto;
-    }
+  }
+  .form-disclaimer {
+    margin-top: 10px;
+  }
+  img.cta-icon-inline {
+    height: 15px;
+    padding-right: 5px;
+    width: auto;
+  }
   .left-icon {
     position: absolute;
     padding-left: 15px;
     margin-top: 13px;
     vertical-align: middle;
   }
-
 </style>
