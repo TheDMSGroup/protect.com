@@ -91,7 +91,7 @@
         <div class="wrapper">
           <b-row>
             <b-col cols="12" lg="6">
-              <h2>How does your ahealth insurance company rank?</h2>
+              <h2>How does your health insurance company rank?</h2>
               <p>
                 Protect.com ranks top health insurance companies based on J.D. Power satisfaction scores plus our own Protect.com customer
                 satisfaction scores comprised of multiple reviews from the health insurance industry's most trusted sources.
