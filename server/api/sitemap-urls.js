@@ -1,59 +1,12 @@
+import { stateMapping } from "~/utils/redirect-config";
+
 export default defineEventHandler(async () => {
   console.log("=== SITEMAP API ENDPOINT CALLED ===");
 
-  // Define state data directly since we can't use Pinia store on server side
-  const stateData = [
-    { slug: "alabama", abbreviation: "AL" },
-    { slug: "alaska", abbreviation: "AK" },
-    { slug: "arizona", abbreviation: "AZ" },
-    { slug: "arkansas", abbreviation: "AR" },
-    { slug: "california", abbreviation: "CA" },
-    { slug: "colorado", abbreviation: "CO" },
-    { slug: "connecticut", abbreviation: "CT" },
-    { slug: "delaware", abbreviation: "DE" },
-    { slug: "florida", abbreviation: "FL" },
-    { slug: "georgia", abbreviation: "GA" },
-    { slug: "hawaii", abbreviation: "HI" },
-    { slug: "idaho", abbreviation: "ID" },
-    { slug: "illinois", abbreviation: "IL" },
-    { slug: "indiana", abbreviation: "IN" },
-    { slug: "iowa", abbreviation: "IA" },
-    { slug: "kansas", abbreviation: "KS" },
-    { slug: "kentucky", abbreviation: "KY" },
-    { slug: "louisiana", abbreviation: "LA" },
-    { slug: "maine", abbreviation: "ME" },
-    { slug: "maryland", abbreviation: "MD" },
-    { slug: "massachusetts", abbreviation: "MA" },
-    { slug: "michigan", abbreviation: "MI" },
-    { slug: "minnesota", abbreviation: "MN" },
-    { slug: "mississippi", abbreviation: "MS" },
-    { slug: "missouri", abbreviation: "MO" },
-    { slug: "montana", abbreviation: "MT" },
-    { slug: "nebraska", abbreviation: "NE" },
-    { slug: "nevada", abbreviation: "NV" },
-    { slug: "new-hampshire", abbreviation: "NH" },
-    { slug: "new-jersey", abbreviation: "NJ" },
-    { slug: "new-mexico", abbreviation: "NM" },
-    { slug: "new-york", abbreviation: "NY" },
-    { slug: "north-carolina", abbreviation: "NC" },
-    { slug: "north-dakota", abbreviation: "ND" },
-    { slug: "ohio", abbreviation: "OH" },
-    { slug: "oklahoma", abbreviation: "OK" },
-    { slug: "oregon", abbreviation: "OR" },
-    { slug: "pennsylvania", abbreviation: "PA" },
-    { slug: "rhode-island", abbreviation: "RI" },
-    { slug: "south-carolina", abbreviation: "SC" },
-    { slug: "south-dakota", abbreviation: "SD" },
-    { slug: "tennessee", abbreviation: "TN" },
-    { slug: "texas", abbreviation: "TX" },
-    { slug: "utah", abbreviation: "UT" },
-    { slug: "vermont", abbreviation: "VT" },
-    { slug: "virginia", abbreviation: "VA" },
-    { slug: "washington", abbreviation: "WA" },
-    { slug: "west-virginia", abbreviation: "WV" },
-    { slug: "wisconsin", abbreviation: "WI" },
-    { slug: "wyoming", abbreviation: "WY" },
-  ];
+  // Derive state slugs from unified redirect config (excluding USA)
+  const stateSlugs = Object.entries(stateMapping)
+    .filter(([code]) => code !== "USA")
+    .map(([, slug]) => slug);
 
   const query = `query getAllArticles {
     articles(where: {domain: protectCom}){
@@ -87,7 +40,7 @@ export default defineEventHandler(async () => {
     urlMap.push("/car-insurance/calculator");
 
     // Add state-specific car insurance pages
-    const stateUrls = stateData.map((state) => `/car-insurance/${state.slug}`);
+    const stateUrls = stateSlugs.map((slug) => `/car-insurance/${slug}`);
     urlMap.push(...stateUrls);
 
     // Add vertical pages
@@ -102,7 +55,7 @@ export default defineEventHandler(async () => {
   } catch (error) {
     console.error("Error generating sitemap:", error);
     // Return minimal sitemap on error
-    const fallbackUrls = ["/articles", ...stateData.map((state) => `/car-insurance/${state.slug}`)];
+    const fallbackUrls = ["/articles", ...stateSlugs.map((slug) => `/car-insurance/${slug}`)];
     console.log("Returning fallback URLs:", fallbackUrls.length);
     return fallbackUrls;
   }
