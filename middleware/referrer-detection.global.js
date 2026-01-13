@@ -3,8 +3,14 @@ import { getUeidByReferrer, REFERRER_MST } from "~/utils/referrer-detection";
 
 export default defineNuxtRouteMiddleware((to) => {
   const store = useStore();
-  const ueidCookie = useCookie('ueid', { maxAge: 60 * 60 }); // 1 hour
-  const mstCookie = useCookie('mst', { maxAge: 60 * 60 });
+  const vistorInfoFromStore = store.visitorInfo;
+
+  //exit early if we already have ueid and mst
+  if (vistorInfoFromStore.ueid && vistorInfoFromStore.mst) {
+    return;
+  }
+  const ueidCookie = useCookie("ueid", { maxAge: 60 * 60 }); // 1 hour
+  const mstCookie = useCookie("mst", { maxAge: 60 * 60 });
 
   const ueidParam = to.query.ueid;
   if (ueidParam) {
@@ -16,7 +22,7 @@ export default defineNuxtRouteMiddleware((to) => {
   if (ueidCookie.value) {
     store.setVisitorInfo({
       ueid: ueidCookie.value,
-      mst: mstCookie.value || null
+      mst: mstCookie.value || null,
     });
     return;
   }
@@ -25,7 +31,7 @@ export default defineNuxtRouteMiddleware((to) => {
   let referrer = referrerParam;
 
   if (!referrer) {
-    const headers = useRequestHeaders(['referer']);
+    const headers = useRequestHeaders(["referer"]);
     referrer = headers.referer;
   }
 

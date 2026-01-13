@@ -13,7 +13,6 @@
 </template>
 
 <script setup>
-  import { redirectWithParams } from "@/composables/utils.js";
   import { useFaq } from "@/composables/useFaq.js";
   // Props
   const props = defineProps({
@@ -31,9 +30,6 @@
   // composable to manage faq data
   const processedFaq = useFaq(props);
 
-  // Router
-  const router = useRouter();
-
   // Template ref for accessing the component element
   const faqSection = ref(null);
 
@@ -42,7 +38,7 @@
     ev.preventDefault();
     // Need to use .getAttribute to get the raw href without resolution, browser returns full url
     // when using ev.target.href
-    redirectWithParams(ev.target.getAttribute("href"), {}, router);
+    navigateTo(ev.target.getAttribute("href"));
   };
 
   // Lifecycle - setup link event listeners after mount

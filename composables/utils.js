@@ -20,26 +20,28 @@ export const preprocessTextForLinks = (fullText, linkData, className = "") => {
   });
   return processedFullText;
 };
+
 export const generateRedirectUrl = (route, paramsToAppend) => {
   const store = useStore();
-  const params = new URLSearchParams(typeof window !== "undefined" ? window.location.search : "");
-  Object.keys(paramsToAppend).forEach((key) => {
-    if (paramsToAppend[key] !== undefined && paramsToAppend[key] !== null) {
-      params.set(key, paramsToAppend[key]);
+  if (store.visitorInfo?.ueid && !paramsToAppend.ueid) {
+    paramsToAppend.ueid = store.visitorInfo.ueid;
+  }
+  if (store.visitorInfo?.mst && !paramsToAppend.mst) {
+    paramsToAppend.mst = store.visitorInfo.mst;
+  }
+
+  //append any params we need to the current URL params - vue router is persisting params across navigations
+  const params = new URLSearchParams(window.location.search);
+  Object.entries(paramsToAppend).forEach(([key, value]) => {
+    if (value !== null && value !== undefined) {
+      params.set(key, value);
     }
   });
 
-  if (store.visitorInfo?.ueid) {
-    params.set("ueid", store.visitorInfo.ueid);
-  }
-  if (store.visitorInfo?.mst) {
-    params.set("mst", store.visitorInfo.mst);
-  }
-  const paramsString = params.toString();
   let url;
   const communicationProtocols = ["mailto:", "tel:"];
   // if we do not have a relative route, ensure we have a protocol
-  if (!route.startsWith("/") && !communicationProtocols.some((protocol) => route.includes(`${protocol}`))) {
+  if (!communicationProtocols.some((protocol) => route.includes(`${protocol}`))) {
     // if the route already has a protocol, use it as is
     if (route.includes("://")) {
       url = route;
@@ -51,21 +53,22 @@ export const generateRedirectUrl = (route, paramsToAppend) => {
     // relative route
     url = route;
   }
-  // append params if we have any and return
-  return `${url}${paramsString.length > 0 ? "?" : ""}${paramsString}`;
-};
-export const redirectWithParams = (route, { ...paramsToAppend }, router = null) => {
-  const fullUrl = generateRedirectUrl(route, paramsToAppend);
-  console.log("Redirecting to:", fullUrl);
-  if (!route.startsWith("/")) {
-    window.open(fullUrl, "_blank");
-  } else {
-    if (!router) {
-      return;
-    }
-    router.push(fullUrl);
+
+  // Append params to the URL
+  const queryString = params.toString();
+  if (queryString) {
+    const separator = url.includes("?") ? "&" : "?";
+    url = `${url}${separator}${queryString}`;
   }
+
+  // append params if we have any and return
+  return url;
 };
+
+export const redirectWithParams = (route, { ...paramsToAppend }) => {
+  window.open(generateRedirectUrl(route, paramsToAppend), "_blank");
+};
+
 export const updateMetaData = (tags = {}) => {
   Object.entries(tags).forEach(([tag, content]) => {
     const existingTag = document.querySelector(`meta[property="${tag}"]`);
@@ -80,6 +83,7 @@ export const updateMetaData = (tags = {}) => {
     }
   });
 };
+
 export const handleRoute = (route, router) => {
   // SEO updates require external links, need to check for them
   if (!route.startsWith("/")) {
@@ -90,10 +94,12 @@ export const handleRoute = (route, router) => {
     router.push(route);
   }
 };
+
 export const returnStateSlug = (stateName) => {
   if (!stateName || typeof stateName !== "string") return "";
   return stateName.toLowerCase().replace(/\s/g, "");
 };
+
 const utilsComposable = {
   methods: {
     preprocessTextForLinks,

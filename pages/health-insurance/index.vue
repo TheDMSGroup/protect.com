@@ -103,7 +103,7 @@
             <b-col cols="12" class="feed-wrapper">
               <rating-chart
                 banner-headline="Compare Top Healthcare Insurance Providers and Plans Head-to-head."
-                :action="action"
+                :action="zipCodeUrl"
                 :carriers="carriers"
               />
             </b-col>
@@ -119,7 +119,7 @@
         headline="Explore new policy options"
         subheadline="Discover how much you could save with Protect. "
         image="doctor-patient.png"
-        :action="action"
+        :action="zipCodeUrl"
         :lazy-image="true"
         :image-alt-description="'Woman and doctor discussing health insurance options in a medical office.'"
       />

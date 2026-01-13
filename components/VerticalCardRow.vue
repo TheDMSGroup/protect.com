@@ -1,6 +1,5 @@
 <script setup>
   import { buildImageUrl } from "@/composables/images";
-  import { redirectWithParams, preprocessTextForLinks } from "@/composables/utils";
 
   const props = defineProps({
     cardImage: {
@@ -41,10 +40,8 @@
     },
   });
 
-  const router = useRouter();
-
   const goToRoute = (route) => {
-    redirectWithParams(route, {}, router);
+    redirectWithParams(route, {});
   };
 
   const preprocessDescription = () => {

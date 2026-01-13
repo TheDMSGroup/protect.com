@@ -1073,16 +1073,9 @@
   };
   const getQuotes = function () {
     if (zipcode?.value?.toString().length == 5) {
-      var options = {
+      const options = {
         zipcode: zipcode.value,
       };
-
-      if (store.visitorInfo?.ueid) {
-        options.ueid = store.visitorInfo.ueid;
-      }
-      if (store.visitorInfo?.mst) {
-        options.mst = store.visitorInfo.mst;
-      }
       redirectWithParams("https://insure.protect.com", options);
     }
   };
