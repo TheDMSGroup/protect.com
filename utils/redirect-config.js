@@ -138,11 +138,12 @@ export function processRedirect(path) {
       const officialSlug = getOfficialSlug(stateSegment);
 
       if (!officialSlug) {
-        // Invalid state slug
+        // Invalid state slug - redirect to parent
         return {
-          type: "error",
-          code: 404,
-          message: "Page Not Found",
+          type: "redirect",
+          path: "/car-insurance",
+          code: 302,
+          reason: "invalid-state-to-parent",
         };
       }
 

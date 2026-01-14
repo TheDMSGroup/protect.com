@@ -95,7 +95,7 @@
           touched = true;
         "
       />
-      <label :for="config.name" :class="{ focus: focus || value, valid: valid }">{{ config.label }}</label>
+      <label :for="config.name" :class="{ focus: focus, valid: valid }">{{ config.label }}</label>
     </b-input-group>
   </div>
 </template>

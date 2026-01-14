@@ -45,15 +45,12 @@
   <form class="zipcode-form" :action="action" method="GET" @submit.prevent @submit="submit">
     <InputsMain
       :validate="validateZip"
-      :valid="!!zipcode"
-      :value="zipcode"
       :config="{
         label: 'Enter your zip code',
         invalidFeedback: 'Please input a valid zipcode',
         noCheckMark: true,
         name: 'zipcode',
         icon: 'geo',
-        model: zipcode,
         type: 'number',
       }"
       @input-updated:model-value="handleValidInput"
