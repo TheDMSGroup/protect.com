@@ -3,10 +3,10 @@ import { getUeidByReferrer, REFERRER_MST } from "~/utils/referrer-detection";
 
 export default defineNuxtRouteMiddleware((to) => {
   const store = useStore();
-  const vistorInfoFromStore = store.visitorInfo;
+  const visitorInfoFromStore = store.visitorInfo;
 
   //exit early if we already have ueid and mst
-  if (vistorInfoFromStore.ueid && vistorInfoFromStore.mst) {
+  if (visitorInfoFromStore.ueid && visitorInfoFromStore.mst) {
     return;
   }
   const ueidCookie = useCookie("ueid", { maxAge: 60 * 60 }); // 1 hour
