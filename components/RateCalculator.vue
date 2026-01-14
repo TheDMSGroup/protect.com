@@ -75,7 +75,7 @@
                 </p>
               </div>
 
-              <b-buttons
+              <ButtonsMain
                 class="calculate-rate"
                 :config="{
                   click: submit,
@@ -84,7 +84,7 @@
                   label: 'CALCULATE RATE',
                   icon: 'arrow-right-short',
                 }"
-              ></b-buttons>
+              />
             </form>
           </div>
         </b-card-text>
@@ -163,7 +163,7 @@
                 </p>
               </div>
 
-              <b-buttons
+              <ButtonsMain
                 class="calculate-rate"
                 :config="{
                   click: submit,
@@ -172,7 +172,7 @@
                   label: 'CALCULATE RATE',
                   icon: 'arrow-right-short',
                 }"
-              ></b-buttons>
+              />
             </form>
           </div>
         </b-card-text>

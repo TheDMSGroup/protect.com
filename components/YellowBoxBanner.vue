@@ -36,7 +36,7 @@
             {{ content }}
           </p>
           <p v-if="action && actionMessage">
-            <b-buttons
+            <ButtonsMain
               :config="{
                 type: 'submit',
                 size: 'lg',
