@@ -2,7 +2,7 @@
 export default defineNuxtConfig({
   compatibilityDate: "2025-07-15",
   devtools: { enabled: true },
-  modules: ["@nuxtjs/sitemap", "@bootstrap-vue-next/nuxt", "@nuxt/image", "@pinia/nuxt", "@nuxt/eslint", "@nuxt/scripts"],
+  modules: ["@nuxtjs/sitemap", "@bootstrap-vue-next/nuxt", "@nuxt/image", "@pinia/nuxt", "@nuxt/eslint", "@nuxt/scripts", "nuxt-seo-utils"],
   bootstrapVueNext: {
     css: false, // Disable automatic Bootstrap CSS import - we import only what we need in main.scss
   },
@@ -72,6 +72,7 @@ export default defineNuxtConfig({
     hostname: "https://protect.com",
     gzip: true,
     sources: ["/api/sitemap-urls"],
+    xsl: false,
   },
   // Only apply caching rules in production
   ...(process.env.NODE_ENV === "production" && {

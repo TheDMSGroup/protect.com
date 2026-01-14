@@ -14,22 +14,9 @@
   // Reactive data
   const zipcode = ref("");
   // Router for navigation
-  const router = useRouter();
 
   const submit = () => {
-    console.log(props.action);
-    // Check if action is an external URL (http/https) or contains a domain name
-    if (props.action.includes("http") || props.action.includes(".")) {
-      const actionUrl = new URL(props.action.startsWith("http") ? props.action : `https://${props.action}`);
-      actionUrl.searchParams.set("zipcode", zipcode.value);
-
-      window.location.href = actionUrl;
-    } else {
-      router.push({
-        path: props.action,
-        query: { zipcode: zipcode.value },
-      });
-    }
+    redirectWithParams(props.action, { zipcode: zipcode.value });
   }; // callabcks for emitted events from the input
   const handleValidInput = (inputValue) => {
     zipcode.value = inputValue;

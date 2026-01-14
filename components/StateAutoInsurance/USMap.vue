@@ -2,12 +2,8 @@
   //generateredirecturl and redirectwith params
 
   import { useStore } from "@/stores/store.js";
-  import { useTemplateRef, ref, onMounted, nextTick } from "vue";
-  import { generateRedirectUrl, redirectWithParams } from "@/composables/utils";
-  import { useRouter } from "vue-router";
 
   const store = useStore();
-  const router = useRouter();
   const stateValueMapping = store.getStateValueMap();
 
   const mapContainerRef = useTemplateRef("usMap");
@@ -16,7 +12,9 @@
   const excludedStates = [
     stateValueMapping.find((state) => state.abbreviation === "AK"),
     stateValueMapping.find((state) => state.abbreviation === "HI"),
-  ].filter(Boolean).map((state) => ({ ...state, id: state.abbreviation }));
+  ]
+    .filter(Boolean)
+    .map((state) => ({ ...state, id: state.abbreviation }));
   //const focusedState = computed(() => null);
   const mapConfig = {
     fontSize: {
@@ -36,7 +34,7 @@
     mapContainerRef.value.querySelectorAll("a").forEach((stateLink) => {
       stateLink.addEventListener("click", (e) => {
         e.preventDefault();
-        redirectWithParams(e.target.closest("a").getAttribute("href"), {}, router);
+        navigateTo(e.target.closest("a").getAttribute("href"));
       });
     });
   };
@@ -63,7 +61,7 @@
     mergedStates.forEach((state) => {
       // Better approach - use SVG namespace
       const a = document.createElementNS("http://www.w3.org/2000/svg", "a");
-      a.setAttributeNS("http://www.w3.org/1999/xlink", "href", generateRedirectUrl(`/car-insurance/${state.slug}`, {}, router));
+      a.setAttributeNS("http://www.w3.org/1999/xlink", "href", `/car-insurance/${state.slug}`);
       a.setAttribute("aria-label", state.name);
       const groupParent = state.path.parentNode;
       Array.from(groupParent.children).forEach((child) => a.appendChild(child));
@@ -122,7 +120,7 @@
 
   const mobileStatesLinkList = computed(() => [...states.value].sort((a, b) => (a.name > b.name ? 1 : -1)));
   const createStateMapUrl = (stateSlug) => {
-    return generateRedirectUrl(`/car-insurance/${stateSlug}`, {}, router);
+    return `/car-insurance/${stateSlug}`;
   };
 
   onMounted(() => {

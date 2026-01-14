@@ -1,5 +1,5 @@
 {
-  "name": "protect-nuxt",
+  "name": "Protect.com",
   "type": "module",
   "private": true,
   "scripts": {
@@ -20,6 +20,7 @@
     "axios": "^1.13.2",
     "ipx": "^3.1.1",
     "nuxt": "^4.2.0",
+    "nuxt-seo-utils": "^7.0.19",
     "pinia": "^3.0.4",
     "vue": "^3.5.22",
     "vue-router": "^4.6.3"
