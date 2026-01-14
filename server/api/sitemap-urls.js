@@ -1,4 +1,5 @@
 import { stateMapping } from "~/utils/redirect-config";
+import { vehicles } from "~/data/vehicles";
 
 export default defineEventHandler(async () => {
   console.log("=== SITEMAP API ENDPOINT CALLED ===");
@@ -7,6 +8,16 @@ export default defineEventHandler(async () => {
   const stateSlugs = Object.entries(stateMapping)
     .filter(([code]) => code !== "USA")
     .map(([, slug]) => slug);
+
+  // Generate vehicle URLs from vehicles config
+  const vehicleUrls = [];
+  vehicleUrls.push("/car-insurance/vehicles");
+  for (const [makeSlug, makeData] of Object.entries(vehicles)) {
+    vehicleUrls.push(`/car-insurance/vehicles/${makeSlug}`);
+    for (const model of makeData.models) {
+      vehicleUrls.push(`/car-insurance/vehicles/${makeSlug}/${model}`);
+    }
+  }
 
   const query = `query getAllArticles {
     articles(where: {domain: protectCom}){
@@ -42,6 +53,9 @@ export default defineEventHandler(async () => {
     // Add state-specific car insurance pages
     const stateUrls = stateSlugs.map((slug) => `/car-insurance/${slug}`);
     urlMap.push(...stateUrls);
+
+    // Add vehicle pages
+    urlMap.push(...vehicleUrls);
 
     // Add vertical pages
     ["car-insurance", "home-insurance", "health-insurance"].forEach((insuranceType) => {

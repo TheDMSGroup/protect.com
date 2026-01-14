@@ -8,10 +8,10 @@ export const vehicles = {
   //   name: "Acura",
   //   models: ["integra", "mdx", "rdx", "tlx", "ilx"],
   // },
-  // honda: {
-  //   name: "Honda",
-  //   models: ["accord", "civic", "cr-v", "pilot"],
-  // },
+  honda: {
+    name: "Honda",
+    models: ["accord", "civic", "cr-v", "pilot"],
+  },
 };
 
 // Helper to get formatted make name
