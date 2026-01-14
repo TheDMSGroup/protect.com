@@ -22,7 +22,11 @@ export default defineEventHandler(async (event) => {
   const pathStateCode = path.split("/")[2];
   if (path.includes("car-insurance") && pathStateCode) {
     const pathParts = path.split("/");
-    const carInsuranceSubPath = pathParts[pathParts.length - 1];
+
+    //relies on url structure of /car-insurance/{stateNameOrCode}
+    const carInsuranceSubPath = pathParts.indexOf("car-insurance") + 1 < pathParts.length ? pathParts[pathParts.indexOf("car-insurance") + 1] : null;
+
+    console.log("sub path", carInsuranceSubPath);
 
     //redirect 301 if state code is found -> state name
     //do nothing if state name is found (with correct format)
@@ -46,7 +50,6 @@ export default defineEventHandler(async (event) => {
       await sendRedirect(event, newPath, 301);
       return;
     }
-
     // Check if the slug is valid (with or without hyphens)
     const officialSlug = getOfficialSlug(carInsuranceSubPath);
 
@@ -57,6 +60,9 @@ export default defineEventHandler(async (event) => {
         statusCode: 404,
         statusMessage: "Page Not Found",
       });
+    } else if (officialSlug && pathParts.length > 3) {
+      //allow request to continue for paths like /car-insurance/{state-slug}/{city-name}
+      return;
     }
 
     // If slug has hyphens, redirect to non-hyphenated version
