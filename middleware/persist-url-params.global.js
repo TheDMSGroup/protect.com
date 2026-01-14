@@ -9,7 +9,6 @@ export default defineNuxtRouteMiddleware((to, from) => {
 
     // Only navigate if the merged params are different from current params
     if (JSON.stringify(mergedQueryParams) !== JSON.stringify(to.query)) {
-      console.log(mergedQueryParams);
       return navigateTo({ path: to.path, query: mergedQueryParams }, { replace: true });
     }
   }
