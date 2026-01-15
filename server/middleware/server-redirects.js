@@ -3,7 +3,6 @@ import { stateMapping, redirectRules, getOfficialSlug, carInsuranceSubRoutes } f
 export default defineEventHandler(async (event) => {
   const url = getRequestURL(event);
   const path = url.pathname;
-  console.log(path);
   // Early return for non-relevant paths
   if (!path.startsWith("/insurance/") && !path.includes("car-insurance") && path !== "/car-insurance/") {
     return;
@@ -25,8 +24,6 @@ export default defineEventHandler(async (event) => {
 
     //relies on url structure of /car-insurance/{stateNameOrCode}
     const carInsuranceSubPath = pathParts.indexOf("car-insurance") + 1 < pathParts.length ? pathParts[pathParts.indexOf("car-insurance") + 1] : null;
-
-    console.log("sub path", carInsuranceSubPath);
 
     //redirect 301 if state code is found -> state name
     //do nothing if state name is found (with correct format)
@@ -55,14 +52,10 @@ export default defineEventHandler(async (event) => {
 
     if (!officialSlug) {
       // Invalid state slug - throw 404
-      console.log(`Invalid state code/slug in path: ${path}`);
       throw createError({
         statusCode: 404,
         statusMessage: "Page Not Found",
       });
-    } else if (officialSlug && pathParts.length > 3) {
-      //allow request to continue for paths like /car-insurance/{state-slug}/{city-name}
-      return;
     }
 
     // If slug has hyphens, redirect to non-hyphenated version
