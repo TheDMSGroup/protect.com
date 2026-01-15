@@ -92,8 +92,7 @@
             insurance company or agency and we are not directly affiliated with any particular insurance company. If you do not receive a quote from a
             specific company you were searching for, we recommend contacting that company directly so you can compare the quotes you receive from us
             with one from them. All trademarks and copyrights are the property of their respective owners. Protect.com® and its logos are trademarks
-            or registered trademarks of SchoolAdvisor, LLC. Digital Media Solutions, LLC. All rights reserved. 4800 140th Ave N. Ste 101, Clearwater,
-            FL 33762.
+            or registered trademarks of Digital Media Solutions, LLC. All rights reserved.
           </p>
         </div>
       </div>

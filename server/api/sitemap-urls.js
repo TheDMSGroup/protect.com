@@ -1,6 +1,4 @@
 export default defineEventHandler(async () => {
-  console.log("=== SITEMAP API ENDPOINT CALLED ===");
-
   // Define state data directly since we can't use Pinia store on server side
   const stateData = [
     { slug: "alabama", abbreviation: "AL" },
@@ -62,7 +60,6 @@ export default defineEventHandler(async () => {
   }`;
 
   try {
-    console.log("About to fetch articles...");
     // Fetch articles
     const data = await fetch("https://us-west-2.cdn.hygraph.com/content/ckwzg7tk528a001z4e7z0bqi0/master", {
       method: "POST",
@@ -73,7 +70,6 @@ export default defineEventHandler(async () => {
     });
 
     const dataJson = await data.json();
-    console.log("Fetched articles:", dataJson.data?.articles?.length || 0);
     const urlMap = [];
 
     // Add article URLs
@@ -85,6 +81,8 @@ export default defineEventHandler(async () => {
     // Add static routes
     urlMap.push("/articles");
     urlMap.push("/car-insurance/calculator");
+    urlMap.push("/car-insurance/discounts");
+    urlMap.push("/car-insurance/discounts/bundle");
 
     // Add state-specific car insurance pages
     const stateUrls = stateData.map((state) => `/car-insurance/${state.slug}`);
@@ -96,14 +94,11 @@ export default defineEventHandler(async () => {
       urlMap.push(`/articles/${insuranceType}`);
     });
 
-    console.log("Total URLs generated:", urlMap.length);
-    console.log("Sample URLs:", urlMap.slice(0, 5));
     return urlMap;
   } catch (error) {
-    console.error("Error generating sitemap:", error);
+    console.error("Error generating sitemap URLs:", error);
     // Return minimal sitemap on error
     const fallbackUrls = ["/articles", ...stateData.map((state) => `/car-insurance/${state.slug}`)];
-    console.log("Returning fallback URLs:", fallbackUrls.length);
     return fallbackUrls;
   }
 });
