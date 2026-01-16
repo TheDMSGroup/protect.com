@@ -63,6 +63,7 @@ export default defineNuxtConfig({
     // Private keys (only available on server-side)
     graphqlApiUrl: process.env.GRAPHQL_API_URL || "https://us-west-2.cdn.hygraph.com/content/ckwzg7tk528a001z4e7z0bqi0/master",
     mastodonApiKey: process.env.MASTODON_API_KEY || "",
+    googleSheetsApiKey: process.env.GOOGLE_SHEETS_API_KEY || "AIzaSyDKMdKBaogjDHC7CR87SOmJx21I28hWyiI",
     // Public keys (exposed to client-side)
     public: {
       // Add any public config here if needed

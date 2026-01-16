@@ -9,11 +9,6 @@
   import { useStore } from "~/stores/store";
   import StateView from "~/views/StateAutoInsurancePage.vue";
 
-  const props = defineProps({
-    title: String,
-    description: String,
-  });
-
   const route = useRoute();
   const store = useStore();
   const topic = ref(route.params.state);

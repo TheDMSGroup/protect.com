@@ -3,6 +3,45 @@
 </template>
 
 <script setup>
+  const route = useRoute();
+  const stateName = route.params.state;
+  const cityName = route.params.city;
+
+  const { cityData, error, pending } = await useCityDataFromCacheOrApi();
+
+  const city = computed(() => cityData.value?.response || {});
+
+  async function useCityDataFromCacheOrApi() {
+    const cacheKey = `${stateName}-${cityName}-car-insurance-data`;
+    const nuxtApp = useNuxtApp();
+
+    const {
+      data: response,
+      error,
+      pending,
+    } = await useAsyncData(
+      cacheKey,
+      async () => {
+        const url = `/api/state/city/?state=${stateName}&city=${cityName}`;
+        console.log("🌐 Making API request:", url);
+        const result = await $fetch(url);
+        return result;
+      },
+      {
+        server: true,
+        lazy: false,
+        //watch: [() => route.params.slug],
+        getCachedData(key) {
+          const cacheHit = nuxtApp.payload.data[key] || nuxtApp.static.data[key];
+          if (cacheHit) {
+            console.log("✅ Using cached data for key:", key, cacheHit);
+          }
+          return cacheHit;
+        },
+      }
+    );
+    return { response, error, pending };
+  }
   // Calculate cost comparison
   // const costComparison = computed(() => {
   //   const nationalAvg = 2700;
