@@ -1,18 +1,136 @@
+<!-- {cityState : "New Haven, CT" licenseShare : "0.74" licensedDrivers : "426771" name : "New Haven" population : "576718" stateCode : "CT" stateName :
+"Connecticut"} -->
+
 <template>
-  <div>Hello</div>
+  <div class="city-insurance-page">
+    <section class="hero-section">
+      <div class="hero-image-wrapper">
+        <img :src="cityImage" :alt="`${cityName}, ${stateName} skyline`" class="hero-image" />
+      </div>
+      <div class="hero-content container">
+        <h1>Car Insurance in {{ cityName }}, {{ stateName }}</h1>
+        <p class="hero-subheadline">Quiuckly compare rates in your city</p>
+        <zip-code-form :action="zipCodeUrl" />
+      </div>
+    </section>
+
+    <section class="insurance-providers container">
+      <h2>Compare Car Insurance Quotes From Top Companies</h2>
+      <p>Get quotes from leading car insurance providers in {{ cityName }} and find the best coverage at the most affordable rates.</p>
+      <insurance-brands
+        :providers-config="[
+          { name: 'Progressive', src: 'provider-progressive.png' },
+          { name: 'Geico', src: 'provider-geico.png' },
+          { name: 'Nationwide', src: 'provider-nationwide.png' },
+          { name: 'State Farm', src: 'provider-state-farm.png' },
+          { name: 'Liberty Mutual Insurance', src: 'provider-liberty.png' },
+        ]"
+      />
+    </section>
+    <section class="city-info container">
+      <div class="city-stats">
+        <div class="stat-card">
+          <span class="stat-label">Metro Population</span>
+          <span class="stat-value">{{ population }}</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-label">Average Annual Cost</span>
+          <span class="stat-value">${{ cityData.avgCost }}</span>
+        </div>
+        <!-- <div class="stat-card">
+          <span class="stat-label">vs. National Average</span>
+          <span class="stat-value" :class="costComparison.class">
+            <span class="stat-value">{{ costComparison.text }}</span>
+            <span :class="costComparison.class">{{ costComparison.text }}</span>
+          </span>
+        </div> -->
+        <div class="stat-card">
+          <span class="stat-label">Licensed Drivers</span>
+          <span class="stat-value">{{ licensedDrivers }}</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="local-factors container">
+      <h2>What Affects Car Insurance Rates in {{ cityName }}?</h2>
+      <p class="factors-intro">
+        Insurance rates in {{ cityName }} are influenced by your driving record, age, vehicle type, credit score, specific ZIP code, coverage levels,
+        and available discounts. Local factors unique to {{ cityName }} include:
+      </p>
+      <ul class="factors-list">
+        <li v-for="(factor, index) in cityData.localFactors" :key="index">
+          {{ factor }}
+        </li>
+      </ul>
+      <p v-if="cityData.neighborhoodNote" class="neighborhood-note">
+        {{ cityData.neighborhoodNote }}
+      </p>
+    </section>
+
+    <!-- <section class="license-plate container" v-if="stateData.licensePlateImage">
+      <div class="plate-wrapper">
+        <img :src="stateData.licensePlateImage" :alt="`${stateName} license plate`" class="license-plate-image" />
+        <div class="plate-content">
+          <h3>{{ stateName }} License Plate Requirements</h3>
+          <p>{{ stateData.plateInfo }}</p>
+        </div>
+      </div>
+    </section> -->
+
+    <section class="faq container">
+      <FaqMain :faq="faqs" />
+    </section>
+
+    <section class="cta-section">
+      <div class="container">
+        <h2>Get Your {{ cityName }} Car Insurance Quote</h2>
+        <p>Compare rates from top providers in minutes</p>
+        <zip-code-form :action="zipCodeUrl" />
+      </div>
+    </section>
+  </div>
 </template>
 
 <script setup>
   const route = useRoute();
-  const stateName = route.params.state;
-  const cityName = route.params.city;
-
+  const stateNameSlug = route.params.state;
+  const cityNameSlug = route.params.city;
+  console.log("Route params - state:", stateNameSlug, "city:", cityNameSlug);
   const { cityData, error, pending } = await useCityDataFromCacheOrApi();
 
-  const city = computed(() => cityData.value?.response || {});
+  const cityInfo = computed(() => {
+    if (cityData.value && cityData.value.data && cityData.value.data.length > 0) {
+      return cityData.value.data[0];
+    }
+    return null;
+  });
+
+  const cityName = computed(() => {
+    return cityInfo.value ? cityInfo.value.name : "";
+  });
+
+  const stateName = computed(() => {
+    return cityInfo.value ? cityInfo.value.stateName : "";
+  });
+
+  const population = computed(() => {
+    return cityInfo.value ? useNumberFormatter().formatNumber(cityInfo.value.population) : "";
+  });
+
+  const licensedDrivers = computed(() => {
+    return cityInfo.value ? useNumberFormatter().formatNumber(cityInfo.value.licensedDrivers) : "";
+  });
+
+  function useNumberFormatter() {
+    const formatter = new Intl.NumberFormat("en-US");
+    function formatNumber(value) {
+      return formatter.format(value);
+    }
+    return { formatNumber };
+  }
 
   async function useCityDataFromCacheOrApi() {
-    const cacheKey = `${stateName}-${cityName}-car-insurance-data`;
+    const cacheKey = `${stateNameSlug}-${cityNameSlug}-car-insurance-data`;
     const nuxtApp = useNuxtApp();
 
     const {
@@ -22,7 +140,7 @@
     } = await useAsyncData(
       cacheKey,
       async () => {
-        const url = `/api/state/city/?state=${stateName}&city=${cityName}`;
+        const url = `/api/state/city/?state=${stateNameSlug}&city=${cityNameSlug}`;
         console.log("🌐 Making API request:", url);
         const result = await $fetch(url);
         return result;
@@ -40,7 +158,8 @@
         },
       }
     );
-    return { response, error, pending };
+
+    return { cityData: response, error, pending };
   }
   // Calculate cost comparison
   // const costComparison = computed(() => {
@@ -67,30 +186,31 @@
   // });
 
   // FAQs
-  // const faqs = computed(() => [
-  //   {
-  //     question: `How much is car insurance in ${cityName.value}?`,
-  //     answer: `<p>The average cost of car insurance in ${cityName.value}, ${stateName.value} is $${cityData.value.avgCost} per year for full coverage. However, your actual rate will depend on factors like your age, driving record, vehicle type, and coverage levels.</p>`,
-  //   },
-  //   {
-  //     question: `What factors affect car insurance rates in ${cityName.value}?`,
-  //     answer: `<p>Rates are influenced by ${
-  //       cityData.value.localFactors.length > 0 ? "local factors including " + cityData.value.localFactors[0].toLowerCase() + ", as well as" : ""
-  //     } your driving record, age, vehicle type, credit score, and coverage levels.</p>`,
-  //   },
-  //   {
-  //     question: `How can I get cheap car insurance in ${cityName.value}?`,
-  //     answer: `<p>To find affordable coverage in ${cityName.value}, compare quotes from multiple providers, maintain a clean driving record, bundle policies, ask about available discounts, and consider raising your deductible if appropriate for your situation.</p>`,
-  //   },
-  //   {
-  //     question: `What's the minimum car insurance required in ${stateName.value}?`,
-  //     answer: `<p>${stateName.value} requires drivers to carry minimum liability coverage. Check with your insurance provider for specific state requirements and consider purchasing additional coverage beyond the minimum for better protection.</p>`,
-  //   },
-  // ]);
+  const faqs = computed(() => [
+    {
+      question: `How much is car insurance in ${cityName.value}?`,
+      answer: `<p>The average cost of car insurance in ${cityName.value}, ${stateName.value} is $${cityData.value.avgCost} per year for full coverage. However, your actual rate will depend on factors like your age, driving record, vehicle type, and coverage levels.</p>`,
+    },
+    {
+      question: `What factors affect car insurance rates in ${cityName.value}?`,
+      answer: `<p>Rates are influenced by your driving record, age, vehicle type, credit score, and coverage levels.</p>`,
+    },
+    {
+      question: `How can I get cheap car insurance in ${cityName.value}?`,
+      answer: `<p>To find affordable coverage in ${cityName.value}, compare quotes from multiple providers, maintain a clean driving record, bundle policies, ask about available discounts, and consider raising your deductible if appropriate for your situation.</p>`,
+    },
+    {
+      question: `What's the minimum car insurance required in ${stateName.value}?`,
+      answer: `<p>${stateName.value} requires drivers to carry minimum liability coverage. Check with your insurance provider for specific state requirements and consider purchasing additional coverage beyond the minimum for better protection.</p>`,
+    },
+  ]);
 </script>
 
 <style lang="scss" scoped>
   .city-insurance-page {
+    section {
+      padding: 4rem;
+    }
     .hero-section {
       position: relative;
       height: 500px;
@@ -150,8 +270,6 @@
     }
 
     .city-info {
-      padding: 4rem 0;
-
       .city-stats {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
@@ -164,7 +282,7 @@
 
         .stat-card {
           background: #f8f9fa;
-          padding: 2rem;
+          padding: 1rem;
           border-radius: 8px;
           text-align: center;
 
@@ -207,7 +325,6 @@
 
     .local-factors {
       background: #f8f9fa;
-      padding: 4rem 0;
 
       h2 {
         font-size: 2rem;
@@ -247,8 +364,6 @@
     }
 
     .license-plate {
-      padding: 4rem 0;
-
       .plate-wrapper {
         display: flex;
         align-items: center;
@@ -271,8 +386,6 @@
     }
 
     .insurance-providers {
-      padding: 4rem 0;
-
       h2 {
         font-size: 2rem;
         margin-bottom: 2rem;
@@ -320,7 +433,6 @@
     .cta-section {
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       color: white;
-      padding: 4rem 0;
       text-align: center;
 
       h2 {
