@@ -58,7 +58,7 @@
             <h3>{{ bannerHeadline }}</h3>
           </b-col>
           <b-col cols="12" lg="4">
-            <b-buttons
+            <ButtonsMain
               :config="{
                 type: 'submit',
                 size: 'lg',
@@ -66,7 +66,7 @@
                 label: 'COMPARE RATES',
                 icon:'arrow-right-short',
                 click: goToAction,
-            }"></b-buttons>
+            }" />
           </b-col>
         </b-row>
       </div>
