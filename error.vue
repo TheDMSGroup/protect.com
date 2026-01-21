@@ -4,6 +4,7 @@
 
   const store = useStore();
   const assetsBaseUrl = store.assetsBaseUrl;
+  const route = useRoute();
 
   // Get the error object from Nuxt
   const props = defineProps({
@@ -12,6 +13,19 @@
       default: () => ({ statusCode: 404 }),
     },
   });
+
+  // On 404, redirect to parent path
+  if (props.error.statusCode === 404 && import.meta.client) {
+    const currentPath = route.path;
+    const pathParts = currentPath.split("/").filter(Boolean);
+
+    // Only redirect if there's a parent path (more than 1 segment)
+    if (pathParts.length > 1) {
+      pathParts.pop();
+      const parentPath = "/" + pathParts.join("/");
+      clearError({ redirect: parentPath });
+    }
+  }
 
   // Set page meta for SEO
   useHead({

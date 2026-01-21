@@ -26,6 +26,12 @@ module.exports = {
         "control-character-in-input-stream": false,
       },
     ],
+    "object-curly-newline": [
+      "error",
+      {
+        allowAllPropertiesOnSameLine: false,
+      },
+    ],
     "global-require": "off",
     "import/no-dynamic-require": "off",
     camelcase: "off",

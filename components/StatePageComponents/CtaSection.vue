@@ -6,7 +6,12 @@
         <div class="cta-primary-content">
           <div class="cta-left">
             <div class="cta-icon">
-              <img :src="svgPath" alt="SVG Icon" class="svg-icon" loading="lazy" />
+              <img
+                :src="svgPath"
+                alt="SVG Icon"
+                class="svg-icon"
+                loading="lazy"
+              />
             </div>
             <div class="cta-text">
               <h3>Save On Car Insurance!</h3>
@@ -20,13 +25,28 @@
                 <label>Ready to see what you can save?</label>
                 <div class="form-row">
                   <IconsGeoPin class="left-icon" />
-                  <input type="text" v-model="localZipcode" placeholder="Zip Code" class="zipcode-input" maxlength="5" />
+                  <input
+                    type="text"
+                    v-model="localZipcode"
+                    placeholder="Zip Code"
+                    class="zipcode-input"
+                    maxlength="5"
+                  />
                   <ClientOnly>
-                    <button @click="getQuotes" class="compare-btn">COMPARE QUOTES</button>
+                    <button @click="getQuotes" class="compare-btn">
+                      COMPARE QUOTES
+                    </button>
                   </ClientOnly>
                 </div>
                 <div class="form-disclaimer">
-                  <span> <img :src="svgPath" alt="SVG Icon" class="cta-icon-inline svg-icon" loading="lazy" />No spam, just quotes </span>
+                  <span>
+                    <img
+                      :src="svgPath"
+                      alt="SVG Icon"
+                      class="cta-icon-inline svg-icon"
+                      loading="lazy"
+                    />No spam, just quotes
+                  </span>
                 </div>
               </div>
             </div>
