@@ -9,7 +9,8 @@ export const useStore = defineStore("store", {
     iconsBaseUrl: "/assets/icons",
     mastodonApiKey: "d030e397-ca37-4e72-8609-05dee60b7efc",
     articles: {
-      apiUrl: "https://us-west-2.cdn.hygraph.com/content/ckwzg7tk528a001z4e7z0bqi0/master",
+      apiUrl:
+        "https://us-west-2.cdn.hygraph.com/content/ckwzg7tk528a001z4e7z0bqi0/master",
       domain: "protectCom",
       articleType: "article",
       categories: [

@@ -1,6 +1,7 @@
 import { states } from "~/utils/redirect-config";
 
-const formatLocationNameForMatch = (name) => name.toLowerCase().replaceAll(/\s+/g, "");
+const formatLocationNameForMatch = (name) =>
+  name.toLowerCase().replaceAll(/\s+/g, "");
 
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig();
@@ -16,13 +17,15 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  const matchedState = states.find((s) => formatLocationNameForMatch(s.name) === state);
+  const matchedState = states.find(
+    (s) => formatLocationNameForMatch(s.name) === state
+  );
 
   // Google Sheets configuration
   const SHEET_ID = "1auut2Px5pfJwaPA58OeUQeMG_5KP-RpEVUfzHIQadV0";
   const API_KEY = config.googleSheetsApiKey || "";
   // Try wrapping sheet name in quotes or use Sheet1 as default
-  const RANGE = "Cities!1:101"; // Wrap sheet name in single quotes
+  const RANGE = "Cities!2:101"; // Wrap sheet name in single quotes
   if (!SHEET_ID || !API_KEY) {
     throw createError({
       statusCode: 500,
@@ -41,25 +44,43 @@ export default defineEventHandler(async (event) => {
 
     // Parse the data
     const rows = response.values.slice(1);
+
     // Convert to array of objects
     const data = rows.map((row) => {
       return {
-        name: row[0],
-        stateCode: row[1],
+        name: row[1],
+        stateCode: row[3],
+        metroArea: row[4],
         cityState: row[2],
-        population: row[3],
-        licenseShare: row[4],
-        licensedDrivers: row[5],
+        population: row[5],
+        licenseShare: row[6],
+        licensedDrivers: row[7],
+        primaryZip: row[8],
+        coverageRates: {
+          annual: row[12],
+          monthly: row[13],
+        },
+        stateMinCoverage: row[14],
+        stateFaultType: row[15],
+        cityDescription: row[16],
+        faq: [row[22], row[23], row[24], row[25], row[26]],
+        cityPosition: row[27],
       };
     });
 
     // const filteredData = data.filter((item) => formatLocationNameForMatch(item.name) === city && state === matchedState?.slug);
     const filteredData = data
-      .filter((item) => formatLocationNameForMatch(item.name) === city && item.stateCode.toLowerCase() === matchedState?.abbreviation.toLowerCase())
+      .filter(
+        (item) =>
+          formatLocationNameForMatch(item.name) === city &&
+          item.stateCode.toLowerCase() ===
+            matchedState?.abbreviation.toLowerCase()
+      )
       .map((item) => ({
         ...item,
         stateName: matchedState?.name || "",
       }));
+    console.log("Filtered City Data:", filteredData);
     return {
       success: true,
       data: filteredData,
