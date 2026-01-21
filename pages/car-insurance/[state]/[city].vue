@@ -1,9 +1,27 @@
 <template>
-  <div v-if="error" class="error-state">
-    <p>Error loading city insurance data. Please try again later.</p>
+  <div v-if="error || !cityName" class="error-state">
+    <div class="state-container">
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="#dc2626">
+        <path
+          d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"
+        />
+      </svg>
+      <h2>Unable to Load Data</h2>
+      <p>
+        We're having trouble loading the insurance information. Please try again
+        later.
+      </p>
+      <NuxtLink to="/car-insurance" class="compare-btn primary">
+        Back to Car Insurance
+      </NuxtLink>
+    </div>
   </div>
   <div v-else-if="pending" class="loading-state">
-    <p>Loading city insurance data...</p>
+    <div class="state-container">
+      <div class="spinner"></div>
+      <h2>Loading Insurance Data</h2>
+      <p>Please wait while we gather the latest information...</p>
+    </div>
   </div>
   <div v-else class="state-insurance-page">
     <!-- Hero Section -->
@@ -78,7 +96,9 @@
                     viewBox="0 0 24 24"
                     fill="currentColor"
                   >
-                    <path d="M7 14l5-5 5 5z" />
+                    <path
+                      d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"
+                    />
                   </svg>
                   Below Average
                 </span>
@@ -110,7 +130,9 @@
                     viewBox="0 0 24 24"
                     fill="currentColor"
                   >
-                    <path d="M7 14l5-5 5 5z" />
+                    <path
+                      d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"
+                    />
                   </svg>
                   Below Average
                 </span>
@@ -233,17 +255,13 @@
     <section class="fast-facts">
       <div class="container">
         <div class="cta-box">
-          <svg
-            width="48"
-            height="48"
-            viewBox="0 0 24 24"
-            fill="white"
-            style="margin: 0 auto 16px"
-          >
-            <path
-              d="M12 2L4 7v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-8-5z"
+          <div class="col-2 mx-auto">
+            <NuxtImg
+              src="/assets/states/outlines/icon-shield.png"
+              alt="Shield Icon"
+              class="cta-icon"
             />
-          </svg>
+          </div>
           <h3>Compare Top Providers in {{ cityName }}</h3>
           <p class="subtext">Ready to see what you can save?</p>
           <button
@@ -285,12 +303,11 @@
               Instead of focusing solely on the cheapest companies, we look at
               the full picture — offering a balance between affordable pricing,
               coverage types, and the provider's reputation. We prioritize
-              providers known for exceptional customer service in the Salt Lake
-              City area, ensuring you're not just getting a good rate, but
-              reliable support when it matters most. Local agents in Salt Lake
-              City can provide personalized guidance for navigating
-              {{ stateName }}'s unique insurance requirements, including
-              no-fault coverage.
+              providers known for exceptional customer service in the
+              {{ cityName }} area, ensuring you're not just getting a good rate,
+              but reliable support when it matters most. Local agents can
+              provide personalized guidance for navigating {{ stateName }}'s
+              unique insurance requirements, including no-fault coverage.
             </p>
             <p>
               Compare quotes today to see which {{ cityName }} providers are
@@ -310,9 +327,8 @@
               {{ cityName }} drivers have access to all major national insurance
               providers, plus several regional carriers that specialize in
               {{ stateName }}'s unique driving conditions. Whether you're
-              commuting through downtown, heading to the ski resorts in the
-              Wasatch Mountains, or navigating winter weather, finding the right
-              coverage at the best price is essential.
+              commuting through downtown, or taking a Sunday drive, finding the
+              right coverage at the best price is essential.
             </p>
           </div>
         </div>
@@ -335,7 +351,7 @@
         <div class="steps">
           <div class="step">
             <div class="step-number">1</div>
-            <h3>Enter Your {{ cityName }} Zip Code</h3>
+            <h3>Enter Your Zip Code</h3>
             <p>
               Tell us where you live in the {{ cityName }} area to find
               insurance providers
@@ -347,17 +363,14 @@
             <h3>Compare Quotes</h3>
             <p>
               Review personalized quotes from top insurance companies serving
-              {{ cityName }}
+              your area
             </p>
           </div>
 
           <div class="step">
             <div class="step-number">3</div>
             <h3>Save Money</h3>
-            <p>
-              Choose the best coverage at the lowest price for your Salt Lake
-              City needs
-            </p>
+            <p>Choose the best coverage at the lowest price for your needs</p>
           </div>
         </div>
 
@@ -380,7 +393,7 @@
     <!-- Rate Calculator -->
     <section class="rate-calculator">
       <div class="container">
-        <AutoRateCalculator />
+        <AutoRateCalculator :initial-zip="computedZipCode" />
       </div>
     </section>
 
@@ -434,7 +447,6 @@
     stateMinCoverage,
     stateFaultType,
     faq,
-    cityDescription,
     rateComparison,
   } = await useCityDataFromCacheOrApi();
 
@@ -449,6 +461,7 @@
     } = await useAsyncData(
       cacheKey,
       async () => {
+        console.log("hitting api for city data:", stateNameSlug, cityNameSlug);
         const url = `/api/state/city/?state=${stateNameSlug}&city=${cityNameSlug}`;
         const result = await $fetch(url);
         return result;
@@ -459,6 +472,7 @@
         getCachedData(key) {
           const cacheHit =
             nuxtApp.payload.data[key] || nuxtApp.static.data[key];
+          console.log("Cache hit for", key, ":", cacheHit);
           return cacheHit;
         },
       }
@@ -467,8 +481,6 @@
     // Helper function for number formatting
     function useNumberFormatter(num) {
       const formatter = new Intl.NumberFormat("en-US");
-      console.log("Formatting number:", num);
-      console.log("Formatted result:", formatter.format(num));
       return formatter.format(num);
     }
 
@@ -547,8 +559,6 @@
       )
     );
 
-    console.log("Rate Comparison:", rateComparison.value);
-
     const coverageRateAnnual = computed(() => {
       return cityInfo.value
         ? useNumberFormatter(cityInfo.value.coverageRates.annual)
@@ -582,7 +592,6 @@
           answer,
         };
       });
-      console.log("Formatted FAQ Array:", formattedFaqArray);
       return formattedFaqArray;
     });
 
@@ -625,12 +634,66 @@
   onMounted(() => {
     const store = useStore();
     zipCode.value = store.visitorInfo.zip || "";
-    console.log("updated zip to", zipCode.value);
   });
 </script>
 
 <style lang="scss" scoped>
   @import "@/scss/stateautoinsurance.scss";
+
+  // ==================== ERROR & LOADING STATES ====================
+  .error-state,
+  .loading-state {
+    min-height: 60vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+
+    .state-container {
+      text-align: center;
+      max-width: 500px;
+      padding: 48px;
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+
+      svg {
+        margin-bottom: 24px;
+      }
+
+      h2 {
+        font-size: 24px;
+        color: $blue;
+        margin-bottom: 16px;
+        font-weight: 600;
+      }
+
+      p {
+        font-size: 16px;
+        color: #64748b;
+        line-height: 1.6;
+        margin: 0;
+      }
+    }
+  }
+
+  .loading-state {
+    .spinner {
+      width: 48px;
+      height: 48px;
+      margin: 0 auto 24px;
+      border: 4px solid #e5e7eb;
+      border-top-color: $blue;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+  }
+
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
 
   .container {
     max-width: 1200px;
@@ -752,7 +815,6 @@
       margin-top: 50px;
 
       @include mobile {
-        min-height: 600px;
         max-width: 100%;
         display: flex;
         flex-wrap: wrap;
@@ -770,9 +832,9 @@
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
         width: 260px;
         height: auto;
-        min-height: 165px;
 
         @include desktop {
+          min-height: 165px;
           &:nth-child(1) {
             top: 0;
             left: 30px;
@@ -808,6 +870,7 @@
           min-width: 48%;
           flex: 1 1 48%;
           gap: 2%;
+          min-height: auto;
         }
 
         &:hover {
@@ -1475,6 +1538,10 @@
       color: #6b7280;
       line-height: 1.8;
       margin-bottom: 12px;
+    }
+    a {
+      font-size: 14px;
+      text-decoration: underline;
     }
   }
 </style>
