@@ -605,6 +605,25 @@
 
   const capitalize = (s) => s.charAt(0).toUpperCase() + s.slice(1);
 
+  useSeoMeta({
+    title: () =>
+      `${cityName.value} Car Insurance - Compare Quotes in ${stateName.value}`,
+    description: () =>
+      `Get free car insurance quotes in ${cityName.value}, ${stateName.value}. Compare rates from top providers and save up to $500/year. Fast, easy, and no spam.`,
+    ogTitle: () =>
+      `${cityName.value} Car Insurance - Compare Quotes in ${stateName.value}`,
+    ogDescription: () =>
+      `Get free car insurance quotes in ${cityName.value}, ${stateName.value}. Compare rates from top providers and save up to $500/year. Fast, easy, and no spam.`,
+    ogImage: () => "https://stage.protect.com/img/protect-share.dabdad17.jpg",
+    ogType: "article",
+    twitterCard: "summary_large_image",
+    twitterTitle: () =>
+      `${cityName.value} Car Insurance - Compare Quotes in ${stateName.value}`,
+    twitterDescription: () =>
+      `Get free car insurance quotes in ${cityName.value}, ${stateName.value}. Compare rates from top providers and save up to $500/year. Fast, easy, and no spam.`,
+    twitterImage: () =>
+      "https://stage.protect.com/img/protect-share.dabdad17.jpg",
+  });
   onMounted(() => {
     const store = useStore();
     zipCode.value = store.visitorInfo.zip || "";
