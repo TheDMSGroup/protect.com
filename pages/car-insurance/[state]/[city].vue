@@ -84,7 +84,7 @@
           <div class="hero-visual">
             <div class="hero-facts-grid">
               <div class="fact-card rate">
-                <h3>${{ coverageRateAnnual }}</h3>
+                <h2>${{ coverageRateAnnual }}</h2>
                 <p>Average Annual Cost</p>
                 <span
                   :class="`${rateComparison.comparison.annual.comparisonStatus}-average`"
@@ -94,7 +94,7 @@
               </div>
 
               <div class="fact-card rate">
-                <h3>${{ coverageRateMonthly }}</h3>
+                <h2>${{ coverageRateMonthly }}</h2>
                 <p>Average Monthly Cost</p>
                 <span
                   :class="`${rateComparison.comparison.monthly.comparisonStatus}-average`"
@@ -104,12 +104,12 @@
               </div>
 
               <div class="fact-card">
-                <h3>{{ stateFaultType }}</h3>
+                <h2>{{ stateFaultType }}</h2>
                 <p>State Type</p>
               </div>
 
               <div class="fact-card">
-                <h3>{{ stateMinCoverage }}</h3>
+                <h2>{{ stateMinCoverage }}</h2>
                 <p>Min. Coverage</p>
               </div>
             </div>
@@ -265,7 +265,7 @@
     <section class="local-insights">
       <div class="container">
         <div class="insight-box">
-          <NuxtImg
+          <img
             :src="'/assets/states/license-plates/' + stateNameSlug + '.jpg'"
             alt="{{stateName}} license plate"
           />
@@ -291,9 +291,9 @@
         </div>
 
         <div class="insight-box">
-          <NuxtImg
+          <img
             :src="'/assets/states/outlines/' + stateNameSlug + '.svg'"
-            alt="{{stateName}} outline"
+            :alt="`${stateName} outline`"
           />
           <div class="insight-content">
             <h3>Compare and Save in {{ cityName }}!</h3>
@@ -853,6 +853,18 @@
           }
         }
 
+        h2 {
+          font-family: inherit;
+          font-size: 36px;
+          color: $blue;
+          font-weight: 700;
+
+          @include mobile {
+            font-size: 28px;
+            font-family: inherit;
+          }
+        }
+
         @include mobile {
           width: 100%;
           padding: 24px 20px;
@@ -1165,32 +1177,32 @@
     }
 
     .below-average {
-      background: rgba(102, 194, 150, 0.1);
-      color: $green-dark;
-      border: 1px solid rgba(102, 194, 150, 0.3);
+      background: rgba(102, 194, 150, 0.12);
+      color: darken($green-dark, 20%);
+      border: 1px solid darken($green-dark, 20%);
 
       &::before {
-        background-image: url('data:image/svg+xml;utf8,<svg width="12" height="12" viewBox="0 0 24 24" fill="%2316a34a" xmlns="http://www.w3.org/2000/svg"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>');
+        background-image: url('data:image/svg+xml;utf8,<svg width="12" height="12" viewBox="0 0 24 24" fill="%23275c42" xmlns="http://www.w3.org/2000/svg"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>');
       }
     }
 
     .above-average {
       background: rgba(239, 68, 68, 0.1);
-      color: #dc2626;
+      color: darken(#dc2626, 15%);
       border: 1px solid rgba(239, 68, 68, 0.3);
 
       &::before {
-        background-image: url('data:image/svg+xml;utf8,<svg width="12" height="12" viewBox="0 0 24 24" fill="%23dc2626" xmlns="http://www.w3.org/2000/svg"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>');
+        background-image: url('data:image/svg+xml;utf8,<svg width="12" height="12" viewBox="0 0 24 24" fill="%239c1919" xmlns="http://www.w3.org/2000/svg"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>');
       }
     }
 
     .at-average {
       background: rgba(59, 130, 246, 0.1);
-      color: #2563eb;
+      color: darken(#2563eb, 15%);
       border: 1px solid rgba(59, 130, 246, 0.3);
 
       &::before {
-        background-image: url('data:image/svg+xml;utf8,<svg width="12" height="12" viewBox="0 0 24 24" fill="%232563eb" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>');
+        background-image: url('data:image/svg+xml;utf8,<svg width="12" height="12" viewBox="0 0 24 24" fill="%231043b3" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>');
       }
     }
   }
@@ -1204,7 +1216,7 @@
     box-shadow: 0 8px 24px rgba(12, 44, 103, 0.15);
 
     img {
-      width: 48px;
+      width: 41px;
       height: 48px;
       margin: 0 auto 16px;
     }
