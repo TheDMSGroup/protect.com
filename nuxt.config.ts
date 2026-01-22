@@ -68,6 +68,7 @@ export default defineNuxtConfig({
     statesSpreadsheetId: process.env.STATES_SPREADSHEET_ID,
     vehiclesSpreadsheetId: process.env.VEHICLES_SPREADSHEET_ID,
     cacheClearToken: process.env.CACHE_CLEAR_TOKEN,
+    googleSheetsApiKey: process.env.GOOGLE_SHEETS_API_KEY || "AIzaSyDKMdKBaogjDHC7CR87SOmJx21I28hWyiI",
     // Public keys (exposed to client-side)
     public: {
       // Google Sheets ranges (can be public as they're just range specifications)

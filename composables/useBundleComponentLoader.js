@@ -1,7 +1,7 @@
 // Component registry for SSR-compatible dynamic imports
 // All components must be registered here to be included in server payload
 
-const componentRegistry = {
+const bundleComponentRegistry = {
   // Bundle components
   AutoHomeBundleForm: () => import("~/components/Bundles/AutoHomeBundleForm.vue"),
 
@@ -15,7 +15,7 @@ export async function useBundleComponentLoader(name) {
     return null;
   }
 
-  if (!componentRegistry[name]) {
+  if (!bundleComponentRegistry[name]) {
     console.error(`Component "${name}" not found in registry`);
     return {
       name: "ComponentError",
@@ -28,7 +28,7 @@ export async function useBundleComponentLoader(name) {
   }
 
   try {
-    const component = await componentRegistry[name]();
+    const component = await bundleComponentRegistry[name]();
     return component.default || component;
   } catch (error) {
     console.error(`Error loading component "${name}":`, error);
@@ -43,4 +43,4 @@ export async function useBundleComponentLoader(name) {
   }
 }
 
-export { componentRegistry };
+export { bundleComponentRegistry };
