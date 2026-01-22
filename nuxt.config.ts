@@ -63,9 +63,17 @@ export default defineNuxtConfig({
     // Private keys (only available on server-side)
     graphqlApiUrl: process.env.GRAPHQL_API_URL || "https://us-west-2.cdn.hygraph.com/content/ckwzg7tk528a001z4e7z0bqi0/master",
     mastodonApiKey: process.env.MASTODON_API_KEY || "",
+    // Google Sheets API configuration
+    googleApiKey: process.env.GOOGLE_API_KEY, // For public sheets
+    statesSpreadsheetId: process.env.STATES_SPREADSHEET_ID,
+    vehiclesSpreadsheetId: process.env.VEHICLES_SPREADSHEET_ID,
+    vehiclesDetailSpreadsheetId: process.env.VEHICLES_DETAIL_SPREADSHEET_ID,
+    cacheClearToken: process.env.CACHE_CLEAR_TOKEN,
     // Public keys (exposed to client-side)
     public: {
-      // Add any public config here if needed
+      // Google Sheets ranges (can be public as they're just range specifications)
+      statesRange: process.env.STATES_RANGE || "States!A:Z",
+      vehiclesRange: process.env.VEHICLES_RANGE || "Sheet1!A:Z",
     },
   },
   sitemap: {
