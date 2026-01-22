@@ -87,33 +87,9 @@
                 <h3>${{ coverageRateAnnual }}</h3>
                 <p>Average Annual Cost</p>
                 <span
-                  v-if="rateComparison.comparison.annual.isBelowAverage"
-                  class="below-average"
+                  :class="`${rateComparison.comparison.annual.comparisonStatus}-average`"
                 >
-                  <svg
-                    width="12"
-                    height="12"
-                    viewBox="0 0 24 24"
-                    fill="currentColor"
-                  >
-                    <path
-                      d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"
-                    />
-                  </svg>
-                  Below Average
-                </span>
-                <span v-else class="above-average">
-                  <svg
-                    width="12"
-                    height="12"
-                    viewBox="0 0 24 24"
-                    fill="currentColor"
-                  >
-                    <path
-                      d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"
-                    />
-                  </svg>
-                  Above Average
+                  {{ capitalize(rateComparison.comparison.annual.text) }}
                 </span>
               </div>
 
@@ -121,33 +97,9 @@
                 <h3>${{ coverageRateMonthly }}</h3>
                 <p>Average Monthly Cost</p>
                 <span
-                  v-if="rateComparison.comparison.monthly.isBelowAverage"
-                  class="below-average"
+                  :class="`${rateComparison.comparison.monthly.comparisonStatus}-average`"
                 >
-                  <svg
-                    width="12"
-                    height="12"
-                    viewBox="0 0 24 24"
-                    fill="currentColor"
-                  >
-                    <path
-                      d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"
-                    />
-                  </svg>
-                  Below Average
-                </span>
-                <span v-else class="above-average">
-                  <svg
-                    width="12"
-                    height="12"
-                    viewBox="0 0 24 24"
-                    fill="currentColor"
-                  >
-                    <path
-                      d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"
-                    />
-                  </svg>
-                  Above Average
+                  {{ capitalize(rateComparison.comparison.monthly.text) }}
                 </span>
               </div>
 
@@ -160,6 +112,28 @@
                 <h3>{{ stateMinCoverage }}</h3>
                 <p>Min. Coverage</p>
               </div>
+            </div>
+            <div class="rate-output-text">
+              <p
+                v-if="
+                  rateComparison.comparison.annual.comparisonStatus === 'above'
+                "
+              >
+                High rates in your area don't have to mean high prices. Our tool
+                can help you find the best rate available.
+              </p>
+              <p
+                v-else-if="
+                  rateComparison.comparison.annual.comparisonStatus === 'below'
+                "
+              >
+                Low prices in your area are waiting. Use our tool to find your
+                personalized rate today.
+              </p>
+              <p v-else>
+                Your area has average rates, but you could still save. Compare
+                quotes to ensure you're getting the best deal.
+              </p>
             </div>
           </div>
         </div>
@@ -558,7 +532,7 @@
         cityInfo.value ? cityInfo.value.coverageRates.annual : null
       )
     );
-
+    console.log("rateComparison:", rateComparison.value);
     const coverageRateAnnual = computed(() => {
       return cityInfo.value
         ? useNumberFormatter(cityInfo.value.coverageRates.annual)
@@ -893,43 +867,49 @@
           font-weight: 500;
           margin-bottom: 8px;
         }
+      }
+    }
 
-        .below-average,
-        .above-average {
-          display: inline-flex;
-          align-items: center;
-          gap: 4px;
-          padding: 4px 10px;
-          border-radius: 4px;
-          font-size: 11px;
-          font-weight: 600;
-          margin-top: 4px;
+    .rate-output-text {
+      margin-top: 24px;
+      background: linear-gradient(
+        135deg,
+        rgba(59, 130, 246, 0.08) 0%,
+        rgba(96, 165, 250, 0.08) 100%
+      );
+      border: 1px solid rgba(59, 130, 246, 0.2);
+      border-radius: 12px;
+      padding: 16px 20px 16px 48px;
+      position: relative;
+      box-shadow: 0 2px 8px rgba(59, 130, 246, 0.08);
+      max-width: 600px;
+      width: 100%;
 
-          svg {
-            width: 12px;
-            height: 12px;
-          }
-        }
+      @include mobile {
+        margin-top: 32px;
+        padding: 16px 16px 16px 44px;
+      }
 
-        .below-average {
-          background: rgba(102, 194, 150, 0.1);
-          color: $green-dark;
-          border: 1px solid rgba(102, 194, 150, 0.3);
+      &::before {
+        content: "";
+        position: absolute;
+        left: 16px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 20px;
+        height: 20px;
+        background-image: url('data:image/svg+xml;utf8,<svg width="20" height="20" viewBox="0 0 24 24" fill="%232563eb" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>');
+        background-size: contain;
+        background-repeat: no-repeat;
+        background-position: center;
+      }
 
-          svg {
-            fill: $green-dark;
-          }
-        }
-
-        .above-average {
-          background: rgba(239, 68, 68, 0.1);
-          color: #dc2626;
-          border: 1px solid rgba(239, 68, 68, 0.3);
-
-          svg {
-            fill: #dc2626;
-          }
-        }
+      p {
+        margin: 0;
+        font-size: 14px;
+        line-height: 1.6;
+        color: #1e40af;
+        font-weight: 500;
       }
     }
   }
@@ -1139,19 +1119,29 @@
     }
 
     .below-average,
-    .above-average {
+    .above-average,
+    .at-average {
       display: inline-flex;
       align-items: center;
       gap: 4px;
-      padding: 4px 12px;
       border-radius: 4px;
       font-size: 13px;
       font-weight: 600;
       margin-top: 8px;
+      position: relative;
+      padding: 5px 10px 5px 28px;
 
-      svg {
+      &::before {
+        content: "";
+        position: absolute;
+        left: 8px;
+        top: 50%;
+        transform: translateY(-50%);
         width: 12px;
         height: 12px;
+        background-size: contain;
+        background-repeat: no-repeat;
+        background-position: center;
       }
     }
 
@@ -1160,8 +1150,8 @@
       color: $green-dark;
       border: 1px solid rgba(102, 194, 150, 0.3);
 
-      svg {
-        fill: $green-dark;
+      &::before {
+        background-image: url('data:image/svg+xml;utf8,<svg width="12" height="12" viewBox="0 0 24 24" fill="%2316a34a" xmlns="http://www.w3.org/2000/svg"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>');
       }
     }
 
@@ -1170,8 +1160,18 @@
       color: #dc2626;
       border: 1px solid rgba(239, 68, 68, 0.3);
 
-      svg {
-        fill: #dc2626;
+      &::before {
+        background-image: url('data:image/svg+xml;utf8,<svg width="12" height="12" viewBox="0 0 24 24" fill="%23dc2626" xmlns="http://www.w3.org/2000/svg"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>');
+      }
+    }
+
+    .at-average {
+      background: rgba(59, 130, 246, 0.1);
+      color: #2563eb;
+      border: 1px solid rgba(59, 130, 246, 0.3);
+
+      &::before {
+        background-image: url('data:image/svg+xml;utf8,<svg width="12" height="12" viewBox="0 0 24 24" fill="%232563eb" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>');
       }
     }
   }
