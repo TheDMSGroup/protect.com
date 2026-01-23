@@ -126,12 +126,12 @@
     </section>
 
     <section id="faq" class="faq-section mb-4 pb-4">
-      <div class="section-header">
-        <div class="section-label">Common Questions</div>
-        <h2 class="section-title">Why Bundle Your Insurance?</h2>
-      </div>
       <b-container>
-        <FaqAccordion :content="content" />
+        <div class="section-header">
+          <div class="section-label">Common Questions</div>
+          <h2 class="section-title">Why Bundle Your Insurance?</h2>
+        </div>
+        <FaqAccordion :faqs="faqData" />
       </b-container>
     </section>
 
@@ -175,6 +175,34 @@
   const upperCaseDescriptor = computed(() => {
     return props.content.descriptor.charAt(0).toUpperCase() + props.content.descriptor.slice(1);
   });
+
+  // Define FAQ data structure for composable
+  const faqData = computed(() => [
+    {
+      question: `What are the benefits of bundling ${props.content.type} insurance?`,
+      answer: `Bundling offers multiple benefits: significant cost savings averaging ${props.content.stats.averageSavings} per year, simplified policy management with one provider and one renewal date, streamlined claims process, potential for higher coverage limits, and enhanced customer service. Most customers also appreciate having a single point of contact for all their insurance needs.`,
+    },
+    {
+      question: "How much can I actually save by bundling?",
+      answer: `Bundling discounts typically range from ${props.content.stats.discountRange} on your total insurance premiums. The average homeowner saves ${props.content.stats.averageSavings} annually, though your actual savings depend on factors like your location, coverage amounts, insurance provider, and claims history. Many customers find the convenience alone worth switching to a bundled policy.`,
+    },
+    ...(props.content.customFaq || []),
+    {
+      question: "Will bundling affect my coverage quality?",
+      answer:
+        "Not at all. Bundling doesn't compromise coverage—you'll receive the same quality protection whether policies are bundled or separate. In fact, many providers offer enhanced coverage options exclusively for bundled customers. You can still customize each policy independently to meet your specific needs while enjoying the discount benefits.",
+    },
+    {
+      question: "What if I need to file a claim on one policy?",
+      answer:
+        "Filing a claim on one bundled policy works just like separate policies—each policy is handled independently. However, bundled customers often experience faster claims processing because all their information is in one system. Additionally, having both policies with one provider can prevent coverage gaps and ensure smoother coordination if a single incident affects both your auto and home.",
+    },
+    {
+      question: "Can I switch providers if I'm already insured separately?",
+      answer:
+        "Yes! Switching to bundled coverage is straightforward. Most insurance providers will help you transition both policies, often timing them to coincide with your current renewal dates to avoid cancellation fees. Many customers find the substantial savings make switching well worth any minor hassle. Just make sure you have new coverage in place before canceling existing policies.",
+    },
+  ]);
 
   const fadeCardContainer = ref(null);
 

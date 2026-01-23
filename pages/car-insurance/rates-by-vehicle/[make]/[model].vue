@@ -1,5 +1,6 @@
 <script setup>
 import { isValidMake, isValidModel, getMakeName, getModelsForMake, getVehicleImagePath, getMakeLogoPath } from "~/data/vehicles";
+import { redirectWithParams } from "@/composables/utils.js";
 
 const route = useRoute();
 const make = route.params.make;
@@ -13,7 +14,18 @@ if (!isValidMake(make) || !isValidModel(make, model)) {
 }
 
 const formattedMake = computed(() => getMakeName(make));
+
+// Fetch model data from Google Sheets first so we can use it in formattedModel
+const { data: modelData } = await useFetch(`/api/sheets/vehicles-detail`, {
+  query: { make, model },
+  key: `model-${make}-${model}`,
+});
+
 const formattedModel = computed(() => {
+  // Use the 'model' column from spreadsheet if available, otherwise format the slug
+  if (modelData.value && modelData.value['model']) {
+    return modelData.value['model'];
+  }
   return model
     .split("-")
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
@@ -41,8 +53,20 @@ const onLogoError = () => {
   logoError.value = true;
 };
 
+// Fetch all models for this make to get display names
+const { data: allModelsData } = await useFetch(`/api/sheets/vehicles-detail`, {
+  query: { make },
+  key: `all-models-${make}`,
+});
+
 const otherModels = computed(() => {
-  return getModelsForMake(make).filter((m) => m !== model);
+  // Only show models that exist in the spreadsheet
+  if (allModelsData.value && Array.isArray(allModelsData.value)) {
+    return allModelsData.value
+      .filter((m) => m.model_slug && m.model_slug !== model)
+      .map((m) => m.model_slug);
+  }
+  return [];
 });
 
 const formatModelName = (modelSlug) => {
@@ -52,11 +76,16 @@ const formatModelName = (modelSlug) => {
     .join("-");
 };
 
-// Fetch model data from Google Sheets
-const { data: modelData } = await useFetch(`/api/sheets/vehicles-detail`, {
-  query: { make, model },
-  key: `model-${make}-${model}`,
-});
+// Helper to get display name for a model slug
+const getModelDisplayName = (modelSlug) => {
+  if (allModelsData.value && Array.isArray(allModelsData.value)) {
+    const modelInfo = allModelsData.value.find(m => m.model_slug === modelSlug);
+    if (modelInfo && modelInfo.model) {
+      return modelInfo.model;
+    }
+  }
+  return formatModelName(modelSlug);
+};
 
 // Vehicle stats from spreadsheet with fallback
 const vehicleStats = computed(() => {
@@ -283,17 +312,23 @@ useSeoMeta({
             <p class="hero-subtitle">
               Get comprehensive coverage for your {{ formattedMake }} {{ formattedModel }}. Compare quotes from top insurers and find the best rates available.
             </p>
-            <NuxtLink to="https://insure.protect.com" class="cta-button">Compare Quotes</NuxtLink>
+            <button class="cta-button" @click="redirectWithParams('https://insure.protect.com', { vehicle1make: formattedMake.toUpperCase(), vehicle1model: formattedModel.toUpperCase() })">Compare Quotes</button>
           </b-col>
           <b-col cols="12" lg="6" class="hero-image-col">
             <div class="vehicle-image-wrapper">
-              <img
+              <NuxtImg
                 v-if="!imageError"
                 :src="vehicleImage"
                 :alt="`${formattedMake} ${formattedModel}`"
                 class="vehicle-image"
+                format="webp"
+                quality="80"
+                loading="eager"
+                sizes="xs:100vw sm:100vw md:50vw lg:50vw xl:600px"
+                :width="600"
+                :height="450"
                 @error="onImageError"
-              >
+              />
               <div v-else class="vehicle-placeholder">
                 <i class="bi bi-car-front-fill" />
                 <span>{{ formattedMake }} {{ formattedModel }}</span>
@@ -394,7 +429,7 @@ useSeoMeta({
 
         <div class="safety-grid">
           <div v-for="feature in safetyFeatures" :key="feature.title" class="safety-item">
-            <h4><span class="safety-icon">✓</span> {{ feature.title }}</h4>
+            <h3><span class="safety-icon">✓</span> {{ feature.title }}</h3>
             <p>{{ feature.description }}</p>
           </div>
         </div>
@@ -410,7 +445,7 @@ useSeoMeta({
 
         <div class="factors-list">
           <div v-for="factor in insuranceFactors" :key="factor.title" class="factor-item">
-            <h4>{{ factor.title }}</h4>
+            <h3>{{ factor.title }}</h3>
             <p>{{ factor.description }}</p>
           </div>
         </div>
@@ -430,13 +465,19 @@ useSeoMeta({
     <section v-if="otherModels.length > 0" class="similar-section">
       <b-container>
         <div class="section-header">
-          <img
+          <NuxtImg
             v-if="!logoError"
             :src="makeLogo"
             :alt="`${formattedMake} logo`"
             class="section-logo"
+            format="webp"
+            quality="80"
+            loading="lazy"
+            :width="120"
+            fit="inside"
+            :modifiers="{ fit: 'inside' }"
             @error="onLogoError"
-          >
+          />
           <h2>Other {{ formattedMake }} Models</h2>
           <p>Compare insurance options for other {{ formattedMake }} vehicles</p>
         </div>
@@ -448,7 +489,7 @@ useSeoMeta({
             :to="`/car-insurance/rates-by-vehicle/${make}/${otherModel}`"
             class="similar-card"
           >
-            <h4>{{ formatModelName(otherModel) }}</h4>
+            <h3>{{ getModelDisplayName(otherModel) }}</h3>
           </NuxtLink>
         </div>
       </b-container>
@@ -458,7 +499,7 @@ useSeoMeta({
       <b-container>
         <h2>Ready to Save on {{ formattedMake }} {{ formattedModel }} Insurance?</h2>
         <p>Compare quotes from top insurers and find the best rate for your vehicle</p>
-        <NuxtLink to="https://insure.protect.com" class="cta-button">Get Your Free Quote</NuxtLink>
+        <button class="cta-button" @click="redirectWithParams('https://insure.protect.com', { vehicle1make: formattedMake.toUpperCase(), vehicle1model: formattedModel.toUpperCase() })">Get Your Free Quote</button>
       </b-container>
     </section>
   </div>
@@ -564,7 +605,7 @@ useSeoMeta({
   }
 
   .cta-button {
-    background: $green;
+    background: $green-accessible;
     color: white;
     padding: 1rem 2.5rem;
     border: none;
@@ -680,12 +721,12 @@ useSeoMeta({
       flex-wrap: wrap;
 
       i {
-        color: $green;
+        color: $green-accessible;
       }
     }
 
     .rating-badge {
-      background: $green;
+      background: $green-accessible;
       color: white;
       padding: 4px 12px;
       border-radius: 20px;
@@ -717,13 +758,13 @@ useSeoMeta({
     border-radius: 8px;
     border-left: 4px solid $green;
 
-    h4 {
+    h3 {
       font-size: 1rem;
       color: $blue;
       margin-bottom: 0.5rem;
 
       i {
-        color: $green;
+        color: $green-accessible;
         margin-right: 0.5rem;
       }
     }
@@ -761,7 +802,7 @@ useSeoMeta({
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
     }
 
-    h4 {
+    h3 {
       font-size: 1.25rem;
       color: $blue;
       margin-bottom: 0.75rem;
@@ -809,12 +850,12 @@ useSeoMeta({
       background: $gray-lighter;
       border-color: $blue;
 
-      h4 {
+      h3 {
         color: darken($blue, 10%);
       }
     }
 
-    h4 {
+    h3 {
       font-size: 1rem;
       color: $blue;
       margin: 0;

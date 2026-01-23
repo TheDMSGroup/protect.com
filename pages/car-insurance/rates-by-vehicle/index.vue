@@ -1,5 +1,6 @@
 <script setup>
 import { getAllMakes, getMakeLogoPath } from "~/data/vehicles";
+import { redirectWithParams } from "@/composables/utils.js";
 
 const makes = computed(() => getAllMakes());
 
@@ -28,7 +29,7 @@ useSeoMeta({
         <div class="hero-content">
           <h1>Car Insurance by Vehicle</h1>
           <p class="hero-subtitle">Find affordable insurance coverage for your specific make and model</p>
-          <NuxtLink to="https://insure.protect.com" class="cta-button">Compare Quotes</NuxtLink>
+          <button class="cta-button" @click="redirectWithParams('https://insure.protect.com', {})">Compare Quotes</button>
         </div>
       </b-container>
     </section>
@@ -167,7 +168,7 @@ useSeoMeta({
       <b-container>
         <h2>Find the Best Rate for Your Vehicle</h2>
         <p>Compare quotes from top insurers in minutes</p>
-        <NuxtLink to="https://insure.protect.com" class="cta-button">Get Your Free Quote</NuxtLink>
+        <button class="cta-button" @click="redirectWithParams('https://insure.protect.com', {})">Get Your Free Quote</button>
       </b-container>
     </section>
   </div>
@@ -221,7 +222,7 @@ useSeoMeta({
   }
 
   .cta-button {
-    background: $green;
+    background: $green-accessible;
     color: white;
     padding: 1rem 2.5rem;
     border: none;
@@ -272,7 +273,7 @@ useSeoMeta({
     overflow: hidden;
     transition: transform 0.3s, box-shadow 0.3s;
     text-decoration: none;
-    color: inherit;
+    color: $blue; // Use dark blue for sufficient contrast
     display: block;
 
     &:hover {
@@ -331,7 +332,7 @@ useSeoMeta({
 
     .learn-more {
       display: inline-block;
-      color: $green;
+      color: $green-accessible;
       font-weight: 600;
       font-size: 1rem;
     }

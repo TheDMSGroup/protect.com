@@ -1,5 +1,6 @@
 <script setup>
 import { isValidMake, getMakeName, getVehicleImagePath, getMakeLogoPath } from "~/data/vehicles";
+import { redirectWithParams } from "@/composables/utils.js";
 
 const route = useRoute();
 const make = route.params.make;
@@ -119,7 +120,7 @@ const seoTitle = computed(() => {
 });
 
 const seoDescription = computed(() => {
-  return makeData.value?.['meta_description'] || `Find affordable ${formattedMake.value} car insurance. Compare rates for ${models.value.map(model => formatModelName(model.model_slug)).join(", ")} and more. Get your free quote today.`;
+  return makeData.value?.['meta_description'] || `Find affordable ${formattedMake.value} car insurance. Compare rates for ${models.value.map(model => model.model || formatModelName(model.model_slug)).join(", ")} and more. Get your free quote today.`;
 });
 
 useSeoMeta({
@@ -142,7 +143,7 @@ useSeoMeta({
         <div class="hero-content">
           <h1>{{ formattedMake }} Car Insurance</h1>
           <p class="hero-subtitle">Find affordable insurance coverage for your {{ formattedMake }} vehicle</p>
-          <NuxtLink to="https://insure.protect.com" class="cta-button">Compare Quotes</NuxtLink>
+          <button class="cta-button" @click="redirectWithParams('https://insure.protect.com', { vehicle1make: formattedMake.toUpperCase() })">Compare Quotes</button>
         </div>
       </b-container>
     </section>
@@ -155,11 +156,17 @@ useSeoMeta({
             <p>{{ makeDescription }}</p>
           </b-col>
           <b-col v-if="!logoError" cols="12" md="4" class="text-center d-none d-md-block">
-            <img
+            <NuxtImg
               :src="makeLogo"
               :alt="`${formattedMake} logo`"
               class="about-logo"
-            >
+              format="webp"
+              quality="80"
+              loading="lazy"
+              :width="200"
+              fit="inside"
+              :modifiers="{ fit: 'inside' }"
+            />
           </b-col>
         </b-row>
       </b-container>
@@ -180,25 +187,31 @@ useSeoMeta({
             class="model-card"
           >
             <div class="model-image-wrapper">
-              <img
+              <NuxtImg
                 v-if="!imageErrors[model.model_slug]"
                 :src="getVehicleImage(model.model_slug)"
-                :alt="`${formattedMake} ${formatModelName(model.model_slug)}`"
+                :alt="`${formattedMake} ${model.model || formatModelName(model.model_slug)}`"
                 class="model-image"
+                format="webp"
+                quality="80"
+                loading="lazy"
+                sizes="xs:100vw sm:50vw md:33vw lg:25vw xl:300px"
+                :width="300"
+                :height="225"
                 @error="onImageError(model.model_slug)"
-              >
+              />
               <div v-else class="model-placeholder">
                 <i class="bi bi-car-front-fill" />
               </div>
             </div>
             <div class="model-content">
-              <h3 class="model-name">{{ formatModelName(model.model_slug) }}</h3>
+              <h3 class="model-name">{{ model.model || formatModelName(model.model_slug) }}</h3>
               <ul v-if="model.safety_feature_1 || model.safety_feature_2" class="model-features">
                 <li v-if="model.safety_feature_1">{{ model.safety_feature_1 }}</li>
                 <li v-if="model.safety_feature_2">{{ model.safety_feature_2 }}</li>
               </ul>
               <p v-else class="model-description">
-                Get insurance quotes for the {{ formatModelName(model.model_slug) }}. Compare rates from top insurers.
+                Get insurance quotes for the {{ model.model || formatModelName(model.model_slug) }}. Compare rates from top insurers.
               </p>
               <div v-if="model.full_coverage_annual || model.minimum_coverage_annual" class="model-pricing">
                 <div v-if="model.full_coverage_annual" class="price-item">
@@ -288,7 +301,7 @@ useSeoMeta({
       <b-container>
         <h2>Ready to Save on {{ formattedMake }} Insurance?</h2>
         <p>Compare quotes from top insurers in minutes</p>
-        <NuxtLink to="https://insure.protect.com" class="cta-button">Get Your Free Quote</NuxtLink>
+        <button class="cta-button" @click="redirectWithParams('https://insure.protect.com', { vehicle1make: formattedMake.toUpperCase() })">Get Your Free Quote</button>
       </b-container>
     </section>
   </div>
@@ -342,7 +355,7 @@ useSeoMeta({
   }
 
   .cta-button {
-    background: $green;
+    background: $green-accessible;
     color: white;
     padding: 1rem 2.5rem;
     border: none;
@@ -428,7 +441,7 @@ useSeoMeta({
     overflow: hidden;
     transition: transform 0.3s, box-shadow 0.3s;
     text-decoration: none;
-    color: inherit;
+    color: $blue; // Use dark blue for sufficient contrast
     display: block;
 
     &:hover {
@@ -543,7 +556,7 @@ useSeoMeta({
 
     .learn-more {
       display: inline-block;
-      color: $green;
+      color: $green-accessible;
       font-weight: 600;
       font-size: 1rem;
     }

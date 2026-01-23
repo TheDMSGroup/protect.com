@@ -22,6 +22,7 @@ export default defineEventHandler(async (event) => {
 
   const spreadsheetId = config.vehiclesSpreadsheetId;
   const range = config.public.vehiclesModelsRange || 'Models!A:Z';
+  const gid = config.vehiclesModelsGid || config.public.vehiclesModelsGid || '2';
 
   if (!spreadsheetId) {
     throw createError({
@@ -36,6 +37,7 @@ export default defineEventHandler(async (event) => {
       useCache: query.nocache !== 'true',
       ttl: 1000 * 60 * 60 * 24 * 30, // 30 days cache for vehicle model data
       headerRow: true,
+      gid: gid,
     });
 
     // Apply filters

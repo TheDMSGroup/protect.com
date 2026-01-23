@@ -30,6 +30,7 @@
     "@bootstrap-vue-next/nuxt": "^0.40.7",
     "bootstrap": "^5.3.8",
     "bootstrap-vue-next": "^0.40.7",
-    "sass-embedded": "^1.93.3"
+    "sass-embedded": "^1.93.3",
+    "sharp": "^0.34.5"
   }
 }

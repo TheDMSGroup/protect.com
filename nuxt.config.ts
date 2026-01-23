@@ -64,17 +64,15 @@ export default defineNuxtConfig({
     graphqlApiUrl: process.env.GRAPHQL_API_URL || "https://us-west-2.cdn.hygraph.com/content/ckwzg7tk528a001z4e7z0bqi0/master",
     mastodonApiKey: process.env.MASTODON_API_KEY || "",
     // Google Sheets API configuration
-    googleApiKey: process.env.GOOGLE_API_KEY, // For public sheets
-    statesSpreadsheetId: process.env.STATES_SPREADSHEET_ID,
-    vehiclesSpreadsheetId: process.env.VEHICLES_SPREADSHEET_ID,
+    statesSpreadsheetId: "1qjb3pBf2-jVhJna5tF884OzjJaCo5LdUIy0EsCatjc4",
+    vehiclesSpreadsheetId: "1gpwj9rK5vNYeCfkdFwpdGCEgZBWGe8u27EMdVEbRlac",
     cacheClearToken: process.env.CACHE_CLEAR_TOKEN,
-    googleSheetsApiKey: process.env.GOOGLE_SHEETS_API_KEY || "AIzaSyDKMdKBaogjDHC7CR87SOmJx21I28hWyiI",
+    googleSheetsApiKey: process.env.GOOGLE_SHEETS_API_KEY,
     // Public keys (exposed to client-side)
     public: {
-      // Google Sheets ranges (can be public as they're just range specifications)
-      statesRange: process.env.STATES_RANGE || "Sheet1!A:Z",
-      vehiclesMakesRange: process.env.VEHICLES_MAKES_RANGE || "Makes!A:Z",
-      vehiclesModelsRange: process.env.VEHICLES_MODELS_RANGE || "Models!A:Z",
+      statesRange: "Sheet1!A:Z",
+      vehiclesMakesRange: "Makes!A:Z",
+      vehiclesModelsRange: "Models!A:Z",
     },
   },
   sitemap: {

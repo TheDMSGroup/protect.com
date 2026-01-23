@@ -39,13 +39,7 @@ export default defineEventHandler(async (event) => {
           },
           formComponent: "AutoHomeBundleForm",
           formAction: "https://insure.protect.com/",
-          customFaq: [
-            {
-              question: "Can I bundle if I rent my home instead of owning?",
-              answer:
-                "Absolutely! While Auto & Home insurance protects the structure you own, renters can bundle their auto insurance with renters insurance for similar savings. Renters insurance covers your personal belongings, liability, and additional living expenses. Most providers offer bundling discounts of 10% to 20% when you combine auto and renters policies.",
-            },
-          ],
+          customFaq: []
         };
     }
   };

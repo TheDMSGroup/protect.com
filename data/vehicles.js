@@ -19,7 +19,7 @@ export const vehicles = {
     name: "Ford",
     models: [
       "bronco",
-      "bronco-sport",
+      "broncosport",
       "edge",
       "escape",
       "expedition",
@@ -30,10 +30,10 @@ export const vehicles = {
       "f450",
       "maverick",
       "mustang",
-      "mustang-mach-e",
+      "mustangmache",
       "ranger",
       "transit",
-      "transit-connect",
+      "transitconnect",
     ],
   },
   toyota: {
@@ -43,16 +43,16 @@ export const vehicles = {
       "bz4x",
       "camry",
       "corolla",
-      "corolla-cross",
+      "corollacross",
       "crown",
-      "gr-86",
-      "gr-corolla",
+      "gr86",
+      "grcorolla",
       "highlander",
       "mirai",
       "prius",
-      "prius-prime",
+      "priusprime",
       "rav4",
-      "rav4-prime",
+      "rav4prime",
       "sequoia",
       "sienna",
       "supra",
@@ -91,14 +91,14 @@ export function getModelsForMake(make) {
   return vehicles[make]?.models || [];
 }
 
-// Get vehicle image path - images stored at /assets/vehicles/{year}/{make}/{model}.png
-export function getVehicleImagePath(make, model, year = DEFAULT_VEHICLE_YEAR) {
+// Get vehicle image path - images stored at /assets/vehicles/{year}/{make}/{model}.webp (or .png fallback)
+export function getVehicleImagePath(make, model, year = DEFAULT_VEHICLE_YEAR, format = "webp") {
   // Remove hyphens from model slug for image filename (e.g., "bronco-sport" -> "broncosport")
   const imageModel = model.replace(/-/g, "");
-  return `/assets/vehicles/${year}/${make}/${imageModel}.png`;
+  return `/assets/vehicles/${year}/${make}/${imageModel}.${format}`;
 }
 
-// Get make logo path - logos stored at /assets/vehicles/{year}/{make}/logo.png
-export function getMakeLogoPath(make, year = DEFAULT_VEHICLE_YEAR) {
-  return `/assets/vehicles/${year}/${make}/logo.png`;
+// Get make logo path - logos stored at /assets/vehicles/{year}/{make}/logo.webp (or .png fallback)
+export function getMakeLogoPath(make, year = DEFAULT_VEHICLE_YEAR, format = "webp") {
+  return `/assets/vehicles/${year}/${make}/logo.${format}`;
 }

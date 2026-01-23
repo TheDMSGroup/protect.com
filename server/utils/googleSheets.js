@@ -42,95 +42,30 @@ export function clearCache(key = null) {
 }
 
 /**
- * Parse CSV data into objects
- * @param {string} csv - The CSV/TSV data to parse
- * @param {number} skipRows - Number of rows to skip before header row (default: 0)
- */
-function parseCSV(csv, skipRows = 0) {
-  const lines = csv.split('\n').filter(line => line.trim());
-  if (lines.length === 0) return [];
-
-  // Skip the specified number of rows, then use the next row as headers
-  const headerIndex = skipRows;
-  const headers = lines[headerIndex].split('\t').map(h => h.trim());
-  const data = [];
-
-  for (let i = headerIndex + 1; i < lines.length; i++) {
-    const values = lines[i].split('\t');
-    const obj = {};
-    headers.forEach((header, index) => {
-      obj[header] = values[index]?.trim() || '';
-    });
-    data.push(obj);
-  }
-
-  return data;
-}
-
-/**
- * Fetch public Google Sheet as CSV (no API key needed)
- * @param {string} spreadsheetId - The spreadsheet ID
- * @param {string} gid - The sheet GID (default: '0')
- * @param {number} skipRows - Number of rows to skip before header row (default: 0)
- */
-async function fetchPublicSheet(spreadsheetId, gid = '0', skipRows = 0) {
-  const url = `https://docs.google.com/spreadsheets/d/${spreadsheetId}/export?format=tsv&gid=${gid}`;
-
-  try {
-    const response = await fetch(url, {
-      redirect: 'follow', // Follow redirects
-      headers: {
-        'User-Agent': 'Mozilla/5.0' // Some services require a user agent
-      }
-    });
-    if (!response.ok) {
-      throw new Error(`Failed to fetch sheet: ${response.status} ${response.statusText}`);
-    }
-    const csv = await response.text();
-    return parseCSV(csv, skipRows);
-  } catch (error) {
-    throw new Error(`Error fetching public sheet: ${error.message}`);
-  }
-}
-
-/**
- * Initialize Google Sheets API client (for private sheets with authentication)
+ * Initialize Google Sheets API client with API key
  */
 function getGoogleSheetsClient() {
   const config = useRuntimeConfig();
+  const apiKey = config.googleSheetsApiKey;
 
-  // Check if using API key for public sheets
-  if (config.googleApiKey || config.public.googleApiKey) {
-    const apiKey = config.googleApiKey || config.public.googleApiKey;
-    return google.sheets({ version: 'v4', auth: apiKey });
+  if (!apiKey) {
+    throw createError({
+      statusCode: 500,
+      statusMessage: 'Google Sheets API key not configured',
+    });
   }
 
-  // Otherwise use service account credentials
-  const credentials = config.googleServiceAccount
-    ? JSON.parse(config.googleServiceAccount)
-    : {
-        client_email: config.googleClientEmail,
-        private_key: config.googlePrivateKey?.replace(/\\n/g, '\n'),
-      };
-
-  const auth = new google.auth.GoogleAuth({
-    credentials,
-    scopes: ['https://www.googleapis.com/auth/spreadsheets.readonly'],
-  });
-
-  return google.sheets({ version: 'v4', auth });
+  return google.sheets({ version: 'v4', auth: apiKey });
 }
 
 /**
  * Fetch data from a Google Sheet
  * @param {string} spreadsheetId - The Google Sheets spreadsheet ID
- * @param {string} range - The range to fetch (e.g., 'Sheet1!A1:D10') or gid for public sheets
+ * @param {string} range - The range to fetch (e.g., 'Sheet1!A1:D10')
  * @param {object} options - Additional options
  * @param {number} options.ttl - Cache TTL in milliseconds
  * @param {boolean} options.useCache - Whether to use cache (default: true)
  * @param {boolean} options.headerRow - Whether first row is headers (default: true)
- * @param {string} options.gid - Sheet GID for public sheets (default: '0')
- * @param {boolean} options.usePublic - Force public CSV fetch (default: true if no auth configured)
  * @param {number} options.skipRows - Number of rows to skip before header row (default: 0)
  * @returns {Promise<Array>} Array of data objects
  */
@@ -139,13 +74,10 @@ export async function fetchSheetData(spreadsheetId, range, options = {}) {
     ttl = DEFAULT_TTL,
     useCache = true,
     headerRow = true,
-    gid = '0',
-    usePublic,
     skipRows = 0,
   } = options;
 
-  const config = useRuntimeConfig();
-  const cacheKey = `${spreadsheetId}:${range}:${gid}`;
+  const cacheKey = `${spreadsheetId}:${range}:${skipRows}`;
 
   // Check cache first
   if (useCache) {
@@ -155,46 +87,40 @@ export async function fetchSheetData(spreadsheetId, range, options = {}) {
     }
   }
 
-  // Determine if we should use public CSV fetch
-  const hasAuth = config.googleApiKey || config.googleServiceAccount || config.googleClientEmail;
-  const shouldUsePublic = usePublic !== false && !hasAuth;
-
   try {
+    const sheets = getGoogleSheetsClient();
+
+    const response = await sheets.spreadsheets.values.get({
+      spreadsheetId,
+      range,
+    });
+
+    const rows = response.data.values;
+
+    if (!rows || rows.length === 0) {
+      return [];
+    }
+
     let data;
 
-    if (shouldUsePublic) {
-      // Fetch as public CSV (no authentication needed)
-      console.log('Fetching public sheet:', spreadsheetId, 'gid:', gid, 'skipRows:', skipRows);
-      data = await fetchPublicSheet(spreadsheetId, gid, skipRows);
-    } else {
-      // Use Google Sheets API with authentication
-      const sheets = getGoogleSheetsClient();
-
-      const response = await sheets.spreadsheets.values.get({
-        spreadsheetId,
-        range,
-      });
-
-      const rows = response.data.values;
-
-      if (!rows || rows.length === 0) {
+    if (headerRow) {
+      // Skip the specified number of rows, then use the next row as headers
+      const headerIndex = skipRows;
+      if (headerIndex >= rows.length) {
         return [];
       }
 
-      if (headerRow) {
-        // First row is headers
-        const headers = rows[0];
-        data = rows.slice(1).map(row => {
-          const obj = {};
-          headers.forEach((header, index) => {
-            obj[header] = row[index] || '';
-          });
-          return obj;
+      const headers = rows[headerIndex];
+      data = rows.slice(headerIndex + 1).map(row => {
+        const obj = {};
+        headers.forEach((header, index) => {
+          obj[header] = row[index] || '';
         });
-      } else {
-        // Return raw rows
-        data = rows;
-      }
+        return obj;
+      });
+    } else {
+      // Return raw rows (skip the specified number of rows first)
+      data = rows.slice(skipRows);
     }
 
     // Cache the results
