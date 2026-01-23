@@ -502,6 +502,14 @@ useSeoMeta({
         <button class="cta-button" @click="redirectWithParams('https://insure.protect.com', { vehicle1make: formattedMake.toUpperCase(), vehicle1model: formattedModel.toUpperCase() })">Get Your Free Quote</button>
       </b-container>
     </section>
+
+    <div class="rates-disclaimer">
+      <b-container>
+        <p>
+          Rates shown are for a 30-year-old male with full coverage and a clean driving record in 2025. Your actual costs will vary based on your vehicle's trim, modifications, and driving history.
+        </p>
+      </b-container>
+    </div>
   </div>
 </template>
 
@@ -884,6 +892,21 @@ useSeoMeta({
       font-size: 1.25rem;
       margin-bottom: 2rem;
       color: white;
+    }
+
+  }
+
+  .rates-disclaimer {
+    padding: 1.5rem 0;
+    text-align: center;
+
+    p {
+      font-size: 0.85rem;
+      color: $gray-dark;
+      margin-bottom: 0;
+      max-width: 800px;
+      margin-left: auto;
+      margin-right: auto;
     }
   }
 }

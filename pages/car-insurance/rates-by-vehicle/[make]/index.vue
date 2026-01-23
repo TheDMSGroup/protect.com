@@ -148,30 +148,6 @@ useSeoMeta({
       </b-container>
     </section>
 
-    <section class="about-make">
-      <b-container>
-        <b-row align-v="center">
-          <b-col cols="12" md="8">
-            <h2>About {{ formattedMake }}</h2>
-            <p>{{ makeDescription }}</p>
-          </b-col>
-          <b-col v-if="!logoError" cols="12" md="4" class="text-center d-none d-md-block">
-            <NuxtImg
-              :src="makeLogo"
-              :alt="`${formattedMake} logo`"
-              class="about-logo"
-              format="webp"
-              quality="80"
-              loading="lazy"
-              :width="200"
-              fit="inside"
-              :modifiers="{ fit: 'inside' }"
-            />
-          </b-col>
-        </b-row>
-      </b-container>
-    </section>
-
     <section class="models-section">
       <b-container>
         <div class="section-header">
@@ -223,13 +199,37 @@ useSeoMeta({
                   <div class="price-value">${{ model.minimum_coverage_annual }}</div>
                 </div>
               </div>
-              <span class="learn-more">Learn more →</span>
+              <span class="learn-more">Get Model Rates →</span>
             </div>
           </NuxtLink>
         </div>
         <div v-else class="no-models">
           <p>No models found for {{ formattedMake }}. Check back soon!</p>
         </div>
+      </b-container>
+    </section>
+
+    <section class="about-make">
+      <b-container>
+        <b-row align-v="center">
+          <b-col cols="12" md="8">
+            <h2>About {{ formattedMake }}</h2>
+            <p>{{ makeDescription }}</p>
+          </b-col>
+          <b-col v-if="!logoError" cols="12" md="4" class="text-center d-none d-md-block">
+            <NuxtImg
+              :src="makeLogo"
+              :alt="`${formattedMake} logo`"
+              class="about-logo"
+              format="webp"
+              quality="80"
+              loading="lazy"
+              :width="200"
+              fit="inside"
+              :modifiers="{ fit: 'inside' }"
+            />
+          </b-col>
+        </b-row>
       </b-container>
     </section>
 
