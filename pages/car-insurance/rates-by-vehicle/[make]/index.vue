@@ -103,6 +103,14 @@ const formatModelName = (model) => {
     .join("-");
 };
 
+// Dropdown options for SelectDropdown component
+const modelDropdownOptions = computed(() => {
+  return models.value.map((model) => ({
+    label: model.model || formatModelName(model.model_slug),
+    to: `/car-insurance/rates-by-vehicle/${make}/${model.model_slug}`,
+  }));
+});
+
 // Make logo
 const makeLogo = computed(() => getMakeLogoPath(make));
 const logoError = ref(false);
@@ -153,6 +161,10 @@ useSeoMeta({
         <div class="section-header">
           <h2>Car Insurance for {{ formattedMake }}: By Model</h2>
           <p>Compare insurance costs and coverage options for popular {{ formattedMake }} models</p>
+        </div>
+
+        <div v-if="models.length > 0" class="models-filter">
+          <SelectDropdown title="Select Model" :options="modelDropdownOptions" />
         </div>
 
         <div v-if="models.length > 0" class="models-grid">
@@ -400,6 +412,16 @@ useSeoMeta({
 
   .models-section {
     padding: 60px 0;
+  }
+
+  .models-filter {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 2rem;
+
+    @include media-breakpoint-down(sm) {
+      width: 100%;
+    }
   }
 
   .section-header {

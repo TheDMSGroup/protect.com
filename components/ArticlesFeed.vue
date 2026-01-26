@@ -20,14 +20,13 @@
   //dropdown
   const store = useStore();
   const categories = store.articles.categories || [];
-  const userFilterSelectionSubvertical = ref("");
 
-  //show tags
-  const showTagsDropdown = ref(false);
-
-  // filter arrow position
-  const selectCategoriesArrowPosition = computed(() => {
-    return showTagsDropdown.value ? "up" : "down";
+  // Dropdown options for SelectDropdown component
+  const categoryDropdownOptions = computed(() => {
+    return categories.map((category) => ({
+      label: category.name,
+      to: `/articles/${props.vertical}/${category.value}`,
+    }));
   });
 
   //category output - computed to be reactive to subvertical changes
@@ -36,15 +35,6 @@
     const currentCategory = categories.find((cat) => cat.value === props.subvertical);
     return currentCategory?.name || "";
   });
-
-  const toggleTagsDropdown = () => {
-    showTagsDropdown.value = !showTagsDropdown.value;
-  };
-
-  const resetTags = async () => {
-    userFilterSelectionSubvertical.value = "";
-    page.value = 1;
-  };
 
   //static value of how many articles to show per page
   const filterLength = 8;
@@ -103,32 +93,7 @@
           <span v-if="props.articles">Showing results {{ paginationStart + 1 }} to {{ paginationEnd }} of {{ props.articles.length }}</span>
         </span>
         <div class="right-dropdown">
-          <div class="select-wrapper">
-            <div class="select-header">
-              <span class="select-title" @click="toggleTagsDropdown">Select Category</span>
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18.32 10.74" :class="selectCategoriesArrowPosition" @click="toggleTagsDropdown">
-                <g>
-                  <g id="icons">
-                    <path
-                      class="down-arrow-gray"
-                      d="M17.7.68A2.16,2.16,0,0,0,14.62.61c-.74.67-1.48,
-                    1.36-2.2,2S10.75,4.2,9.9,5l-.72.65,0,0-.3-.25L8.42,5,7,3.67c-1.08-1-2.2-2-3.32-3.06A2.16,
-                    2.16,0,0,0,.62.68,2.16,2.16,0,0,0,.71,3.8c2.41,2.26,4.65,4.33,6.85,6.32a2.56,2.56,0,0,0,
-                    1.23.58,2.85,2.85,0,0,0,.41,0,1.8,1.8,0,0,0,.73-.15,2.4,2.4,0,0,0,.83-.47c2.2-2,4.44-4.06,
-                    6.85-6.32A2.16,2.16,0,0,0,17.7.68Z"
-                    />
-                  </g>
-                </g>
-              </svg>
-            </div>
-            <transition name="slide-fade">
-              <div v-if="showTagsDropdown" class="category-options">
-                <div v-for="category in categories" :key="category.value" :value="category.value" class="category">
-                  <NuxtLink class="category-link" :to="`/articles/${vertical}/${category.value}`">{{ category.name }}</NuxtLink>
-                </div>
-              </div>
-            </transition>
-          </div>
+          <SelectDropdown title="Select Category" :options="categoryDropdownOptions" />
         </div>
       </div>
     </div>
@@ -231,217 +196,8 @@
         }
 
         .right-dropdown {
-          position: relative;
-
           @include media-breakpoint-down(sm) {
             width: 100%;
-          }
-
-          .select-wrapper {
-            min-width: 260px;
-            position: absolute;
-            right: 0;
-            z-index: 1;
-
-            @include media-breakpoint-down(sm) {
-              position: relative;
-              right: 0;
-              width: 100%;
-            }
-
-            @include media-breakpoint-down(xs) {
-              width: 100%;
-            }
-
-            .select-header {
-              display: flex;
-              justify-content: space-between;
-              align-items: center;
-              margin-bottom: 0.5em;
-              height: 25px;
-
-              @include media-breakpoint-down(xs) {
-                padding: 0 1em;
-              }
-
-              .select-title {
-                cursor: pointer;
-                display: block;
-                color: $blue;
-                font-weight: 600;
-                padding-left: 10px;
-                flex: 1;
-                &:hover {
-                  cursor: pointer;
-                }
-
-                @include media-breakpoint-down(sm) {
-                  padding: 0;
-                }
-              }
-
-              .down {
-                fill: #999999;
-                width: 15px;
-                cursor: pointer;
-              }
-
-              .up {
-                fill: #999999;
-                width: 15px;
-                cursor: pointer;
-                transform: rotate(180deg);
-              }
-
-              svg {
-                @include media-breakpoint-down(sm) {
-                  position: relative;
-                  right: -10px;
-                }
-
-                @include media-breakpoint-down(xs) {
-                  margin-right: 10px;
-                }
-              }
-            }
-
-            .category-options {
-              display: flex;
-              flex-direction: column;
-              width: initial;
-              border-left: 1px solid #ced4d9;
-              border-right: 1px solid #ced4d9;
-              border-top: 1px solid $blue;
-              border-bottom: 1px solid #ced4d9;
-
-              @include media-breakpoint-down(xs) {
-                border-right: 0;
-                border-left: 0;
-              }
-
-              div {
-                background-color: $white;
-                border: 0;
-                text-align: left;
-                border-bottom: 1px solid #ced4d9;
-                padding: 0 10px;
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                position: relative;
-                outline: 0;
-
-                @include media-breakpoint-down(xs) {
-                  padding: 0 1em;
-                  background-color: #f7faff;
-                }
-
-                &:last-child {
-                  border-bottom: 0;
-                }
-
-                label {
-                  padding: 10px 0;
-                  margin: 0;
-                  width: 100%;
-                  cursor: pointer;
-                }
-
-                .radio-box {
-                  border-left: 1px solid #ced4d9;
-                  padding: 0 0 0 8px;
-                  position: absolute;
-                  right: 10px;
-                  height: 44px;
-                  display: none;
-                  align-items: center;
-                  cursor: initial;
-                  top: 0;
-
-                  @include media-breakpoint-down(xs) {
-                    border-left: 0;
-                    padding-right: 1em;
-                  }
-
-                  input[type="radio"] {
-                    opacity: 1;
-
-                    &:checked {
-                      &:after {
-                        width: 15px;
-                        height: 15px;
-                        border-radius: 15px;
-                        top: -2px;
-                        left: -1px;
-                        position: relative;
-                        background-color: $blue;
-                        content: "";
-                        display: inline-block;
-                        visibility: visible;
-                        border: 1px solid $gray;
-                      }
-                    }
-
-                    &:after {
-                      width: 100px;
-                      height: 44px;
-                    }
-                  }
-                }
-              }
-            }
-
-            .update {
-              font-weight: 600;
-              border-left: 1px solid #ced4d9;
-              border-right: 1px solid #ced4d9;
-              border-bottom: 1px solid #ced4d9;
-              padding: 10px;
-              display: flex;
-              justify-content: space-between;
-              align-items: center;
-              background-color: $white;
-
-              @include media-breakpoint-down(xs) {
-                border: 0;
-                background-color: #f7faff;
-                width: 100%;
-                display: block;
-                padding: 1em;
-              }
-
-              .search-update-results {
-                display: block;
-                position: relative;
-
-                .update-results-button {
-                  display: block;
-                  position: relative;
-
-                  button {
-                    font-weight: 600;
-
-                    @include media-breakpoint-down(xs) {
-                      width: 100%;
-                      background-color: transparent;
-                      color: $green;
-                      border: 2px solid $green;
-                    }
-                  }
-                }
-              }
-
-              .reset {
-                font-weight: 600;
-                margin-right: 1.5em;
-                font-size: 0.875em;
-                cursor: pointer;
-
-                @include media-breakpoint-down(xs) {
-                  display: none;
-                }
-              }
-            }
           }
         }
       }
@@ -511,16 +267,4 @@
     }
   }
 
-  .category-link {
-    cursor: pointer;
-    color: $blue-light;
-    display: block;
-    padding: 10px 0;
-    width: 100%;
-
-    &:hover {
-      background-color: #f8f9fa;
-      color: $blue;
-    }
-  }
 </style>
