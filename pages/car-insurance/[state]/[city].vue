@@ -398,6 +398,10 @@
 <script setup>
   import { useStore } from "@/stores/store";
 
+  definePageMeta({
+    middleware: "city-validation",
+  });
+
   const route = useRoute();
   const stateNameSlug = route.params.state;
   const cityNameSlug = route.params.city;
