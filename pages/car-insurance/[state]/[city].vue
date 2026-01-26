@@ -691,6 +691,10 @@
   section {
     padding: 60px 0;
 
+    @include mobile {
+      padding: 40px 0;
+    }
+
     .compare-btn {
       background: #007a5f;
       color: white;
@@ -1077,6 +1081,10 @@
     border-radius: 16px;
     text-align: center;
     box-shadow: 0 8px 24px rgba(12, 44, 103, 0.15);
+
+    @include mobile {
+      padding: 32px 20px;
+    }
 
     img {
       width: 41px;
