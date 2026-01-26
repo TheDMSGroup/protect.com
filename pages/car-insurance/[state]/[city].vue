@@ -720,6 +720,10 @@
     padding: 60px 0;
     background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
 
+    @include mobile {
+      padding: 40px 0;
+    }
+
     .hero-content {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -805,7 +809,8 @@
       height: 100%;
 
       @include mobile {
-        padding: 20px 0;
+        padding: 0;
+        justify-content: flex-start;
       }
     }
 
