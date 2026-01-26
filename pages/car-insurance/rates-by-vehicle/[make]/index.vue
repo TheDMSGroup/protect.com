@@ -1,6 +1,7 @@
 <script setup>
 import { isValidMake, getMakeName, getVehicleImagePath, getMakeLogoPath } from "~/data/vehicles";
 import { redirectWithParams } from "@/composables/utils.js";
+import { extractFaqsFromData } from "@/composables/useFaq.js";
 
 const route = useRoute();
 const make = route.params.make;
@@ -38,44 +39,12 @@ const makeDescription = computed(() => {
   return makeData.value?.['make_description'] || '';
 });
 
-// Custom FAQs from spreadsheet
-const defaultFaqs = computed(() => {
-  // Check if spreadsheet has custom FAQs (using faq_question_1 and faq_answer_1 format)
-  const hasCustomFaqs = makeData.value?.['faq_question_1'] && makeData.value?.['faq_answer_1'];
+// FAQs - use custom from spreadsheet or fallback to defaults
+const displayFaqs = computed(() => {
+  const customFaqs = extractFaqsFromData(makeData.value);
+  if (customFaqs) return customFaqs;
 
-  if (hasCustomFaqs) {
-    const customFaqs = [
-      {
-        question: makeData.value['faq_question_1'],
-        answer: makeData.value['faq_answer_1'],
-      }
-    ];
-
-    if (makeData.value['faq_question_2'] && makeData.value['faq_answer_2']) {
-      customFaqs.push({
-        question: makeData.value['faq_question_2'],
-        answer: makeData.value['faq_answer_2'],
-      });
-    }
-
-    if (makeData.value['faq_question_3'] && makeData.value['faq_answer_3']) {
-      customFaqs.push({
-        question: makeData.value['faq_question_3'],
-        answer: makeData.value['faq_answer_3'],
-      });
-    }
-
-    if (makeData.value['faq_question_4'] && makeData.value['faq_answer_4']) {
-      customFaqs.push({
-        question: makeData.value['faq_question_4'],
-        answer: makeData.value['faq_answer_4'],
-      });
-    }
-
-    return customFaqs;
-  }
-
-  // Return default FAQs if no custom FAQs in spreadsheet
+  // Default FAQs if no custom FAQs in spreadsheet
   return [
     {
       question: `How much does ${formattedMake.value} insurance cost?`,
@@ -305,7 +274,7 @@ useSeoMeta({
           <h2>Frequently Asked Questions</h2>
         </div>
 
-        <FaqAccordion :faqs="defaultFaqs" />
+        <FaqAccordion :faqs="displayFaqs" />
       </b-container>
     </section>
 
