@@ -16,26 +16,18 @@ export const useCarInsuranceRateComparison = (monthlyRate, annualRate) => {
     return comparisonStatus.ABOVE_AVERAGE;
   };
 
+  const comparisonText = `${isBelowAverage(
+    annualRate,
+    annualAverage
+  )} U.S Average`;
+
   return {
     averageAnnual: annualAverage,
     averageMonthly: monthlyAverage,
     comparison: {
-      annual: {
-        value: annualRate ? annualAverage - annualRate : null,
-        comparisonStatus: isBelowAverage(annualRate, annualAverage),
-        text: `${isBelowAverage(annualRate, annualAverage)} Average`.replace(
-          "at",
-          ""
-        ),
-      },
-      monthly: {
-        value: monthlyRate ? monthlyAverage - monthlyRate : null,
-        comparisonStatus: isBelowAverage(monthlyRate, monthlyAverage),
-        text: `${isBelowAverage(monthlyRate, monthlyAverage)} Average`.replace(
-          "at",
-          ""
-        ),
-      },
+      value: annualRate ? annualAverage - annualRate : null,
+      comparisonStatus: isBelowAverage(annualRate, annualAverage),
+      text: comparisonText,
     },
   };
 };

@@ -80,60 +80,54 @@
             >
               Compare Quotes
             </button>
+            <div class="rate-output-text">
+              <p v-if="rateComparison.comparison.comparisonStatus === 'above'">
+                <strong>💡 Good News:</strong> Despite higher area rates, you
+                can still find competitive prices. Compare quotes now to unlock
+                your best rate!
+              </p>
+              <p
+                v-else-if="
+                  rateComparison.comparison.comparisonStatus === 'below'
+                "
+              >
+                <strong>💰 Save Big:</strong> {{ cityName }} drivers are already
+                enjoying lower rates. Get your personalized quote and start
+                saving today!
+              </p>
+              <p v-else>
+                <strong>🎯 Hidden Savings:</strong> Average rates don't mean
+                average savings. Compare quotes to discover how much you could
+                be saving!
+              </p>
+            </div>
           </div>
           <div class="hero-visual">
             <div class="hero-facts-grid">
               <div class="fact-card rate">
                 <h2>${{ coverageRateAnnual }}</h2>
-                <p>Average Annual Cost</p>
+                <p>Average {{ cityName }} Annual Cost</p>
                 <span
-                  :class="`${rateComparison.comparison.annual.comparisonStatus}-average`"
+                  :class="`${rateComparison.comparison.comparisonStatus}-average`"
                 >
-                  {{ capitalize(rateComparison.comparison.annual.text) }}
+                  {{ capitalize(rateComparison.comparison.text) }}
                 </span>
               </div>
 
               <div class="fact-card rate">
                 <h2>${{ coverageRateMonthly }}</h2>
-                <p>Average Monthly Cost</p>
-                <span
-                  :class="`${rateComparison.comparison.monthly.comparisonStatus}-average`"
-                >
-                  {{ capitalize(rateComparison.comparison.monthly.text) }}
-                </span>
+                <p>Average {{ cityName }} Monthly Cost</p>
               </div>
 
               <div class="fact-card">
                 <h2>{{ stateFaultType }}</h2>
-                <p>State Type</p>
+                <p>{{ stateName }} Fault Type</p>
               </div>
 
               <div class="fact-card">
                 <h2>{{ stateMinCoverage }}</h2>
-                <p>Min. Coverage</p>
+                <p>{{ stateName }} Min. Coverage</p>
               </div>
-            </div>
-            <div class="rate-output-text">
-              <p
-                v-if="
-                  rateComparison.comparison.annual.comparisonStatus === 'above'
-                "
-              >
-                High rates in your area don't have to mean high prices. Our tool
-                can help you find the best rate available.
-              </p>
-              <p
-                v-else-if="
-                  rateComparison.comparison.annual.comparisonStatus === 'below'
-                "
-              >
-                Low prices in your area are waiting. Use our tool to find your
-                personalized rate today.
-              </p>
-              <p v-else>
-                Your area has average rates, but you could still save. Compare
-                quotes to ensure you're getting the best deal.
-              </p>
             </div>
           </div>
         </div>
@@ -144,7 +138,7 @@
     <!-- How to Save Money Section -->
     <section class="savings-tips">
       <div class="container">
-        <h2>How to Save Money on Auto Insurance in {{ cityName }}</h2>
+        <h2>How to Save Money on Car Insurance in {{ cityName }}</h2>
         <p>Expert tips to reduce your insurance premiums</p>
 
         <div class="tips-grid">
@@ -320,7 +314,7 @@
     <section class="how-it-works">
       <div class="container">
         <h2>How Protect.com Works</h2>
-        <p>Get the best auto insurance quotes in just three simple steps</p>
+        <p>Get the best car insurance quotes in just three simple steps</p>
 
         <div class="steps">
           <div class="step">
@@ -737,6 +731,11 @@
         gap: 30px;
         text-align: center;
       }
+
+      .compare-btn {
+        max-width: 480px;
+        width: 100%;
+      }
     }
 
     .hero-text {
@@ -769,20 +768,17 @@
         gap: 12px;
         margin-bottom: 32px;
 
+        @include mobile {
+          max-width: 75%;
+          margin: 0 auto 30px auto;
+        }
+
         .feature-item {
           display: flex;
           align-items: center;
           gap: 12px;
           color: #475569;
           font-size: 16px;
-
-          @include tablet {
-            justify-content: center;
-          }
-
-          @include mobile {
-            justify-content: center;
-          }
 
           svg {
             color: $green;
@@ -798,24 +794,29 @@
       justify-content: center;
       align-items: flex-start;
       padding: 20px;
+      height: 100%;
+
+      @include mobile {
+        padding: 20px 0;
+      }
     }
 
     .hero-facts-grid {
-      position: relative;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
       width: 100%;
       max-width: 600px;
-      min-height: 420px;
-      margin-top: 50px;
+      height: 90%;
 
       @include mobile {
         max-width: 100%;
-        display: flex;
-        flex-wrap: wrap;
-        gap: 2%;
+        grid-template-columns: 1fr;
+        gap: 16px;
+        margin-top: 0;
       }
 
       .fact-card {
-        position: absolute;
         background: white;
         padding: 28px 24px;
         border-radius: 12px;
@@ -823,35 +824,11 @@
         border: 2px solid #e5e7eb;
         transition: all 0.3s ease;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-        width: 260px;
-        height: auto;
-
-        @include desktop {
-          min-height: 165px;
-          &:nth-child(1) {
-            top: 0;
-            left: 30px;
-            z-index: 4;
-          }
-
-          &:nth-child(2) {
-            top: 60px;
-            right: -20px;
-            z-index: 3;
-          }
-
-          &:nth-child(3) {
-            top: 150px;
-            left: 0;
-            z-index: 1;
-          }
-
-          &:nth-child(4) {
-            top: 220px;
-            right: 0px;
-            z-index: 2;
-          }
-        }
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        min-height: 165px;
 
         h2 {
           font-family: inherit;
@@ -866,23 +843,14 @@
         }
 
         @include mobile {
-          width: 100%;
           padding: 24px 20px;
-          position: relative;
-          top: 0;
-          right: 0;
-          margin: 20px auto;
-          min-width: 48%;
-          flex: 1 1 48%;
-          gap: 2%;
           min-height: auto;
         }
 
         &:hover {
           border-color: $blue-light;
-          transform: translateY(-4px) scale(1.02);
+          transform: translateY(-4px);
           box-shadow: 0 12px 24px rgba(12, 44, 103, 0.15);
-          z-index: 10;
         }
 
         h3 {
@@ -897,6 +865,8 @@
           color: #6b7280;
           font-weight: 500;
           margin-bottom: 8px;
+          max-width: 157px;
+          margin: 0 auto;
         }
       }
     }
@@ -905,66 +875,38 @@
       margin-top: 24px;
       background: linear-gradient(
         135deg,
-        rgba(59, 130, 246, 0.08) 0%,
-        rgba(96, 165, 250, 0.08) 100%
+        rgba(59, 130, 246, 0.15) 0%,
+        rgba(59, 130, 246, 0.08) 100%
       );
-      border: 1px solid rgba(59, 130, 246, 0.2);
+      color: darken(#2563eb, 15%);
+      border: 2px solid #3b82f6;
       border-radius: 12px;
-      padding: 16px 20px 16px 48px;
+      padding: 18px 24px;
       position: relative;
-      box-shadow: 0 2px 8px rgba(59, 130, 246, 0.08);
-      max-width: 600px;
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+      max-width: 480px;
       width: 100%;
 
       @include mobile {
         margin-top: 32px;
-        padding: 16px 16px 16px 44px;
-      }
-
-      &::before {
-        content: "";
-        position: absolute;
-        left: 16px;
-        top: 50%;
-        transform: translateY(-50%);
-        width: 20px;
-        height: 20px;
-        background-image: url('data:image/svg+xml;utf8,<svg width="20" height="20" viewBox="0 0 24 24" fill="%232563eb" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>');
-        background-size: contain;
-        background-repeat: no-repeat;
-        background-position: center;
+        padding: 16px 20px;
       }
 
       p {
         margin: 0;
-        font-size: 14px;
-        line-height: 1.6;
-        color: #1e40af;
+        font-size: 15px;
+        line-height: 1.5;
+        color: darken(#2563eb, 20%);
         font-weight: 500;
+
+        strong {
+          font-weight: 700;
+          font-size: 16px;
+          display: block;
+          margin-bottom: 4px;
+          color: darken(#2563eb, 25%);
+        }
       }
-    }
-  }
-
-  .cta-button {
-    display: inline-block;
-    background: #ff6b35;
-    color: white;
-    padding: 16px 48px;
-    font-size: 18px;
-    font-weight: 600;
-    border-radius: 8px;
-    border: none;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    box-shadow: 0 4px 12px rgba(255, 107, 53, 0.3);
-
-    &:hover {
-      background: #e55a2b;
-      transform: translateY(-2px);
-      box-shadow: 0 6px 16px rgba(255, 107, 53, 0.4);
-      text-decoration: none;
     }
   }
 
@@ -1013,78 +955,6 @@
     }
   }
 
-  .bottom-bar {
-    background: linear-gradient(135deg, $blue 0%, $blue-light 100%);
-    width: 100vw;
-    position: relative;
-    padding: 3rem 0;
-    margin-top: 3rem;
-
-    .container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 0 20px;
-    }
-
-    .bottom-bar-content {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 2rem;
-
-      @include mobile {
-        flex-direction: column;
-        text-align: center;
-      }
-    }
-
-    .bottom-bar-text {
-      color: $white;
-      flex: 1;
-
-      h3 {
-        font-size: 1.75rem;
-        font-weight: 700;
-        margin-bottom: 0.5rem;
-        color: $white;
-      }
-
-      p {
-        font-size: 1.125rem;
-        opacity: 0.95;
-        margin: 0;
-      }
-    }
-
-    .bottom-bar-form {
-      flex: 0 0 auto;
-      min-width: 300px;
-
-      @include mobile {
-        width: 100%;
-      }
-    }
-  }
-
-  .provider {
-    text-align: center;
-    flex: 1;
-    min-width: 200px;
-
-    img {
-      height: 40px;
-      margin: 0 auto 12px;
-    }
-
-    a {
-      display: inline-block;
-      margin: 0 8px;
-      font-size: 14px;
-      color: #0c2c67;
-      font-weight: 500;
-    }
-  }
-
   // ==================== FAST FACTS ====================
   .fast-facts {
     background: white;
@@ -1103,13 +973,6 @@
       font-size: 18px;
       margin-bottom: 40px;
     }
-  }
-
-  .facts-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 24px;
-    margin-bottom: 60px;
   }
 
   .fact-card {
@@ -1247,25 +1110,6 @@
     }
   }
 
-  // ==================== CITY CONTEXT ====================
-  .city-context {
-    background: white;
-
-    h2 {
-      font-size: 36px;
-      color: #0c2c67;
-      margin-bottom: 24px;
-      font-weight: 700;
-    }
-
-    p {
-      font-size: 18px;
-      line-height: 1.8;
-      color: #4b5563;
-      margin-bottom: 20px;
-    }
-  }
-
   // ==================== SAVINGS TIPS ====================
   .savings-tips {
     background: #f9fafb;
@@ -1339,16 +1183,6 @@
     }
   }
 
-  .tip-link {
-    color: #ff6b35;
-    font-weight: 600;
-    font-size: 16px;
-
-    &:hover {
-      color: #e55a2b;
-    }
-  }
-
   .cta-center {
     text-align: center;
   }
@@ -1369,7 +1203,7 @@
 
     @include mobile {
       flex-direction: column;
-      text-align: center;
+      padding: 20px;
     }
 
     img {
@@ -1406,33 +1240,6 @@
       text-align: center;
       margin-bottom: 48px;
       font-weight: 700;
-    }
-  }
-
-  .faq-item {
-    background: white;
-    padding: 32px;
-    margin-bottom: 16px;
-    border-radius: 12px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-    border-left: 4px solid #0c2c67;
-
-    h3 {
-      font-size: 20px;
-      color: #0c2c67;
-      margin-bottom: 16px;
-      font-weight: 600;
-    }
-
-    p {
-      font-size: 16px;
-      line-height: 1.8;
-      color: #4b5563;
-      margin-bottom: 12px;
-
-      &:last-child {
-        margin-bottom: 0;
-      }
     }
   }
 
@@ -1514,41 +1321,6 @@
       font-size: 18px;
       margin-bottom: 40px;
     }
-  }
-
-  .calculator-widget {
-    background: white;
-    padding: 40px;
-    border-radius: 16px;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
-    max-width: 700px;
-    margin: 0 auto;
-  }
-
-  .progress {
-    background: #e5e7eb;
-    height: 8px;
-    border-radius: 4px;
-    margin-bottom: 32px;
-    overflow: hidden;
-
-    &::before {
-      content: "";
-      display: block;
-      height: 100%;
-      background: linear-gradient(90deg, #0c2c67, #1a4a8a);
-      width: 0%;
-      transition: width 0.3s ease;
-    }
-  }
-
-  .calculator-placeholder {
-    text-align: center;
-    padding: 60px 20px;
-    color: #6b7280;
-    font-size: 16px;
-    border: 2px dashed #d1d5db;
-    border-radius: 8px;
   }
 
   // ==================== METHODOLOGY ====================

@@ -2,7 +2,22 @@
 export default defineNuxtConfig({
   compatibilityDate: "2025-07-15",
   devtools: { enabled: true },
-  modules: ["@nuxtjs/sitemap", "@bootstrap-vue-next/nuxt", "@nuxt/image", "@pinia/nuxt", "@nuxt/eslint", "@nuxt/scripts", "nuxt-seo-utils"],
+  modules: [
+    "@nuxtjs/sitemap",
+    "@bootstrap-vue-next/nuxt",
+    "@nuxt/image",
+    "@pinia/nuxt",
+    "@nuxt/eslint",
+    "@nuxt/scripts",
+    "nuxt-seo-utils",
+  ],
+  experimental: {
+    defaults: {
+      nuxtLink: {
+        trailingSlash: "remove",
+      },
+    },
+  },
   bootstrapVueNext: {
     css: false, // Disable automatic Bootstrap CSS import - we import only what we need in main.scss
   },
@@ -32,7 +47,8 @@ export default defineNuxtConfig({
       meta: [
         {
           name: "description",
-          content: "Compare car, home, renters, and health insurance quotes from top providers. Save money with Protect.com's free comparison tool.",
+          content:
+            "Compare car, home, renters, and health insurance quotes from top providers. Save money with Protect.com's free comparison tool.",
         },
         {
           name: "keywords",
@@ -43,13 +59,20 @@ export default defineNuxtConfig({
         { property: "og:type", content: "website" },
         { property: "og:url", content: "https://protect.com/" },
         { property: "og:site_name", content: "Protect.com" },
-        { property: "og:image", content: "https://stage.protect.com/img/protect-share.dabdad17.jpg" },
+        {
+          property: "og:image",
+          content: "https://stage.protect.com/img/protect-share.dabdad17.jpg",
+        },
         { name: "twitter:card", content: "summary_large_image" },
         { name: "twitter:creator", content: "@ProtectDotCom" },
       ],
       link: [
         { rel: "preconnect", href: "https://fonts.googleapis.com" },
-        { rel: "preconnect", href: "https://fonts.gstatic.com", crossorigin: "" },
+        {
+          rel: "preconnect",
+          href: "https://fonts.gstatic.com",
+          crossorigin: "",
+        },
         {
           rel: "stylesheet",
           href: "https://fonts.googleapis.com/css2?family=Cantata+One&family=Nunito+Sans:wght@400;600;700&display=swap",
@@ -61,9 +84,13 @@ export default defineNuxtConfig({
   },
   runtimeConfig: {
     // Private keys (only available on server-side)
-    graphqlApiUrl: process.env.GRAPHQL_API_URL || "https://us-west-2.cdn.hygraph.com/content/ckwzg7tk528a001z4e7z0bqi0/master",
+    graphqlApiUrl:
+      process.env.GRAPHQL_API_URL ||
+      "https://us-west-2.cdn.hygraph.com/content/ckwzg7tk528a001z4e7z0bqi0/master",
     mastodonApiKey: process.env.MASTODON_API_KEY || "",
-    googleSheetsApiKey: process.env.GOOGLE_SHEETS_API_KEY || "AIzaSyDKMdKBaogjDHC7CR87SOmJx21I28hWyiI",
+    googleSheetsApiKey:
+      process.env.GOOGLE_SHEETS_API_KEY ||
+      "AIzaSyDKMdKBaogjDHC7CR87SOmJx21I28hWyiI",
     // Public keys (exposed to client-side)
     public: {
       // Add any public config here if needed
@@ -123,7 +150,8 @@ export default defineNuxtConfig({
       // HTML pages - short cache with revalidation
       "/**": {
         headers: {
-          "cache-control": "public, max-age=3600, s-maxage=86400, stale-while-revalidate=86400",
+          "cache-control":
+            "public, max-age=3600, s-maxage=86400, stale-while-revalidate=86400",
         },
       },
     },
@@ -141,7 +169,14 @@ export default defineNuxtConfig({
             @import "~/scss/_variables.scss";
           `,
           api: "modern-compiler",
-          silenceDeprecations: ["legacy-js-api", "color-functions", "global-builtin", "import", "mixed-decls", "slash-div"],
+          silenceDeprecations: [
+            "legacy-js-api",
+            "color-functions",
+            "global-builtin",
+            "import",
+            "mixed-decls",
+            "slash-div",
+          ],
           quietDeps: true,
           verbose: false,
         },
