@@ -88,12 +88,16 @@ export default defineNuxtConfig({
       process.env.GRAPHQL_API_URL ||
       "https://us-west-2.cdn.hygraph.com/content/ckwzg7tk528a001z4e7z0bqi0/master",
     mastodonApiKey: process.env.MASTODON_API_KEY || "",
-    googleSheetsApiKey:
-      process.env.GOOGLE_SHEETS_API_KEY ||
-      "AIzaSyDKMdKBaogjDHC7CR87SOmJx21I28hWyiI",
+    // Google Sheets API configuration
+    statesSpreadsheetId: "1qjb3pBf2-jVhJna5tF884OzjJaCo5LdUIy0EsCatjc4",
+    vehiclesSpreadsheetId: "1gpwj9rK5vNYeCfkdFwpdGCEgZBWGe8u27EMdVEbRlac",
+    cacheClearToken: process.env.CACHE_CLEAR_TOKEN,
+    googleSheetsApiKey: process.env.GOOGLE_SHEETS_API_KEY,
     // Public keys (exposed to client-side)
     public: {
-      // Add any public config here if needed
+      statesRange: "Sheet1!A:Z",
+      vehiclesMakesRange: "Makes!A:Z",
+      vehiclesModelsRange: "Models!A:Z",
     },
   },
   sitemap: {
