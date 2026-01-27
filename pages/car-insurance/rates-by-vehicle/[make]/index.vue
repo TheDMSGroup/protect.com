@@ -15,17 +15,17 @@ if (!isValidMake(make)) {
 
 const formattedMake = computed(() => getMakeName(make));
 
-// Fetch make data from Google Sheets
-const { data: makeData, error: makeError } = await useFetch(`/api/sheets/vehicle-makes`, {
-  query: { slug: make },
-  key: `make-${make}`,
-});
-
-// Fetch models for this make from Google Sheets
-const { data: modelsData } = await useFetch(`/api/sheets/vehicles-detail`, {
-  query: { make },
-  key: `models-${make}`,
-});
+// Fetch make data and models in parallel
+const [{ data: makeData, error: makeError }, { data: modelsData }] = await Promise.all([
+  useFetch(`/api/sheets/vehicle-makes`, {
+    query: { slug: make },
+    key: `make-${make}`,
+  }),
+  useFetch(`/api/sheets/vehicles-detail`, {
+    query: { make },
+    key: `models-${make}`,
+  }),
+]);
 
 // Extract model data from the fetched data
 const models = computed(() => {

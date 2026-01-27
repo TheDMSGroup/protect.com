@@ -16,11 +16,17 @@ if (!isValidMake(make) || !isValidModel(make, model)) {
 
 const formattedMake = computed(() => getMakeName(make));
 
-// Fetch model data from Google Sheets first so we can use it in formattedModel
-const { data: modelData } = await useFetch(`/api/sheets/vehicles-detail`, {
-  query: { make, model },
-  key: `model-${make}-${model}`,
-});
+// Fetch model data and all models for this make in parallel
+const [{ data: modelData }, { data: allModelsData }] = await Promise.all([
+  useFetch(`/api/sheets/vehicles-detail`, {
+    query: { make, model },
+    key: `model-${make}-${model}`,
+  }),
+  useFetch(`/api/sheets/vehicles-detail`, {
+    query: { make },
+    key: `all-models-${make}`,
+  }),
+]);
 
 const formattedModel = computed(() => {
   // Use the 'model' column from spreadsheet if available, otherwise format the slug
@@ -53,12 +59,6 @@ const logoError = ref(false);
 const onLogoError = () => {
   logoError.value = true;
 };
-
-// Fetch all models for this make to get display names
-const { data: allModelsData } = await useFetch(`/api/sheets/vehicles-detail`, {
-  query: { make },
-  key: `all-models-${make}`,
-});
 
 const otherModels = computed(() => {
   // Only show models that exist in the spreadsheet
