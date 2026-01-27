@@ -705,8 +705,8 @@
         }
 
         .chevron {
-          width: 16px;
-          height: 16px;
+          width: 22px;
+          height: 22px;
           transition: transform 0.3s ease;
           color: $blue;
           cursor: pointer;
