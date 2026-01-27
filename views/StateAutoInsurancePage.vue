@@ -123,7 +123,7 @@
     }
 
     console.log(props.topic);
-    console.log("props?", props);
+    console.log("props", props);
     const normalizedTopic = props.topic.toLowerCase().replace(/[-\s]/g, "");
     const stateStatInfo = stateInsuranceStats.value.filter((state) => {
       const stateName = state.State || state.state;
