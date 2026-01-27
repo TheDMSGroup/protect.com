@@ -3,14 +3,63 @@
  * Used for validation and page generation
  */
 
+// Default year for vehicle images
+export const DEFAULT_VEHICLE_YEAR = "2026";
+
 export const vehicles = {
   // acura: {
   //   name: "Acura",
   //   models: ["integra", "mdx", "rdx", "tlx", "ilx"],
   // },
-  honda: {
-    name: "Honda",
-    models: ["accord", "civic", "cr-v", "pilot"],
+  // honda: {
+  //   name: "Honda",
+  //   models: ["accord", "civic", "cr-v", "pilot"],
+  // },
+  ford: {
+    name: "Ford",
+    models: [
+      "bronco",
+      "bronco-sport",
+      "edge",
+      "escape",
+      "expedition",
+      "explorer",
+      "f-150",
+      "f-250",
+      "f-350",
+      "f-450",
+      "maverick",
+      "mustang",
+      "mustang-mach-e",
+      "ranger",
+      "transit",
+      "transit-connect",
+    ],
+  },
+  toyota: {
+    name: "Toyota",
+    models: [
+      "4-runner",
+      "bz-4x",
+      "camry",
+      "corolla",
+      "corolla-cross",
+      "crown",
+      "gr-86",
+      "gr-corolla",
+      "highlander",
+      "mirai",
+      "prius",
+      "prius-prime",
+      "rav-4",
+      "rav-4-prime",
+      "sequoia",
+      "sienna",
+      "supra",
+      "tacoma",
+      "tundra",
+      "venza",
+    ],
   },
 };
 
@@ -40,4 +89,16 @@ export function getAllMakes() {
 // Get all models for a make
 export function getModelsForMake(make) {
   return vehicles[make]?.models || [];
+}
+
+// Get vehicle image path - images stored at /assets/vehicles/{year}/{make}/{model}.webp (or .png fallback)
+export function getVehicleImagePath(make, model, year = DEFAULT_VEHICLE_YEAR, format = "webp") {
+  // Remove hyphens from model slug for image filename (e.g., "bronco-sport" -> "broncosport")
+  const imageModel = model.replace(/-/g, "");
+  return `/assets/vehicles/${year}/${make}/${imageModel}.${format}`;
+}
+
+// Get make logo path - logos stored at /assets/vehicles/{year}/{make}/logo.webp (or .png fallback)
+export function getMakeLogoPath(make, year = DEFAULT_VEHICLE_YEAR, format = "webp") {
+  return `/assets/vehicles/${year}/${make}/logo.${format}`;
 }

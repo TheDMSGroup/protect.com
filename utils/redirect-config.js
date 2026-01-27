@@ -72,7 +72,7 @@ export const redirectRules = [
 ];
 
 // Car insurance sub-routes to skip state validation
-export const carInsuranceSubRoutes = ["rate-calculator", "chat-form", "mystate", "vehicles", "discounts"];
+export const carInsuranceSubRoutes = ["rate-calculator", "chat-form", "mystate", "rates-by-vehicle", "discounts"];
 
 // Paths to skip redirect processing
 export const skipPaths = [

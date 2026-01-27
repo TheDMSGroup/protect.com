@@ -3,6 +3,9 @@ import { states } from "~/utils/redirect-config";
 const formatLocationNameForMatch = (name) =>
   name.toLowerCase().replaceAll(/\s+/g, "");
 
+const formatCitySlugForMatch = (slug) =>
+  slug.toLowerCase().replaceAll("-", "").replaceAll(/\s+/g, "");
+
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig();
 
@@ -43,8 +46,7 @@ export default defineEventHandler(async (event) => {
     // console.log("Google Sheets Response:", response.values);
 
     // Parse the data
-    const rows = response.values.slice(1);
-
+    const rows = response.values;
     // Convert to array of objects
     const data = rows.map((row) => {
       return {
@@ -67,15 +69,17 @@ export default defineEventHandler(async (event) => {
         cityPosition: row[27],
       };
     });
-
     // const filteredData = data.filter((item) => formatLocationNameForMatch(item.name) === city && state === matchedState?.slug);
     const filteredData = data
-      .filter(
-        (item) =>
-          formatLocationNameForMatch(item.name) === city &&
+      .filter((item) => {
+        const cityMatch =
+          formatLocationNameForMatch(item.name) ===
+          formatCitySlugForMatch(city);
+        const stateMatch =
           item.stateCode.toLowerCase() ===
-            matchedState?.abbreviation.toLowerCase()
-      )
+          matchedState?.abbreviation.toLowerCase();
+        return cityMatch && stateMatch;
+      })
       .map((item) => ({
         ...item,
         stateName: matchedState?.name || "",

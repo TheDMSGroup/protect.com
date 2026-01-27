@@ -1,5 +1,5 @@
 <template>
-  <div :class="{'hero-right': true, [stateData.stateAbbreviation.toLowerCase()]: true}"
+  <div :class="{'hero-right': true, [stateData?.stateAbbreviation?.toLowerCase() || '']: true}"
     :style="{
       backgroundImage: `url(${svgPath})`,
       backgroundRepeat: 'no-repeat',
