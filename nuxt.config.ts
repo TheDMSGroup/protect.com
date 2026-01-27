@@ -66,8 +66,8 @@ export default defineNuxtConfig({
     // Google Sheets API configuration
     statesSpreadsheetId: "1qjb3pBf2-jVhJna5tF884OzjJaCo5LdUIy0EsCatjc4",
     vehiclesSpreadsheetId: "1gpwj9rK5vNYeCfkdFwpdGCEgZBWGe8u27EMdVEbRlac",
-    cacheClearToken: process.env.CACHE_CLEAR_TOKEN,
-    googleSheetsApiKey: process.env.GOOGLE_SHEETS_API_KEY,
+    cacheClearToken: process.env.CACHE_CLEAR_TOKEN || "h1FKdV/8ZDlXVDkbKNEcP7QNxCYB4Q4bc8T6tjDOqh0=",
+    googleSheetsApiKey: process.env.GOOGLE_SHEETS_API_KEY || "AIzaSyB3Kx7qlcuuX4HxgugR64o0XcNa-6M6hhc",
     // Public keys (exposed to client-side)
     public: {
       statesRange: "Sheet1!A:Z",
