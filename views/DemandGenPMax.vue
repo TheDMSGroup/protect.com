@@ -104,34 +104,43 @@
     <!-- Trust Bar / Insurance Brands -->
     <section class="dg-trust-bar">
       <div class="container">
-        <h2 class="subhead text-center">
+        <p class="subhead text-center">
           We work with 100+ companies to find the best match for you
-        </h2>
-        <InsuranceBrands :providers-config="insuranceBrands"> </InsuranceBrands>
+        </p>
+        <InsuranceBrands :providers-config="insuranceBrands" />
       </div>
     </section>
 
     <!-- Value Proposition Section (Light Background) -->
     <section class="dg-light-section dg-value-props">
       <div class="container">
+        <div class="dg-value-intro text-center mb-5">
+          <h2>No Headaches, Just Free Quotes</h2>
+          <p>
+            Americans overpay for car insurance by an estimated $21 billion per
+            year, let's keep some of that money in your pocket.
+          </p>
+        </div>
         <div class="dg-value-grid">
           <!-- Value Prop 1 -->
           <div class="dg-value-card">
-            <div class="dg-value-icon">🔒</div>
+            <div class="dg-value-icon">
+              <IconsIdentity />
+            </div>
             <h3>Privacy First</h3>
             <p>Your information stays secure with us.</p>
           </div>
 
           <!-- Value Prop 2 -->
           <div class="dg-value-card">
-            <div class="dg-value-icon">⚙️</div>
+            <div class="dg-value-icon"><IconsScales /></div>
             <h3>Insurance on Your Terms</h3>
             <p>You're never pressured to switch or buy.</p>
           </div>
 
           <!-- Value Prop 3 -->
           <div class="dg-value-card">
-            <div class="dg-value-icon">💰</div>
+            <div class="dg-value-icon"><IconsBank /></div>
             <h3>Instant Savings</h3>
             <p>
               Our users save as much as <strong>$940/year</strong> by switching.
@@ -145,17 +154,78 @@
     <section class="dg-dark-section">
       <div class="container">
         <div class="dg-dark-content">
-          <div class="dg-dark-text">
+          <div class="dg-dark-cards">
             <h2>Comprehensive Coverage, Simplified.</h2>
             <p>
               We've done the hard work of vetting 200+ insurance companies so
               you don't have to.
             </p>
           </div>
-          <div class="dg-dark-cards">
-            <!-- Floating quote cards would go here -->
-            <div class="dg-floating-card">Coverage Details</div>
-            <div class="dg-floating-card">Premium Info</div>
+          <!-- Hero Graphics - Brand Icons Grid -->
+          <div class="dg-hero-graphics">
+            <div class="dg-icon-grid">
+              <div class="dg-icon-card">
+                <div class="dg-icon">
+                  <img src="/assets/partners/geico-icon.gif" alt="Geico Logo" />
+                </div>
+                <div class="dg-icon-text-group">
+                  <p class="dg-icon-partner">Geico</p>
+                  <p class="dg-icon-rating">★★★★★</p>
+                </div>
+              </div>
+
+              <div class="dg-icon-card">
+                <div class="dg-icon">
+                  <img
+                    src="/assets/partners/progressive-icon.gif"
+                    alt="Progressive Logo"
+                  />
+                </div>
+                <div class="dg-icon-text-group">
+                  <p class="dg-icon-partner">Progressive</p>
+                  <p class="dg-icon-rating">★★★★★</p>
+                </div>
+              </div>
+
+              <div class="dg-icon-card">
+                <div class="dg-icon dg-icon-shield">
+                  <img
+                    src="/assets/partners/statefarm-icon.gif"
+                    alt="State Farm Icon"
+                  />
+                </div>
+                <div class="dg-icon-text-group">
+                  <p class="dg-icon-partner">State Farm</p>
+                  <p class="dg-icon-rating">★★★★★</p>
+                </div>
+              </div>
+
+              <div class="dg-icon-card">
+                <div class="dg-icon">
+                  <img
+                    src="/assets/partners/liberty-icon.gif"
+                    alt="Liberty Icon"
+                  />
+                </div>
+                <div class="dg-icon-text-group">
+                  <p class="dg-icon-partner">Liberty Mutual</p>
+                  <p class="dg-icon-rating">★★★★★</p>
+                </div>
+              </div>
+
+              <div class="dg-icon-card">
+                <div class="dg-icon">
+                  <img
+                    src="/assets/partners/nationwide-icon.gif"
+                    alt="Nationwide Logo"
+                  />
+                </div>
+                <div class="dg-icon-text-group">
+                  <p class="dg-icon-partner">Nationwide</p>
+                  <p class="dg-icon-rating">★★★★★</p>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -205,30 +275,22 @@
 </template>
 
 <script setup>
-  import { ref } from "vue";
-
-  const insuranceBrands = ref([
+  const insuranceBrands = [
     { name: "Liberty Mutual Insurance", src: "provider-liberty.png" },
     { name: "Root", src: "provider-root.png" },
     { name: "Allstate", src: "provider-allstate.png" },
     { name: "Farmers", src: "provider-farmers.png" },
     { name: "Insurify", src: "provider-insurify.png" },
-  ]);
+  ];
 </script>
 
 <style scoped lang="scss">
-  // Layout uses globally-imported variables from scss/_variables.scss
-  // $blue: #0C2C67
-  // $green: #66C296
-  // $green-accessible: #1F7A4E
-  // $white: #FFFFFF
-  // $gray-light: #F5F8F7
-  // $gray-medium: #ced4da
-  // $gray-dark: #666666
-  // $black: #000000
-
   .demand-gen-pmax {
     width: 100%;
+  }
+
+  section {
+    margin: 50px auto;
   }
 
   // ============================================
@@ -240,6 +302,15 @@
 
     @include mobile {
       padding: 2rem 0;
+    }
+    .dg-value-intro {
+      h2 {
+        margin-bottom: 2rem;
+      }
+      p {
+        max-width: 600px;
+        margin: 0 auto 1rem auto;
+      }
     }
   }
 
@@ -314,7 +385,7 @@
     align-items: center;
     gap: 0.75rem;
     animation: fadeIn 0.6s ease forwards;
-    padding: 1rem 1.25rem;
+    padding: 1rem 1.25rem 1rem 0.75rem;
     background-color: $white;
     border-radius: 16px;
     border: 2px solid rgba(12, 44, 103, 0.1);
@@ -341,11 +412,6 @@
       animation-delay: 0.3s;
       grid-row: 1 / 3;
 
-      .dg-icon-partner {
-        font-size: 0.8rem;
-        font-weight: 700;
-      }
-
       &:hover {
         border-color: rgba(12, 44, 103, 0.4);
         box-shadow: 0 12px 32px rgba(12, 44, 103, 0.15);
@@ -359,6 +425,18 @@
     &:nth-child(5) {
       animation-delay: 0.5s;
       left: 20px;
+    }
+    .dg-icon-partner {
+      color: black;
+    }
+    .dg-icon-rating {
+      color: $green;
+    }
+    .dg-icon-partner,
+    .dg-icon-rating {
+      font-size: 0.85rem;
+      font-weight: 700;
+      margin: 0;
     }
   }
 
@@ -374,7 +452,6 @@
 
     svg {
       width: 100%;
-      height: 100%;
     }
   }
 
@@ -384,46 +461,6 @@
     align-items: flex-start;
     gap: 0.15rem;
     flex: 0 0 auto;
-  }
-
-  svg {
-    width: 100%;
-    height: 100%;
-  }
-
-  .dg-icon-network {
-    background-color: #ff4848;
-  }
-
-  .dg-icon-progressive {
-    background: linear-gradient(135deg, #3b54ba 0%, #0c2c67 100%);
-  }
-
-  .dg-icon-shield {
-    background: linear-gradient(135deg, #1f7a4e 0%, #0c2c67 100%);
-  }
-
-  .dg-icon-liberty {
-    background-color: #ffd700;
-  }
-
-  .dg-icon-geico {
-    background: linear-gradient(135deg, #3b54ba 0%, #0c2c67 100%);
-  }
-
-  .dg-icon-partner {
-    font-size: 0.7rem;
-    font-weight: 700;
-    color: $black;
-    text-align: center;
-    margin: 0;
-  }
-
-  .dg-icon-rating {
-    font-size: 0.65rem;
-    color: $blue;
-    text-align: center;
-    margin: 0.25rem 0 0 0;
   }
 
   .dg-icon-label {
@@ -548,7 +585,9 @@
       font-size: 0.85rem;
     }
   }
-
+  h2 {
+    font-size: 2.15rem;
+  }
   // ============================================
   // TRUST BAR
   // ============================================
@@ -556,10 +595,6 @@
     margin-top: 3rem;
     padding: 2rem 0;
     text-align: center;
-
-    h2 {
-      font-size: 2.15rem;
-    }
 
     :deep(.brands) {
       margin: 0 auto;
@@ -624,30 +659,28 @@
   .dg-value-card {
     text-align: center;
     padding: 2rem;
-    background: linear-gradient(
-      135deg,
-      rgba(12, 44, 103, 0.08) 0%,
-      rgba(59, 84, 186, 0.12) 100%
-    );
-    border-radius: 8px;
-    transition: all 0.3s ease;
-    border: 1px solid rgba(12, 44, 103, 0.15);
-
-    &:hover {
-      box-shadow: 0 8px 20px rgba(12, 44, 103, 0.15);
-      transform: translateY(-4px);
-      background: linear-gradient(
-        135deg,
-        rgba(12, 44, 103, 0.15) 0%,
-        rgba(59, 84, 186, 0.2) 100%
-      );
-    }
   }
 
   .dg-value-icon {
     font-size: 3rem;
     margin-bottom: 1rem;
     display: block;
+
+    .elixr-icon {
+      height: 100px;
+      width: 100px;
+      fill: $blue;
+
+      :deep(.cls-1) {
+        fill: black;
+      }
+      :deep(.cls-2) {
+        opacity: 0.9;
+      }
+      :deep(.cls-2 .cls-1) {
+        fill: $blue-light;
+      }
+    }
   }
 
   .dg-value-card h3 {
@@ -669,13 +702,20 @@
   // ============================================
   .dg-dark-content {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 3rem;
+    grid-template-columns: 2fr 1fr;
+    gap: 6rem;
     align-items: center;
 
     @include tablet {
       grid-template-columns: 1fr;
       gap: 2rem;
+    }
+    h2 {
+      color: $white;
+    }
+    p:not(.dg-icon-partner):not(.dg-icon-rating) {
+      max-width: 500px;
+      color: $white;
     }
   }
 
