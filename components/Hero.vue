@@ -3,7 +3,7 @@
     <div class="container">
       <div class="hero">
         <div class="hero-left">
-            <h1>Compare home, health, and car insurance rates and start saving money today</h1>
+            <h1>Compare car, health, and home insurance rates and start saving money today</h1>
             <p>Take the stress out of finding the best insurance rates by letting us instantly shop the top home, health, and auto insurance companies for you.</p>
             <div class="compare-dropdown" v-if="action === 'rates-dropdown'">
               <CompareYourRateDropdown

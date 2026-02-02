@@ -46,7 +46,7 @@
   <div>
     <vertical-hero
       hero-image="protect_main_hero_flat.png"
-      headline="Compare home, health, and car insurance rates today"
+      headline="Compare car, home, and health insurance rates today"
       subheadline="Start saving money and take the stress out of finding the best insurance rates by letting us
       instantly shop the top home, health, and auto insurance companies for you."
       subheadline-type="small"

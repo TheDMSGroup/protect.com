@@ -65,7 +65,7 @@ useSeoMeta({
               <p class="make-description">
                 Compare insurance rates for {{ makeItem.name }} vehicles
               </p>
-              <span class="learn-more">View models &rarr;</span>
+              <span class="learn-more">View {{ makeItem.name }} Rates By Model &rarr;</span>
             </div>
           </NuxtLink>
         </div>
