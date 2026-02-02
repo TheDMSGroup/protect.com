@@ -754,7 +754,7 @@
     background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
 
     @include mobile {
-      padding: 40px 0;
+      padding: 10px 0;
     }
 
     .hero-content {
@@ -788,9 +788,17 @@
         a {
           text-decoration: underline;
           color: $gray-dark;
+
+          @include mobile {
+            font-size: 14px;
+          }
         }
         span {
           color: $gray-dark;
+
+          @include mobile {
+            font-size: 14px;
+          }
         }
       }
       h1 {
@@ -814,6 +822,13 @@
         margin-bottom: 32px;
         color: #64748b;
         line-height: 1.6;
+
+        @include mobile {
+          font-size: 16px;
+          margin-bottom: 24px;
+          max-width: 90%;
+          margin: 20px auto;
+        }
       }
 
       .hero-features {
@@ -827,12 +842,22 @@
           margin: 0 auto 30px auto;
         }
 
+        @include mobile {
+          gap: 5px;
+        }
+
         .feature-item {
           display: flex;
           align-items: center;
           gap: 12px;
           color: #475569;
           font-size: 16px;
+
+          span {
+            @include mobile {
+              font-size: 14px;
+            }
+          }
 
           svg {
             color: $green;
