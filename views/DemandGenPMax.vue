@@ -372,6 +372,8 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    background: url("/assets/states/outlines/icon-shield.png") no-repeat center
+      center / contain;
 
     @include tablet {
       display: none;
@@ -381,7 +383,7 @@
   .dg-icon-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 2rem;
+    gap: 0.75rem;
     width: 100%;
     max-width: 350px;
     align-items: center;
@@ -409,31 +411,14 @@
       transform: translateY(-4px);
     }
 
-    &:nth-child(1) {
-      animation-delay: 0.1s;
-      left: 20px;
-    }
-    &:nth-child(2) {
-      animation-delay: 0.2s;
-      left: 50px;
-    }
-    &:nth-child(3) {
-      animation-delay: 0.3s;
-      grid-row: 1 / 3;
-
-      &:hover {
-        border-color: rgba(12, 44, 103, 0.4);
-        box-shadow: 0 12px 32px rgba(12, 44, 103, 0.15);
-      }
-    }
-    &:nth-child(4) {
-      animation-delay: 0.4s;
-      left: 30px;
-      top: -60px;
+    &:hover {
+      border-color: rgba(12, 44, 103, 0.4);
+      box-shadow: 0 12px 32px rgba(12, 44, 103, 0.15);
     }
     &:nth-child(5) {
-      animation-delay: 0.5s;
-      left: 20px;
+      max-width: 200px;
+      margin: auto;
+      grid-column: 1 / -1;
     }
     .dg-icon-partner {
       color: black;
