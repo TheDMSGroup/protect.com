@@ -181,7 +181,6 @@
         </div>
       </b-container>
     </section>
-
     <section class="py-4 my-4">
       <b-container>
         <h2 class="text-center">Compare Car Insurance Quotes By State</h2>
@@ -190,6 +189,16 @@
       </b-container>
     </section>
 
+    <yellow-box-banner
+      headline="Compare Rates by Vehicle Make & Model"
+      content="See how your specific car affects your insurance rates. Get detailed information for your make and model to find the best coverage options."
+      image-alt="Ford F-150 and Toyota Camry comparison"
+      image="vehicle-comparison.png"
+      action="/car-insurance/rates-by-vehicle"
+      action-message="Find Your Vehicle"
+      image-align="right"
+      :lazy-image="true"
+    />
     <action-banner
       cta-type="zipcode-form"
       image_top="100"

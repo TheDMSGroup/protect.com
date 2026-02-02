@@ -1,10 +1,19 @@
 <script setup>
   import { redirectWithParams } from "@/composables/utils.js";
+
+  const props = defineProps({
+    initialZip: {
+      type: String,
+      default: "",
+    },
+  });
+
+  console.log("Initial Zip Prop:", props.initialZip);
   // Reactive data
   const multipleVehicles = ref(null);
   const hasIncidents = ref(null);
   const age = ref(null);
-  const zipCode = ref("");
+  const zipCode = ref(props.initialZip || "");
   const creditScore = ref("");
   const isHomeowner = ref(null);
   const detectedState = ref("");
@@ -12,6 +21,17 @@
   const showResults = ref(false);
   const calculatedRate = ref(0);
   const isCalculating = ref(false);
+
+  // Watch for changes to initialZip prop and update zipCode
+  watch(
+    () => props.initialZip,
+    (newZip) => {
+      if (newZip && !zipCode.value) {
+        zipCode.value = newZip;
+        detectState();
+      }
+    }
+  );
 
   // State insurance rates data
   const stateRates = ref({
@@ -139,7 +159,6 @@
     if (multipleVehicles.value !== null) completed++;
     if (hasIncidents.value !== null) completed++;
     if (age.value > 0) completed++;
-    console.log(zipCode.value.length, detectedState.value);
     if (zipCode.value.length === 5 && detectedState.value) completed++;
     if (creditScore.value !== "") completed++;
     if (isHomeowner.value !== null) completed++;
@@ -303,7 +322,9 @@
     <!-- Header -->
     <div class="widget-header">
       <h2 class="widget-title">Auto Insurance Rate Calculator 📱</h2>
-      <p class="widget-subtitle">Answer 6 quick questions to get your personalized estimate</p>
+      <p class="widget-subtitle">
+        Answer 6 quick questions to get your personalized estimate
+      </p>
     </div>
 
     <!-- Progress -->
@@ -324,8 +345,20 @@
                 Multiple vehicles?
               </label>
               <div class="toggle-group">
-                <button class="toggle-btn" :class="{ active: multipleVehicles === true }" @click="handleInput('multipleVehicles', true)">Yes</button>
-                <button class="toggle-btn" :class="{ active: multipleVehicles === false }" @click="handleInput('multipleVehicles', false)">No</button>
+                <button
+                  class="toggle-btn"
+                  :class="{ active: multipleVehicles === true }"
+                  @click="handleInput('multipleVehicles', true)"
+                >
+                  Yes
+                </button>
+                <button
+                  class="toggle-btn"
+                  :class="{ active: multipleVehicles === false }"
+                  @click="handleInput('multipleVehicles', false)"
+                >
+                  No
+                </button>
               </div>
             </div>
 
@@ -335,8 +368,20 @@
                 Any incidents (3 years)?
               </label>
               <div class="toggle-group">
-                <button class="toggle-btn" :class="{ active: hasIncidents === true }" @click="handleInput('hasIncidents', true)">Yes</button>
-                <button class="toggle-btn" :class="{ active: hasIncidents === false }" @click="handleInput('hasIncidents', false)">No</button>
+                <button
+                  class="toggle-btn"
+                  :class="{ active: hasIncidents === true }"
+                  @click="handleInput('hasIncidents', true)"
+                >
+                  Yes
+                </button>
+                <button
+                  class="toggle-btn"
+                  :class="{ active: hasIncidents === false }"
+                  @click="handleInput('hasIncidents', false)"
+                >
+                  No
+                </button>
               </div>
             </div>
           </div>
@@ -378,7 +423,9 @@
                     handleInput('zipCode', zipCode);
                   "
                 />
-                <span v-if="detectedState" class="state-indicator">{{ detectedState }}</span>
+                <span v-if="detectedState" class="state-indicator">{{
+                  detectedState
+                }}</span>
               </div>
             </div>
           </div>
@@ -390,7 +437,12 @@
                 <span class="question-number">5</span>
                 Credit score range
               </label>
-              <select id="credit-select" v-model="creditScore" class="compact-select" @change="handleInput('creditScore', creditScore)">
+              <select
+                id="credit-select"
+                v-model="creditScore"
+                class="compact-select"
+                @change="handleInput('creditScore', creditScore)"
+              >
                 <option value="">Select range</option>
                 <option value="excellent">Excellent (750+)</option>
                 <option value="good">Good (700-749)</option>
@@ -405,8 +457,20 @@
                 Are you a homeowner?
               </label>
               <div class="toggle-group">
-                <button class="toggle-btn" :class="{ active: isHomeowner === true }" @click="handleInput('isHomeowner', true)">Yes</button>
-                <button class="toggle-btn" :class="{ active: isHomeowner === false }" @click="handleInput('isHomeowner', false)">No</button>
+                <button
+                  class="toggle-btn"
+                  :class="{ active: isHomeowner === true }"
+                  @click="handleInput('isHomeowner', true)"
+                >
+                  Yes
+                </button>
+                <button
+                  class="toggle-btn"
+                  :class="{ active: isHomeowner === false }"
+                  @click="handleInput('isHomeowner', false)"
+                >
+                  No
+                </button>
               </div>
             </div>
           </div>
@@ -419,7 +483,11 @@
             @click="calculateRate"
           >
             <span v-if="!isCalculating">
-              {{ isFormComplete ? "Calculate My Rate" : `Complete ${6 - completedQuestions} more questions` }}
+              {{
+                isFormComplete
+                  ? "Calculate My Rate"
+                  : `Complete ${6 - completedQuestions} more questions`
+              }}
             </span>
             <span v-else class="calculating-text">
               <div class="mini-spinner" />
@@ -432,10 +500,17 @@
           <div v-if="!showResults" class="results-placeholder">
             <div class="placeholder-icon">📊</div>
             <h3>Your Rate Estimate</h3>
-            <p>Complete the questions to see your personalized insurance rate</p>
+            <p>
+              Complete the questions to see your personalized insurance rate
+            </p>
             <div class="progress-indicator">
-              <div class="progress-ring" :style="{ '--progress': progressPercentage + '%' }">
-                <span class="progress-number">{{ Math.round(progressPercentage) }}%</span>
+              <div
+                class="progress-ring"
+                :style="{ '--progress': progressPercentage + '%' }"
+              >
+                <span class="progress-number"
+                  >{{ Math.round(progressPercentage) }}%</span
+                >
               </div>
             </div>
           </div>
@@ -448,16 +523,27 @@
 
             <div class="rate-showcase">
               <div class="monthly-rate">
-                <span class="rate-range"> ${{ monthlyRangeLow }}-${{ monthlyRangeHigh }} </span>
+                <span class="rate-range">
+                  ${{ monthlyRangeLow }}-${{ monthlyRangeHigh }}
+                </span>
                 <span class="rate-period">/month</span>
               </div>
-              <div class="annual-rate">${{ annualRangeLow.toLocaleString() }}-${{ annualRangeHigh.toLocaleString() }} annually</div>
+              <div class="annual-rate">
+                ${{ annualRangeLow.toLocaleString() }}-${{
+                  annualRangeHigh.toLocaleString()
+                }}
+                annually
+              </div>
             </div>
 
             <div v-if="totalDiscount > 0" class="savings-highlight">
               <div class="savings-icon">💰</div>
               <div class="savings-text">
-                <span class="savings-amount">Save up to ${{ Math.round((baseRate * totalDiscount) / 12) }}/month</span>
+                <span class="savings-amount"
+                  >Save up to ${{
+                    Math.round((baseRate * totalDiscount) / 12)
+                  }}/month</span
+                >
                 <span class="savings-desc">with available discounts</span>
               </div>
             </div>
@@ -514,8 +600,12 @@
             </div> -->
 
             <div class="cta-section">
-              <button class="cta-primary" @click="goToQuote()">Get Official Quote</button>
-              <button class="cta-secondary" @click="resetCalculator">Start Over</button>
+              <button class="cta-primary" @click="goToQuote()">
+                Get Official Quote
+              </button>
+              <button class="cta-secondary" @click="resetCalculator">
+                Start Over
+              </button>
             </div>
           </div>
         </div>
@@ -533,7 +623,8 @@
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
     border: 1px solid #e2e8f0;
     overflow: hidden;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto",
+      sans-serif;
   }
 
   /* Header */
@@ -827,7 +918,12 @@
     width: 80px;
     height: 80px;
     border-radius: 50%;
-    background: conic-gradient(#667eea 0deg, #667eea calc(var(--progress) * 3.6deg), #e2e8f0 calc(var(--progress) * 3.6deg), #e2e8f0 360deg);
+    background: conic-gradient(
+      #667eea 0deg,
+      #667eea calc(var(--progress) * 3.6deg),
+      #e2e8f0 calc(var(--progress) * 3.6deg),
+      #e2e8f0 360deg
+    );
     display: flex;
     align-items: center;
     justify-content: center;

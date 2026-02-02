@@ -9,7 +9,8 @@ $green: #66C296;
 // secondary brand colors
 $blue-light: #3B54BA;
 $blue-lighter: #BFCDFB;
-$green-dark: #45A476;
+$green-dark: #1F7A4E; // Darker green for better contrast (was #45A476)
+$green-accessible: #1F7A4E; // WCAG AA compliant green for text/buttons (5.5:1 contrast ratio)
 $green-light: #E8F7F0;
 
 // supporting colors
