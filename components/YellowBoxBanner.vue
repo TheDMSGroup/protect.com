@@ -1,5 +1,5 @@
 <template lang="html">
-  <section class="yellow-box-banner">
+  <section class="yellow-box-banner" :aria-labelledby="headingId">
     <b-container :class="{ 'right-image': imageAlign === 'right' }">
       <b-row>
         <b-col v-if="imageAlign === 'left'" cols="12" md="5" lg="7">
@@ -31,14 +31,15 @@
           />
         </b-col>
         <b-col cols="12" md="7" lg="5" class="wrapper">
-          <h2>{{ headline }}</h2>
+          <h2 :id="headingId">{{ headline }}</h2>
           <p>
             {{ content }}
           </p>
           <p v-if="action && actionMessage">
             <ButtonsMain
+              :disabled="false"
               :config="{
-                type: 'submit',
+                type: 'button',
                 size: 'lg',
                 variant: 'outline-primary',
                 label: actionMessage,
@@ -114,6 +115,9 @@
 
   const router = useRouter();
 
+  // Generate unique ID for heading to link with aria-labelledby
+  const headingId = `yellow-banner-heading-${Math.random().toString(36).substring(2, 11)}`;
+
   const goToAction = () => {
     if (props.action.includes("#")) {
       const element = document.querySelector(props.action);
@@ -139,6 +143,7 @@
     h2 {
       font-size: 2.5rem;
       margin-bottom: 15px;
+      color: #3a3a3a;
 
       @include media-breakpoint-down(md) {
         text-align: left;
@@ -194,6 +199,7 @@
     p {
       font-weight: 400;
       font-size: 1.5rem;
+      color: #4a4a4a;
 
       @include media-breakpoint-down(md) {
         font-size: 1.35rem;
