@@ -2,6 +2,7 @@
 
 ## Project Goals
 
+- **Mobile first** - Most traffic is mobile; design and test mobile experience first
 - **SSR first** - Maximize server-side rendering for SEO and performance
 - **Aggressive caching** - Use CDN and browser caching where possible
 - **Accessibility** - Target high Lighthouse accessibility scores (WCAG compliance)
