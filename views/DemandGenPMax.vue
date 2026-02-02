@@ -1,7 +1,7 @@
 <template>
   <div class="demand-gen-pmax">
     <!-- Hero Section (Light Background) -->
-    <section class="dg-hero dg-light-section">
+    <section class="dg-hero dg-light-section mt-0">
       <div class="container">
         <div class="dg-hero-wrapper">
           <div class="dg-hero-content">
@@ -285,6 +285,15 @@
 </script>
 
 <style scoped lang="scss">
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: "Nunito Sans", sans-serif;
+    font-weight: 700;
+    color: darken($blue, 10%);
+  }
   .demand-gen-pmax {
     width: 100%;
   }
@@ -315,7 +324,7 @@
   }
 
   .dg-dark-section {
-    background-color: #001f3f;
+    background-color: darken($blue, 15%);
     color: $white;
     padding: 4rem 0;
 
@@ -330,7 +339,7 @@
   .dg-hero {
     text-align: center;
     padding: 6rem 0 4rem;
-    background: lighten($blue-light, 48%);
+    // background: lighten($blue-light, 48%);
 
     @include mobile {
       padding: 3rem 0 2rem;
@@ -595,9 +604,17 @@
     margin-top: 3rem;
     padding: 2rem 0;
     text-align: center;
+    border-top: 2px solid darken($blue, 15%);
+    border-bottom: 2px solid darken($blue, 15%);
+    width: 75%;
+    margin-left: auto;
 
     :deep(.brands) {
       margin: 0 auto;
+    }
+
+    @include mobile {
+      width: 100%;
     }
   }
 
@@ -672,7 +689,7 @@
       fill: $blue;
 
       :deep(.cls-1) {
-        fill: black;
+        fill: darken($blue, 15%);
       }
       :deep(.cls-2) {
         opacity: 0.9;
@@ -785,14 +802,9 @@
   }
 
   .dg-review-card {
-    background: linear-gradient(
-      135deg,
-      rgba(12, 44, 103, 0.06) 0%,
-      rgba(59, 84, 186, 0.1) 100%
-    );
     padding: 2rem;
     border-radius: 8px;
-    border-left: 4px solid $green-accessible;
+    border: 2px solid darken($blue, 15%);
     transition: all 0.3s ease;
 
     &:hover {
@@ -802,7 +814,7 @@
   }
 
   .dg-stars {
-    color: $green-accessible;
+    color: $green;
     font-size: 1.25rem;
     margin-bottom: 1rem;
     display: block;
@@ -810,7 +822,7 @@
 
   .dg-review-text {
     font-size: 1rem;
-    color: $gray-dark;
+    color: $blue;
     margin-bottom: 1rem;
     line-height: 1.6;
     font-style: italic;
@@ -818,7 +830,7 @@
 
   .dg-review-author {
     font-size: 0.9rem;
-    color: $gray;
+    color: $blue;
     font-weight: 500;
     margin: 0;
   }
@@ -830,9 +842,9 @@
     text-align: center;
     padding: 5rem 0;
     background: linear-gradient(
-      135deg,
+      165deg,
       rgba(12, 44, 103, 0.08) 0%,
-      rgba(59, 84, 186, 0.12) 100%
+      rgba(59, 84, 186, 0.25) 100%
     );
 
     h2 {
@@ -842,6 +854,44 @@
 
       @include mobile {
         font-size: 1.75rem;
+      }
+    }
+  }
+
+  @include mobile {
+    div:has(.dg-hero-graphics) {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+
+      .dg-hero-graphics {
+        height: auto;
+        width: 100%;
+      }
+
+      .dg-icon-grid {
+        grid-template-columns: unset;
+        gap: 10px;
+        padding: 0 15px;
+        width: 100%;
+        max-width: 400px;
+      }
+      .dg-icon-card {
+        max-width: 100%;
+        min-width: auto;
+        width: 100%;
+        left: 0;
+        top: 0;
+        grid-row: auto !important;
+        gap: 0;
+        padding: 10px;
+
+        .dg-icon {
+          width: 50px;
+          height: 50px;
+          margin-right: 10px;
+        }
       }
     }
   }
