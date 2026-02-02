@@ -862,6 +862,7 @@
       gap: 20px;
       width: 100%;
       max-width: 600px;
+      margin: auto;
       height: 90%;
 
       @include mobile {
@@ -1331,6 +1332,16 @@
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: 40px;
     margin-bottom: 48px;
+
+    @include tablet {
+      grid-template-columns: repeat(2, 1fr);
+
+      .step:nth-child(3) {
+        grid-column: 1 / -1;
+        max-width: 50%;
+        margin: 0 auto;
+      }
+    }
   }
 
   .step {
