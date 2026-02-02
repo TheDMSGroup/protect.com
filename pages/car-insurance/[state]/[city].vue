@@ -29,6 +29,15 @@
       <div class="container">
         <div class="hero-content">
           <div class="hero-text">
+            <nav aria-label="Breadcrumb" class="breadcrumb-nav pb-4 m-auto">
+              <NuxtLink to="/car-insurance">Car Insurance</NuxtLink>
+              <span> / </span>
+              <NuxtLink :to="`/car-insurance/${stateNameSlug}`">{{
+                stateName
+              }}</NuxtLink>
+              <span> / </span>
+              <span>{{ cityName }}</span>
+            </nav>
             <h1>{{ cityName }} Car Insurance</h1>
             <p class="subtitle">
               Compare quotes from top providers in {{ cityName }},
@@ -365,6 +374,23 @@
       </div>
     </section>
 
+    <section class="other-cities">
+      <div class="container">
+        <div class="cities-grid">
+          <div v-for="city in otherCities" :key="city" class="city-card">
+            <NuxtLink
+              :to="`/car-insurance/${stateNameSlug}/${city
+                .toLowerCase()
+                .replace(/ /g, '-')}`"
+              class="city-link"
+            >
+              {{ city }} Car Insurance
+            </NuxtLink>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- Methodology -->
     <section class="methodology">
       <div class="container">
@@ -420,7 +446,10 @@
     stateFaultType,
     faq,
     rateComparison,
+    otherCities,
   } = await useCityDataFromCacheOrApi();
+
+  console.log("otherCities:", otherCities);
 
   async function useCityDataFromCacheOrApi() {
     const cacheKey = `${stateNameSlug}-${cityNameSlug}-car-insurance-data`;
@@ -574,6 +603,9 @@
     const zipCodeUrl = computed(() => {
       return "/get-quote";
     });
+    const otherCities = computed(() => {
+      return cityInfo.value ? cityInfo.value.otherCities : [];
+    });
 
     return {
       error,
@@ -598,6 +630,7 @@
       faq,
       zipCodeUrl,
       rateComparison,
+      otherCities,
     };
   }
 
@@ -751,6 +784,15 @@
     }
 
     .hero-text {
+      .breadcrumb-nav {
+        a {
+          text-decoration: underline;
+          color: $gray-dark;
+        }
+        span {
+          color: $gray-dark;
+        }
+      }
       h1 {
         font-size: 52px;
         font-weight: 700;
@@ -780,7 +822,7 @@
         gap: 12px;
         margin-bottom: 32px;
 
-        @include mobile {
+        @include tablet {
           max-width: 75%;
           margin: 0 auto 30px auto;
         }
@@ -899,6 +941,10 @@
       box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
       max-width: 480px;
       width: 100%;
+
+      @include tablet {
+        margin: 32px auto 0 auto;
+      }
 
       @include mobile {
         margin-top: 32px;
@@ -1362,6 +1408,14 @@
     a {
       font-size: 14px;
       text-decoration: underline;
+    }
+  }
+
+  .other-cities {
+    .city-link {
+      font-size: 0.95rem;
+      text-decoration: underline;
+      color: $blue-light;
     }
   }
 </style>
