@@ -61,8 +61,8 @@
 </script>
 
 <style lang="scss" scoped>
-  // Local CSS variables needed for this component
-  :root {
+  // FAQ Section
+  .faq-section {
     --primary-color: #1e40af;
     --background-color: #ffffff;
     --surface-color: #f8fafc;
@@ -73,10 +73,7 @@
     --spacing-4xl: 4rem;
     --radius-lg: 0.5rem;
     --spacing-md: 1rem;
-  }
 
-  // FAQ Section
-  .faq-section {
     padding: var(--spacing-4xl) 0;
     background: var(--background-color);
 

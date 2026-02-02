@@ -42,7 +42,7 @@
 
 <script setup>
 import { computed } from 'vue';
-import { useStore } from "../stores/store";
+import { useStore } from "~/stores/store";
 const store = useStore();
 
 const props = defineProps({

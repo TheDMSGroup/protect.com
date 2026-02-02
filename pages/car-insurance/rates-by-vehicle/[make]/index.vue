@@ -180,7 +180,7 @@ useSeoMeta({
                   <div class="price-value">${{ model.minimum_coverage_annual }}</div>
                 </div>
               </div>
-              <span class="learn-more">Get Model Rates →</span>
+              <span class="learn-more">Get {{ model.model }} Rates →</span>
             </div>
           </NuxtLink>
         </div>
