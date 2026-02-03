@@ -59,13 +59,14 @@
           </b-col>
           <b-col cols="12" lg="4">
             <ButtonsMain
+              :disabled="false"
               :config="{
                 type: 'submit',
                 size: 'lg',
                 variant: 'primary',
                 label: 'COMPARE RATES',
                 icon:'arrow-right-short',
-                click: goToAction,
+                click: goToAction
             }" />
           </b-col>
         </b-row>

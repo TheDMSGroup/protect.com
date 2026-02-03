@@ -13,9 +13,19 @@ export default defineNuxtRouteMiddleware((to) => {
   const mstCookie = useCookie("mst", { maxAge: 60 * 60 });
 
   const ueidParam = to.query.ueid;
-  if (ueidParam) {
-    ueidCookie.value = ueidParam;
-    store.setVisitorInfo({ ueid: ueidParam });
+  const mstParam = to.query.mst;
+
+  if (ueidParam || mstParam) {
+    const visitorInfo = {};
+    if (ueidParam) {
+      ueidCookie.value = ueidParam;
+      visitorInfo.ueid = ueidParam;
+    }
+    if (mstParam) {
+      mstCookie.value = mstParam;
+      visitorInfo.mst = mstParam;
+    }
+    store.setVisitorInfo(visitorInfo);
     return;
   }
 
