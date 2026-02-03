@@ -6,12 +6,9 @@
         <div class="logo">
           <img src="/assets/protect_logo_white.svg" alt="Protect.com" class="logo-img" />
         </div>
-        <a href="tel:8885551234" class="phone-link" aria-label="Call 888-555-1234">
-          <svg class="phone-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-          </svg>
-          <span class="phone-number">888-555-1234</span>
-        </a>
+        <div class="priority-message">
+          Inquire in the next {{ formattedCountdown }} minutes to receive priority assistance!
+        </div>
       </div>
     </header>
     <div class="agent-profile-container">
@@ -27,7 +24,7 @@
         </div>
       </div>
     </div>
-    <div ref="chatContainer" class="chat-section">
+    <div class="chat-section">
 <!-- Chat Container -->
     <main class="chat-container" role="log" aria-live="polite" aria-label="Chat messages">
       <div class="messages-wrapper">
@@ -63,6 +60,18 @@
           </div>
         </div>
 
+        <!-- Typing Indicator -->
+        <div v-if="isTyping" class="typing-indicator">
+          <img src="/assets/callcenteragent.png" alt="Emma" class="avatar avatar--bot" />
+          <div class="typing-bubble">
+            <span class="typing-dots">
+              <span class="dot"></span>
+              <span class="dot"></span>
+              <span class="dot"></span>
+            </span>
+          </div>
+        </div>
+
         <!-- Quick Replies -->
         <div v-if="quickReplies.length > 0" class="quick-replies" role="group" aria-label="Quick reply options">
           <button
@@ -78,18 +87,30 @@
 
         <!-- Zipcode Input -->
         <div v-if="showZipcodeInput" class="zipcode-input-wrapper">
-          <form @submit.prevent="handleZipcodeSubmit" class="zipcode-form">
+          <form @submit.prevent="handleZipcodeSubmit" class="zipcode-form" role="form" aria-label="Zipcode entry form">
+            <label for="zipcode-input" class="visually-hidden">Enter your 5-digit zipcode</label>
             <input
+              id="zipcode-input"
               v-model="zipcodeInput"
               type="text"
               inputmode="numeric"
               pattern="[0-9]*"
               maxlength="5"
-              placeholder="Enter zipcode"
+              placeholder="12345"
               class="zipcode-field"
-              aria-label="Enter your zipcode"
+              aria-label="Zipcode"
+              aria-required="true"
+              aria-describedby="zipcode-hint"
+              autocomplete="postal-code"
+              required
             />
-            <button type="submit" class="zipcode-submit-btn" :disabled="zipcodeInput.length !== 5">
+            <span id="zipcode-hint" class="visually-hidden">Enter a 5-digit US zipcode</span>
+            <button
+              type="submit"
+              class="zipcode-submit-btn"
+              :disabled="zipcodeInput.length !== 5"
+              :aria-disabled="zipcodeInput.length !== 5"
+            >
               Submit
             </button>
           </form>
@@ -97,12 +118,39 @@
 
         <!-- Call CTA -->
         <div v-if="showCallCTA" class="call-cta-wrapper">
-          <a href="tel:8885551234" class="call-cta-btn">
+          <a :href="phoneNumberLink" class="call-cta-btn">
             <svg class="call-cta-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
             </svg>
             Call Now for Your Free Quote
           </a>
+          <div class="countdown-timer">
+            Priority assistance available for the next {{ formattedCountdown }}
+          </div>
+        </div>
+
+        <!-- Follow-up Messages (appear after call button) -->
+        <div
+          v-for="(msg, idx) in followUpMessages"
+          :key="`followup-${idx}`"
+          :class="['message', 'message--bot']"
+        >
+          <img src="/assets/callcenteragent.png" alt="Emma" class="avatar avatar--bot" />
+          <div class="message-bubble">
+            {{ msg.text }}
+          </div>
+        </div>
+
+        <!-- Typing Indicator for follow-up messages -->
+        <div v-if="isTypingFollowUp" class="typing-indicator">
+          <img src="/assets/callcenteragent.png" alt="Emma" class="avatar avatar--bot" />
+          <div class="typing-bubble">
+            <span class="typing-dots">
+              <span class="dot"></span>
+              <span class="dot"></span>
+              <span class="dot"></span>
+            </span>
+          </div>
         </div>
 
         <!-- Mastodon Bids Loading -->
@@ -127,7 +175,7 @@
 </template>
 
 <script setup>
-import { ref, watch, nextTick, onMounted, computed } from 'vue'
+import { ref, watch, nextTick, onMounted, onBeforeUnmount, computed } from 'vue'
 import { useMastodonApi } from '~/composables/useMastodonApi'
 
 definePageMeta({
@@ -135,6 +183,7 @@ definePageMeta({
 })
 
 const store = useStore()
+const route = useRoute()
 const cityCookie = useCookie('protect_geo_city')
 const { submitLead } = useMastodonApi()
 
@@ -143,13 +192,72 @@ const userCity = computed(() => {
   return store.visitorInfo.city || cityCookie.value || 'your area'
 })
 
+// Get phone number from URL param or use default
+const DEFAULT_PHONE_NUMBER = '8449442300'
+const phoneNumber = computed(() => {
+  return route.query.c2cnumber || DEFAULT_PHONE_NUMBER
+})
+
+// Format phone number for display (e.g., 844-944-2300)
+const formattedPhoneNumber = computed(() => {
+  const num = phoneNumber.value.replace(/\D/g, '') // Remove non-digits
+  if (num.length === 10) {
+    return `${num.slice(0, 3)}-${num.slice(3, 6)}-${num.slice(6)}`
+  }
+  return phoneNumber.value
+})
+
+// Format phone number for tel: link
+const phoneNumberLink = computed(() => {
+  return `tel:${phoneNumber.value.replace(/\D/g, '')}`
+})
+
 const messages = ref([])
+const followUpMessages = ref([]) // Messages that appear after the call button
 const quickReplies = ref([])
-const chatContainer = ref(null)
 const isConnecting = ref(true)
 const showZipcodeInput = ref(false)
 const showCallCTA = ref(false)
 const zipcodeInput = ref('')
+const isTyping = ref(false) // Typing indicator state
+const isTypingFollowUp = ref(false) // Typing indicator for follow-up messages
+
+// Countdown timer state
+const countdownSeconds = ref(300) // 5 minutes = 300 seconds
+let countdownInterval = null
+
+// Format countdown as MM:SS
+const formattedCountdown = computed(() => {
+  const minutes = Math.floor(countdownSeconds.value / 60)
+  const seconds = countdownSeconds.value % 60
+  return `${minutes}:${seconds.toString().padStart(2, '0')}`
+})
+
+// Start countdown timer
+const startCountdown = () => {
+  if (countdownInterval) return // Already running
+
+  countdownInterval = setInterval(() => {
+    if (countdownSeconds.value > 0) {
+      countdownSeconds.value--
+    } else {
+      stopCountdown()
+    }
+  }, 1000)
+}
+
+// Stop countdown timer
+const stopCountdown = () => {
+  if (countdownInterval) {
+    clearInterval(countdownInterval)
+    countdownInterval = null
+  }
+}
+
+// Cleanup on unmount
+onBeforeUnmount(() => {
+  stopCountdown()
+})
 
 // Mastodon bids state
 const isLoadingBids = ref(false)
@@ -164,45 +272,83 @@ const collectedData = ref({
   ownsHome: null
 })
 
-// Auto-scroll to bottom when content changes
+// Auto-scroll down slightly when content changes
 const scrollToBottom = () => {
   nextTick(() => {
-    setTimeout(() => {
-      console.log('scrollToBottom called', {
-        ref: chatContainer.value,
-        scrollHeight: chatContainer.value?.scrollHeight,
-        clientHeight: chatContainer.value?.clientHeight,
-        scrollTop: chatContainer.value?.scrollTop
-      })
-      if (chatContainer.value) {
-        chatContainer.value.scrollTo({
-          top: chatContainer.value.scrollHeight,
+    // Only scroll to mastodon container if apiResults has data
+    if (apiResults.value) {
+      // Retry logic to wait for container to render
+      const checkForContainer = (attempts = 0) => {
+        const mastodonContainer = document.querySelector('#mastodon-results-container')
+
+        if (mastodonContainer) {
+          mastodonContainer.scrollIntoView({ behavior: 'smooth', block: 'start' })
+        } else if (attempts < 10) {
+          setTimeout(() => checkForContainer(attempts + 1), 100)
+        }
+      }
+
+      checkForContainer()
+    } else {
+      // Default: scroll down 20px from current position after a brief delay
+      setTimeout(() => {
+        window.scrollBy({
+          top: 20,
           behavior: 'smooth'
         })
-      }
-    }, 100)
+      }, 150)
+    }
   })
 }
 
-watch([messages, quickReplies, showCallCTA, showZipcodeInput, apiResults], scrollToBottom, { deep: true })
+watch([messages, followUpMessages, quickReplies, showCallCTA, showZipcodeInput, apiResults, isTyping, isTypingFollowUp, isLoadingBids], scrollToBottom, { deep: true })
 
 onMounted(() => {
   // Show connecting indicator, then first message
   setTimeout(() => {
     isConnecting.value = false
-    addBotMessage("I'm Emma, your personal auto insurance quote finder. Let's see how much we can save you today on auto insurance!");
+    addBotMessage("I'm Emma, your personal auto insurance quote finder. Let's see how much we can save you today on auto insurance!")
+
+    // Wait for first message to complete (typingDelay + animation time), then ask second question
     setTimeout(() => {
       conversationStep.value = 'ask_insured'
       addBotMessage("Are you currently insured?", ['Yes', 'No'])
-    }, 700)
+    }, 2500) // Increased delay to account for typing animation
   }, 1500)
 })
 
 const addBotMessage = (text, replies = []) => {
-  messages.value.push({ type: 'bot', text })
+  // Show typing indicator
+  isTyping.value = true
+
+  // Random delay between 800ms and 2000ms to simulate typing
+  const typingDelay = Math.floor(Math.random() * 1200) + 800
+
   setTimeout(() => {
-    quickReplies.value = replies
-  }, 500);
+    isTyping.value = false
+    messages.value.push({ type: 'bot', text })
+
+    // Show quick replies after message appears
+    if (replies.length > 0) {
+      setTimeout(() => {
+        quickReplies.value = replies
+      }, 300)
+    }
+  }, typingDelay)
+}
+
+// Add messages that appear after the call button
+const addFollowUpMessage = (text) => {
+  // Show typing indicator for follow-up
+  isTypingFollowUp.value = true
+
+  // Random delay between 800ms and 2000ms to simulate typing
+  const typingDelay = Math.floor(Math.random() * 1200) + 800
+
+  setTimeout(() => {
+    isTypingFollowUp.value = false
+    followUpMessages.value.push({ type: 'bot', text })
+  }, typingDelay)
 }
 
 const handleQuickReply = (reply) => {
@@ -246,7 +392,7 @@ const processResponse = (response) => {
           addBotMessage("No problem! What's your zipcode so I can find the best rates in your area?")
           setTimeout(() => {
             showZipcodeInput.value = true
-          }, 500)
+          }, 2500)
         }
         break
 
@@ -254,13 +400,21 @@ const processResponse = (response) => {
         collectedData.value.ownsHome = response === 'Yes'
         conversationStep.value = 'complete'
         addBotMessage("I found your match! Click the button below to speak with an advisor and get your personalized quote.")
+        // Wait for typing animation to complete (max typingDelay is 2000ms) + message display time
         setTimeout(() => {
           showCallCTA.value = true
-          // Start 2 second timer for Mastodon feed
+          startCountdown() // Start the countdown timer
+
+          // Wait a bit longer, then show the follow-up message and Mastodon feed
           setTimeout(() => {
-            fetchMastodonBids()
-          }, 2000)
-        }, 500)
+            addFollowUpMessage("Not ready to talk to someone right now? That's totally fine! Here are a few other great options you can check out in the meantime:")
+
+            // Wait for this message's typing animation to complete before showing feed
+            setTimeout(() => {
+              fetchMastodonBids()
+            }, 2500) // Wait for typing animation of the "Not ready" message
+          }, 5000) // Wait 5 seconds after button appears before starting mastodon feed
+        }, 2500) // Increased to account for typing animation completion
         break
     }
   }, 800)
@@ -300,26 +454,27 @@ const fetchMastodonBids = async () => {
 
   try {
     let result
-
+    // Build minimal payload from collected data
+    const payload = {
+      source_token: 'r0TV0W_hUOqv_Uow4brhX-wkx5F9TQ',
+      limit: 3,
+      data: {
+        zipcode: collectedData.value.zipcode || store.visitorInfo.zip || '',
+        currently_insured: collectedData.value.isInsured || false,
+        home_ownership: collectedData.value.ownsHome || false,
+        user_agent: typeof navigator !== 'undefined' ? navigator.userAgent : '',
+        source_url: typeof window !== 'undefined' ? window.location.href : ''
+      }
+    }
+    if (store.visitorInfo?.mst) {
+      payload.source_token = store.visitorInfo.mst;
+    }
     if (useMockData) {
       console.log('Using mock Mastodon API data (mastodonoff=true)')
       // Simulate API delay
       await new Promise(resolve => setTimeout(resolve, 1500))
       result = getMockResults()
     } else {
-      // Build minimal payload from collected data
-      const payload = {
-        source_token: 'r0TV0W_hUOqv_Uow4brhX-wkx5F9TQ',
-        limit: 3,
-        data: {
-          zipcode: collectedData.value.zipcode || store.visitorInfo.zip || '',
-          currently_insured: collectedData.value.isInsured || false,
-          home_ownership: collectedData.value.ownsHome || false,
-          user_agent: typeof navigator !== 'undefined' ? navigator.userAgent : '',
-          source_url: typeof window !== 'undefined' ? window.location.href : ''
-        }
-      }
-
       result = await submitLead(payload)
     }
 
@@ -391,6 +546,17 @@ const fetchMastodonBids = async () => {
 .phone-number {
   @media (max-width: 360px) {
     display: none;
+  }
+}
+
+.priority-message {
+  color: white;
+  font-weight: 600;
+  font-size: 0.875rem;
+  text-align: right;
+
+  @media (max-width: 640px) {
+    font-size: 0.75rem;
   }
 }
 
@@ -603,6 +769,49 @@ const fetchMastodonBids = async () => {
   }
 }
 
+// Typing Indicator
+.typing-indicator {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  align-self: flex-start;
+}
+
+.typing-bubble {
+  display: flex;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  background: #f0f0f0;
+  border-radius: 1rem;
+  border-bottom-left-radius: 0.25rem;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+
+  .typing-dots {
+    display: flex;
+    gap: 0.25rem;
+
+    .dot {
+      width: 0.375rem;
+      height: 0.375rem;
+      background-color: #9ca3af;
+      border-radius: 50%;
+      animation: bounce 1.4s infinite ease-in-out both;
+
+      &:nth-child(1) {
+        animation-delay: -0.32s;
+      }
+
+      &:nth-child(2) {
+        animation-delay: -0.16s;
+      }
+
+      &:nth-child(3) {
+        animation-delay: 0s;
+      }
+    }
+  }
+}
+
 // Quick Replies
 .quick-replies {
   display: flex;
@@ -610,6 +819,7 @@ const fetchMastodonBids = async () => {
   gap: 0.5rem;
   margin-top: 0.5rem;
   padding-left: 2.5rem; // Align with messages (avatar width + gap)
+  scroll-margin-top: -60px;
 }
 
 .quick-reply-btn {
@@ -643,22 +853,26 @@ const fetchMastodonBids = async () => {
 
 .zipcode-form {
   display: flex;
-  gap: 0.5rem;
-  max-width: 280px;
+  gap: 0.75rem;
+  max-width: 100%;
+  align-items: center;
 }
 
 .zipcode-field {
   flex: 1;
-  padding: 0.75rem 1rem;
-  border: 2px solid #2d5a87;
-  border-radius: 2rem;
+  min-width: 0;
+  padding: 0.625rem 1rem;
+  border: 2px solid #d1d5db;
+  border-radius: 0.5rem;
   font-size: 1rem;
   outline: none;
   text-align: center;
   letter-spacing: 0.1em;
+  background: white;
+  transition: border-color 0.2s, box-shadow 0.2s;
 
   &:focus {
-    border-color: #1e3a5f;
+    border-color: #2d5a87;
     box-shadow: 0 0 0 3px rgba(45, 90, 135, 0.1);
   }
 
@@ -666,32 +880,69 @@ const fetchMastodonBids = async () => {
     color: #9ca3af;
     letter-spacing: normal;
   }
+
+  &:hover:not(:focus) {
+    border-color: #9ca3af;
+  }
 }
 
 .zipcode-submit-btn {
-  padding: 0.75rem 1.25rem;
+  flex-shrink: 0;
+  height: 60px;
+  padding: 0 1.25rem;
   background: #2d5a87;
   color: white;
   border: none;
-  border-radius: 2rem;
+  border-radius: 0.5rem;
   font-size: 0.9375rem;
   font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: all 0.2s;
+  min-width: 80px;
+  white-space: nowrap;
+  line-height: 1.2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
-  &:hover:not(:disabled),
-  &:focus:not(:disabled) {
+  &:hover:not(:disabled) {
     background: #1e3a5f;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   }
 
   &:disabled {
-    opacity: 0.5;
+    opacity: 0.4;
     cursor: not-allowed;
+    background: #9ca3af;
   }
 
-  &:focus {
-    outline: 2px solid #2d5a87;
+  &:focus-visible {
+    outline: 3px solid #2d5a87;
     outline-offset: 2px;
+  }
+
+  // High contrast mode support
+  @media (prefers-contrast: high) {
+    border: 2px solid currentColor;
+  }
+
+  // Reduced motion support
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+
+    &:hover:not(:disabled) {
+      transform: none;
+    }
+
+    &:active:not(:disabled) {
+      transform: none;
+    }
   }
 }
 
@@ -699,6 +950,9 @@ const fetchMastodonBids = async () => {
 .call-cta-wrapper {
   margin-top: 1rem;
   padding-left: 2.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
 }
 
 .call-cta-btn {
@@ -713,6 +967,7 @@ const fetchMastodonBids = async () => {
   font-size: 1.125rem;
   font-weight: 700;
   transition: background-color 0.2s;
+  width: fit-content;
 
   &:hover,
   &:focus {
@@ -728,6 +983,13 @@ const fetchMastodonBids = async () => {
 .call-cta-icon {
   width: 1.5rem;
   height: 1.5rem;
+}
+
+.countdown-timer {
+  font-size: 0.875rem;
+  color: #dc2626;
+  font-weight: 600;
+  text-align: left;
 }
 
 // Bids Loading
