@@ -1,0 +1,16 @@
+version: "3.9"
+
+services:
+  mcp:
+    build:
+      context: .
+      dockerfile: mcp/Dockerfile
+    volumes:
+      - .:workspace
+      - /workspace/node_modules
+      - /workspace/mcp/node_modules
+    working_dir: /workspace
+    stdin_open: true
+    tty: true
+    ports:
+      - "10000:10000"
