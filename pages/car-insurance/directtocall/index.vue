@@ -577,6 +577,10 @@ const fetchMastodonBids = async () => {
     letter-spacing: 0;
     color: #000000;
     margin: 0;
+
+    @media (max-width: 767px) {
+      font: normal normal 900 30px/40px 'Nunito Sans', sans-serif;
+    }
   }
 }
 
@@ -711,7 +715,7 @@ const fetchMastodonBids = async () => {
 // Messages
 .message {
   display: flex;
-  align-items: flex-start;
+  align-items: flex-end;
   gap: 0.5rem;
   max-width: 85%;
 
