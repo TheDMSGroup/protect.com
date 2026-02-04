@@ -7,7 +7,7 @@
           Hi {{ firstName }}, we've matched you with great offers in {{ city }}!
         </h2>
         <p>
-          <i class="fa-solid fa-circle-check"></i>
+          <i class="fa-solid fa-circle-check" aria-hidden="true"></i>
           Click on <span>2 or more offers</span> below to compare quotes and maximize your savings.
         </p>
       </div>
@@ -18,7 +18,7 @@
           Hi {{ firstName }}, we've matched you with a top offer in {{ city }}!
         </h2>
         <p>
-          <i class="fa-solid fa-circle-check"></i>
+          <i class="fa-solid fa-circle-check" aria-hidden="true"></i>
           Click on the <span>recommended match</span> to get a quote and maximize your savings.
         </p>
       </div>
@@ -30,7 +30,12 @@
           :id="`offer-${index}`"
           class="offer-container"
           :class="{ featured: index < featuredCount }"
+          role="button"
+          tabindex="0"
+          :aria-label="`View quote from ${bid.buyer_name}`"
           @click="openOffer(bid.click_url)"
+          @keydown.enter="openOffer(bid.click_url)"
+          @keydown.space.prevent="openOffer(bid.click_url)"
         >
           <div class="banner-wrapper"></div>
           <div class="logo-wrapper">
@@ -56,14 +61,16 @@
           :class="{ featured: index < featuredCount }"
           :id="`mobile-description-${index}`"
         >
-          <a
+          <button
+            type="button"
             class="toggle-link"
             :id="`toggle-link-${index}`"
-            href="javascript:;"
-            @click.prevent="toggleDescription(index)"
+            :aria-expanded="expandedDescriptions[index] ? 'true' : 'false'"
+            :aria-controls="`description-${index}`"
+            @click="toggleDescription(index)"
           >
             {{ expandedDescriptions[index] ? 'Less' : 'More' }}
-          </a>
+          </button>
           <div
             class="mobile-description-text"
             :id="`description-${index}`"
@@ -216,6 +223,22 @@ const openOffer = (url) => {
 
 .offer-container button:hover {
   background: #005a8f;
+}
+
+/* Focus styles for keyboard navigation */
+.offer-container:focus {
+  outline: 2px solid #0076bb;
+  outline-offset: 2px;
+}
+
+.offer-container:focus-visible {
+  outline: 2px solid #0076bb;
+  outline-offset: 2px;
+}
+
+.offer-container button:focus-visible {
+  outline: 2px solid #005a8f;
+  outline-offset: 2px;
 }
 
 .offer-container .logo-wrapper {
@@ -380,10 +403,19 @@ const openOffer = (url) => {
     font-size: 14px;
     color: #0076bb;
     text-decoration: none;
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
   }
 
   .toggle-link:hover {
     text-decoration: underline;
+  }
+
+  .toggle-link:focus-visible {
+    outline: 2px solid #0076bb;
+    outline-offset: 2px;
   }
 }
 </style>
