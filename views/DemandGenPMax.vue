@@ -107,7 +107,9 @@
         <p class="subhead text-center">
           We work with 100+ companies to find the best match for you
         </p>
-        <InsuranceBrands :providers-config="insuranceBrands" />
+        <div class="col-md-8 col-9 mx-auto">
+          <InsuranceBrands :providers-config="insuranceBrands" />
+        </div>
       </div>
     </section>
 
@@ -281,6 +283,7 @@
     { name: "Allstate", src: "provider-allstate.png" },
     { name: "Farmers", src: "provider-farmers.png" },
     { name: "Insurify", src: "provider-insurify.png" },
+    { name: "Nationwide", src: "provider-nationwide.png" },
   ];
 </script>
 
@@ -599,7 +602,8 @@
     }
 
     @include mobile {
-      width: 100%;
+      max-width: 90%;
+      margin: auto;
     }
   }
 
@@ -708,7 +712,16 @@
     gap: 6rem;
     align-items: center;
 
-    @include tablet {
+    .dg-hero-graphics {
+      background: linear-gradient(
+          rgba(4.0173913043, 14.7304347826, 34.4826086957, 0.75),
+          rgba(4.0173913043, 14.7304347826, 34.4826086957, 0.75)
+        ),
+        url("/assets/states/outlines/icon-shield.png") no-repeat center center /
+          contain;
+    }
+
+    @include media-breakpoint-down(md) {
       grid-template-columns: 1fr;
       gap: 2rem;
     }
@@ -781,7 +794,7 @@
     grid-template-columns: repeat(3, 1fr);
     gap: 2rem;
 
-    @include tablet {
+    @include media-breakpoint-down(md) {
       grid-template-columns: 1fr;
     }
   }
@@ -832,6 +845,10 @@
       rgba(59, 84, 186, 0.25) 100%
     );
 
+    @include media-breakpoint-down(md) {
+      margin: 2rem 0;
+      width: 100%;
+    }
     h2 {
       font-size: 2.5rem;
       color: $blue;
