@@ -166,7 +166,7 @@
           </div>
         </div>
         <!-- Mastodon Feed Results -->
-        <MastodonFeedTopMatchStar v-if="apiResults" :results="apiResults" class="feed-results" />
+        <MastodonFeedInsureMobileExpandableShowMore v-if="apiResults" :results="apiResults" class="feed-results" :hideHeader="true" />
       </div>
     </main>
     </div>
@@ -1005,9 +1005,8 @@ const fetchMastodonBids = async () => {
   margin-top: 1rem;
 }
 
-// Feed Results (MastodonFeedTopMatchStar component)
+// Feed Results (MastodonFeed component)
 .feed-results {
-  max-width: 600px;
   margin: 1.5rem auto 0;
   width: 100%;
 }
