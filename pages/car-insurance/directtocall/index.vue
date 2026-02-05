@@ -959,7 +959,7 @@ const fetchMastodonBids = async () => {
   align-items: center;
   justify-content: center;
   gap: 0.125rem;
-  padding: 0.5rem 1rem;
+  padding: 0.5rem 0;
   background: #F5F5F5;
   border: 2px solid #F5F5F5;
   border-radius: 1.5rem;
@@ -983,7 +983,7 @@ const fetchMastodonBids = async () => {
 .countdown-text {
   color: #12235B;
   font-weight: 700;
-  font-size: 1rem;
+  font-size: .7rem;
   line-height: 1;
 }
 
