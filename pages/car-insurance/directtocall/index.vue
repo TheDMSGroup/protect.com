@@ -61,15 +61,9 @@
         </div>
 
         <!-- Typing Indicator -->
-        <div v-if="isTyping" class="typing-indicator">
+        <div v-if="isTyping" class="typing-indicator-wrapper">
           <img src="/assets/callcenteragent.png" alt="Emma" class="avatar avatar--bot" />
-          <div class="typing-bubble">
-            <span class="typing-dots">
-              <span class="dot"></span>
-              <span class="dot"></span>
-              <span class="dot"></span>
-            </span>
-          </div>
+          <ChatTypingIndicator />
         </div>
 
         <!-- Quick Replies -->
@@ -142,15 +136,9 @@
         </div>
 
         <!-- Typing Indicator for follow-up messages -->
-        <div v-if="isTypingFollowUp" class="typing-indicator">
+        <div v-if="isTypingFollowUp" class="typing-indicator-wrapper">
           <img src="/assets/callcenteragent.png" alt="Emma" class="avatar avatar--bot" />
-          <div class="typing-bubble">
-            <span class="typing-dots">
-              <span class="dot"></span>
-              <span class="dot"></span>
-              <span class="dot"></span>
-            </span>
-          </div>
+          <ChatTypingIndicator />
         </div>
 
         <!-- Mastodon Bids Loading -->
@@ -773,47 +761,12 @@ const fetchMastodonBids = async () => {
   }
 }
 
-// Typing Indicator
-.typing-indicator {
+// Typing Indicator wrapper (adds avatar next to the typing indicator component)
+.typing-indicator-wrapper {
   display: flex;
   align-items: flex-start;
   gap: 0.5rem;
   align-self: flex-start;
-}
-
-.typing-bubble {
-  display: flex;
-  align-items: center;
-  padding: 0.75rem 1rem;
-  background: #f0f0f0;
-  border-radius: 1rem;
-  border-bottom-left-radius: 0.25rem;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-
-  .typing-dots {
-    display: flex;
-    gap: 0.25rem;
-
-    .dot {
-      width: 0.375rem;
-      height: 0.375rem;
-      background-color: #9ca3af;
-      border-radius: 50%;
-      animation: bounce 1.4s infinite ease-in-out both;
-
-      &:nth-child(1) {
-        animation-delay: -0.32s;
-      }
-
-      &:nth-child(2) {
-        animation-delay: -0.16s;
-      }
-
-      &:nth-child(3) {
-        animation-delay: 0s;
-      }
-    }
-  }
 }
 
 // Quick Replies
