@@ -3,7 +3,6 @@
     <main class="chatbot-main">
       <slot />
     </main>
-    <AppFooter />
   </div>
 </template>
 
