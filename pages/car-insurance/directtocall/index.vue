@@ -61,15 +61,9 @@
         </div>
 
         <!-- Typing Indicator -->
-        <div v-if="isTyping" class="typing-indicator">
+        <div v-if="isTyping" class="typing-indicator-wrapper">
           <img src="/assets/callcenteragent.png" alt="Emma" class="avatar avatar--bot" />
-          <div class="typing-bubble">
-            <span class="typing-dots">
-              <span class="dot"></span>
-              <span class="dot"></span>
-              <span class="dot"></span>
-            </span>
-          </div>
+          <ChatTypingIndicator />
         </div>
 
         <!-- Quick Replies -->
@@ -119,13 +113,13 @@
         <!-- Call CTA -->
         <div v-if="showCallCTA" class="call-cta-wrapper">
           <a :href="phoneNumberLink" class="call-cta-btn">
-            <svg class="call-cta-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-            </svg>
-            Call Now for Your Free Quote
+            Call Now
           </a>
           <div class="countdown-timer">
-            Priority assistance available for the next {{ formattedCountdown }}
+            <span class="countdown-text">Offer expires in:</span>
+            <span class="countdown-time"><svg class="countdown-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>{{ formattedCountdown }}</span>
           </div>
         </div>
 
@@ -142,15 +136,9 @@
         </div>
 
         <!-- Typing Indicator for follow-up messages -->
-        <div v-if="isTypingFollowUp" class="typing-indicator">
+        <div v-if="isTypingFollowUp" class="typing-indicator-wrapper">
           <img src="/assets/callcenteragent.png" alt="Emma" class="avatar avatar--bot" />
-          <div class="typing-bubble">
-            <span class="typing-dots">
-              <span class="dot"></span>
-              <span class="dot"></span>
-              <span class="dot"></span>
-            </span>
-          </div>
+          <ChatTypingIndicator />
         </div>
 
         <!-- Mastodon Bids Loading -->
@@ -166,7 +154,7 @@
           </div>
         </div>
         <!-- Mastodon Feed Results -->
-        <MastodonFeedTopMatchStar v-if="apiResults" :results="apiResults" class="feed-results" />
+        <MastodonFeedInsureMobileExpandableShowMore v-if="apiResults" :results="apiResults" class="feed-results" :hideHeader="true" />
       </div>
     </main>
     </div>
@@ -337,20 +325,6 @@ const addBotMessage = (text, replies = []) => {
   }, typingDelay)
 }
 
-// Add messages that appear after the call button
-const addFollowUpMessage = (text) => {
-  // Show typing indicator for follow-up
-  isTypingFollowUp.value = true
-
-  // Random delay between 800ms and 2000ms to simulate typing
-  const typingDelay = Math.floor(Math.random() * 1200) + 800
-
-  setTimeout(() => {
-    isTypingFollowUp.value = false
-    followUpMessages.value.push({ type: 'bot', text })
-  }, typingDelay)
-}
-
 const handleQuickReply = (reply) => {
   quickReplies.value = []
   setTimeout(() => {
@@ -405,15 +379,8 @@ const processResponse = (response) => {
           showCallCTA.value = true
           startCountdown() // Start the countdown timer
 
-          // Wait a bit longer, then show the follow-up message and Mastodon feed
-          setTimeout(() => {
-            addFollowUpMessage("Not ready to talk to someone right now? That's totally fine! Here are a few other great options you can check out in the meantime:")
-
-            // Wait for this message's typing animation to complete before showing feed
-            setTimeout(() => {
-              fetchMastodonBids()
-            }, 2500) // Wait for typing animation of the "Not ready" message
-          }, 5000) // Wait 5 seconds after button appears before starting mastodon feed
+          // Start fetching Mastodon bids immediately in the background
+          fetchMastodonBids()
         }, 2500) // Increased to account for typing animation completion
         break
     }
@@ -446,7 +413,7 @@ const getMockResults = () => ({
 })
 
 const fetchMastodonBids = async () => {
-  isLoadingBids.value = true
+  // Don't show loading indicator yet - fetch silently in background
 
   // Check for mastodonoff URL parameter
   const urlParams = new URLSearchParams(window.location.search)
@@ -478,14 +445,38 @@ const fetchMastodonBids = async () => {
       result = await submitLead(payload)
     }
 
-    isLoadingBids.value = false
-
     if (result && result.bids && result.bids.length > 0) {
-      apiResults.value = result
+      // Wait 5 seconds before showing the typing indicator and message
+      setTimeout(() => {
+        // Show typing indicator first
+        isTypingFollowUp.value = true
+
+        // Random delay between 1200ms and 2000ms to simulate typing (longer for this message)
+        const typingDelay = Math.floor(Math.random() * 800) + 1200
+
+        setTimeout(() => {
+          // Hide typing indicator and show the message
+          isTypingFollowUp.value = false
+          followUpMessages.value.push({
+            type: 'bot',
+            text: "Not ready to talk to someone right now? That's totally fine! Here are a few other great options you can check out in the meantime:"
+          })
+
+          // Show loading indicator after message appears
+          setTimeout(() => {
+            isLoadingBids.value = true
+
+            // Wait before showing results
+            setTimeout(() => {
+              isLoadingBids.value = false
+              apiResults.value = result
+            }, 2500)
+          }, 300)
+        }, typingDelay)
+      }, 5000)
     }
   } catch (err) {
     console.error('Error fetching Mastodon bids:', err)
-    isLoadingBids.value = false
   }
 }
 </script>
@@ -577,6 +568,10 @@ const fetchMastodonBids = async () => {
     letter-spacing: 0;
     color: #000000;
     margin: 0;
+
+    @media (max-width: 767px) {
+      font: normal normal 900 30px/40px 'Nunito Sans', sans-serif;
+    }
   }
 }
 
@@ -711,7 +706,7 @@ const fetchMastodonBids = async () => {
 // Messages
 .message {
   display: flex;
-  align-items: flex-start;
+  align-items: flex-end;
   gap: 0.5rem;
   max-width: 85%;
 
@@ -769,47 +764,12 @@ const fetchMastodonBids = async () => {
   }
 }
 
-// Typing Indicator
-.typing-indicator {
+// Typing Indicator wrapper (adds avatar next to the typing indicator component)
+.typing-indicator-wrapper {
   display: flex;
   align-items: flex-start;
   gap: 0.5rem;
   align-self: flex-start;
-}
-
-.typing-bubble {
-  display: flex;
-  align-items: center;
-  padding: 0.75rem 1rem;
-  background: #f0f0f0;
-  border-radius: 1rem;
-  border-bottom-left-radius: 0.25rem;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-
-  .typing-dots {
-    display: flex;
-    gap: 0.25rem;
-
-    .dot {
-      width: 0.375rem;
-      height: 0.375rem;
-      background-color: #9ca3af;
-      border-radius: 50%;
-      animation: bounce 1.4s infinite ease-in-out both;
-
-      &:nth-child(1) {
-        animation-delay: -0.32s;
-      }
-
-      &:nth-child(2) {
-        animation-delay: -0.16s;
-      }
-
-      &:nth-child(3) {
-        animation-delay: 0s;
-      }
-    }
-  }
 }
 
 // Quick Replies
@@ -949,33 +909,41 @@ const fetchMastodonBids = async () => {
 // Call CTA
 .call-cta-wrapper {
   margin-top: 1rem;
-  padding-left: 2.5rem;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  align-items: stretch;
   gap: 0.75rem;
+  flex-wrap: wrap;
+  padding-left: 2.5rem; // Align with message bubbles (avatar 2rem + gap 0.5rem)
+  max-width: 85%; // Match message max-width
+  align-self: flex-start; // Align to left like bot messages
+  width: 100%;
 }
 
 .call-cta-btn {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 0.5rem;
-  padding: 1rem 1.5rem;
-  background: #22c55e;
+  padding: 0.625rem 1.25rem;
+  background: #4A7D64;
   color: white;
   text-decoration: none;
-  border-radius: 2rem;
-  font-size: 1.125rem;
+  border-radius: 1.5rem;
+  font-size: 1rem;
   font-weight: 700;
   transition: background-color 0.2s;
-  width: fit-content;
+  flex: 1;
+  min-width: 0;
+  min-height: 45px;
 
   &:hover,
   &:focus {
-    background: #16a34a;
+    background: #3D6B54;
   }
 
   &:focus {
-    outline: 2px solid #22c55e;
+    outline: 2px solid #4A7D64;
     outline-offset: 2px;
   }
 }
@@ -986,10 +954,47 @@ const fetchMastodonBids = async () => {
 }
 
 .countdown-timer {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.125rem;
+  padding: 0.5rem 0;
+  background: #F5F5F5;
+  border: 2px solid #F5F5F5;
+  border-radius: 1.5rem;
   font-size: 0.875rem;
-  color: #dc2626;
   font-weight: 600;
-  text-align: left;
+  color: #12235B;
+  flex: 1;
+  min-width: 0;
+  min-height: 45px;
+}
+
+.countdown-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+  color: #B1CAF0;
+  fill: #B1CAF0;
+  stroke: #000000;
+  flex-shrink: 0;
+}
+
+.countdown-text {
+  color: #12235B;
+  font-weight: 700;
+  font-size: .7rem;
+  line-height: 1;
+}
+
+.countdown-time {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  color: #12235B;
+  font-weight: 700;
+  font-size: 1rem;
+  line-height: 1;
 }
 
 // Bids Loading
@@ -1001,9 +1006,8 @@ const fetchMastodonBids = async () => {
   margin-top: 1rem;
 }
 
-// Feed Results (MastodonFeedTopMatchStar component)
+// Feed Results (MastodonFeed component)
 .feed-results {
-  max-width: 600px;
   margin: 1.5rem auto 0;
   width: 100%;
 }
