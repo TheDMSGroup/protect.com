@@ -164,9 +164,9 @@
           <!-- Value Prop 3 -->
           <div class="dg-value-card">
             <div class="dg-value-icon"><IconsBank /></div>
-            <h3>Instant Savings</h3>
+            <h3>Big Savings</h3>
             <p>
-              Our users save as much as <strong>$940/year</strong> by switching.
+              Our users save as much as <strong>$900/year</strong> by switching.
             </p>
           </div>
         </div>
@@ -435,7 +435,7 @@
   }
 
   section {
-    margin: 50px auto;
+    margin: auto;
   }
 
   // ============================================
@@ -488,7 +488,7 @@
   // ============================================
   .dg-hero {
     text-align: center;
-    padding: 6rem 0 4rem;
+    padding: 6rem 0 2rem;
     // background: lighten($blue-light, 48%);
 
     @include mobile {
