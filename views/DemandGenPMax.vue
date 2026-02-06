@@ -436,6 +436,10 @@
 
   section {
     margin: auto;
+
+		@include mobile {
+			margin: 35px auto;
+		}
   }
 
   // ============================================
