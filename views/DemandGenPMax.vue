@@ -1,5 +1,5 @@
 <template>
-  <div class="demand-gen-pmax">
+  <div class="lp-layout">
     <!-- Hero Section (Light Background) -->
     <section class="dg-hero dg-light-section mt-0">
       <div class="container">
@@ -9,7 +9,7 @@
               The Smarter Way to Protect Your Car and Your Wallet
             </h1>
             <p class="dg-subheadline">
-              Save Over $900 Per Year by Comparing Rates from Top Companies
+              Save as much as $900/year by comparing rates
             </p>
 
             <!-- ZIP Code Input -->
@@ -21,7 +21,7 @@
                 aria-label="Enter your ZIP code"
               />
               <button class="dg-cta-btn dg-cta-primary">
-                See My Free Quotes
+                Compare Free Quotes
               </button>
             </div>
 
@@ -33,8 +33,17 @@
 
           <!-- Hero Graphics - Brand Icons Grid -->
           <div class="dg-hero-graphics">
+            <p class="graphic-header">
+              Compare Rates from Trusted&nbsp;Providers
+            </p>
             <div class="dg-icon-grid">
-              <div class="dg-icon-card">
+              <a
+                @click.prevent="
+                  redirectWithParams('https://insure.protect.com', {})
+                "
+                href="#"
+                class="dg-icon-card"
+              >
                 <div class="dg-icon">
                   <img src="/assets/partners/geico-icon.gif" alt="Geico Logo" />
                 </div>
@@ -42,9 +51,15 @@
                   <p class="dg-icon-partner">Geico</p>
                   <p class="dg-icon-rating">★★★★★</p>
                 </div>
-              </div>
+              </a>
 
-              <div class="dg-icon-card">
+              <a
+                @click.prevent="
+                  redirectWithParams('https://insure.protect.com', {})
+                "
+                href="#"
+                class="dg-icon-card"
+              >
                 <div class="dg-icon">
                   <img
                     src="/assets/partners/progressive-icon.gif"
@@ -55,9 +70,15 @@
                   <p class="dg-icon-partner">Progressive</p>
                   <p class="dg-icon-rating">★★★★★</p>
                 </div>
-              </div>
+              </a>
 
-              <div class="dg-icon-card">
+              <a
+                @click.prevent="
+                  redirectWithParams('https://insure.protect.com', {})
+                "
+                href="#"
+                class="dg-icon-card"
+              >
                 <div class="dg-icon dg-icon-shield">
                   <img
                     src="/assets/partners/statefarm-icon.gif"
@@ -68,9 +89,15 @@
                   <p class="dg-icon-partner">State Farm</p>
                   <p class="dg-icon-rating">★★★★★</p>
                 </div>
-              </div>
+              </a>
 
-              <div class="dg-icon-card">
+              <a
+                @click.prevent="
+                  redirectWithParams('https://insure.protect.com', {})
+                "
+                href="#"
+                class="dg-icon-card"
+              >
                 <div class="dg-icon">
                   <img
                     src="/assets/partners/liberty-icon.gif"
@@ -81,9 +108,15 @@
                   <p class="dg-icon-partner">Liberty Mutual</p>
                   <p class="dg-icon-rating">★★★★★</p>
                 </div>
-              </div>
+              </a>
 
-              <div class="dg-icon-card">
+              <a
+                @click.prevent="
+                  redirectWithParams('https://insure.protect.com', {})
+                "
+                href="#"
+                class="dg-icon-card"
+              >
                 <div class="dg-icon">
                   <img
                     src="/assets/partners/nationwide-icon.gif"
@@ -94,21 +127,9 @@
                   <p class="dg-icon-partner">Nationwide</p>
                   <p class="dg-icon-rating">★★★★★</p>
                 </div>
-              </div>
+              </a>
             </div>
           </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Trust Bar / Insurance Brands -->
-    <section class="dg-trust-bar">
-      <div class="container">
-        <p class="subhead text-center">
-          We work with 100+ companies to find the best match for you
-        </p>
-        <div class="col-md-8 col-9 mx-auto">
-          <InsuranceBrands :providers-config="insuranceBrands" />
         </div>
       </div>
     </section>
@@ -159,14 +180,20 @@
           <div class="dg-dark-cards">
             <h2>Comprehensive Coverage, Simplified.</h2>
             <p>
-              We've done the hard work of vetting 200+ insurance companies so
+              We've done the hard work of vetting 100+ insurance companies so
               you don't have to.
             </p>
           </div>
           <!-- Hero Graphics - Brand Icons Grid -->
           <div class="dg-hero-graphics">
             <div class="dg-icon-grid">
-              <div class="dg-icon-card">
+              <a
+                @click.prevent="
+                  redirectWithParams('https://insure.protect.com', {})
+                "
+                href="#"
+                class="dg-icon-card"
+              >
                 <div class="dg-icon">
                   <img src="/assets/partners/geico-icon.gif" alt="Geico Logo" />
                 </div>
@@ -174,9 +201,15 @@
                   <p class="dg-icon-partner">Geico</p>
                   <p class="dg-icon-rating">★★★★★</p>
                 </div>
-              </div>
+              </a>
 
-              <div class="dg-icon-card">
+              <a
+                @click.prevent="
+                  redirectWithParams('https://insure.protect.com', {})
+                "
+                href="#"
+                class="dg-icon-card"
+              >
                 <div class="dg-icon">
                   <img
                     src="/assets/partners/progressive-icon.gif"
@@ -187,9 +220,15 @@
                   <p class="dg-icon-partner">Progressive</p>
                   <p class="dg-icon-rating">★★★★★</p>
                 </div>
-              </div>
+              </a>
 
-              <div class="dg-icon-card">
+              <a
+                @click.prevent="
+                  redirectWithParams('https://insure.protect.com', {})
+                "
+                href="#"
+                class="dg-icon-card"
+              >
                 <div class="dg-icon dg-icon-shield">
                   <img
                     src="/assets/partners/statefarm-icon.gif"
@@ -200,9 +239,15 @@
                   <p class="dg-icon-partner">State Farm</p>
                   <p class="dg-icon-rating">★★★★★</p>
                 </div>
-              </div>
+              </a>
 
-              <div class="dg-icon-card">
+              <a
+                @click.prevent="
+                  redirectWithParams('https://insure.protect.com', {})
+                "
+                href="#"
+                class="dg-icon-card"
+              >
                 <div class="dg-icon">
                   <img
                     src="/assets/partners/liberty-icon.gif"
@@ -213,9 +258,15 @@
                   <p class="dg-icon-partner">Liberty Mutual</p>
                   <p class="dg-icon-rating">★★★★★</p>
                 </div>
-              </div>
+              </a>
 
-              <div class="dg-icon-card">
+              <a
+                @click.prevent="
+                  redirectWithParams('https://insure.protect.com', {})
+                "
+                href="#"
+                class="dg-icon-card"
+              >
                 <div class="dg-icon">
                   <img
                     src="/assets/partners/nationwide-icon.gif"
@@ -226,17 +277,27 @@
                   <p class="dg-icon-partner">Nationwide</p>
                   <p class="dg-icon-rating">★★★★★</p>
                 </div>
-              </div>
+              </a>
             </div>
           </div>
         </div>
       </div>
     </section>
 
+    <section id="steps" class="steps-container">
+      <steps
+        :steps-config="[
+          { text: 'Use our online tool' },
+          { text: 'Compare quotes from trusted companies' },
+          { text: 'Choose from the best rates available' },
+        ]"
+      />
+    </section>
+
     <!-- Social Proof / Trustpilot Section (Light Background) -->
     <section class="dg-light-section dg-social-proof">
       <div class="container">
-        <h2>Over 74 million quotes and counting</h2>
+        <h2>Over <span>74 million</span> quotes and counting</h2>
         <div class="dg-review-grid">
           <div class="dg-review-card">
             <div class="dg-stars">★★★★★</div>
@@ -252,6 +313,72 @@
             <div class="dg-stars">★★★★★</div>
             <p class="dg-review-text">"Best comparison tool out there."</p>
             <p class="dg-review-author">- Verified Customer</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Trust Bar / Insurance Brands -->
+    <section class="dg-trust-bar">
+      <div class="container">
+        <p class="subhead text-center">
+          We work with 100+ companies to find the best match for you
+        </p>
+        <div class="col-md-12 col-9 mx-auto">
+          <InsuranceBrands :providers-config="insuranceBrands" />
+        </div>
+      </div>
+    </section>
+
+    <!-- Discounts Section -->
+    <section class="dg-discounts-section">
+      <div class="container">
+        <div class="dg-discounts-intro text-center mb-5">
+          <h2>Maximize Your Savings</h2>
+          <p>
+            Take advantage of multiple discounts that could significantly lower
+            your rates
+          </p>
+        </div>
+        <div class="dg-discounts-grid">
+          <!-- Discount 1 -->
+          <div class="dg-discount-card">
+            <div class="dg-discount-icon-wrapper">
+              <div class="dg-discount-icon">
+                <span>up to</span>
+                <p>25%</p>
+              </div>
+            </div>
+            <h4>Safe Driver Discount</h4>
+            <p>No accidents or violations in the past 3&nbsp;years?</p>
+          </div>
+
+          <!-- Discount 2 -->
+          <div class="dg-discount-card">
+            <div class="dg-discount-icon-wrapper">
+              <div class="dg-discount-icon">
+                <span>up to</span>
+                <p>$250</p>
+              </div>
+            </div>
+            <h4>Bundle & Save</h4>
+            <p>
+              Combine auto and home insurance policies for significant savings
+            </p>
+          </div>
+
+          <!-- Discount 3 -->
+          <div class="dg-discount-card">
+            <div class="dg-discount-icon-wrapper">
+              <div class="dg-discount-icon">
+                <span>up to</span>
+                <p>25%</p>
+              </div>
+            </div>
+            <h4>Multi-Vehicle Discount</h4>
+            <p>
+              Insure multiple vehicles under one policy and reduce your premium
+            </p>
           </div>
         </div>
       </div>
@@ -277,17 +404,23 @@
 </template>
 
 <script setup>
+  import { redirectWithParams } from "@/composables/utils.js";
+
   const insuranceBrands = [
     { name: "Liberty Mutual Insurance", src: "provider-liberty.png" },
     { name: "Root", src: "provider-root.png" },
     { name: "Allstate", src: "provider-allstate.png" },
     { name: "Farmers", src: "provider-farmers.png" },
-    { name: "Insurify", src: "provider-insurify.png" },
     { name: "Nationwide", src: "provider-nationwide.png" },
   ];
 </script>
 
 <style scoped lang="scss">
+  .lp-layout {
+    @include mobile {
+      padding: 0 15px;
+    }
+  }
   h2,
   h3,
   h4,
@@ -295,7 +428,7 @@
   h6 {
     font-family: "Nunito Sans", sans-serif;
     font-weight: 700;
-    color: darken($blue, 10%);
+    color: $blue;
   }
   .demand-gen-pmax {
     width: 100%;
@@ -326,6 +459,19 @@
     }
   }
 
+  .steps-container {
+    margin: 100px auto 50px auto;
+    :deep(.steps .step-number) {
+      border-right: 2px solid $gray;
+    }
+    :deep(h2) {
+      font-family: "Nunito Sans", sans-serif;
+      font-weight: 700;
+      font-size: 2.5rem;
+      color: $blue;
+    }
+  }
+
   .dg-dark-section {
     background-color: darken($blue, 15%);
     color: $white;
@@ -333,6 +479,7 @@
 
     @include mobile {
       padding: 2rem 0;
+      margin: 0 -15px;
     }
   }
 
@@ -345,7 +492,7 @@
     // background: lighten($blue-light, 48%);
 
     @include mobile {
-      padding: 3rem 0 2rem;
+      padding: 0;
     }
   }
 
@@ -378,8 +525,17 @@
     background: url("/assets/states/outlines/icon-shield.png") no-repeat center
       center / contain;
 
+    flex-wrap: wrap;
+
     @include tablet {
       display: none;
+    }
+
+    .graphic-header {
+      min-width: 100%;
+      flex-basis: 100%;
+      font-size: 1.15rem;
+      margin: 0.5rem auto 2rem auto;
     }
   }
 
@@ -407,7 +563,6 @@
     cursor: pointer;
     position: relative;
     min-width: 200px;
-    box-shadow: 0 4px 16px rgba(12, 44, 103, 0.1);
 
     &:hover {
       border-color: rgba(12, 44, 103, 0.3);
@@ -416,7 +571,6 @@
 
     &:hover {
       border-color: rgba(12, 44, 103, 0.4);
-      box-shadow: 0 12px 32px rgba(12, 44, 103, 0.15);
     }
     &:nth-child(5) {
       max-width: 200px;
@@ -458,14 +612,6 @@
     align-items: flex-start;
     gap: 0.15rem;
     flex: 0 0 auto;
-  }
-
-  .dg-icon-label {
-    font-size: 0.85rem;
-    font-weight: 600;
-    color: $gray-dark;
-    text-align: center;
-    margin: 0;
   }
 
   @keyframes fadeIn {
@@ -592,51 +738,15 @@
     margin-top: 3rem;
     padding: 2rem 0;
     text-align: center;
-    border-top: 2px solid darken($blue, 15%);
-    border-bottom: 2px solid darken($blue, 15%);
-    width: 75%;
     margin-left: auto;
+
+    @include mobile {
+      padding: 0rem 0;
+    }
 
     :deep(.brands) {
       margin: 0 auto;
     }
-
-    @include mobile {
-      max-width: 90%;
-      margin: auto;
-    }
-  }
-
-  .dg-trust-text {
-    font-size: 1rem;
-    color: $gray-dark;
-    margin-bottom: 1.5rem;
-    font-weight: 500;
-  }
-
-  .dg-logo-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-    gap: 1.5rem;
-    align-items: center;
-
-    @include mobile {
-      grid-template-columns: repeat(2, 1fr);
-      gap: 1rem;
-    }
-  }
-
-  .dg-logo-placeholder {
-    padding: 1rem;
-    background-color: $white;
-    border-radius: 4px;
-    font-size: 0.9rem;
-    color: $gray-dark;
-    text-align: center;
-    height: 60px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
   }
 
   // ============================================
@@ -644,6 +754,10 @@
   // ============================================
   .dg-value-props {
     padding: 5rem 0;
+
+    @include mobile {
+      padding: 0rem 0;
+    }
   }
 
   .dg-value-grid {
@@ -746,29 +860,9 @@
   }
 
   .dg-dark-text p {
-    font-size: 1rem;
-    line-height: 1.6;
-    opacity: 0.95;
-  }
-
-  .dg-dark-cards {
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
-  }
-
-  .dg-floating-card {
-    background-color: rgba($white, 0.95);
-    color: $blue;
-    padding: 1.5rem;
-    border-radius: 8px;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
-    transition: all 0.3s ease;
-
-    &:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.25);
-    }
   }
 
   // ============================================
@@ -778,10 +872,20 @@
     text-align: center;
     padding: 5rem 0;
 
+    @include mobile {
+      padding: 2rem 0;
+    }
+
     h2 {
       font-size: 2.5rem;
       color: $blue;
       margin-bottom: 3rem;
+
+      span {
+        color: $blue-light;
+        font-weight: 800;
+        font-size: inherit;
+      }
 
       @include mobile {
         font-size: 1.75rem;
@@ -802,25 +906,25 @@
   .dg-review-card {
     padding: 2rem;
     border-radius: 8px;
-    border: 2px solid darken($blue, 15%);
+    border: 3px solid darken($blue, 4%);
     transition: all 0.3s ease;
 
     &:hover {
-      box-shadow: 0 6px 16px rgba(12, 44, 103, 0.2);
       transform: translateY(-2px);
     }
   }
 
   .dg-stars {
-    color: $green;
+    color: $blue-light;
     font-size: 1.25rem;
     margin-bottom: 1rem;
     display: block;
   }
 
   .dg-review-text {
-    font-size: 1rem;
+    font-size: 1.25rem;
     color: $blue;
+    font-weight: 700;
     margin-bottom: 1rem;
     line-height: 1.6;
     font-style: italic;
@@ -828,9 +932,190 @@
 
   .dg-review-author {
     font-size: 0.9rem;
-    color: $blue;
+    color: $gray-dark;
     font-weight: 500;
     margin: 0;
+  }
+
+  // ============================================
+  // DISCOUNTS SECTION
+  // ============================================
+  .dg-discounts-section {
+    background-color: $white;
+    padding: 4rem 0;
+
+    @include mobile {
+      padding: 0rem 0;
+    }
+
+    .dg-discounts-intro {
+      h2 {
+        margin-bottom: 1rem;
+        color: darken($blue, 10%);
+      }
+      p {
+        font-size: 1.1rem;
+        color: darken($gray-dark, 10%);
+        max-width: 700px;
+        margin: 0 auto;
+        font-weight: 500;
+      }
+    }
+  }
+
+  .dg-discounts-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 3rem;
+    max-width: 1200px;
+    margin: 0 auto;
+
+    @include media-breakpoint-down(md) {
+      grid-template-columns: 1fr;
+      gap: 2rem;
+    }
+  }
+
+  .dg-discount-card {
+    padding: 2rem 1.5rem;
+    text-align: center;
+    transition: all 0.3s ease;
+
+    &:hover,
+    &.is-active {
+      transform: translateY(-4px);
+    }
+    &:nth-of-type(2) {
+      border-left: 2px solid $gray-medium;
+      border-right: 2px solid $gray-medium;
+
+      @include media-breakpoint-down(md) {
+        border: none;
+      }
+    }
+
+    h4 {
+      font-size: 1.3rem;
+      font-weight: 800;
+      color: darken($blue, 10%);
+      margin: 1.25rem 0 0.75rem;
+    }
+
+    p {
+      font-size: 1rem;
+      color: darken($gray-dark, 5%);
+      margin: 0;
+      line-height: 1.6;
+      font-weight: 400;
+    }
+  }
+
+  @keyframes spin {
+    from {
+      transform: translate(-50%, -50%) rotate(0deg);
+    }
+    to {
+      transform: translate(-50%, -50%) rotate(360deg);
+    }
+  }
+
+  .dg-discount-icon-wrapper {
+    position: relative;
+    width: 80px;
+    height: 80px;
+    margin: 0 auto;
+
+    // &::before {
+    //   content: "";
+    //   position: absolute;
+    //   top: 50%;
+    //   left: 50%;
+    //   width: 135%;
+    //   height: 135%;
+    //   z-index: 0;
+    //   // background: conic-gradient(
+    //   //     from 0deg,
+    //   //     rgba($blue, 1) 0%,
+    //   //     rgba($blue-light, 1) 25%,
+    //   //     rgba($green, 1) 50%,
+    //   //     rgba(lighten($green, 10%), 1) 75%,
+    //   //     rgba($blue, 1) 100%
+    //   //   ),
+    //   //   radial-gradient(
+    //   //     circle,
+    //   //     transparent 50%,
+    //   //     rgba($white, 0.2) 60%,
+    //   //     rgba($white, 0.7) 80%,
+    //   //     $white 92%
+    //   //   );
+    //   // opacity: 0;
+    //   // transform: translate(-50%, -50%) rotate(0deg);
+    //   // filter: blur(8px);
+    //   // transition: opacity 0.3s ease;
+    //   pointer-events: none;
+    //   border-radius: 50%;
+    // }
+
+    .dg-discount-card:hover &,
+    .dg-discount-card.is-active & {
+      &::before {
+        opacity: 0.7;
+        animation: spin 5s linear infinite;
+      }
+    }
+  }
+
+  .dg-discount-icon {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.3s ease;
+    background: darken($blue, 10%);
+    color: $white;
+    border-radius: 20%;
+    position: relative;
+    z-index: 1;
+
+    p {
+      color: $white;
+      font-size: 1.55rem;
+      font-weight: 800;
+      transition: color 0.3s ease;
+    }
+
+    span {
+      text-transform: uppercase;
+      font-size: 0.75rem;
+      font-weight: 600;
+      margin-top: 10px;
+      margin-bottom: -10px;
+    }
+
+    .dg-discount-card:hover &,
+    .dg-discount-card.is-active & {
+      transform: scale(1.1);
+
+      p {
+        // color: lighten($green, 10%);
+      }
+    }
+    &::after {
+      content: "$";
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      top: -20%;
+      left: 0;
+      z-index: -1;
+      color: $white;
+      opacity: 0.1;
+      font-size: 5rem;
+      font-weight: 800;
+      transform: rotate(-15deg);
+    }
   }
 
   // ============================================
@@ -845,10 +1130,6 @@
       rgba(59, 84, 186, 0.25) 100%
     );
 
-    @include media-breakpoint-down(md) {
-      margin: 2rem 0;
-      width: 100%;
-    }
     h2 {
       font-size: 2.5rem;
       color: $blue;
@@ -873,14 +1154,13 @@
       }
 
       .dg-icon-grid {
-        grid-template-columns: unset;
+        grid-template-columns: repeat(2, 1fr);
         gap: 10px;
         padding: 0 15px;
         width: 100%;
         max-width: 400px;
       }
       .dg-icon-card {
-        max-width: 100%;
         min-width: auto;
         width: 100%;
         left: 0;
@@ -888,11 +1168,16 @@
         grid-row: auto !important;
         gap: 0;
         padding: 10px;
+        flex-direction: column;
 
         .dg-icon {
-          width: 50px;
-          height: 50px;
-          margin-right: 10px;
+          width: auto;
+          height: auto;
+          max-width: 70px;
+          max-height: 70px;
+        }
+        .dg-icon-partner {
+          padding-top: 10px;
         }
       }
     }

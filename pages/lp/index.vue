@@ -1,7 +1,9 @@
 <template>
-  <DemandGenPMax />
+  <div />
 </template>
 
 <script setup>
-  import DemandGenPMax from "~/views/DemandGenPMax.vue";
+  definePageMeta({
+    redirect: "/lp/ppc-protect",
+  });
 </script>
