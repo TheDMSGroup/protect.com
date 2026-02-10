@@ -22,12 +22,28 @@
   // Reactive data
   const focus = ref(false);
   const menu = ref(false);
+
+  // Initialize selected and valid refs
   const selected = ref(false);
   const valid = ref(false);
 
+  // Hardcode initialization for compareYourRateDropdown dropdowns on homepage
+  watch(() => props.config.options, (options) => {
+    if (options && !selected.value && (props.config.name === 'compareYourRateDropdown' || props.config.name === 'compareYourRateDropdownMain')) {
+      // Select the first option (Car Insurance)
+      const firstOption = options[0];
+      if (firstOption) {
+        selected.value = { value: firstOption.value.value, text: firstOption.text, icon: firstOption.value.icon };
+        valid.value = props.validate ? props.validate(firstOption.value.value) : true;
+        // Emit the initial value
+        emit("selectUpdated:modelValue", firstOption.value.value);
+      }
+    }
+  }, { immediate: true });
+
   // Computed properties
   const currentIcon = computed(() => {
-    return selected.value && selected.value.value ? selected.value.value.icon : props.config.icon;
+    return selected.value && selected.value.icon ? selected.value.icon : props.config.icon;
   });
 
   const selectedValue = computed(() => {
@@ -38,7 +54,7 @@
   });
 
   const display = computed(() => {
-    if (selected.value && selected.value) {
+    if (selected.value && selected.value.text) {
       return selected.value.text;
     } else {
       return props.config.placeholderText;
@@ -46,6 +62,10 @@
   });
 
   const update = (selectValue, selectText) => {
+    // Find the selected option to get its icon
+    const selectedOption = props.config.options.find(opt => opt.value.value === selectValue);
+    const selectedIcon = selectedOption ? selectedOption.value.icon : null;
+
     // Run validation if provided
     if (props.validate) {
       const isValid = props.validate(selectValue);
@@ -53,7 +73,7 @@
       if (isValid) {
         emit("selectUpdated:modelValue", selectValue);
         valid.value = true;
-        selected.value = { value: selectValue, text: selectText };
+        selected.value = { value: selectValue, text: selectText, icon: selectedIcon };
         toggleMenu();
       } else {
         emit("selectInvalid:modelValue", selectValue);
@@ -62,6 +82,7 @@
     } else {
       // No validation, emit normally
       emit("selectUpdated:modelValue", selectValue);
+      selected.value = { value: selectValue, text: selectText, icon: selectedIcon };
     }
   };
   // Methods
@@ -99,12 +120,11 @@
           <b-input-group-text
             :class="{
               indicator: true,
-              'menu-open-icon': false && menu,
+              'menu-open-icon': menu,
               error: !valid,
             }"
           >
-            <IconsArrowDown v-if="menu || !selected" :classes="(valid ? 'valid' : 'error') + (menu ? ' menu-open-icon' : '')" />
-            <IconsCheckMark v-else :classes="(valid ? 'valid' : 'error') + (menu ? ' menu-open-icon' : '')" />
+            <IconsArrowDown :classes="(valid ? 'valid' : 'error') + (menu ? ' menu-open-icon' : '')" />
           </b-input-group-text>
         </template>
         <span class="selected-value clickable">{{ display }}</span>
@@ -131,25 +151,23 @@
     svg.elixr-icon.choice-icon {
       fill: #4153b3;
     }
+
     svg.elixr-icon {
-      // .cls-1 {
       fill: #999999;
-      // }
-      // &.check-mark.valid {
-      //   fill: #7DC099;
-      // }
     }
-    .elixr-icon.check-mark {
+
+    .elixr-icon.arrow-down {
+      transition: transform 0.2s ease;
+      fill: #999999;
+
       &.valid {
-        fill: #4153b3;
-        &.menu-open-icon {
-          fill: white;
-        }
+        fill: #4153b3 !important;
+      }
+
+      &.menu-open-icon {
+        transform: rotate(180deg);
       }
     }
-    // .menu-open > div > div > svg.elixr-icon.check-mark {
-    //   fill: blue;
-    // }
 
     .select-icon {
       padding: 0.5rem !important;
@@ -375,7 +393,7 @@
             border: 1px solid rgb(206, 212, 218);
             background: #f9f9f9;
             svg {
-              fill: #9a9a9a;
+              fill: #9a9a9a !important;
             }
           }
         }
