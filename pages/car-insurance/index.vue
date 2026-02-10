@@ -3,24 +3,68 @@
 
   const store = useStore();
 
+  const cityLinksLimit = 50;
+
+  //inline composable to fetch article with caching
+  async function useCityLinksFromCacheOrApi() {
+    const cacheKey = `cities-top-${cityLinksLimit}`;
+    console.log("🔑 Cache key:", cacheKey);
+
+    const nuxtApp = useNuxtApp();
+
+    const {
+      data: cityListResult,
+      error,
+      pending,
+    } = await useAsyncData(
+      cacheKey,
+      async () => {
+        const url = `/api/city/list?limit=${cityLinksLimit}`;
+        console.log("🌐 Making API request:", url);
+        const result = await $fetch(url);
+        return result;
+      },
+      {
+        server: true,
+        lazy: false,
+        //watch: [() => route.params.slug],
+        getCachedData(key) {
+          const cacheHit =
+            nuxtApp.payload.data[key] || nuxtApp.static.data[key];
+          if (cacheHit) {
+            console.log("✅ Using cached data for key:", key, cacheHit);
+          }
+          return cacheHit;
+        },
+      }
+    );
+
+    return { cityListResult, error, pending };
+  }
+
   useSeoMeta({
     title: () => "Compare Auto Insurance Rates & Get Side-by-Side Quotes",
-    description: () => " Get free car insurance quotes from the top companies and compare side-by-side to find the best deals. Start saving on your monthly payment with Protect.com.",
+    description: () =>
+      " Get free car insurance quotes from the top companies and compare side-by-side to find the best deals. Start saving on your monthly payment with Protect.com.",
     ogTitle: () => "Compare Auto Insurance Rates & Get Side-by-Side Quotes",
-    ogDescription: () => " Get free car insurance quotes from the top companies and compare side-by-side to find the best deals. Start saving on your monthly payment with Protect.com.",
+    ogDescription: () =>
+      " Get free car insurance quotes from the top companies and compare side-by-side to find the best deals. Start saving on your monthly payment with Protect.com.",
     ogImage: () => "https://stage.protect.com/img/protect-share.dabdad17.jpg",
     ogType: "article",
     twitterCard: "summary_large_image",
-    twitterTitle: () => "Compare Auto Insurance Rates & Get Side-by-Side Quotes",
-    twitterDescription: () => " Get free car insurance quotes from the top companies and compare side-by-side to find the best deals. Start saving on your monthly payment with Protect.com.",
-    twitterImage: () => "https://stage.protect.com/img/protect-share.dabdad17.jpg",
+    twitterTitle: () =>
+      "Compare Auto Insurance Rates & Get Side-by-Side Quotes",
+    twitterDescription: () =>
+      " Get free car insurance quotes from the top companies and compare side-by-side to find the best deals. Start saving on your monthly payment with Protect.com.",
+    twitterImage: () =>
+      "https://stage.protect.com/img/protect-share.dabdad17.jpg",
   });
   import { buildImageUrl } from "@/composables/images.js";
 
   const action = computed(() => {
-    let surveyUrl = 'https://insure.protect.com/';
+    let surveyUrl = "https://insure.protect.com/";
     if (store.visitorInfo?.ueid) {
-      surveyUrl = surveyUrl + '?ueid=' + store.visitorInfo.ueid;
+      surveyUrl = surveyUrl + "?ueid=" + store.visitorInfo.ueid;
     }
     return surveyUrl;
   });
@@ -155,8 +199,10 @@
             <b-col cols="12" lg="6">
               <h2>How does your auto insurance company rank?</h2>
               <p>
-                Protect.com ranks top auto insurance companies based on J.D. Power satisfaction scores plus our own Protect.com customer satisfaction
-                scores comprised of multiple reviews from the auto insurance industry’s most trusted sources.
+                Protect.com ranks top auto insurance companies based on J.D.
+                Power satisfaction scores plus our own Protect.com customer
+                satisfaction scores comprised of multiple reviews from the auto
+                insurance industry’s most trusted sources.
               </p>
             </b-col>
             <b-col cols="12" lg="6">
@@ -181,11 +227,23 @@
         </div>
       </b-container>
     </section>
+
     <section class="py-4 my-4">
       <b-container>
         <h2 class="text-center">Compare Car Insurance Quotes By State</h2>
         <p class="text-center">Select your state below to get started.</p>
         <StateAutoInsuranceUSMap />
+      </b-container>
+    </section>
+
+    <section>
+      <b-container>
+        <h2 class="text-center">Compare Car Insurance Quotes By City</h2>
+        <p class="text-center">
+          Check out our top 50 cities and how they line up with National
+          Averages.
+        </p>
+        <CityLinkList :links="links" />
       </b-container>
     </section>
 
@@ -210,7 +268,11 @@
       :lazy-image="true"
     />
 
-    <BlogFeed :show-categories="false" vertical="insurance" :sub-verticals="['car-insurance']" />
+    <BlogFeed
+      :show-categories="false"
+      vertical="insurance"
+      :sub-verticals="['car-insurance']"
+    />
     <!-- <join-newsletter /> -->
   </div>
 </template>
