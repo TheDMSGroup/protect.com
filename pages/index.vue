@@ -18,6 +18,7 @@
         value: {
           icon: "car",
           value: "car-insurance",
+          target: "https://insure.protect.com",
         },
         text: "Car Insurance",
       },
@@ -58,6 +59,7 @@
             value: {
               icon: 'car',
               value: 'car-insurance',
+              target: 'https://insure.protect.com'
             },
             text: 'Car Insurance',
           },
@@ -65,6 +67,7 @@
             value: {
               icon: 'health-insurance',
               value: 'health-insurance',
+              target: 'https://health.protect.com'
             },
             text: 'Health Insurance',
           },
@@ -72,11 +75,12 @@
             value: {
               icon: 'home',
               value: 'home-insurance',
+              target: 'https://homeinsurance.protect.com'
             },
             text: 'Home Insurance',
           },
         ],
-        icon: 'scales',
+        icon: 'car',
         name: 'compareYourRateDropdown',
         placeholderText: 'Compare rates for...',
         label: 'Compare Your Rate Selections',
