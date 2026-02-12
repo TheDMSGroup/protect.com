@@ -121,8 +121,11 @@
                 >
                   {{ capitalize(rateComparison.comparison.text) }}
                 </span>
+                <span class="contender"
+                  ><span class="emoji">👍</span>
+                  <span>Great contender for Protect.com savings</span>
+                </span>
               </div>
-
               <div class="fact-card rate">
                 <h2>${{ coverageRateMonthly }}</h2>
                 <p>Average {{ cityName }} Monthly Cost</p>
@@ -1026,6 +1029,20 @@
     &.rate {
       justify-content: space-between;
       height: 100%;
+
+      .contender {
+        max-width: 150px;
+        margin: 20px auto 0 auto;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 4px;
+
+        span {
+          font-size: 0.8rem;
+          line-height: 1rem;
+        }
+      }
     }
 
     &:hover {

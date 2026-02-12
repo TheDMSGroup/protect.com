@@ -3,20 +3,36 @@
     <!-- Hero Section -->
     <section class="hero-section row">
       <b-col cols="12" lg="7" class="text-lg-left hero-content">
-        <h1>Maximize Your Savings: The Ultimate List of Car Insurance Discounts in&nbsp;2026</h1>
+        <h1>
+          Maximize Your Savings: The Ultimate List of Car Insurance Discounts
+          in&nbsp;2026
+        </h1>
         <p class="intro-text">
-          Most drivers are eligible for at least three to five different discounts, yet many never claim them. Whether you've recently improved your
-          credit score, bought a car with advanced safety features, or simply maintained a clean driving record, you could be sitting on hundreds of
-          dollars in annual&nbsp;savings.
+          Most drivers are eligible for at least three to five different
+          discounts, yet many never claim them. Whether you've recently improved
+          your credit score, bought a car with advanced safety features, or
+          simply maintained a clean driving record, you could be sitting on
+          hundreds of dollars in annual&nbsp;savings.
         </p>
         <p class="intro-text">
-          The challenge is that every insurance provider offers different incentives. That's where Protect.com comes in. Our advanced quote tool does
-          the heavy lifting for you, scanning top-rated providers to see exactly who can offer the deepest discounts on your current&nbsp;rate.
+          The challenge is that every insurance provider offers different
+          incentives. That's where Protect.com comes in. Our advanced quote tool
+          does the heavy lifting for you, scanning top-rated providers to see
+          exactly who can offer the deepest discounts on your current&nbsp;rate.
         </p>
-        <a href="https://insure.protect.com/" class="cta-button primary" @click.prevent="goToForm()">Get Your Free Quotes</a>
+        <a
+          href="https://insure.protect.com/"
+          class="cta-button primary"
+          @click.prevent="goToForm()"
+          >Get Your Free Quotes</a
+        >
       </b-col>
 
-      <b-col cols="12" lg="5" class="hero-img d-flex align-items-center justify-content-center">
+      <b-col
+        cols="12"
+        lg="5"
+        class="hero-img d-flex align-items-center justify-content-center"
+      >
         <NuxtImg
           class="hero-image"
           :src="buildImageUrl('mobile-phone-quotes.jpg')"
@@ -29,11 +45,6 @@
       </b-col>
     </section>
 
-    <!-- Video Section -->
-    <section v-if="videoResult && !error" class="video-container mt-4 pt-4">
-      <YouTubeEmbed :video-id="videoId" :title="title" class="video-container" />
-    </section>
-
     <!-- Discounts List Section -->
     <section class="discounts-section">
       <h2>List of Common Car Insurance Discounts</h2>
@@ -43,7 +54,10 @@
           { label: 'Policy & Loyalty', target: 'policy-loyalty' },
           { label: 'Safe Driving & Habits', target: 'safe-driving' },
           { label: 'Driver Profile & Lifestyle', target: 'driver-profile' },
-          { label: 'Vehicle Equipment & Technology', target: 'vehicle-equipment' },
+          {
+            label: 'Vehicle Equipment & Technology',
+            target: 'vehicle-equipment',
+          },
         ]"
         :active-tab="currentTab"
         :previous-tab="'policy-loyalty'"
@@ -52,15 +66,25 @@
 
       <!-- Category 1: Policy & Loyalty Discounts -->
       <Transition name="fade" mode="out-in">
-        <div v-show="currentTab === 'policy-loyalty'" id="policy-loyalty" class="discount-category">
+        <div
+          v-show="currentTab === 'policy-loyalty'"
+          id="policy-loyalty"
+          class="discount-category"
+        >
           <h3>1. Policy & Loyalty Discounts</h3>
-          <p class="category-description">These savings are based on how you manage your account and how long you've been a customer.</p>
+          <p class="category-description">
+            These savings are based on how you manage your account and how long
+            you've been a customer.
+          </p>
 
           <div class="discount-list">
             <div class="discount-item">
               <NuxtLink to="/car-insurance/discounts/bundle">
                 <h4>📦 Multi-Policy (Bundling Auto & Home)</h4>
-                <p>Save up to <strong>25%</strong> by combining auto with home, renters, or life insurance.</p>
+                <p>
+                  Save up to <strong>25%</strong> by combining auto with home,
+                  renters, or life insurance.
+                </p>
               </NuxtLink>
             </div>
 
@@ -76,7 +100,10 @@
 
             <div class="discount-item">
               <h4>🐦 Early Quote/Early Bird</h4>
-              <p>Getting a quote and signing your policy 7–10 days before your current one expires.</p>
+              <p>
+                Getting a quote and signing your policy 7–10 days before your
+                current one expires.
+              </p>
             </div>
 
             <div class="discount-item">
@@ -86,7 +113,10 @@
 
             <div class="discount-item">
               <h4>💳 Paperless & Auto-Pay</h4>
-              <p>Small discounts for choosing digital billing and automatic bank transfers.</p>
+              <p>
+                Small discounts for choosing digital billing and automatic bank
+                transfers.
+              </p>
             </div>
           </div>
         </div>
@@ -94,36 +124,55 @@
 
       <!-- Category 2: Safe Driving & Habits Discounts -->
       <Transition name="fade" mode="out-in">
-        <div v-show="currentTab === 'safe-driving'" id="safe-driving" class="discount-category">
+        <div
+          v-show="currentTab === 'safe-driving'"
+          id="safe-driving"
+          class="discount-category"
+        >
           <h3>2. Safe Driving & Habits Discounts</h3>
-          <p class="category-description">Your behavior on the road is the biggest factor in your premium cost.</p>
+          <p class="category-description">
+            Your behavior on the road is the biggest factor in your premium
+            cost.
+          </p>
 
           <div class="discount-list">
             <div class="discount-item">
               <h4>✅ Safe Driver</h4>
-              <p>For those with no accidents or moving violations for 3–5 years.</p>
+              <p>
+                For those with no accidents or moving violations for 3–5 years.
+              </p>
             </div>
 
             <div class="discount-item">
               <h4>📱 Telematics (Usage-Based)</h4>
-              <p>Programs like Progressive's Snapshot or State Farm's Drive Safe & Save track your braking and speed for up to 30% savings.</p>
+              <p>
+                Programs like Progressive's Snapshot or State Farm's Drive Safe
+                & Save track your braking and speed for up to 30% savings.
+              </p>
             </div>
 
             <div class="discount-item">
               <h4>📏 Low-Mileage</h4>
-              <p>For those who drive less than 7,500 miles per year (common for remote workers).</p>
+              <p>
+                For those who drive less than 7,500 miles per year (common for
+                remote workers).
+              </p>
             </div>
 
             <div class="discount-item">
               <h4>🎓 Defensive Driving Course</h4>
-              <p>Completing an approved safety course (mandatory discounts in many states).</p>
+              <p>
+                Completing an approved safety course (mandatory discounts in
+                many states).
+              </p>
             </div>
 
             <div class="discount-item">
               <h4>🛡️ Accident Forgiveness</h4>
               <p>
-                While not a "discount" per se, if you're a good driver, it prevents your first at-fault accident from raising your rates which is a
-                discount from otherwise higher rates.
+                While not a "discount" per se, if you're a good driver, it
+                prevents your first at-fault accident from raising your rates
+                which is a discount from otherwise higher rates.
               </p>
             </div>
           </div>
@@ -132,44 +181,70 @@
 
       <!-- Category 3: Driver Profile & Lifestyle Discounts -->
       <Transition name="fade" mode="out-in">
-        <div v-show="currentTab === 'driver-profile'" id="driver-profile" class="discount-category">
+        <div
+          v-show="currentTab === 'driver-profile'"
+          id="driver-profile"
+          class="discount-category"
+        >
           <h3>3. Driver Profile & Lifestyle Discounts</h3>
-          <p class="category-description">Who you are, where you work, and your life milestones can trigger lower rates.</p>
+          <p class="category-description">
+            Who you are, where you work, and your life milestones can trigger
+            lower rates.
+          </p>
 
           <div class="discount-list">
             <div class="discount-item">
               <h4>📚 Good Student</h4>
-              <p>For full-time students (high school or college) maintaining a 3.0 GPA (B average) or higher.</p>
+              <p>
+                For full-time students (high school or college) maintaining a
+                3.0 GPA (B average) or higher.
+              </p>
             </div>
 
             <div class="discount-item">
               <h4>🎒 Student Away at School</h4>
-              <p>For students living 100+ miles away from home without a car.</p>
+              <p>
+                For students living 100+ miles away from home without a car.
+              </p>
             </div>
 
             <div class="discount-item">
               <h4>🏡 Homeowner Discount</h4>
-              <p>Many insurers offer a discount simply for owning a home, even if you don't bundle.</p>
+              <p>
+                Many insurers offer a discount simply for owning a home, even if
+                you don't bundle.
+              </p>
             </div>
 
             <div class="discount-item">
               <h4>👔 Occupational/Affinity</h4>
-              <p>Special rates for teachers, nurses, first responders, military, and alumni associations.</p>
+              <p>
+                Special rates for teachers, nurses, first responders, military,
+                and alumni associations.
+              </p>
             </div>
 
             <div class="discount-item">
               <h4>🎖️ Military/Federal Employee</h4>
-              <p>Dedicated discounts for active duty, veterans, and government workers.</p>
+              <p>
+                Dedicated discounts for active duty, veterans, and government
+                workers.
+              </p>
             </div>
 
             <div class="discount-item">
               <h4>👴 Mature/Senior Driver</h4>
-              <p>For drivers over 55 who complete a senior driving safety course.</p>
+              <p>
+                For drivers over 55 who complete a senior driving safety course.
+              </p>
             </div>
 
             <div class="discount-item">
               <h4>💍 Newly Married</h4>
-              <p>Statistics show married drivers are lower risk, leading to lower premiums.</p>
+              <p>
+                Statistics show married drivers are lower risk, leading to lower
+                premiums.
+              </p>
             </div>
           </div>
         </div>
@@ -177,29 +252,47 @@
 
       <!-- Category 4: Vehicle Equipment & Technology Discounts -->
       <Transition name="fade" mode="out-in">
-        <div v-show="currentTab === 'vehicle-equipment'" id="vehicle-equipment" class="discount-category">
+        <div
+          v-show="currentTab === 'vehicle-equipment'"
+          id="vehicle-equipment"
+          class="discount-category"
+        >
           <h3>4. Vehicle Equipment & Technology Discounts</h3>
-          <p class="category-description">The safety and security features of your car can work in your favor.</p>
+          <p class="category-description">
+            The safety and security features of your car can work in your favor.
+          </p>
 
           <div class="discount-list">
             <div class="discount-item">
               <h4>🔒 Anti-Theft Devices</h4>
-              <p>For factory-installed alarms, GPS trackers (like LoJack), or kill switches.</p>
+              <p>
+                For factory-installed alarms, GPS trackers (like LoJack), or
+                kill switches.
+              </p>
             </div>
 
             <div class="discount-item">
               <h4>🛟 Safety Features</h4>
-              <p>Discounts for anti-lock brakes (ABS), airbags, and daytime running lights.</p>
+              <p>
+                Discounts for anti-lock brakes (ABS), airbags, and daytime
+                running lights.
+              </p>
             </div>
 
             <div class="discount-item">
               <h4>✨ New Vehicle</h4>
-              <p>Cars that are less than 3 years old are often eligible for a 10–15% credit.</p>
+              <p>
+                Cars that are less than 3 years old are often eligible for a
+                10–15% credit.
+              </p>
             </div>
 
             <div class="discount-item">
               <h4>🌱 Green Vehicle (Hybrid/EV)</h4>
-              <p>Incentives for driving eco-friendly or alternative-fuel vehicles.</p>
+              <p>
+                Incentives for driving eco-friendly or alternative-fuel
+                vehicles.
+              </p>
             </div>
 
             <div class="discount-item">
@@ -210,41 +303,80 @@
             <div class="discount-item">
               <h4>🏠 Garage Parking</h4>
               <p>
-                If you park your car in a safe location, like a garage, insurance carriers will often reward you with a lower rate than if you were to
-                park on the street.
+                If you park your car in a safe location, like a garage,
+                insurance carriers will often reward you with a lower rate than
+                if you were to park on the street.
               </p>
             </div>
           </div>
         </div>
       </Transition>
+
+      <div class="col-md-6 col-12 mx-auto text-center">
+        <a
+          href="https://insure.protect.com/"
+          class="cta-button primary mt-0"
+          @click.prevent="goToForm()"
+          >Get Your Free Quotes</a
+        >
+      </div>
+    </section>
+
+    <!-- Video Section -->
+    <section v-if="videoResult && !error" class="video-container my-4 py-4">
+      <YouTubeEmbed
+        :video-id="videoId"
+        :title="title"
+        class="video-container"
+      />
     </section>
 
     <!-- CTA Section -->
     <section class="cta-section">
       <b-container>
-        <h2>Take the Guess Work out of Car Insurance Discounts and Start Saving with Protect.com</h2>
+        <h2>
+          Take the Guess Work out of Car Insurance Discounts and Start Saving
+          with Protect.com
+        </h2>
         <p>
-          Finding which company offers the specific "Good Student" or "Safe Driver" discount tailored to YOUR lifestyle can take hours of manual
+          Finding which company offers the specific "Good Student" or "Safe
+          Driver" discount tailored to YOUR lifestyle can take hours of manual
           searching.
         </p>
         <p>
-          Why wait? Use the <a href="https://insure.protect.com/" @click.prevent="goToForm()">Protect.com quote tool</a> to instantly compare dozens
-          of providers. We help you identify the specific car insurance companies that can offer a discount on your current rate, ensuring you never
-          pay a penny more than you have to.
+          Why wait? Use the
+          <a href="https://insure.protect.com/" @click.prevent="goToForm()"
+            >Protect.com quote tool</a
+          >
+          to instantly compare dozens of providers. We help you identify the
+          specific car insurance companies that can offer a discount on your
+          current rate, ensuring you never pay a penny more than you have to.
         </p>
 
         <div class="how-it-works">
           <h3>How it Works:</h3>
           <ol>
-            <li class=""><strong>Enter Your Zip Code:</strong> Start with your location to see local availability.</li>
-            <li class=""><strong>Compare in Real-Time:</strong> See quotes from the nation's top insurers side-by-side.</li>
             <li class="">
-              <strong>Unlock Hidden Discounts:</strong> Our tool identifies the providers most likely to reward your specific driving profile.
+              <strong>Enter Your Zip Code:</strong> Start with your location to
+              see local availability.
+            </li>
+            <li class="">
+              <strong>Compare in Real-Time:</strong> See quotes from the
+              nation's top insurers side-by-side.
+            </li>
+            <li class="">
+              <strong>Unlock Hidden Discounts:</strong> Our tool identifies the
+              providers most likely to reward your specific driving profile.
             </li>
           </ol>
         </div>
 
-        <a href="https://insure.protect.com/" class="cta-button primary" @click.prevent="goToForm()">Get Your Free Quotes</a>
+        <a
+          href="https://insure.protect.com/"
+          class="cta-button primary"
+          @click.prevent="goToForm()"
+          >Get Your Free Quotes</a
+        >
       </b-container>
     </section>
   </div>
@@ -289,7 +421,8 @@
         lazy: false,
         //watch: [() => route.params.slug],
         getCachedData(key) {
-          const cacheHit = nuxtApp.payload.data[key] || nuxtApp.static.data[key];
+          const cacheHit =
+            nuxtApp.payload.data[key] || nuxtApp.static.data[key];
           if (cacheHit) {
             console.log("✅ Using cached data for key:", key, cacheHit);
           }
@@ -302,7 +435,8 @@
   }
 
   useSeoMeta({
-    title: "Maximize Your Savings: The Ultimate List of Car Insurance Discounts in 2026 | Protect.com",
+    title:
+      "Maximize Your Savings: The Ultimate List of Car Insurance Discounts in 2026 | Protect.com",
     description:
       "Discover every car insurance discount available, from safe driver rewards to multi-policy bundles. Use Protect.com's quote tool to find the best rates and hidden discounts today!",
     keywords: [
@@ -372,23 +506,6 @@
 
       @include media-breakpoint-up(md) {
         max-width: 700px;
-      }
-    }
-
-    .cta-button {
-      display: inline-block;
-      padding: 1rem 2.5rem;
-      background: $blue-light;
-      color: white;
-      text-decoration: none;
-      border-radius: 50px;
-      font-weight: 700;
-      font-size: 1.1rem;
-      transition: all 0.3s;
-
-      &:hover {
-        background: darken($blue-light, 10%);
-        transform: translateY(-2px);
       }
     }
 
@@ -497,7 +614,7 @@
         max-width: 800px;
       }
     }
-    a {
+    a:not(.cta-button) {
       color: white;
       text-decoration: underline;
     }
@@ -575,26 +692,24 @@
         }
       }
     }
+  }
+  .cta-button {
+    display: inline-block;
+    padding: 1rem 2.5rem;
+    background: $blue-light;
+    color: white;
+    text-decoration: none;
+    border-radius: 50px;
+    font-weight: 700;
+    font-size: 1.1rem;
+    margin-top: 2rem;
+    transition: all 0.3s;
 
-    .cta-button {
-      display: inline-block;
-      padding: 1rem 2.5rem;
-      background: $blue-light;
-      color: white;
-      text-decoration: none;
-      border-radius: 50px;
-      font-weight: 700;
-      font-size: 1.1rem;
-      margin-top: 2rem;
-      transition: all 0.3s;
-
-      &:hover {
-        background: darken($blue-light, 10%);
-        transform: translateY(-2px);
-      }
+    &:hover {
+      background: darken($blue-light, 10%);
+      transform: translateY(-2px);
     }
   }
-
   // Transition animations
   .fade-enter-active,
   .fade-leave-active {
