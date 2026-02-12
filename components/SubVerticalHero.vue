@@ -52,7 +52,7 @@
           <b-row>
             <b-col class="headline-col" cols="12">
               <h1>{{ headline }}</h1>
-              <h2>{{ subheadline }}</h2>
+              <p class="lead">{{ subheadline }}</p>
             </b-col>
             <b-col class="cta-col" cols="12">
               <slot name="formactions">
@@ -152,36 +152,9 @@
           margin-bottom: 0;
         }
 
-        h1 {
-          font-size: 4.3rem;
-          font-family: "Cantata One", serif;
-          letter-spacing: -0.07rem;
-          line-height: 4.9rem;
-
-          @include media-breakpoint-down(xl) {
-            font-size: 3.3em;
-            line-height: 1.2;
-          }
-          @include media-breakpoint-down(lg) {
-            font-size: 2.5em;
-            max-width: 450px;
-          }
-        }
-
-        h2 {
-          color: $gray-dark;
-          font-size: 2.39rem;
-          font-family: "Nunito Sans", sans-serif;
-          font-weight: 400;
+        .lead {
           margin-top: 1.3rem;
           margin-bottom: 2.3rem;
-          letter-spacing: -0.019rem;
-          line-height: 2.85rem;
-
-          @include media-breakpoint-down(lg) {
-            font-size: 1.6em;
-            line-height: 1.3em;
-          }
         }
 
         img.mobile-image {

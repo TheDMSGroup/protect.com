@@ -16,7 +16,7 @@ if (!isValidMake(make)) {
 const formattedMake = computed(() => getMakeName(make));
 
 // Fetch make data and models in parallel
-const [{ data: makeData, error: makeError }, { data: modelsData }] = await Promise.all([
+const [{ data: makeData }, { data: modelsData }] = await Promise.all([
   useFetch(`/api/sheets/vehicle-makes`, {
     query: { slug: make },
     key: `make-${make}`,
@@ -273,8 +273,7 @@ useSeoMeta({
         <div class="section-header">
           <h2>Frequently Asked Questions</h2>
         </div>
-
-        <FaqAccordion :faqs="displayFaqs" />
+        <FaqMain :faq="displayFaqs" />
       </b-container>
     </section>
 

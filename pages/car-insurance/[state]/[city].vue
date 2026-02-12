@@ -689,16 +689,10 @@
       }
 
       h2 {
-        font-size: 24px;
-        color: $blue;
         margin-bottom: 16px;
-        font-weight: 600;
       }
 
       p {
-        font-size: 16px;
-        color: #64748b;
-        line-height: 1.6;
         margin: 0;
       }
     }
@@ -805,29 +799,13 @@
         }
       }
       h1 {
-        font-size: 52px;
-        font-weight: 700;
         margin-bottom: 20px;
-        line-height: 1.1;
-        color: $blue;
-
-        @include tablet {
-          font-size: 42px;
-        }
-
-        @include mobile {
-          font-size: 36px;
-        }
       }
 
       .subtitle {
-        font-size: 20px;
         margin-bottom: 32px;
-        color: #64748b;
-        line-height: 1.6;
 
         @include mobile {
-          font-size: 16px;
           margin-bottom: 24px;
           max-width: 90%;
           margin: 20px auto;
@@ -914,17 +892,6 @@
         align-items: center;
         min-height: 165px;
 
-        h2 {
-          font-family: inherit;
-          font-size: 36px;
-          color: $blue;
-          font-weight: 700;
-
-          @include mobile {
-            font-size: 28px;
-            font-family: inherit;
-          }
-        }
 
         @include mobile {
           padding: 24px 20px;
@@ -938,16 +905,10 @@
         }
 
         h3 {
-          font-size: 32px;
-          color: $blue;
-          font-weight: 700;
           margin-bottom: 8px;
         }
 
         p {
-          font-size: 14px;
-          color: #6b7280;
-          font-weight: 500;
           margin-bottom: 8px;
           max-width: 157px;
           margin: 0 auto;
@@ -982,14 +943,9 @@
 
       p {
         margin: 0;
-        font-size: 15px;
-        line-height: 1.5;
         color: darken(#2563eb, 20%);
-        font-weight: 500;
 
         strong {
-          font-weight: 700;
-          font-size: 16px;
           display: block;
           margin-bottom: 4px;
           color: darken(#2563eb, 25%);
@@ -1048,17 +1004,12 @@
     background: white;
 
     h2 {
-      font-size: 36px;
-      color: #0c2c67;
       text-align: center;
       margin-bottom: 12px;
-      font-weight: 700;
     }
 
     .intro {
       text-align: center;
-      color: #6b7280;
-      font-size: 18px;
       margin-bottom: 40px;
     }
   }
@@ -1101,16 +1052,10 @@
     }
 
     h3 {
-      font-size: 42px;
-      color: #0c2c67;
-      font-weight: 700;
       margin-bottom: 8px;
     }
 
     p {
-      font-size: 16px;
-      color: #6b7280;
-      font-weight: 500;
       margin-bottom: 8px;
     }
 
@@ -1191,13 +1136,11 @@
     }
 
     h3 {
-      font-size: 28px;
       margin-bottom: 8px;
       color: white;
     }
 
     p {
-      font-size: 18px;
       margin-bottom: 8px;
       opacity: 0.95;
       color: white;
@@ -1221,17 +1164,12 @@
     background: #f9fafb;
 
     h2 {
-      font-size: 36px;
-      color: #0c2c67;
       text-align: center;
       margin-bottom: 12px;
-      font-weight: 700;
     }
 
     > .container > p {
       text-align: center;
-      color: #6b7280;
-      font-size: 18px;
       margin-bottom: 48px;
     }
   }
@@ -1275,16 +1213,10 @@
     }
 
     .headline {
-      color: #0c2c67;
       margin-bottom: 12px;
-      font-weight: 600;
-      font-size: 28px;
     }
 
     p {
-      font-size: 16px;
-      color: #6b7280;
-      line-height: 1.6;
       margin-bottom: 16px;
     }
   }
@@ -1322,16 +1254,10 @@
 
   .insight-content {
     h3 {
-      font-size: 24px;
-      color: #0c2c67;
       margin-bottom: 16px;
-      font-weight: 600;
     }
 
     p {
-      font-size: 16px;
-      line-height: 1.8;
-      color: #4b5563;
       margin-bottom: 16px;
     }
   }
@@ -1341,11 +1267,8 @@
     background: #f9fafb;
 
     h2 {
-      font-size: 36px;
-      color: #0c2c67;
       text-align: center;
       margin-bottom: 48px;
-      font-weight: 700;
     }
   }
 
@@ -1354,17 +1277,12 @@
     background: white;
 
     h2 {
-      font-size: 36px;
-      color: #0c2c67;
       text-align: center;
       margin-bottom: 12px;
-      font-weight: 700;
     }
 
     > .container > p {
       text-align: center;
-      color: #6b7280;
-      font-size: 18px;
       margin-bottom: 48px;
     }
   }
@@ -1391,16 +1309,7 @@
     position: relative;
 
     h3 {
-      font-size: 22px;
-      color: #0c2c67;
       margin-bottom: 12px;
-      font-weight: 600;
-    }
-
-    p {
-      font-size: 16px;
-      color: #6b7280;
-      line-height: 1.6;
     }
   }
 
@@ -1424,17 +1333,12 @@
     background: #f9fafb;
 
     h2 {
-      font-size: 36px;
-      color: #0c2c67;
       text-align: center;
       margin-bottom: 12px;
-      font-weight: 700;
     }
 
     > .container > p {
       text-align: center;
-      color: #6b7280;
-      font-size: 18px;
       margin-bottom: 40px;
     }
   }
@@ -1446,20 +1350,14 @@
     padding: 40px 0;
 
     h3 {
-      font-size: 20px;
-      color: #0c2c67;
       margin-bottom: 16px;
-      font-weight: 600;
     }
 
     p {
-      font-size: 14px;
-      color: #6b7280;
-      line-height: 1.8;
       margin-bottom: 12px;
     }
+
     a {
-      font-size: 14px;
       text-decoration: underline;
     }
   }

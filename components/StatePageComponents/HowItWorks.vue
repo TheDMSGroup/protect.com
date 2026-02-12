@@ -102,14 +102,11 @@ const getQuotes = computed(() => {
     }
 
     h3 {
-      color: var(--text-primary);
       margin-bottom: var(--spacing-md);
-      font-size: 1.25rem;
     }
 
     p {
-      color: var(--text-secondary);
-      line-height: 1.6;
+      margin-bottom: 0;
     }
   }
 }

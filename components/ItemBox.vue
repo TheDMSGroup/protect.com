@@ -64,11 +64,10 @@
       margin: 10px 0;
     }
     p {
-      font-size: 18px;
-      line-height: 24px;
       font-weight: 700;
-      color: #3b54ba;
+      color: $blue;
       padding: 0;
+      margin-bottom: 0;
     }
     &.noicon {
       background: #3b54bb;

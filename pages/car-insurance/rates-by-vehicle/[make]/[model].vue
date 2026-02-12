@@ -1,5 +1,5 @@
 <script setup>
-import { isValidMake, isValidModel, getMakeName, getModelsForMake, getVehicleImagePath, getMakeLogoPath } from "~/data/vehicles";
+import { isValidMake, isValidModel, getMakeName, getVehicleImagePath, getMakeLogoPath } from "~/data/vehicles";
 import { redirectWithParams } from "@/composables/utils.js";
 import { extractFaqsFromData } from "@/composables/useFaq.js";
 
@@ -44,13 +44,6 @@ const vehicleImage = computed(() => getVehicleImagePath(make, model));
 const imageError = ref(false);
 const onImageError = () => {
   imageError.value = true;
-};
-
-// Track image errors for other models
-const otherModelImageErrors = ref({});
-const getOtherModelImage = (modelSlug) => getVehicleImagePath(make, modelSlug);
-const onOtherModelImageError = (modelSlug) => {
-  otherModelImageErrors.value[modelSlug] = true;
 };
 
 // Make logo
@@ -413,8 +406,7 @@ useSeoMeta({
         <div class="section-header">
           <h2>Frequently Asked Questions</h2>
         </div>
-
-        <FaqAccordion :faqs="displayFaqs" />
+        <FaqMain :faq="displayFaqs" />
       </b-container>
     </section>
 

@@ -15,6 +15,25 @@ useSeoMeta({
   title: "Car Insurance by Vehicle Make & Model | Protect.com",
   description: "Find affordable car insurance for your vehicle. Compare rates by make and model, learn about coverage options, and get your free quote today.",
 });
+
+const faqData = [
+  {
+    question: "How does my vehicle affect insurance rates?",
+    answer: "Your vehicle's make, model, and year significantly impact insurance costs. Factors include safety ratings, repair costs, theft rates, vehicle value, and performance characteristics. Safer, more reliable vehicles with lower repair costs typically have lower premiums.",
+  },
+  {
+    question: "Which vehicles are cheapest to insure?",
+    answer: "Generally, mid-size sedans and minivans with excellent safety ratings and moderate repair costs are cheapest to insure. Vehicles from brands known for reliability like Honda and Toyota often have competitive insurance rates.",
+  },
+  {
+    question: "Do safety features lower insurance costs?",
+    answer: "Yes, many insurers offer discounts for vehicles equipped with advanced safety features like automatic emergency braking, lane departure warning, blind spot monitoring, and adaptive cruise control.",
+  },
+  {
+    question: "How can I find the best rate for my vehicle?",
+    answer: "Compare quotes from multiple insurers, as rates can vary significantly by company. Also consider bundling policies, maintaining a clean driving record, and asking about all available discounts for your specific vehicle.",
+  },
+];
 </script>
 
 <template>
@@ -131,36 +150,7 @@ useSeoMeta({
         <div class="section-header">
           <h2>Frequently Asked Questions</h2>
         </div>
-
-        <div class="faq-list">
-          <div class="faq-item">
-            <h3 class="faq-question">How does my vehicle affect insurance rates?</h3>
-            <p class="faq-answer">
-              Your vehicle's make, model, and year significantly impact insurance costs. Factors include safety ratings, repair costs, theft rates, vehicle value, and performance characteristics. Safer, more reliable vehicles with lower repair costs typically have lower premiums.
-            </p>
-          </div>
-
-          <div class="faq-item">
-            <h3 class="faq-question">Which vehicles are cheapest to insure?</h3>
-            <p class="faq-answer">
-              Generally, mid-size sedans and minivans with excellent safety ratings and moderate repair costs are cheapest to insure. Vehicles from brands known for reliability like Honda and Toyota often have competitive insurance rates.
-            </p>
-          </div>
-
-          <div class="faq-item">
-            <h3 class="faq-question">Do safety features lower insurance costs?</h3>
-            <p class="faq-answer">
-              Yes, many insurers offer discounts for vehicles equipped with advanced safety features like automatic emergency braking, lane departure warning, blind spot monitoring, and adaptive cruise control.
-            </p>
-          </div>
-
-          <div class="faq-item">
-            <h3 class="faq-question">How can I find the best rate for my vehicle?</h3>
-            <p class="faq-answer">
-              Compare quotes from multiple insurers, as rates can vary significantly by company. Also consider bundling policies, maintaining a clean driving record, and asking about all available discounts for your specific vehicle.
-            </p>
-          </div>
-        </div>
+        <FaqMain :faq="faqData" />
       </b-container>
     </section>
 
@@ -204,18 +194,11 @@ useSeoMeta({
     }
 
     h1 {
-      font-size: 3rem;
       margin-bottom: 1rem;
-      font-weight: 700;
       color: white;
-
-      @include media-breakpoint-down(md) {
-        font-size: 2.25rem;
-      }
     }
 
     .hero-subtitle {
-      font-size: 1.25rem;
       margin-bottom: 2rem;
       color: white;
     }
@@ -249,14 +232,7 @@ useSeoMeta({
     margin-bottom: 3rem;
 
     h2 {
-      font-size: 2.25rem;
-      color: $blue;
       margin-bottom: 1rem;
-    }
-
-    p {
-      font-size: 1.125rem;
-      color: $gray-dark;
     }
   }
 
@@ -317,17 +293,11 @@ useSeoMeta({
     }
 
     .make-name {
-      font-size: 1.5rem;
-      font-weight: 700;
-      color: $blue;
       margin-bottom: 0.75rem;
     }
 
     .make-description {
-      font-size: 0.95rem;
-      color: $gray-dark;
       margin-bottom: 1rem;
-      line-height: 1.5;
     }
 
     .learn-more {
@@ -359,46 +329,10 @@ useSeoMeta({
     }
 
     h3 {
-      font-size: 1.25rem;
-      color: $blue;
       margin-bottom: 0.75rem;
     }
 
     p {
-      color: $gray-dark;
-      font-size: 0.95rem;
-      line-height: 1.6;
-      margin-bottom: 0;
-    }
-  }
-
-  .faq-section {
-    padding: 60px 0;
-  }
-
-  .faq-list {
-    max-width: 800px;
-    margin: 0 auto;
-  }
-
-  .faq-item {
-    background: white;
-    border: 1px solid $gray-light;
-    border-radius: 8px;
-    margin-bottom: 1rem;
-    padding: 1.5rem;
-
-    .faq-question {
-      font-size: 1.125rem;
-      font-weight: 600;
-      color: $blue;
-      margin-bottom: 0.75rem;
-    }
-
-    .faq-answer {
-      color: $gray-dark;
-      font-size: 1rem;
-      line-height: 1.7;
       margin-bottom: 0;
     }
   }
@@ -410,17 +344,11 @@ useSeoMeta({
     text-align: center;
 
     h2 {
-      font-size: 2.5rem;
       margin-bottom: 1rem;
       color: white;
-
-      @include media-breakpoint-down(md) {
-        font-size: 2rem;
-      }
     }
 
     p {
-      font-size: 1.25rem;
       margin-bottom: 2rem;
       color: white;
     }
