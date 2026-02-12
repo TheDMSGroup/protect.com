@@ -36,11 +36,14 @@
     ul {
       list-style-type: none;
       padding: 0;
-      column-count: 2;
+      column-count: 5;
       column-gap: 1rem;
       gap: 1rem;
       margin: 4rem 0;
 
+      @include media-breakpoint-down(lg) {
+        column-count: 3;
+      }
       @include media-breakpoint-down(md) {
         column-count: 2;
       }
