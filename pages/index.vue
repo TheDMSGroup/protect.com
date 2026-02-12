@@ -125,10 +125,9 @@
         headline="Calculate your new rate"
         subheadline="Discover how much you can save with Protect.com."
         image="dad-bike.png"
-        image-alt="dad riding a bike with a child in a carrier on the rear and a puppy in the front basket"
+        image-alt="Dad riding a bike with a child in a carrier on the rear and a puppy in the front basket"
         container-class="dad-bike"
         :lazy-image="true"
-        image-alt-description="Dad riding a bike with a child in a carrier on the rear and a puppy in the front basket"
       />
     </div>
   </div>

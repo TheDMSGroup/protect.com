@@ -121,7 +121,7 @@
         image="doctor-patient.png"
         :action="zipCodeUrl"
         :lazy-image="true"
-        :image-alt-description="'Woman and doctor discussing health insurance options in a medical office.'"
+        image-alt="Woman and doctor discussing health insurance options in a medical office."
       />
     </section>
     <BlogFeed :show-categories="false" vertical="insurance" :sub-verticals="['health-insurance']" />

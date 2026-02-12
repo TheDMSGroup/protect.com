@@ -97,7 +97,7 @@
       image="pet-family.png"
       :action="zipcodeUrl"
       :lazy-image="true"
-      :image-alt-description="'Man with two cats, enjoying peace of mind in their home.'"
+      image-alt="Man with two cats, enjoying peace of mind in their home."
     />
 
     <BlogFeed :show-categories="false" vertical="insurance" :sub-verticals="['home-insurance']" />
