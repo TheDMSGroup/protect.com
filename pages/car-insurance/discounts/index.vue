@@ -361,7 +361,6 @@
 
       @include media-breakpoint-up(md) {
         max-width: 700px;
-        font-size: 3.75rem;
       }
     }
     // .hero-content {
@@ -369,9 +368,6 @@
     // }
 
     .intro-text {
-      font-size: 1.1rem;
-      line-height: 1.7;
-      color: $gray-dark;
       margin-bottom: 1.5rem;
 
       @include media-breakpoint-up(md) {
@@ -448,15 +444,10 @@
     }
 
     h3 {
-      font-family: "Cantata One", serif;
-      font-size: 1.75rem;
-      color: $blue;
       margin-bottom: 1rem;
     }
 
     .category-description {
-      font-size: 1.1rem;
-      color: $gray-dark;
       margin-bottom: 2rem;
       font-style: italic;
     }
@@ -480,15 +471,10 @@
     }
 
     h4 {
-      font-size: 1.25rem;
-      color: $blue;
       margin-bottom: 0.5rem;
-      font-weight: 700;
     }
 
     p {
-      color: $gray-dark;
-      line-height: 1.6;
       margin: 0;
     }
   }
@@ -522,8 +508,6 @@
     }
 
     p {
-      font-size: 1.1rem;
-      line-height: 1.7;
       margin-bottom: 1.5rem;
       color: white;
       max-width: 900px;
@@ -547,7 +531,6 @@
       }
 
       h3 {
-        font-family: "Cantata One", serif;
         color: white;
         text-align: center;
       }

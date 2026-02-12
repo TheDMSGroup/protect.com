@@ -1,60 +1,142 @@
-h1 {
-  font-family: 'Cantata One', serif;
-  color: #3b54ba;
-  font-size: 70px;
+// ----------------------------- //
+// TYPOGRAPHY
+// ----------------------------- //
 
-  @include media-breakpoint-down(md) {
-    font-size: 2.5rem;
+// Font families
+$font-heading: 'Cantata One', serif;
+$font-body: 'Nunito Sans', sans-serif;
+
+// Base styles
+body {
+  font-family: $font-body;
+  font-size: 1rem; // 16px base
+  font-weight: 400;
+  line-height: 1.5;
+  color: $gray-dark;
+}
+
+// Headings
+h1 {
+  font-family: $font-heading;
+  font-weight: 500;
+  color: $blue-light;
+  font-size: 2.5rem;
+  line-height: 1.4;
+
+  @include desktop {
+    font-size: 3rem;
+    line-height: 1.2;
   }
 }
-h2 {
-  font-family: 'Cantata One', serif;
-  color: #3b54ba;
-  font-size: 50px;
 
-  @include media-breakpoint-down(md) {
+h2 {
+  font-family: $font-heading;
+  color: $blue-light;
+  font-size: 1.8rem;
+  line-height: 1.2;
+
+  @include desktop {
+    font-size: 2.2rem;
+  }
+}
+
+h3 {
+  font-family: $font-body;
+  font-weight: 600;
+  color: $gray-dark;
+  font-size: 1.5rem; // 24px mobile
+  line-height: 1.3;
+
+  @include desktop {
+    font-size: 2.3125rem; // 37px
+  }
+}
+
+h4 {
+  font-family: $font-body;
+  font-weight: 400;
+  color: $blue-light;
+  font-size: 1.5rem; // 24px mobile
+  line-height: 1.3;
+
+  @include desktop {
+    font-size: 2rem; // 32px
+  }
+}
+
+h5 {
+  font-family: $font-body;
+  font-weight: 600;
+  color: $gray-dark;
+  font-size: 1.25rem; // 20px mobile
+  line-height: 1.3;
+
+  @include desktop {
+    font-size: 1.9375rem; // 31px
+  }
+}
+
+h6 {
+  font-family: $font-body;
+  font-weight: 600;
+  color: $gray-dark;
+  font-size: 1rem;
+  line-height: 1.3;
+}
+
+// Article headings (different style)
+article h1 {
+  font-family: $font-body;
+  font-weight: 700;
+  color: $gray-dark;
+  font-size: 1.75rem; // 28px
+}
+
+// Paragraphs
+p {
+  font-family: $font-body;
+  font-weight: 400;
+  color: $gray-dark;
+  font-size: 1.2rem;
+  line-height: 1.5;
+  margin-bottom: 1rem;
+}
+
+// Lead text (subheadlines)
+.lead {
+  font-family: $font-body;
+  font-weight: 400;
+  color: $gray-dark;
+  font-size: 1.6rem;
+  line-height: 1.4;
+
+  @include desktop {
     font-size: 2rem;
   }
 }
-h3 {
-  font-family: 'Nunito Sans', sans-serif;
-  font-weight: 600;
-  color: #666666;
-  font-size: 37px;
-}
-h4 {
-  font-family: 'Nunito Sans', sans-serif;
-  font-weight: 400;
-  color: #3b54ba;
-  font-size: 32px;
-}
-h5 {
-  font-family: 'Nunito Sans', sans-serif;
-  font-weight: 600;
-  color: #666666;
-  font-size: 31px;
-}
-article {
-  h1 {
-    font-family: 'Nunito Sans', sans-serif;
-    font-weight: 700;
-    color: #666666;
-    font-size: 28px;
-  }
-}
-div, span, a, li, strong, em, label, input, button, td, th, section, header, footer, nav, main, aside, ul, ol, dl, dt, dd, blockquote, pre, code, textarea, select, option {
-  font-family: 'Nunito Sans', sans-serif;
-  font-weight: 400;
-  font-size: 18px;
-}
-p {
-  font-family: 'Nunito Sans', sans-serif;
-  font-weight: 600;
-  color: #666666;
-  font-size: 20px;
-}
 
+// Links
 a {
   color: $blue;
-  text-decoration: unset;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+// Form elements & misc
+input,
+select,
+textarea,
+button,
+label {
+  font-family: $font-body;
+  font-size: 1rem;
+}
+
+// Small text utility
+small,
+.small {
+  font-size: 0.875rem; // 14px
 }

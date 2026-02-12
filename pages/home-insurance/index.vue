@@ -79,7 +79,7 @@
               </p>
             </b-col>
             <b-col cols="12" lg="6">
-              <NuxtImg :src="buildImageUrl('company-rank-collage-home.jpg')" />
+              <NuxtImg :src="buildImageUrl('company-rank-collage-home.jpg')" alt="Collage showing J.D. Power, BBB, and NAIC rating logos for top home insurance companies" />
             </b-col>
             <b-col cols="12" class="feed-wrapper">
               <rating-chart banner-headline="Compare Over 30 Top Home Insurance Providers Head-to-head." :action="action" :carriers="carriers" />
@@ -107,16 +107,7 @@
 
 <style lang="scss" scoped>
   h2 {
-    font-size: 2.5rem;
     margin-bottom: 15px;
-
-    @include media-breakpoint-down(md) {
-      text-align: left;
-      font-size: 2.3rem;
-    }
-    @include media-breakpoint-down(sm) {
-      font-size: 2rem;
-    }
   }
 
   #top-companies {
@@ -129,10 +120,6 @@
 
     h3 {
       margin-bottom: 45px;
-
-      @include media-breakpoint-down(md) {
-        font-size: 1.25rem;
-      }
     }
     .top-companies-list {
       display: flex;
@@ -153,7 +140,6 @@
         align-items: center;
 
         @include media-breakpoint-down(md) {
-          font-size: 0.75rem;
           padding: 7.5px 20px;
         }
         @include media-breakpoint-down(sm) {
@@ -200,14 +186,8 @@
         display: block;
       }
       p {
-        font-size: 1.5rem;
         max-width: 200px;
-        font-weight: 400;
         margin: 0 auto;
-
-        @include media-breakpoint-down(md) {
-          font-size: 1.35rem;
-        }
       }
       .step-number {
         @include media-breakpoint-down(md) {
@@ -218,7 +198,6 @@
           display: flex !important;
           justify-content: center;
           align-items: center;
-          font-size: 2rem;
           color: #999;
           margin: 0 auto 50px auto;
         }
@@ -246,14 +225,6 @@
         padding: 35px 15px;
       }
 
-      p {
-        font-weight: 400;
-        font-size: 1.5rem;
-
-        @include media-breakpoint-down(md) {
-          font-size: 1.35rem;
-        }
-      }
       img {
         max-width: 100%;
       }

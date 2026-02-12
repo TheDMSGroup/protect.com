@@ -106,23 +106,12 @@
       h3 {
         margin-bottom: var(--spacing-lg);
         color: var(--primary-color);
-        font-size: 1.25rem;
-        font-family: "Cantata One", serif;
-
-        @include media-breakpoint-down(md) {
-          font-size: 1.5rem;
-        }
       }
 
       p {
         color: black;
         line-height: 1.7;
         margin: 0;
-        font-size: 1.125rem;
-
-        @include media-breakpoint-down(md) {
-          font-size: 1.25rem;
-        }
 
         ol {
           padding-left: 1.5rem;

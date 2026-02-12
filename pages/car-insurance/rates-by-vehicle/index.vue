@@ -204,18 +204,11 @@ useSeoMeta({
     }
 
     h1 {
-      font-size: 3rem;
       margin-bottom: 1rem;
-      font-weight: 700;
       color: white;
-
-      @include media-breakpoint-down(md) {
-        font-size: 2.25rem;
-      }
     }
 
     .hero-subtitle {
-      font-size: 1.25rem;
       margin-bottom: 2rem;
       color: white;
     }
@@ -249,14 +242,7 @@ useSeoMeta({
     margin-bottom: 3rem;
 
     h2 {
-      font-size: 2.25rem;
-      color: $blue;
       margin-bottom: 1rem;
-    }
-
-    p {
-      font-size: 1.125rem;
-      color: $gray-dark;
     }
   }
 
@@ -317,17 +303,11 @@ useSeoMeta({
     }
 
     .make-name {
-      font-size: 1.5rem;
-      font-weight: 700;
-      color: $blue;
       margin-bottom: 0.75rem;
     }
 
     .make-description {
-      font-size: 0.95rem;
-      color: $gray-dark;
       margin-bottom: 1rem;
-      line-height: 1.5;
     }
 
     .learn-more {
@@ -359,15 +339,10 @@ useSeoMeta({
     }
 
     h3 {
-      font-size: 1.25rem;
-      color: $blue;
       margin-bottom: 0.75rem;
     }
 
     p {
-      color: $gray-dark;
-      font-size: 0.95rem;
-      line-height: 1.6;
       margin-bottom: 0;
     }
   }
@@ -389,16 +364,10 @@ useSeoMeta({
     padding: 1.5rem;
 
     .faq-question {
-      font-size: 1.125rem;
-      font-weight: 600;
-      color: $blue;
       margin-bottom: 0.75rem;
     }
 
     .faq-answer {
-      color: $gray-dark;
-      font-size: 1rem;
-      line-height: 1.7;
       margin-bottom: 0;
     }
   }
@@ -410,17 +379,11 @@ useSeoMeta({
     text-align: center;
 
     h2 {
-      font-size: 2.5rem;
       margin-bottom: 1rem;
       color: white;
-
-      @include media-breakpoint-down(md) {
-        font-size: 2rem;
-      }
     }
 
     p {
-      font-size: 1.25rem;
       margin-bottom: 2rem;
       color: white;
     }

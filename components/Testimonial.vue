@@ -12,10 +12,13 @@ const props = defineProps({
 const imageOverlap = computed(() => {
   return props.testimonialConfig.imageOverlap === false ? " no-overlap" : "";
 });
+
+// Generate unique ID for aria-labelledby
+const headingId = `testimonial-heading-${Math.random().toString(36).substring(2, 11)}`;
 </script>
 
 <template>
-  <section id="testimonials" :class="imageOverlap">
+  <section id="testimonials" :class="imageOverlap" :aria-labelledby="headingId">
     <div class="container">
       <div class="wrapper">
         <div class="testimonial-container">
@@ -29,7 +32,7 @@ const imageOverlap = computed(() => {
             >
               <NuxtImg
                 :src="`${assetsBaseUrl}/testimonials/${testimonialConfig.image}`"
-                :alt="testimonialConfig.title"
+                :alt="`Photo of ${testimonialConfig.byline?.split(',')[0] || 'customer'}`"
                 format="webp"
                 loading="lazy"
                 width="450"
@@ -43,7 +46,7 @@ const imageOverlap = computed(() => {
                 `${testimonialConfig.textWrapperClass || 'default'}`
               "
             >
-              <h2>{{ testimonialConfig.title }}</h2>
+              <h2 :id="headingId">{{ testimonialConfig.title }}</h2>
               <span class="h4">{{ testimonialConfig.subhead }}</span>
               <p>{{ testimonialConfig.quote }}</p>
               <small class="byline">{{ testimonialConfig.byline }}</small>

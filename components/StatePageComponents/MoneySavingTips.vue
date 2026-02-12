@@ -12,14 +12,14 @@
             <IconsStars classes="star-icon golden"></IconsStars>
           </div>
           <div class="tip-icon">
-            <img :src="getImage('chart-simple-solid-full.svg')" alt="SVG Icon" class="svg-icon" loading="lazy" />
+            <img :src="getImage('chart-simple-solid-full.svg')" alt="" class="svg-icon" loading="lazy" />
           </div>
           <h3>Compare Regularly</h3>
           <p>Shop around annually to ensure you're getting the best rates</p>
         </div>
         <div class="tip-card">
           <div class="tip-icon">
-            <img :src="getImage('money-bill-wave-solid.svg')" alt="SVG Icon" class="svg-icon" loading="lazy" />
+            <img :src="getImage('money-bill-wave-solid.svg')" alt="" class="svg-icon" loading="lazy" />
           </div>
           <h3>Bundle Policies</h3>
           <p>Combine auto and home insurance for discounts up to 25%</p>
@@ -27,7 +27,7 @@
 
         <div class="tip-card">
           <div class="tip-icon">
-            <img :src="getImage('car-solid-full.svg')" alt="SVG Icon" class="svg-icon" loading="lazy" />
+            <img :src="getImage('car-solid-full.svg')" alt="" class="svg-icon" loading="lazy" />
           </div>
           <h3>Safe Driver Discounts</h3>
           <p>Maintain a clean driving record to qualify for lower rates</p>
@@ -35,7 +35,7 @@
 
         <div class="tip-card">
           <div class="tip-icon">
-            <img :src="getImage('mobile-button-solid-full.svg')" alt="SVG Icon" class="svg-icon" loading="lazy" />
+            <img :src="getImage('mobile-button-solid-full.svg')" alt="" class="svg-icon" loading="lazy" />
           </div>
           <h3>Usage-Based Programs</h3>
           <p>Save up to 30% with telematics and safe driving apps</p>
@@ -43,7 +43,7 @@
 
         <div class="tip-card">
           <div class="tip-icon">
-            <img :src="getImage('graduation-cap-solid-full.svg')" alt="SVG Icon" class="svg-icon" loading="lazy" />
+            <img :src="getImage('graduation-cap-solid-full.svg')" alt="" class="svg-icon" loading="lazy" />
           </div>
           <h3>Education Discounts</h3>
           <p>Students and alumni may qualify for education-based savings</p>
@@ -51,7 +51,7 @@
 
         <div class="tip-card">
           <div class="tip-icon">
-            <img :src="getImage('shield-halved-solid-full.svg')" alt="SVG Icon" class="svg-icon" loading="lazy" />
+            <img :src="getImage('shield-halved-solid-full.svg')" alt="" class="svg-icon" loading="lazy" />
           </div>
           <h3>Safety Features</h3>
           <p>Anti-theft devices and safety features can lower premiums</p>
@@ -149,7 +149,6 @@ const getImage = (image) => {
     }
 
     h3 {
-      font-size: 1.25rem;
       margin-bottom: var(--spacing-md);
       color: var(--text-primary);
     }
