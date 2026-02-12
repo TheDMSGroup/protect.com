@@ -27,12 +27,52 @@ export default defineEventHandler(async (event) => {
 
     const data = rows.map((row) => ({
       name: row[1],
+      state: row[2],
+      stateCode: row[3],
+      slug: row[1].toLowerCase().replaceAll(/\s+/g, "-"),
     }));
 
+    //if state is not passed or is empty, return all cities up to the limit, sorted alphabetically by state code
     if (!state) {
+      const limitedData = data.slice(0, limit);
+      const stateMap = new Map(
+        states.map((s) => [s.name.toLowerCase(), s.name])
+      );
+
+      const groupedByState = limitedData.reduce((acc, city) => {
+        const stateKey = city.state.toLowerCase();
+        const normalizedState = stateMap.get(stateKey);
+
+        if (!normalizedState) return acc;
+
+        if (!acc[normalizedState]) {
+          acc[normalizedState] = {
+            state: normalizedState,
+            cities: [],
+          };
+        }
+
+        acc[normalizedState].cities.push({
+          name: city.name,
+          slug: city.slug,
+          state: city.state,
+          stateCode: city.stateCode,
+        });
+
+        return acc;
+      }, {});
+
+      // Sort state codes and cities within each state
+      const result = Object.values(groupedByState)
+        .sort((a, b) => a.state.localeCompare(b.state))
+        .map((group) => ({
+          ...group,
+          cities: group.cities.sort((a, b) => a.name.localeCompare(b.name)),
+        }));
+
       return {
         success: true,
-        data: data.slice(0, limit),
+        data: result,
         total: Math.min(limit, data.length),
       };
     }
