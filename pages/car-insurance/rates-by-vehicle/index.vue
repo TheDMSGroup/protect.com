@@ -15,6 +15,25 @@ useSeoMeta({
   title: "Car Insurance by Vehicle Make & Model | Protect.com",
   description: "Find affordable car insurance for your vehicle. Compare rates by make and model, learn about coverage options, and get your free quote today.",
 });
+
+const faqData = [
+  {
+    question: "How does my vehicle affect insurance rates?",
+    answer: "Your vehicle's make, model, and year significantly impact insurance costs. Factors include safety ratings, repair costs, theft rates, vehicle value, and performance characteristics. Safer, more reliable vehicles with lower repair costs typically have lower premiums.",
+  },
+  {
+    question: "Which vehicles are cheapest to insure?",
+    answer: "Generally, mid-size sedans and minivans with excellent safety ratings and moderate repair costs are cheapest to insure. Vehicles from brands known for reliability like Honda and Toyota often have competitive insurance rates.",
+  },
+  {
+    question: "Do safety features lower insurance costs?",
+    answer: "Yes, many insurers offer discounts for vehicles equipped with advanced safety features like automatic emergency braking, lane departure warning, blind spot monitoring, and adaptive cruise control.",
+  },
+  {
+    question: "How can I find the best rate for my vehicle?",
+    answer: "Compare quotes from multiple insurers, as rates can vary significantly by company. Also consider bundling policies, maintaining a clean driving record, and asking about all available discounts for your specific vehicle.",
+  },
+];
 </script>
 
 <template>
@@ -131,36 +150,7 @@ useSeoMeta({
         <div class="section-header">
           <h2>Frequently Asked Questions</h2>
         </div>
-
-        <div class="faq-list">
-          <div class="faq-item">
-            <h3 class="faq-question">How does my vehicle affect insurance rates?</h3>
-            <p class="faq-answer">
-              Your vehicle's make, model, and year significantly impact insurance costs. Factors include safety ratings, repair costs, theft rates, vehicle value, and performance characteristics. Safer, more reliable vehicles with lower repair costs typically have lower premiums.
-            </p>
-          </div>
-
-          <div class="faq-item">
-            <h3 class="faq-question">Which vehicles are cheapest to insure?</h3>
-            <p class="faq-answer">
-              Generally, mid-size sedans and minivans with excellent safety ratings and moderate repair costs are cheapest to insure. Vehicles from brands known for reliability like Honda and Toyota often have competitive insurance rates.
-            </p>
-          </div>
-
-          <div class="faq-item">
-            <h3 class="faq-question">Do safety features lower insurance costs?</h3>
-            <p class="faq-answer">
-              Yes, many insurers offer discounts for vehicles equipped with advanced safety features like automatic emergency braking, lane departure warning, blind spot monitoring, and adaptive cruise control.
-            </p>
-          </div>
-
-          <div class="faq-item">
-            <h3 class="faq-question">How can I find the best rate for my vehicle?</h3>
-            <p class="faq-answer">
-              Compare quotes from multiple insurers, as rates can vary significantly by company. Also consider bundling policies, maintaining a clean driving record, and asking about all available discounts for your specific vehicle.
-            </p>
-          </div>
-        </div>
+        <FaqMain :faq="faqData" />
       </b-container>
     </section>
 
@@ -343,31 +333,6 @@ useSeoMeta({
     }
 
     p {
-      margin-bottom: 0;
-    }
-  }
-
-  .faq-section {
-    padding: 60px 0;
-  }
-
-  .faq-list {
-    max-width: 800px;
-    margin: 0 auto;
-  }
-
-  .faq-item {
-    background: white;
-    border: 1px solid $gray-light;
-    border-radius: 8px;
-    margin-bottom: 1rem;
-    padding: 1.5rem;
-
-    .faq-question {
-      margin-bottom: 0.75rem;
-    }
-
-    .faq-answer {
       margin-bottom: 0;
     }
   }

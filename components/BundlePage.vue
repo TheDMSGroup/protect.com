@@ -131,7 +131,7 @@
           <div class="section-label">Common Questions</div>
           <h2 class="section-title">Why Bundle Your Insurance?</h2>
         </div>
-        <FaqAccordion :faqs="faqData" />
+        <FaqMain :faq="faqData" />
       </b-container>
     </section>
 
