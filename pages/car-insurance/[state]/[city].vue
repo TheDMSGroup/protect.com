@@ -318,6 +318,10 @@
     <!-- FAQ Section -->
     <section class="faq">
       <div class="container">
+        <div class="section-header">
+          <h2>Frequently Asked Questions</h2>
+        </div>
+
         <FaqMain :faq="faq" />
       </div>
     </section>
@@ -688,10 +692,6 @@
         margin-bottom: 24px;
       }
 
-      h2 {
-        margin-bottom: 16px;
-      }
-
       p {
         margin: 0;
       }
@@ -1005,7 +1005,6 @@
 
     h2 {
       text-align: center;
-      margin-bottom: 12px;
     }
 
     .intro {
@@ -1255,6 +1254,7 @@
   .insight-content {
     h3 {
       margin-bottom: 16px;
+      color: #333333;
     }
 
     p {
@@ -1264,7 +1264,6 @@
 
   // ==================== FAQ SECTION ====================
   .faq {
-    background: #f9fafb;
 
     h2 {
       text-align: center;

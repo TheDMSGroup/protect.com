@@ -7,14 +7,14 @@
           Maximize Your Savings: The Ultimate List of Car Insurance Discounts
           in&nbsp;2026
         </h1>
-        <p class="intro-text">
+        <p class="lead">
           Most drivers are eligible for at least three to five different
           discounts, yet many never claim them. Whether you've recently improved
           your credit score, bought a car with advanced safety features, or
           simply maintained a clean driving record, you could be sitting on
           hundreds of dollars in annual&nbsp;savings.
         </p>
-        <p class="intro-text">
+        <p class="lead">
           The challenge is that every insurance provider offers different
           incentives. That's where Protect.com comes in. Our advanced quote tool
           does the heavy lifting for you, scanning top-rated providers to see
@@ -501,14 +501,6 @@
     //   animation: slideInLeft 0.25s ease-out;
     // }
 
-    .intro-text {
-      margin-bottom: 1.5rem;
-
-      @include media-breakpoint-up(md) {
-        max-width: 700px;
-      }
-    }
-
     .hero-image {
       width: 100%;
       max-width: 500px;
@@ -544,8 +536,6 @@
     padding: 4rem 0;
 
     h2 {
-      color: $blue;
-      margin-bottom: 3rem;
       text-align: center;
     }
   }
@@ -558,10 +548,6 @@
 
     @include mobile {
       padding: 2rem 1.5rem;
-    }
-
-    h3 {
-      margin-bottom: 1rem;
     }
 
     .category-description {
@@ -620,17 +606,11 @@
     }
 
     h2 {
-      margin-bottom: 1.5rem;
       color: white;
     }
 
     p {
-      margin-bottom: 1.5rem;
       color: white;
-      max-width: 900px;
-      margin-left: auto;
-      margin-right: auto;
-      width: 100%;
     }
 
     .how-it-works {

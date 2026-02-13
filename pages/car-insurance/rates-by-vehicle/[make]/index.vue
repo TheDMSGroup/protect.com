@@ -119,7 +119,7 @@ useSeoMeta({
         </nav>
         <div class="hero-content">
           <h1>{{ formattedMake }} Car Insurance</h1>
-          <p class="hero-subtitle">Find affordable insurance coverage for your {{ formattedMake }} vehicle</p>
+          <p class="lead">Find affordable insurance coverage for your {{ formattedMake }} vehicle</p>
           <button class="cta-button" @click="redirectWithParams('https://insure.protect.com', { vehicle1make: formattedMake.toUpperCase() })">Compare Quotes</button>
         </div>
       </b-container>
@@ -317,19 +317,10 @@ useSeoMeta({
     }
 
     h1 {
-      font-size: 3rem;
-      margin-bottom: 1rem;
-      font-weight: 700;
       color: white;
-
-      @include media-breakpoint-down(md) {
-        font-size: 2.25rem;
-      }
     }
 
-    .hero-subtitle {
-      font-size: 1.25rem;
-      margin-bottom: 2rem;
+    .lead {
       color: white;
     }
   }
@@ -356,12 +347,6 @@ useSeoMeta({
   .about-make {
     padding: 60px 0;
     background: $gray-lighter;
-
-    h2 {
-      font-size: 2.25rem;
-      margin-bottom: 1.5rem;
-      color: $blue;
-    }
 
     p {
       font-size: 1.125rem;
@@ -395,17 +380,6 @@ useSeoMeta({
   .section-header {
     text-align: center;
     margin-bottom: 3rem;
-
-    h2 {
-      font-size: 2.25rem;
-      color: $blue;
-      margin-bottom: 1rem;
-    }
-
-    p {
-      font-size: 1.125rem;
-      color: $gray-dark;
-    }
   }
 
   .models-grid {
@@ -575,19 +549,6 @@ useSeoMeta({
       margin-bottom: 1.25rem;
       line-height: 1;
     }
-
-    h3 {
-      font-size: 1.25rem;
-      color: $blue;
-      margin-bottom: 0.75rem;
-    }
-
-    p {
-      color: $gray-dark;
-      font-size: 0.95rem;
-      line-height: 1.6;
-      margin-bottom: 0;
-    }
   }
 
   .faq-section {
@@ -602,20 +563,14 @@ useSeoMeta({
     text-align: center;
 
     h2 {
-      font-size: 2.5rem;
-      margin-bottom: 1rem;
       color: white;
-
-      @include media-breakpoint-down(md) {
-        font-size: 2rem;
-      }
     }
 
     p {
-      font-size: 1.25rem;
       margin-bottom: 2rem;
       color: white;
     }
   }
 }
 </style>
+

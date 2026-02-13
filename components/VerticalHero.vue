@@ -90,7 +90,7 @@
     .container.home-seo-hero {
       .hero {
         .hero-left {
-          width: 50%;
+          width: 53%;
           @include media-breakpoint-down(md) {
             width: 100%;
           }
@@ -191,6 +191,7 @@
 
         @include media-breakpoint-down(md) {
           width: 100%;
+          padding-bottom: 1px;
         }
 
         img {

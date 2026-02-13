@@ -23,7 +23,7 @@
             <!-- Left Content -->
             <div class="hero-left">
               <h1>{{ stateData.state }} Car Insurance</h1>
-              <p class="hero-subtitle">Find some of the best car insurance quotes in the {{ stateData.nickname }}!</p>
+              <p class="lead">Find some of the best car insurance quotes in the {{ stateData.nickname }}!</p>
 
               <!-- Desktop Quote Form -->
               <div class="desktop-quote-form">

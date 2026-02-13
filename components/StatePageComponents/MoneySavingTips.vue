@@ -153,11 +153,6 @@ const getImage = (image) => {
       color: var(--text-primary);
     }
 
-    p {
-      color: var(--text-secondary);
-      line-height: 1.6;
-      margin: 0;
-    }
   }
   @include mobile {
     padding-bottom: 0px;
