@@ -137,13 +137,13 @@
       />
     </section>
 
-    <section v-if="links.length && !error" id="top-cities">
+    <section v-if="cityLinks.length && !cityLinksError" id="top-cities">
       <b-container>
         <h2 class="text-center">Top Cities for Auto Insurance</h2>
         <p class="text-center">
           Explore auto insurance options in popular cities across the country.
         </p>
-        <CityLinksList :city-links="links" />
+        <CityLinksList :city-links="cityLinks" />
       </b-container>
     </section>
 
@@ -170,52 +170,17 @@
 <script setup>
   import { useStore } from "~/stores/store";
   import { buildImageUrl } from "@/composables/images.js";
+  import { useCityLinksApi } from "@/composables/useCityLinksApi.js";
 
   const store = useStore();
 
-  const cityLinksLimit = 50;
-  const { cityListResult, error } = await useCityLinksFromCacheOrApi();
+  const { cityListResult, cityLinksError } = await useCityLinksApi();
 
-  const links = computed(() => {
+  const cityLinks = computed(() => {
     return cityListResult.value?.data || [];
   });
 
   //inline composable to fetch article with caching
-  async function useCityLinksFromCacheOrApi() {
-    const cacheKey = `cities-top-${cityLinksLimit}`;
-    console.log("🔑 Cache key:", cacheKey);
-
-    const nuxtApp = useNuxtApp();
-
-    const {
-      data: cityListResult,
-      error,
-      pending,
-    } = await useAsyncData(
-      cacheKey,
-      async () => {
-        const url = `/api/state/city/list?limit=${cityLinksLimit}`;
-        console.log("🌐 Making API request:", url);
-        const result = await $fetch(url);
-        return result;
-      },
-      {
-        server: true,
-        lazy: false,
-        //watch: [() => route.params.slug],
-        getCachedData(key) {
-          const cacheHit =
-            nuxtApp.payload.data[key] || nuxtApp.static.data[key];
-          if (cacheHit) {
-            console.log("✅ Using cached data for key:", key, cacheHit);
-          }
-          return cacheHit;
-        },
-      }
-    );
-
-    return { cityListResult, error, pending };
-  }
 
   useSeoMeta({
     title: () => "Compare Auto Insurance Rates & Get Side-by-Side Quotes",

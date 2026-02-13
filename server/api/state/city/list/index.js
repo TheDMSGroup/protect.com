@@ -1,7 +1,43 @@
 import { states } from "~/utils/redirect-config";
 
-const formatLocationNameForMatch = (name) =>
-  name.toLowerCase().replaceAll(/\s+/g, "");
+const groupAndSortCities = (cities, stateMap, filterState = null) => {
+  const grouped = cities.reduce((acc, city) => {
+    //get the state name from the city data from the sheet
+    const stateKey = city.state.toLowerCase();
+
+    //get the official state name from stateMap
+    const normalizedState = stateMap.get(stateKey);
+
+    //Skip if state not in map, or if we have a filterState and this city doesn't match it
+    //this allows this function to be used for either case - grouping all cities across states, or grouping cities for a specific state
+    if (
+      !normalizedState ||
+      (filterState && stateKey !== filterState.toLowerCase())
+    )
+      return acc;
+
+    //push new state group if it doesn't exist, otherwise push city to existing state group
+    if (!acc[normalizedState]) {
+      acc[normalizedState] = { state: normalizedState, cities: [] };
+    }
+
+    //spread city object to ensure we don't accidentally modify the original data structure
+    acc[normalizedState].cities.push({
+      ...city,
+    });
+
+    //return the accumulator object for the next iteration of reduce
+    return acc;
+  }, {});
+
+  //convert grouped object to array, sort states alphabetically, and sort cities within each state alphabetically
+  return Object.values(grouped)
+    .sort((a, b) => a.state.localeCompare(b.state))
+    .map((group) => ({
+      ...group,
+      cities: group.cities.sort((a, b) => a.name.localeCompare(b.name)),
+    }));
+};
 
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig();
@@ -32,43 +68,12 @@ export default defineEventHandler(async (event) => {
       slug: row[1].toLowerCase().replaceAll(/\s+/g, "-"),
     }));
 
-    //if state is not passed or is empty, return all cities up to the limit, sorted alphabetically by state code
+    const stateMap = new Map(states.map((s) => [s.name.toLowerCase(), s.name]));
+
+    //if we aren't passed a state, we want to limit the number of cities we return and just return the top cities across all states. If we are passed a state, we want to ignore the limit and return all cities for that state since it's likely there won't be that many cities for each state and it provides a better user experience to show them all instead of an arbitrary subset.
     if (!state) {
       const limitedData = data.slice(0, limit);
-      const stateMap = new Map(
-        states.map((s) => [s.name.toLowerCase(), s.name])
-      );
-
-      const groupedByState = limitedData.reduce((acc, city) => {
-        const stateKey = city.state.toLowerCase();
-        const normalizedState = stateMap.get(stateKey);
-
-        if (!normalizedState) return acc;
-
-        if (!acc[normalizedState]) {
-          acc[normalizedState] = {
-            state: normalizedState,
-            cities: [],
-          };
-        }
-
-        acc[normalizedState].cities.push({
-          name: city.name,
-          slug: city.slug,
-          state: city.state,
-          stateCode: city.stateCode,
-        });
-
-        return acc;
-      }, {});
-
-      // Sort state codes and cities within each state
-      const result = Object.values(groupedByState)
-        .sort((a, b) => a.state.localeCompare(b.state))
-        .map((group) => ({
-          ...group,
-          cities: group.cities.sort((a, b) => a.name.localeCompare(b.name)),
-        }));
+      const result = groupAndSortCities(limitedData, stateMap);
 
       return {
         success: true,
@@ -77,25 +82,13 @@ export default defineEventHandler(async (event) => {
       };
     }
 
-    const matchedState = states.find(
-      (s) =>
-        formatLocationNameForMatch(s.slug) === formatLocationNameForMatch(state)
-    );
-
-    const filteredData = data.filter((item) => {
-      if (matchedState?.abbreviation) {
-        return (
-          item.stateCode?.toLowerCase() ===
-          matchedState.abbreviation.toLowerCase()
-        );
-      }
-      return false;
-    });
+    //otherwise, if we are passed a state, ignore the limit and return all cities for that state, grouped and sorted
+    const result = groupAndSortCities(data, stateMap, state);
 
     return {
       success: true,
-      data: filteredData.slice(0, limit),
-      total: Math.min(limit, filteredData.length),
+      data: result,
+      total: result.length,
     };
   } catch (error) {
     throw createError({

@@ -376,22 +376,15 @@
         <AutoRateCalculator :initial-zip="computedZipCode" />
       </div>
     </section>
-
-    <section class="other-cities">
-      <div class="container">
-        <div class="cities-grid">
-          <div v-for="city in otherCities" :key="city" class="city-card">
-            <NuxtLink
-              :to="`/car-insurance/${stateNameSlug}/${city
-                .toLowerCase()
-                .replace(/ /g, '-')}`"
-              class="city-link"
-            >
-              {{ city }} Car Insurance
-            </NuxtLink>
-          </div>
-        </div>
-      </div>
+    <!-- City Links-->
+    <section
+      v-if="otherCities && otherCities.length && !cityLinksError"
+      class="other-cities"
+    >
+      <b-container>
+        <h3>Explore other {{ stateName }} cities</h3>
+        <CityLinksList :city-links="otherCities" />
+      </b-container>
     </section>
 
     <!-- Methodology -->
@@ -449,10 +442,18 @@
     stateFaultType,
     faq,
     rateComparison,
-    otherCities,
   } = await useCityDataFromCacheOrApi();
 
-  console.log("otherCities:", otherCities);
+  const { cityListResult, cityLinksError } = await useCityLinksApi({
+    state: stateNameSlug,
+    excludedCities: [cityNameSlug],
+  });
+
+  const otherCities = computed(() => {
+    return cityListResult?.value?.data || [];
+  });
+
+  console.log("Other cities in the same state:", otherCities.value);
 
   async function useCityDataFromCacheOrApi() {
     const cacheKey = `${stateNameSlug}-${cityNameSlug}-car-insurance-data`;
@@ -633,7 +634,6 @@
       faq,
       zipCodeUrl,
       rateComparison,
-      otherCities,
     };
   }
 

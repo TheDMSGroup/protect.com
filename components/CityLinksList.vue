@@ -1,29 +1,30 @@
 <template>
   <div class="city-links-list">
     <ul class="space-y-2">
-      <li v-for="city in cityLinks" :key="city.state">
+      <li v-for="cityObj in cityLinks" :key="cityObj.state">
         <!-- <div class="state-label">
           <strong>{{ city.state }}</strong>
         </div> -->
         <NuxtLink
-          v-for="link in city.cities"
+          v-for="link in cityObj.cities"
           :key="link.name"
-          :to="`/car-insurance/${city.state.toLowerCase()}/${link.slug}`"
+          :to="`/car-insurance/${cityObj.state.toLowerCase()}/${link.slug}`"
           class="text-blue-600 hover:underline"
         >
-          {{ link.name }}, {{ city.state }}
+          {{ link.name }}, {{ link.stateCode }}
         </NuxtLink>
       </li>
     </ul>
   </div>
 </template>
 <script setup>
-  defineProps({
+  const props = defineProps({
     cityLinks: {
       type: Array,
       required: true,
     },
   });
+  console.log("Received city links:", props.cityLinks);
 </script>
 <style lang="scss" scoped>
   .city-links-list {
