@@ -101,7 +101,7 @@ export default {
     }
 
     .hero-left {
-      width: 50%;
+      width: 54%;
       display: flex;
       flex-direction: column;
       margin-top: 8em;

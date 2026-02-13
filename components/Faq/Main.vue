@@ -4,7 +4,7 @@
       <div class="faq-list">
         <div v-for="(item, index) in processedFaq" :key="index" class="faq-item">
           <h3>{{ item.question }}</h3>
-          <div class="answer-content" v-html="item.answer" />
+          <p class="answer-content" v-html="item.answer" />
         </div>
       </div>
     </div>
@@ -91,19 +91,11 @@
       h3 {
         margin-bottom: 1.5rem;
         color: $blue;
-        font-weight: 600;
       }
-
-      p {
-        color: black;
-        line-height: 1.7;
-        margin: 0;
-
-        ol {
-          padding-left: 1.5rem;
-          margin-top: 1rem;
-          margin-bottom: 1rem;
-        }
+      ol {
+        padding-left: 1.5rem;
+        margin-top: 1rem;
+        margin-bottom: 1rem;
       }
     }
   }

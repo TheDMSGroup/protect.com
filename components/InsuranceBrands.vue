@@ -73,7 +73,7 @@
 
 <style lang="scss" scoped>
   .brands {
-    max-width: 900px;
+    max-width: 950px;
     width: 100%;
     margin: 50px auto 150px auto;
 

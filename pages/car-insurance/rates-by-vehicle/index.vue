@@ -47,7 +47,7 @@ const faqData = [
         </nav>
         <div class="hero-content">
           <h1>Car Insurance by Vehicle</h1>
-          <p class="hero-subtitle">Find affordable insurance coverage for your specific make and model</p>
+          <p class="lead">Find affordable insurance coverage for your specific make and model</p>
           <button class="cta-button" @click="redirectWithParams('https://insure.protect.com', {})">Compare Quotes</button>
         </div>
       </b-container>
@@ -198,7 +198,7 @@ const faqData = [
       color: white;
     }
 
-    .hero-subtitle {
+    .lead {
       margin-bottom: 2rem;
       color: white;
     }
@@ -235,7 +235,9 @@ const faqData = [
       margin-bottom: 1rem;
     }
   }
-
+  .faq-section {
+    padding: 30px 0;
+  }
   .makes-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));

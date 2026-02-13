@@ -52,7 +52,7 @@
     box-shadow: 0px 0px 16px -5px rgba(0, 0, 0, 0.1);
     border-radius: 6px;
     margin-bottom: 25px;
-    height: 144px;
+    height: auto;
 
     &:hover {
       text-decoration: none;
@@ -61,7 +61,7 @@
       width: 50px;
       height: 50px;
       fill: #4153b3;
-      margin: 10px 0;
+      margin: 0 0 10px;
     }
     p {
       font-weight: 700;
@@ -72,21 +72,32 @@
     &.noicon {
       background: #3b54bb;
       .row {
+        align-items: center;
         display: flex;
         justify-content: bottom;
         padding: 0 10px;
         min-height: 120px;
+
+        @include media-breakpoint-down(md) {
+          .button-label p {
+            max-width: 100%;
+          }
+          min-height: 60px;
+        }
         .button-label {
           flex-direction: column;
           display: flex;
+
           .button-label-empty {
             flex-grow: 1;
           }
           p {
             padding: 0 0 0 10px;
             color: white;
+            max-width: 60%;
           }
         }
+
       }
     }
     .row {
@@ -104,6 +115,16 @@
         padding: 0 5px 0 0;
         p {
           max-width: 40%;
+        }
+
+        @include media-breakpoint-down(md) {
+          display: flex;
+          flex-direction: row;
+          gap: 10px;
+          align-items: center;
+          p {
+            max-width: 60%;
+          }
         }
       }
       .button-label-indicator {

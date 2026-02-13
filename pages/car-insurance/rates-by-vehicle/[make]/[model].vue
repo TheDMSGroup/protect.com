@@ -543,14 +543,7 @@ useSeoMeta({
     }
 
     h1 {
-      font-size: 3rem;
-      margin-bottom: 1rem;
-      font-weight: 700;
       color: white;
-
-      @include media-breakpoint-down(md) {
-        font-size: 2.25rem;
-      }
     }
 
     .hero-subtitle {
