@@ -174,7 +174,10 @@
 
   const store = useStore();
 
-  const { cityListResult, cityLinksError } = await useCityLinksApi();
+  const top50citiesCacheKey = "cities-top-50";
+  const { cityListResult, cityLinksError } = await useCityLinksApi({
+    cacheKey: top50citiesCacheKey,
+  });
 
   const cityLinks = computed(() => {
     return cityListResult.value?.data || [];

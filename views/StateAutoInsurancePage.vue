@@ -83,13 +83,17 @@
         :faq="stateData.faqs ? stateData.faqs : defaultFaqs"
       />
       <!-- City Links-->
-      <b-container>
-        <h3>Explore Car Insurance in Cities Across {{ stateData.state }}</h3>
-        <CityLinksList
-          v-if="cityLinks.length && !cityLinksError"
-          :city-links="cityLinks"
-        />
-      </b-container>
+      <section
+        v-if="cityLinks && cityLinks.length > 0 && !cityLinksError"
+        class="other-cities"
+      >
+        <b-container>
+          <h2 class="text-center">
+            Compare Rates In Cities Across {{ stateData.state }}
+          </h2>
+          <CityLinksList :city-links="cityLinks" />
+        </b-container>
+      </section>
       <!-- How Protect.com Works Section -->
       <StatePageComponentsHowItWorks
         :stateData="stateData"
@@ -146,7 +150,6 @@
 <script setup>
   import { computed, ref, onMounted } from "vue";
   import { useStore } from "../stores/store";
-  import { useCityLinksApi } from "@/composables/useCityLinksApi.js";
 
   const store = useStore();
 
@@ -158,18 +161,18 @@
     title: String,
     description: String,
     dataZoneId: String,
+    cityLinks: {
+      type: Array,
+      default: () => [],
+    },
+    cityLinksError: {
+      type: Boolean,
+      default: false,
+    },
   });
 
   // Reactive zipcode variable
   const zipcode = ref("");
-
-  const { cityListResult, cityLinksError } = await useCityLinksApi({
-    state: props.topic,
-  });
-
-  const cityLinks = computed(() => {
-    return cityListResult.value?.data || [];
-  });
 
   // Fetch state insurance stats from Google Sheets API
   const {

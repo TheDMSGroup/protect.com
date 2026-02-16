@@ -1,20 +1,13 @@
 <template>
-  <div class="city-links-list">
-    <ul class="space-y-2">
-      <li v-for="cityObj in cityLinks" :key="cityObj.state">
-        <!-- <div class="state-label">
-          <strong>{{ city.state }}</strong>
-        </div> -->
-        <NuxtLink
-          v-for="link in cityObj.cities"
-          :key="link.name"
-          :to="`/car-insurance/${cityObj.state.toLowerCase()}/${link.slug}`"
-          class="text-blue-600 hover:underline"
-        >
-          {{ link.name }}, {{ link.stateCode }}
-        </NuxtLink>
-      </li>
-    </ul>
+  <div :class="`city-links-list ${linksClass}`">
+    <NuxtLink
+      v-for="link in allLinks"
+      :key="link.name"
+      :to="`/car-insurance/${link.state.toLowerCase()}/${link.slug}`"
+      class="text-blue-600 hover:underline"
+    >
+      {{ link.name }}, {{ link.stateCode }}
+    </NuxtLink>
   </div>
 </template>
 <script setup>
@@ -24,23 +17,37 @@
       required: true,
     },
   });
-  console.log("Received city links:", props.cityLinks);
+  const allLinks = computed(() => {
+    return props.cityLinks.reduce((acc, cityObj) => {
+      const cityLinks = cityObj.cities.map((city) => ({
+        name: city.name,
+        stateCode: city.stateCode,
+        slug: city.slug,
+        state: cityObj.state,
+      }));
+      return [...acc, ...cityLinks];
+    }, []);
+  });
+
+  const linksClass = computed(() => {
+    const count = allLinks.value.length;
+    if (count >= 20) return "column-display";
+    return "grid-display";
+  });
+
+  console.log("All city links:", allLinks.value);
 </script>
 <style lang="scss" scoped>
   .city-links-list {
-    .state-label {
-      padding: 0.5rem;
-      color: $blue;
-      border-bottom: 2px solid $blue-light;
-      margin-bottom: 2rem;
+    padding: 4rem;
+
+    @include mobile {
+      padding: 2rem;
     }
-    ul {
-      list-style-type: none;
-      padding: 0;
-      column-count: 5;
+
+    &.column-display {
+      column-count: 4;
       column-gap: 1rem;
-      gap: 1rem;
-      margin: 4rem 0;
 
       @include media-breakpoint-down(lg) {
         column-count: 3;
@@ -49,15 +56,28 @@
         column-count: 2;
       }
     }
-
-    li {
-      break-inside: avoid;
-
-      a {
-        display: block;
-        margin-bottom: 1rem;
-        padding: 0.25rem;
+    &.grid-display {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+      align-items: center;
+      @include media-breakpoint-down(md) {
+        grid-template-columns: 1fr;
       }
+      a {
+        text-align: center;
+      }
+    }
+
+    .state-label {
+      padding: 0.5rem;
+      color: $blue;
+      border-bottom: 2px solid $blue-light;
+      margin-bottom: 2rem;
+    }
+    a {
+      display: block;
+      padding: 0.25rem;
     }
   }
 </style>

@@ -42,7 +42,7 @@ const groupAndSortCities = (cities, stateMap, filterState = null) => {
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig();
   const query = getQuery(event);
-  const { state, limit } = query;
+  const { state, limit, excludedCities } = query;
 
   // Google Sheets configuration
   const SHEET_ID = "1auut2Px5pfJwaPA58OeUQeMG_5KP-RpEVUfzHIQadV0";
@@ -83,7 +83,12 @@ export default defineEventHandler(async (event) => {
     }
 
     //otherwise, if we are passed a state, ignore the limit and return all cities for that state, grouped and sorted
-    const result = groupAndSortCities(data, stateMap, state);
+    const result = groupAndSortCities(
+      data,
+      stateMap,
+      state,
+      excludedCities ? excludedCities.split(",") : []
+    );
 
     return {
       success: true,

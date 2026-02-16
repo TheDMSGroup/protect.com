@@ -1,10 +1,9 @@
 export async function useCityLinksApi({
   limit = 50,
   state,
-  excludedCities = [],
+  cacheKey = null,
 } = {}) {
   console.log("🚀 useCityLinksApi called with limit:", limit, "state:", state);
-  const cacheKey = `cities-top-${limit}${state ? `-${state}` : ""}`;
   console.log("🔑 Cache key:", cacheKey);
 
   const nuxtApp = useNuxtApp();
@@ -20,16 +19,6 @@ export async function useCityLinksApi({
       const url = `/api/state/city/list?limit=${limit}${stateQueryStr}`;
       console.log("🌐 Making API request:", url);
       const result = await $fetch(url);
-
-      // If we have excluded cities, filter them out of the results before returning
-      if (excludedCities.length > 0) {
-        result.data = result.data.map((group) => ({
-          ...group,
-          cities: group.cities.filter(
-            (city) => !excludedCities.includes(city.name.toLowerCase())
-          ),
-        }));
-      }
       return result;
     },
     {
