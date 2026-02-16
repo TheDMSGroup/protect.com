@@ -320,6 +320,10 @@
     <!-- FAQ Section -->
     <section class="faq">
       <div class="container">
+        <div class="section-header">
+          <h2>Frequently Asked Questions</h2>
+        </div>
+
         <FaqMain :faq="faq" />
       </div>
     </section>
@@ -707,6 +711,10 @@
       svg {
         margin-bottom: 24px;
       }
+
+      p {
+        margin: 0;
+      }
     }
   }
 
@@ -811,29 +819,13 @@
         }
       }
       h1 {
-        font-size: 52px;
-        font-weight: 700;
         margin-bottom: 20px;
-        line-height: 1.1;
-        color: $blue;
-
-        @include tablet {
-          font-size: 42px;
-        }
-
-        @include mobile {
-          font-size: 36px;
-        }
       }
 
       .subtitle {
-        font-size: 20px;
         margin-bottom: 32px;
-        color: #64748b;
-        line-height: 1.6;
 
         @include mobile {
-          font-size: 16px;
           margin-bottom: 24px;
           max-width: 90%;
           margin: 20px auto;
@@ -934,14 +926,9 @@
 
       p {
         margin: 0;
-        font-size: 15px;
-        line-height: 1.5;
         color: darken(#2563eb, 20%);
-        font-weight: 500;
 
         strong {
-          font-weight: 700;
-          font-size: 16px;
           display: block;
           margin-bottom: 4px;
           color: darken(#2563eb, 25%);
@@ -1001,8 +988,6 @@
 
     .intro {
       text-align: center;
-      color: #6b7280;
-      font-size: 18px;
       margin-bottom: 40px;
     }
   }
@@ -1138,13 +1123,11 @@
     }
 
     h3 {
-      font-size: 28px;
       margin-bottom: 8px;
       color: white;
     }
 
     p {
-      font-size: 18px;
       margin-bottom: 8px;
       opacity: 0.95;
       color: white;
@@ -1212,16 +1195,10 @@
     }
 
     .headline {
-      color: #0c2c67;
       margin-bottom: 12px;
-      font-weight: 600;
-      font-size: 28px;
     }
 
     p {
-      font-size: 16px;
-      color: #6b7280;
-      line-height: 1.6;
       margin-bottom: 16px;
     }
   }
@@ -1259,16 +1236,11 @@
 
   .insight-content {
     h3 {
-      font-size: 24px;
-      color: #0c2c67;
       margin-bottom: 16px;
-      font-weight: 600;
+      color: #333333;
     }
 
     p {
-      font-size: 16px;
-      line-height: 1.8;
-      color: #4b5563;
       margin-bottom: 16px;
     }
   }
@@ -1310,16 +1282,7 @@
     position: relative;
 
     h3 {
-      font-size: 22px;
-      color: #0c2c67;
       margin-bottom: 12px;
-      font-weight: 600;
-    }
-
-    p {
-      font-size: 16px;
-      color: #6b7280;
-      line-height: 1.6;
     }
   }
 
@@ -1355,20 +1318,14 @@
     padding: 40px 0;
 
     h3 {
-      font-size: 20px;
-      color: #0c2c67;
       margin-bottom: 16px;
-      font-weight: 600;
     }
 
     p {
-      font-size: 14px;
-      color: #6b7280;
-      line-height: 1.8;
       margin-bottom: 12px;
     }
+
     a {
-      font-size: 14px;
       text-decoration: underline;
     }
   }

@@ -254,16 +254,7 @@
 
 <style lang="scss" scoped>
   h2 {
-    font-size: 2.5rem;
     margin-bottom: 15px;
-
-    @include media-breakpoint-down(md) {
-      text-align: left;
-      font-size: 2.3rem;
-    }
-    @include media-breakpoint-down(sm) {
-      font-size: 2rem;
-    }
   }
   .make-model-container {
     :deep(.heading) {
@@ -279,10 +270,6 @@
 
     h3 {
       margin-bottom: 45px;
-
-      @include media-breakpoint-down(md) {
-        font-size: 1.25rem;
-      }
     }
     .top-companies-list {
       display: flex;
@@ -350,14 +337,8 @@
         display: block;
       }
       p {
-        font-size: 1.5rem;
         max-width: 200px;
-        font-weight: 400;
         margin: 0 auto;
-
-        @include media-breakpoint-down(md) {
-          font-size: 1.35rem;
-        }
       }
       .step-number {
         @include media-breakpoint-down(md) {
@@ -410,14 +391,6 @@
       max-width: 500px;
       margin: 50px auto 0 auto;
     }
-    p {
-      font-weight: 400;
-      font-size: 1.5rem;
-
-      @include media-breakpoint-down(md) {
-        font-size: 1.35rem;
-      }
-    }
   }
 
   #company-rank {
@@ -437,14 +410,6 @@
         padding: 35px 15px;
       }
 
-      p {
-        font-weight: 400;
-        font-size: 1.5rem;
-
-        @include media-breakpoint-down(md) {
-          font-size: 1.35rem;
-        }
-      }
       img {
         max-width: 100%;
       }

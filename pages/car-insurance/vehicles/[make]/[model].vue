@@ -8,7 +8,7 @@
       <span>{{ formattedModel }}</span>
     </nav>
     <h1>{{ formattedMake }} {{ formattedModel }} Car Insurance</h1>
-    <p>Find car insurance rates for the {{ formattedMake }} {{ formattedModel }}.</p>
+    <p class="lead">Find car insurance rates for the {{ formattedMake }} {{ formattedModel }}.</p>
   </div>
 </template>
 

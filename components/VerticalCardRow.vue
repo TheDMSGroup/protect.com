@@ -147,15 +147,6 @@
         padding: 15px;
         order: 2;
       }
-      p {
-        font-size: 22px;
-        font-weight: 400;
-
-        @include media-breakpoint-down(md) {
-          font-size: 1.25rem;
-          line-height: 1.75rem;
-        }
-      }
       .btn {
         margin-top: 25px;
         padding: 15px 45px;

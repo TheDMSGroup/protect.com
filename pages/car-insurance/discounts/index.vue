@@ -7,14 +7,14 @@
           Maximize Your Savings: The Ultimate List of Car Insurance Discounts
           in&nbsp;2026
         </h1>
-        <p class="intro-text">
+        <p class="lead">
           Most drivers are eligible for at least three to five different
           discounts, yet many never claim them. Whether you've recently improved
           your credit score, bought a car with advanced safety features, or
           simply maintained a clean driving record, you could be sitting on
           hundreds of dollars in annual&nbsp;savings.
         </p>
-        <p class="intro-text">
+        <p class="lead">
           The challenge is that every insurance provider offers different
           incentives. That's where Protect.com comes in. Our advanced quote tool
           does the heavy lifting for you, scanning top-rated providers to see
@@ -495,23 +495,11 @@
 
       @include media-breakpoint-up(md) {
         max-width: 700px;
-        font-size: 3.75rem;
       }
     }
     // .hero-content {
     //   animation: slideInLeft 0.25s ease-out;
     // }
-
-    .intro-text {
-      font-size: 1.1rem;
-      line-height: 1.7;
-      color: $gray-dark;
-      margin-bottom: 1.5rem;
-
-      @include media-breakpoint-up(md) {
-        max-width: 700px;
-      }
-    }
 
     .hero-image {
       width: 100%;
@@ -548,8 +536,6 @@
     padding: 4rem 0;
 
     h2 {
-      color: $blue;
-      margin-bottom: 3rem;
       text-align: center;
     }
   }
@@ -564,16 +550,7 @@
       padding: 2rem 1.5rem;
     }
 
-    h3 {
-      font-family: "Cantata One", serif;
-      font-size: 1.75rem;
-      color: $blue;
-      margin-bottom: 1rem;
-    }
-
     .category-description {
-      font-size: 1.1rem;
-      color: $gray-dark;
       margin-bottom: 2rem;
       font-style: italic;
     }
@@ -597,15 +574,10 @@
     }
 
     h4 {
-      font-size: 1.25rem;
-      color: $blue;
       margin-bottom: 0.5rem;
-      font-weight: 700;
     }
 
     p {
-      color: $gray-dark;
-      line-height: 1.6;
       margin: 0;
     }
   }
@@ -634,19 +606,11 @@
     }
 
     h2 {
-      margin-bottom: 1.5rem;
       color: white;
     }
 
     p {
-      font-size: 1.1rem;
-      line-height: 1.7;
-      margin-bottom: 1.5rem;
       color: white;
-      max-width: 900px;
-      margin-left: auto;
-      margin-right: auto;
-      width: 100%;
     }
 
     .how-it-works {
@@ -664,7 +628,6 @@
       }
 
       h3 {
-        font-family: "Cantata One", serif;
         color: white;
         text-align: center;
       }

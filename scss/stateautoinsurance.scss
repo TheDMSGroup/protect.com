@@ -59,7 +59,7 @@
   .hero-content {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 200px;
+    gap: 100px;
     align-items: flex-start;
 
     @include mobile {
@@ -78,32 +78,6 @@
     @include mobile {
       width: 100%;
       text-align: center;
-    }
-
-    h1 {
-      font-size: 2.5rem;
-      margin-bottom: var(--spacing-lg);
-      font-weight: 400 !important; // Normal weight for Cantata One
-      line-height: 1.2;
-      color: #0C2C67;
-      @include mobile {
-        font-size: 2rem;
-      }
-    }
-
-    .hero-subtitle {
-      font-family: 'Nunito Sans', sans-serif;
-      font-size: 1.125rem;
-      font-weight: bold;
-      margin-bottom: var(--spacing-xl);
-      opacity: 0.8;
-      line-height: 1.4;
-      color: #1F2D6C;
-
-      @include mobile {
-        font-size: 1rem;
-        margin-bottom: var(--spacing-lg);
-      }
     }
   }
 
@@ -809,23 +783,4 @@
 .section-header {
   text-align: center;
   margin-bottom: var(--spacing-4xl);
-
-  h2 {
-    font-size: 2.5rem;
-    font-weight: 400 !important; // Normal weight for Cantata One
-    margin-bottom: var(--spacing-md);
-    color: var(--text-primary);
-
-    @include mobile {
-      font-size: 2rem;
-    }
-  }
-
-  p {
-    font-size: 1.125rem;
-    color: var(--text-secondary);
-    margin: 0;
-    max-width: 600px;
-    margin: 0 auto;
-  }
 }
