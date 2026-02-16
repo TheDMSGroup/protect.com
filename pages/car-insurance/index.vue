@@ -1,71 +1,3 @@
-<script setup>
-  import { useStore } from "~/stores/store";
-
-  const store = useStore();
-
-  useSeoMeta({
-    title: () => "Compare Auto Insurance Rates & Get Side-by-Side Quotes",
-    description: () => " Get free car insurance quotes from the top companies and compare side-by-side to find the best deals. Start saving on your monthly payment with Protect.com.",
-    ogTitle: () => "Compare Auto Insurance Rates & Get Side-by-Side Quotes",
-    ogDescription: () => " Get free car insurance quotes from the top companies and compare side-by-side to find the best deals. Start saving on your monthly payment with Protect.com.",
-    ogImage: () => "https://stage.protect.com/img/protect-share.dabdad17.jpg",
-    ogType: "article",
-    twitterCard: "summary_large_image",
-    twitterTitle: () => "Compare Auto Insurance Rates & Get Side-by-Side Quotes",
-    twitterDescription: () => " Get free car insurance quotes from the top companies and compare side-by-side to find the best deals. Start saving on your monthly payment with Protect.com.",
-    twitterImage: () => "https://stage.protect.com/img/protect-share.dabdad17.jpg",
-  });
-  import { buildImageUrl } from "@/composables/images.js";
-
-  const action = computed(() => {
-    let surveyUrl = 'https://insure.protect.com/';
-    if (store.visitorInfo?.ueid) {
-      surveyUrl = surveyUrl + '?ueid=' + store.visitorInfo.ueid;
-    }
-    return surveyUrl;
-  });
-
-  const config = {
-    carriers: [
-      {
-        carrierName: "Progressive",
-        amBestRating: "A+",
-        jdPowerRating: "3/5",
-        bbbScore: "A+",
-        naicScore: "1.33",
-      },
-      {
-        carrierName: "Allstate",
-        amBestRating: "A+",
-        jdPowerRating: "4.1/5",
-        bbbScore: "A+",
-        naicScore: "2.02",
-      },
-      {
-        carrierName: "State Farm",
-        amBestRating: "A++",
-        jdPowerRating: "4.2/5",
-        bbbScore: "A+",
-        naicScore: "1.28",
-      },
-      {
-        carrierName: "Liberty Mutual",
-        amBestRating: "A",
-        jdPowerRating: "3.2/5",
-        bbbScore: "A+",
-        naicScore: "3.56",
-      },
-      {
-        carrierName: "Root Insurance",
-        amBestRating: "A+",
-        jdPowerRating: "4.5/5",
-        bbbScore: "A+",
-        naicScore: "0.9",
-      },
-    ],
-  };
-</script>
-
 <template>
   <div id="auto-insurance" class="page">
     <sub-vertical-hero
@@ -155,8 +87,10 @@
             <b-col cols="12" lg="6">
               <h2>How does your auto insurance company rank?</h2>
               <p>
-                Protect.com ranks top auto insurance companies based on J.D. Power satisfaction scores plus our own Protect.com customer satisfaction
-                scores comprised of multiple reviews from the auto insurance industry’s most trusted sources.
+                Protect.com ranks top auto insurance companies based on J.D.
+                Power satisfaction scores plus our own Protect.com customer
+                satisfaction scores comprised of multiple reviews from the auto
+                insurance industry’s most trusted sources.
               </p>
             </b-col>
             <b-col cols="12" lg="6">
@@ -181,6 +115,7 @@
         </div>
       </b-container>
     </section>
+
     <section class="py-4 my-4">
       <b-container>
         <h2 class="text-center">Compare Car Insurance Quotes By State</h2>
@@ -189,37 +124,142 @@
       </b-container>
     </section>
 
-    <yellow-box-banner
-      headline="Compare Rates by Vehicle Make & Model"
-      content="See how your specific car affects your insurance rates. Get detailed information for your make and model to find the best coverage options."
-      image-alt="Ford F-150 and Toyota Camry comparison"
-      image="vehicle-comparison.png"
-      action="/car-insurance/rates-by-vehicle"
-      action-message="Find Your Vehicle"
-      image-align="right"
-      :lazy-image="true"
-    />
+    <section class="make-model-container">
+      <yellow-box-banner
+        headline="Compare Rates by Vehicle Make & Model"
+        content="See how your specific car affects your insurance rates. Get detailed information for your make and model to find the best coverage options."
+        image-alt="Ford F-150 and Toyota Camry comparison"
+        image="vehicle-comparison.png"
+        action="/car-insurance/rates-by-vehicle"
+        action-message="Find Your Vehicle"
+        image-align="right"
+        :lazy-image="true"
+      />
+    </section>
+
+    <section v-if="cityLinks.length && !cityLinksError" id="top-cities">
+      <b-container>
+        <h2 class="text-center">Top Cities for Auto Insurance</h2>
+        <p class="text-center">
+          Explore auto insurance options in popular cities across the country.
+        </p>
+        <CityLinksList :city-links="cityLinks" />
+      </b-container>
+    </section>
+
     <action-banner
       cta-type="zipcode-form"
       image_top="100"
       headline="Explore new auto insurance policy options."
-      imageAlt="A mother with a baby carrier standing behind a vehicle while the father steps around the vehicle to get something in the car"
+      image-alt="A mother with a baby carrier standing behind a vehicle while the father steps around the vehicle to get something in the car"
       subheadline="Discover how much you could can save on auto insurance with Protect.com."
       image="car_couple.png"
       :action="action"
       :lazy-image="true"
     />
 
-    <BlogFeed :show-categories="false" vertical="insurance" :sub-verticals="['car-insurance']" />
+    <BlogFeed
+      :show-categories="false"
+      vertical="insurance"
+      :sub-verticals="['car-insurance']"
+    />
     <!-- <join-newsletter /> -->
   </div>
 </template>
+
+<script setup>
+  import { useStore } from "~/stores/store";
+  import { buildImageUrl } from "@/composables/images.js";
+  import { useCityLinksApi } from "@/composables/useCityLinksApi.js";
+
+  const store = useStore();
+
+  const top50citiesCacheKey = "cities-top-50";
+  const { cityListResult, cityLinksError } = await useCityLinksApi({
+    cacheKey: top50citiesCacheKey,
+  });
+
+  const cityLinks = computed(() => {
+    return cityListResult.value?.data || [];
+  });
+
+  //inline composable to fetch article with caching
+
+  useSeoMeta({
+    title: () => "Compare Auto Insurance Rates & Get Side-by-Side Quotes",
+    description: () =>
+      " Get free car insurance quotes from the top companies and compare side-by-side to find the best deals. Start saving on your monthly payment with Protect.com.",
+    ogTitle: () => "Compare Auto Insurance Rates & Get Side-by-Side Quotes",
+    ogDescription: () =>
+      " Get free car insurance quotes from the top companies and compare side-by-side to find the best deals. Start saving on your monthly payment with Protect.com.",
+    ogImage: () => "https://stage.protect.com/img/protect-share.dabdad17.jpg",
+    ogType: "article",
+    twitterCard: "summary_large_image",
+    twitterTitle: () =>
+      "Compare Auto Insurance Rates & Get Side-by-Side Quotes",
+    twitterDescription: () =>
+      " Get free car insurance quotes from the top companies and compare side-by-side to find the best deals. Start saving on your monthly payment with Protect.com.",
+    twitterImage: () =>
+      "https://stage.protect.com/img/protect-share.dabdad17.jpg",
+  });
+
+  const action = computed(() => {
+    let surveyUrl = "https://insure.protect.com/";
+    if (store.visitorInfo?.ueid) {
+      surveyUrl = surveyUrl + "?ueid=" + store.visitorInfo.ueid;
+    }
+    return surveyUrl;
+  });
+
+  const config = {
+    carriers: [
+      {
+        carrierName: "Progressive",
+        amBestRating: "A+",
+        jdPowerRating: "3/5",
+        bbbScore: "A+",
+        naicScore: "1.33",
+      },
+      {
+        carrierName: "Allstate",
+        amBestRating: "A+",
+        jdPowerRating: "4.1/5",
+        bbbScore: "A+",
+        naicScore: "2.02",
+      },
+      {
+        carrierName: "State Farm",
+        amBestRating: "A++",
+        jdPowerRating: "4.2/5",
+        bbbScore: "A+",
+        naicScore: "1.28",
+      },
+      {
+        carrierName: "Liberty Mutual",
+        amBestRating: "A",
+        jdPowerRating: "3.2/5",
+        bbbScore: "A+",
+        naicScore: "3.56",
+      },
+      {
+        carrierName: "Root Insurance",
+        amBestRating: "A+",
+        jdPowerRating: "4.5/5",
+        bbbScore: "A+",
+        naicScore: "0.9",
+      },
+    ],
+  };
+</script>
 
 <style lang="scss" scoped>
   h2 {
     margin-bottom: 15px;
   }
-
+  .make-model-container {
+    :deep(.heading) {
+    }
+  }
   #top-companies {
     position: relative;
     margin-bottom: 100px;

@@ -114,8 +114,8 @@
           <div class="hero-visual">
             <div class="hero-facts-grid">
               <div class="fact-card rate">
-                <h2>${{ coverageRateAnnual }}</h2>
-                <p>Average {{ cityName }} Annual Cost</p>
+                <p>${{ coverageRateAnnual }}</p>
+                <span>Average {{ cityName }} Annual Cost</span>
                 <span
                   :class="`${rateComparison.comparison.comparisonStatus}-average`"
                 >
@@ -127,18 +127,18 @@
                 </span>
               </div>
               <div class="fact-card rate">
-                <h2>${{ coverageRateMonthly }}</h2>
-                <p>Average {{ cityName }} Monthly Cost</p>
+                <p>${{ coverageRateMonthly }}</p>
+                <span>Average {{ cityName }} Monthly Cost</span>
               </div>
 
               <div class="fact-card">
-                <h2>{{ stateFaultType }}</h2>
-                <p>{{ stateName }} Fault Type</p>
+                <p>{{ stateFaultType }}</p>
+                <span>{{ stateName }} Fault Type</span>
               </div>
 
               <div class="fact-card">
-                <h2>{{ stateMinCoverage }}</h2>
-                <p>{{ stateName }} Min. Coverage</p>
+                <p>{{ stateMinCoverage }}</p>
+                <span>{{ stateName }} Min. Coverage</span>
               </div>
             </div>
           </div>
@@ -150,10 +150,12 @@
     <!-- How to Save Money Section -->
     <section class="savings-tips">
       <div class="container">
-        <h2>How to Save Money on Car Insurance in {{ cityName }}</h2>
-        <p>Expert tips to reduce your insurance premiums</p>
+        <div class="col-md-8 col-10 mx-auto text-center my-4">
+          <h2>How to Save Money on Car Insurance in {{ cityName }}</h2>
+          <p>Expert tips to reduce your insurance premiums</p>
+        </div>
 
-        <div class="tips-grid">
+        <div class="tips-grid pt-4">
           <div class="tip-card">
             <svg width="48" height="48" viewBox="0 0 24 24">
               <path
@@ -329,10 +331,14 @@
     <!-- How Protect.com Works -->
     <section class="how-it-works">
       <div class="container">
-        <h2>How Protect.com Works</h2>
-        <p>Get the best car insurance quotes in just three simple steps</p>
+        <div class="col-md-8 col-10 mx-auto text-center my-4">
+          <h2 class="text-center">How Protect.com Works</h2>
+          <p class="text-center">
+            Get the best car insurance quotes in just three simple steps
+          </p>
+        </div>
 
-        <div class="steps">
+        <div class="steps pt-4">
           <div class="step">
             <div class="step-number">1</div>
             <h3>Enter Your Zip Code</h3>
@@ -380,22 +386,15 @@
         <AutoRateCalculator :initial-zip="computedZipCode" />
       </div>
     </section>
-
-    <section class="other-cities">
-      <div class="container">
-        <div class="cities-grid">
-          <div v-for="city in otherCities" :key="city" class="city-card">
-            <NuxtLink
-              :to="`/car-insurance/${stateNameSlug}/${city
-                .toLowerCase()
-                .replace(/ /g, '-')}`"
-              class="city-link"
-            >
-              {{ city }} Car Insurance
-            </NuxtLink>
-          </div>
-        </div>
-      </div>
+    <!-- City Links-->
+    <section
+      v-if="otherCities && otherCities[0].cities.length > 0 && !cityLinksError"
+      class="other-cities"
+    >
+      <b-container>
+        <h2 class="text-center">Explore other cities in {{ stateName }}</h2>
+        <CityLinksList :city-links="otherCities" />
+      </b-container>
     </section>
 
     <!-- Methodology -->
@@ -453,10 +452,35 @@
     stateFaultType,
     faq,
     rateComparison,
-    otherCities,
   } = await useCityDataFromCacheOrApi();
 
-  console.log("otherCities:", otherCities);
+  const cityLinksCacheKey = `cities-${stateNameSlug}`;
+
+  const { cityListResult, cityLinksError } = await useCityLinksApi({
+    state: stateNameSlug,
+    cacheKey: cityLinksCacheKey,
+  });
+
+  const otherCities = computed(() => {
+    if (cityListResult?.value?.data) {
+      const stateCities = cityListResult.value.data[0];
+
+      //filter out current city
+      //choosing to not do this on API level so we can cache the full city list
+      // for the state and reuse it across different city pages without needing to make multiple API calls for each city in the same state
+      return [
+        {
+          state: stateCities.state,
+          cities: stateCities.cities.filter(
+            (city) =>
+              city.name.toLowerCase() !==
+              cityNameSlug.replace(/-/g, " ").toLowerCase()
+          ),
+        },
+      ];
+    }
+    return [];
+  });
 
   async function useCityDataFromCacheOrApi() {
     const cacheKey = `${stateNameSlug}-${cityNameSlug}-car-insurance-data`;
@@ -610,9 +634,6 @@
     const zipCodeUrl = computed(() => {
       return "/get-quote";
     });
-    const otherCities = computed(() => {
-      return cityInfo.value ? cityInfo.value.otherCities : [];
-    });
 
     return {
       error,
@@ -637,7 +658,6 @@
       faq,
       zipCodeUrl,
       rateComparison,
-      otherCities,
     };
   }
 
@@ -877,43 +897,6 @@
         gap: 16px;
         margin-top: 0;
       }
-
-      .fact-card {
-        background: white;
-        padding: 28px 24px;
-        border-radius: 12px;
-        text-align: center;
-        border: 2px solid #e5e7eb;
-        transition: all 0.3s ease;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        min-height: 165px;
-
-
-        @include mobile {
-          padding: 24px 20px;
-          min-height: auto;
-        }
-
-        &:hover {
-          border-color: $blue-light;
-          transform: translateY(-4px);
-          box-shadow: 0 12px 24px rgba(12, 44, 103, 0.15);
-        }
-
-        h3 {
-          margin-bottom: 8px;
-        }
-
-        p {
-          margin-bottom: 8px;
-          max-width: 157px;
-          margin: 0 auto;
-        }
-      }
     }
 
     .rate-output-text {
@@ -1003,10 +986,6 @@
   .fast-facts {
     background: white;
 
-    h2 {
-      text-align: center;
-    }
-
     .intro {
       text-align: center;
       margin-bottom: 40px;
@@ -1015,7 +994,6 @@
 
   .fact-card {
     background: #f9fafb;
-    padding: 32px;
     border-radius: 12px;
     text-align: center;
     border: 2px solid #e5e7eb;
@@ -1024,9 +1002,17 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    min-height: 165px;
+    padding: 32px;
+
+    &:hover {
+      border-color: $blue-light;
+      transform: translateY(-4px);
+      box-shadow: 0 12px 24px rgba(12, 44, 103, 0.15);
+    }
 
     &.rate {
-      justify-content: space-between;
       height: 100%;
 
       .contender {
@@ -1042,77 +1028,79 @@
           line-height: 1rem;
         }
       }
-    }
+      &:hover {
+        border-color: #0c2c67;
+        transform: translateY(-4px);
+        box-shadow: 0 8px 16px rgba(12, 44, 103, 0.1);
+      }
+      .below-average,
+      .above-average,
+      .at-average {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        border-radius: 4px;
+        font-size: 13px;
+        font-weight: 600;
+        margin-top: 8px;
+        position: relative;
+        padding: 5px 10px 5px 28px;
 
-    &:hover {
-      border-color: #0c2c67;
-      transform: translateY(-4px);
-      box-shadow: 0 8px 16px rgba(12, 44, 103, 0.1);
-    }
+        &::before {
+          content: "";
+          position: absolute;
+          left: 8px;
+          top: 50%;
+          transform: translateY(-50%);
+          width: 12px;
+          height: 12px;
+          background-size: contain;
+          background-repeat: no-repeat;
+          background-position: center;
+        }
+      }
 
-    h3 {
-      margin-bottom: 8px;
-    }
+      .below-average {
+        background: rgba(102, 194, 150, 0.12);
+        color: darken($green-dark, 20%);
+        border: 1px solid darken($green-dark, 20%);
 
+        &::before {
+          background-image: url('data:image/svg+xml;utf8,<svg width="12" height="12" viewBox="0 0 24 24" fill="%23275c42" xmlns="http://www.w3.org/2000/svg"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>');
+        }
+      }
+
+      .above-average {
+        background: rgba(239, 68, 68, 0.1);
+        color: darken(#dc2626, 15%);
+        border: 1px solid rgba(239, 68, 68, 0.3);
+
+        &::before {
+          background-image: url('data:image/svg+xml;utf8,<svg width="12" height="12" viewBox="0 0 24 24" fill="%239c1919" xmlns="http://www.w3.org/2000/svg"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>');
+        }
+      }
+
+      .at-average {
+        background: rgba(59, 130, 246, 0.1);
+        color: darken(#2563eb, 15%);
+        border: 1px solid rgba(59, 130, 246, 0.3);
+
+        &::before {
+          background-image: url('data:image/svg+xml;utf8,<svg width="12" height="12" viewBox="0 0 24 24" fill="%231043b3" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>');
+        }
+      }
+    }
     p {
+      font-size: 30px;
+      color: $blue;
+      font-weight: 700;
       margin-bottom: 8px;
     }
-
-    .below-average,
-    .above-average,
-    .at-average {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      border-radius: 4px;
-      font-size: 13px;
-      font-weight: 600;
-      margin-top: 8px;
-      position: relative;
-      padding: 5px 10px 5px 28px;
-
-      &::before {
-        content: "";
-        position: absolute;
-        left: 8px;
-        top: 50%;
-        transform: translateY(-50%);
-        width: 12px;
-        height: 12px;
-        background-size: contain;
-        background-repeat: no-repeat;
-        background-position: center;
-      }
-    }
-
-    .below-average {
-      background: rgba(102, 194, 150, 0.12);
-      color: darken($green-dark, 20%);
-      border: 1px solid darken($green-dark, 20%);
-
-      &::before {
-        background-image: url('data:image/svg+xml;utf8,<svg width="12" height="12" viewBox="0 0 24 24" fill="%23275c42" xmlns="http://www.w3.org/2000/svg"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>');
-      }
-    }
-
-    .above-average {
-      background: rgba(239, 68, 68, 0.1);
-      color: darken(#dc2626, 15%);
-      border: 1px solid rgba(239, 68, 68, 0.3);
-
-      &::before {
-        background-image: url('data:image/svg+xml;utf8,<svg width="12" height="12" viewBox="0 0 24 24" fill="%239c1919" xmlns="http://www.w3.org/2000/svg"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>');
-      }
-    }
-
-    .at-average {
-      background: rgba(59, 130, 246, 0.1);
-      color: darken(#2563eb, 15%);
-      border: 1px solid rgba(59, 130, 246, 0.3);
-
-      &::before {
-        background-image: url('data:image/svg+xml;utf8,<svg width="12" height="12" viewBox="0 0 24 24" fill="%231043b3" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>');
-      }
+    span {
+      font-size: 16px;
+      color: #6b7280;
+      font-weight: 500;
+      display: block;
     }
   }
 
@@ -1162,14 +1150,9 @@
   .savings-tips {
     background: #f9fafb;
 
-    h2 {
-      text-align: center;
-      margin-bottom: 12px;
-    }
-
     > .container > p {
       text-align: center;
-      margin-bottom: 48px;
+      color: #6b7280;
     }
   }
 
@@ -1264,25 +1247,16 @@
 
   // ==================== FAQ SECTION ====================
   .faq {
-
-    h2 {
-      text-align: center;
-      margin-bottom: 48px;
-    }
+    background: #f9fafb;
   }
 
   // ==================== HOW IT WORKS ====================
   .how-it-works {
     background: white;
 
-    h2 {
-      text-align: center;
-      margin-bottom: 12px;
-    }
-
     > .container > p {
       text-align: center;
-      margin-bottom: 48px;
+      color: #6b7280;
     }
   }
 
@@ -1331,14 +1305,9 @@
   .rate-calculator {
     background: #f9fafb;
 
-    h2 {
-      text-align: center;
-      margin-bottom: 12px;
-    }
-
     > .container > p {
       text-align: center;
-      margin-bottom: 40px;
+      color: #6b7280;
     }
   }
 

@@ -1,5 +1,5 @@
 <template lang="html">
-  <section class="yellow-box-banner" :aria-labelledby="headingId">
+  <section class="yellow-box-banner">
     <b-container :class="{ 'right-image': imageAlign === 'right' }">
       <b-row>
         <b-col v-if="imageAlign === 'left'" cols="12" md="5" lg="7">
@@ -13,7 +13,13 @@
             :preload="!lazyImage"
           />
         </b-col>
-        <b-col v-if="imageAlign === 'right'" cols="12" md="5" lg="7" class="d-block d-md-none d-lg-none d-xl-none">
+        <b-col
+          v-if="imageAlign === 'right'"
+          cols="12"
+          md="5"
+          lg="7"
+          class="d-block d-md-none d-lg-none d-xl-none"
+        >
           <NuxtImg
             class="image"
             :alt="imageAlt"
@@ -25,7 +31,7 @@
           />
         </b-col>
         <b-col cols="12" md="7" lg="5" class="wrapper">
-          <h2 :id="headingId">{{ headline }}</h2>
+          <h2 class="heading">{{ headline }}</h2>
           <p>
             {{ content }}
           </p>
@@ -43,7 +49,13 @@
             />
           </p>
         </b-col>
-        <b-col v-if="imageAlign === 'right'" cols="12" md="5" lg="7" class="d-none d-md-block">
+        <b-col
+          v-if="imageAlign === 'right'"
+          cols="12"
+          md="5"
+          lg="7"
+          class="d-none d-md-block"
+        >
           <NuxtImg
             class="image"
             :alt="imageAlt"
@@ -97,9 +109,6 @@
   });
 
   const router = useRouter();
-
-  // Generate unique ID for heading to link with aria-labelledby
-  const headingId = `yellow-banner-heading-${Math.random().toString(36).substring(2, 11)}`;
 
   const goToAction = () => {
     if (props.action.includes("#")) {
