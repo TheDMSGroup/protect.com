@@ -1,10 +1,12 @@
 <script setup>
-import { isValidMake, isValidModel, getMakeName, getModelsForMake, getVehicleImagePath, getMakeLogoPath } from "~/data/vehicles";
+import { isValidMake, isValidModel, getMakeName, getVehicleImagePath, getMakeLogoPath } from "~/data/vehicles";
 import { redirectWithParams } from "@/composables/utils.js";
+import { extractFaqsFromData } from "@/composables/useFaq.js";
 
 const route = useRoute();
 const make = route.params.make;
 const model = route.params.model;
+const useStageData = route.query.stage === 'true';
 
 if (!isValidMake(make) || !isValidModel(make, model)) {
   throw createError({
@@ -15,11 +17,17 @@ if (!isValidMake(make) || !isValidModel(make, model)) {
 
 const formattedMake = computed(() => getMakeName(make));
 
-// Fetch model data from Google Sheets first so we can use it in formattedModel
-const { data: modelData } = await useFetch(`/api/sheets/vehicles-detail`, {
-  query: { make, model },
-  key: `model-${make}-${model}`,
-});
+// Fetch model data and all models for this make in parallel
+const [{ data: modelData }, { data: allModelsData }] = await Promise.all([
+  useFetch(`/api/sheets/vehicles-detail`, {
+    query: { make, model, stage: useStageData || undefined },
+    key: `model-${make}-${model}${useStageData ? '-stage' : ''}`,
+  }),
+  useFetch(`/api/sheets/vehicles-detail`, {
+    query: { make, stage: useStageData || undefined },
+    key: `all-models-${make}${useStageData ? '-stage' : ''}`,
+  }),
+]);
 
 const formattedModel = computed(() => {
   // Use the 'model' column from spreadsheet if available, otherwise format the slug
@@ -39,25 +47,12 @@ const onImageError = () => {
   imageError.value = true;
 };
 
-// Track image errors for other models
-const otherModelImageErrors = ref({});
-const getOtherModelImage = (modelSlug) => getVehicleImagePath(make, modelSlug);
-const onOtherModelImageError = (modelSlug) => {
-  otherModelImageErrors.value[modelSlug] = true;
-};
-
 // Make logo
 const makeLogo = computed(() => getMakeLogoPath(make));
 const logoError = ref(false);
 const onLogoError = () => {
   logoError.value = true;
 };
-
-// Fetch all models for this make to get display names
-const { data: allModelsData } = await useFetch(`/api/sheets/vehicles-detail`, {
-  query: { make },
-  key: `all-models-${make}`,
-});
 
 const otherModels = computed(() => {
   // Only show models that exist in the spreadsheet
@@ -197,79 +192,34 @@ const ratingsData = computed(() => {
   return {};
 });
 
-// Custom FAQs from spreadsheet (using faq_question_1 and faq_answer_1 format)
-const customFaqs = computed(() => {
-  if (!modelData.value) {
-    return null;
-  }
-
-  const hasCustomFaqs = modelData.value['faq_question_1'] && modelData.value['faq_answer_1'];
-  if (!hasCustomFaqs) {
-    return null;
-  }
-
-  const faqs = [
-    {
-      question: modelData.value['faq_question_1'],
-      answer: modelData.value['faq_answer_1'],
-    }
-  ];
-
-  if (modelData.value['faq_question_2'] && modelData.value['faq_answer_2']) {
-    faqs.push({
-      question: modelData.value['faq_question_2'],
-      answer: modelData.value['faq_answer_2'],
-    });
-  }
-
-  if (modelData.value['faq_question_3'] && modelData.value['faq_answer_3']) {
-    faqs.push({
-      question: modelData.value['faq_question_3'],
-      answer: modelData.value['faq_answer_3'],
-    });
-  }
-
-  if (modelData.value['faq_question_4'] && modelData.value['faq_answer_4']) {
-    faqs.push({
-      question: modelData.value['faq_question_4'],
-      answer: modelData.value['faq_answer_4'],
-    });
-  }
-
-  return faqs;
-});
-
-// Default FAQs if no custom FAQs
-const defaultFaqs = computed(() => [
-  {
-    question: `How much does ${formattedMake.value} ${formattedModel.value} insurance cost?`,
-    answer: `The average annual cost for full coverage on a ${formattedMake.value} ${formattedModel.value} is around $${vehicleStats.value.fullCoverageAnnual}, while minimum coverage averages $${vehicleStats.value.minimumCoverageAnnual}. Your actual rate depends on factors like your driving record, location, age, and coverage selections.`,
-  },
-  {
-    question: `Is the ${formattedMake.value} ${formattedModel.value} expensive to insure?`,
-    answer: `The ${formattedMake.value} ${formattedModel.value} is generally affordable to insure compared to other vehicles in its class. Its strong safety ratings, reasonable repair costs, and good reliability record help keep insurance premiums competitive.`,
-  },
-  {
-    question: `What factors affect ${formattedMake.value} ${formattedModel.value} insurance rates?`,
-    answer: `Key factors include the vehicle's safety ratings, repair costs, theft rates, your driving history, age, location, credit score, and the coverage levels you choose. Bundling policies and maintaining a clean driving record can help lower your rates.`,
-  },
-  {
-    question: `Does the ${formattedMake.value} ${formattedModel.value} qualify for safety discounts?`,
-    answer: `Yes, the ${formattedMake.value} ${formattedModel.value}'s advanced safety features like collision mitigation braking, lane keeping assist, and adaptive cruise control often qualify for insurance discounts. Ask your insurer about available safety feature discounts.`,
-  },
-  {
-    question: `How can I save on ${formattedMake.value} ${formattedModel.value} insurance?`,
-    answer: `Compare quotes from multiple insurers, bundle with home or renters insurance, maintain a clean driving record, consider higher deductibles, ask about available discounts (safe driver, low mileage, multi-vehicle), and review your coverage annually.`,
-  },
-]);
-
-// Use custom FAQs if available, otherwise use defaults
+// FAQs - use custom from spreadsheet or fallback to defaults
 const displayFaqs = computed(() => {
-  const custom = customFaqs.value;
-  if (custom && Array.isArray(custom) && custom.length > 0) {
-    return custom;
-  }
-  return defaultFaqs.value;
+  const customFaqs = extractFaqsFromData(modelData.value);
+  if (customFaqs) return customFaqs;
+
+  // Default FAQs if no custom FAQs in spreadsheet
+  return [
+    {
+      question: `How much does ${formattedMake.value} ${formattedModel.value} insurance cost?`,
+      answer: `The average annual cost for full coverage on a ${formattedMake.value} ${formattedModel.value} is around $${vehicleStats.value.fullCoverageAnnual}, while minimum coverage averages $${vehicleStats.value.minimumCoverageAnnual}. Your actual rate depends on factors like your driving record, location, age, and coverage selections.`,
+    },
+    {
+      question: `Is the ${formattedMake.value} ${formattedModel.value} expensive to insure?`,
+      answer: `The ${formattedMake.value} ${formattedModel.value} is generally affordable to insure compared to other vehicles in its class. Its strong safety ratings, reasonable repair costs, and good reliability record help keep insurance premiums competitive.`,
+    },
+    {
+      question: `What factors affect ${formattedMake.value} ${formattedModel.value} insurance rates?`,
+      answer: `Key factors include the vehicle's safety ratings, repair costs, theft rates, your driving history, age, location, credit score, and the coverage levels you choose. Bundling policies and maintaining a clean driving record can help lower your rates.`,
+    },
+    {
+      question: `Does the ${formattedMake.value} ${formattedModel.value} qualify for safety discounts?`,
+      answer: `Yes, the ${formattedMake.value} ${formattedModel.value}'s advanced safety features like collision mitigation braking, lane keeping assist, and adaptive cruise control often qualify for insurance discounts. Ask your insurer about available safety feature discounts.`,
+    },
+    {
+      question: `How can I save on ${formattedMake.value} ${formattedModel.value} insurance?`,
+      answer: `Compare quotes from multiple insurers, bundle with home or renters insurance, maintain a clean driving record, consider higher deductibles, ask about available discounts (safe driver, low mileage, multi-vehicle), and review your coverage annually.`,
+    },
+  ];
 });
 
 // SEO meta tags with custom values from spreadsheet
@@ -457,8 +407,7 @@ useSeoMeta({
         <div class="section-header">
           <h2>Frequently Asked Questions</h2>
         </div>
-
-        <FaqAccordion :faqs="displayFaqs" />
+        <FaqMain :faq="displayFaqs" />
       </b-container>
     </section>
 
@@ -595,14 +544,7 @@ useSeoMeta({
     }
 
     h1 {
-      font-size: 3rem;
-      margin-bottom: 1rem;
-      font-weight: 700;
       color: white;
-
-      @include media-breakpoint-down(md) {
-        font-size: 2.25rem;
-      }
     }
 
     .hero-subtitle {

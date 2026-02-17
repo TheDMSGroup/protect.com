@@ -12,8 +12,8 @@ export default defineEventHandler(async (event) => {
   const query = getQuery(event);
 
   const spreadsheetId = config.vehiclesSpreadsheetId;
-  const range = config.public.vehiclesMakesRange || 'Makes!A:Z';
-  const gid = config.vehiclesMakesGid || config.public.vehiclesMakesGid || '0';
+  // Allow ?stage=true to override and use stage sheet
+  const range = query.stage === 'true' ? 'Stage-Makes!A:Z' : 'Makes!A:Z';
 
   if (!spreadsheetId) {
     throw createError({
@@ -28,7 +28,6 @@ export default defineEventHandler(async (event) => {
       useCache: query.nocache !== 'true',
       ttl: 1000 * 60 * 60 * 24 * 30, // 30 days cache for vehicle makes
       headerRow: true,
-      gid: gid,
     });
 
     // Apply filters

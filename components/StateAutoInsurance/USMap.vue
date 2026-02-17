@@ -1,11 +1,19 @@
 <script setup>
-  //generateredirecturl and redirectwith params
-
   import { useStore } from "@/stores/store.js";
+
+  const props = defineProps({
+    hideLabels: {
+      type: Boolean,
+      default: false,
+    },
+    showLinksOnDesktop: {
+      type: Boolean,
+      default: false,
+    },
+  });
 
   const store = useStore();
   const stateValueMapping = store.getStateValueMap();
-
   const mapContainerRef = useTemplateRef("usMap");
   const smallStates = ref([]);
   const states = ref([]);
@@ -15,7 +23,18 @@
   ]
     .filter(Boolean)
     .map((state) => ({ ...state, id: state.abbreviation }));
-  //const focusedState = computed(() => null);
+
+  const mobileStatesLinkList = computed(() =>
+    [...states.value]
+      .sort((a, b) => (a.name > b.name ? 1 : -1))
+      .map((state) => {
+        return {
+          name: state.name,
+          url: createStateMapUrl(state.slug),
+        };
+      })
+  );
+
   const mapConfig = {
     fontSize: {
       value: 80,
@@ -29,7 +48,7 @@
     },
   };
 
-  const addEventsToStates = () => {
+  const useStateEventListeners = () => {
     if (!mapContainerRef.value) return;
     mapContainerRef.value.querySelectorAll("a").forEach((stateLink) => {
       stateLink.addEventListener("click", (e) => {
@@ -38,7 +57,11 @@
       });
     });
   };
+
   const initStates = () => {
+    if (!mapContainerRef.value) {
+      return;
+    }
     if (!mapContainerRef.value) {
       return;
     }
@@ -49,19 +72,33 @@
 
     states.value = allPaths
       .filter((p) => stateCodes.includes(p.id.split("_")[0]))
-      .map((statePath) => ({ id: statePath.id.split("_")[0], path: statePath }));
-    const detailMap = new Map(stateValueMapping.map((detail) => [detail.abbreviation, detail]));
+      .map((statePath) => ({
+        id: statePath.id.split("_")[0],
+        path: statePath,
+      }));
+    const detailMap = new Map(
+      stateValueMapping.map((detail) => [detail.abbreviation, detail])
+    );
     const mergedStates = states.value.map((idItem) => ({
       ...idItem,
       ...detailMap.get(idItem.id),
     }));
     states.value = mergedStates;
     states.value = states.value.concat(excludedStates);
+  };
+  const useStateMapLabels = () => {
+    if (!mapContainerRef.value) {
+      return;
+    }
 
-    mergedStates.forEach((state) => {
+    states.value.forEach((state) => {
       // Better approach - use SVG namespace
       const a = document.createElementNS("http://www.w3.org/2000/svg", "a");
-      a.setAttributeNS("http://www.w3.org/1999/xlink", "href", `/car-insurance/${state.slug}`);
+      a.setAttributeNS(
+        "http://www.w3.org/1999/xlink",
+        "href",
+        `/car-insurance/${state.slug}`
+      );
       a.setAttribute("aria-label", state.name);
       const groupParent = state.path.parentNode;
       Array.from(groupParent.children).forEach((child) => a.appendChild(child));
@@ -111,14 +148,19 @@
         text.setAttribute("x", x);
         text.setAttribute("y", y);
       } else {
-        smallStates.value = smallStates.value.concat(state);
+        if (!props.showLinksOnDesktop) {
+          smallStates.value = smallStates.value.concat(state);
+        }
       }
     });
-    smallStates.value = smallStates.value.concat(excludedStates).sort((a, b) => (a.id > b.id ? 1 : -1));
-    addEventsToStates();
   };
 
-  const mobileStatesLinkList = computed(() => [...states.value].sort((a, b) => (a.name > b.name ? 1 : -1)));
+  if (!props.showLinksOnDesktop) {
+    smallStates.value = smallStates.value
+      .concat(excludedStates)
+      .sort((a, b) => (a.id > b.id ? 1 : -1));
+  }
+
   const createStateMapUrl = (stateSlug) => {
     return `/car-insurance/${stateSlug}`;
   };
@@ -127,7 +169,10 @@
     // Use nextTick to ensure SVGUSMap component has rendered
     nextTick(() => {
       initStates();
-      addEventsToStates();
+      if (!props.hideLabels) {
+        useStateMapLabels();
+      }
+      useStateEventListeners();
     });
   });
 </script>
@@ -167,8 +212,10 @@
             l-3-3.7l-1.3-3.1l-5.2-1.3l-1.9-0.6l-1.6-2.6l-3.4-1.6l-1.1-3.4l-2.7-1l-2.4-3.7l-4.2-1.5l-2.9-1.5h-2.6l-4,0.8l-0.2,1.9l0.8,1
             l-0.5,1.1l-3.1-0.2l-3.7,3.6l-3.6,1.9h-3.9l-3.2,1.3l-0.3-2.7l-1.6-1.9l-2.9-1.1l-1.6-1.5l-8.1-3.9l-7.6-1.8l-4.4,0.6l-6,0.5
             l-6,2.1l-3.5,0.6l-0.2-8l-2.6-1.9l-1.8-1.8l0.3-3.1l10.2-1.3l25.5-2.9l6.8-0.6l5.4,0.3l2.6,3.9l1.5,1.5l8.1,0.5l10.8-0.6l21.5-1.3
-            l5.4-0.7h4.6l0.2,2.9l3.8,0.8l0.3-4.8l-1.6-4.5l1-0.7l5.1,0.5L755.4,445.5z M781.4,572.9l1.2,1.1l2.7-2.1l5.3-4.2l3.7-3.9l2.5-6.6
-            l1-1.7l0.2-3.4l-0.7,0.5l-1,2.8l-1.5,4.6l-3.2,5.3l-4.4,4.2l-3.4,1.9L781.4,572.9z" sodipodi:="" />
+            l5.4-0.7h4.6l0.2,2.9l3.8,0.8l0.3-4.8l-1.6-4.5l1-0.7l5.1,0.5L755.4,445.5z
+            M781.4,572.9l1.2,1.1l2.7-2.1l5.3-4.2l3.7-3.9l2.5-6.6
+            l1-1.7l0.2-3.4l-0.7,0.5l-1,2.8l-1.5,4.6l-3.2,5.3l-4.4,4.2l-3.4,1.9L781.4,572.9z"
+            sodipodi:="" />
             <path
               class="st1"
               d="M782.6,575.2l-2.9-2.5l3.7-2.2l3.3-1.9l4.2-4l2-3.3l-2.9,1.4l-3.7,0.2l-1.3,1.5l-3,1.2l-1.8-0.7l-1.6-1.3
@@ -214,7 +261,8 @@
           </g>
           <g>
             <path id="GA_00000016036858011758262950000010845866495841748099_"
-            nodetypes="ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc" class="st0" d="
+            nodetypes="ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+            class="st0" d="
             M689.6,358l-4.8,0.8l-8.4,1.1l-8.6,0.9v2.2l0.2,2.1l0.6,3.4l3.4,7.9l2.4,9.9l1.5,6.1l1.6,4.8l1.5,7l2.1,6.3l2.6,3.4l0.5,3.4
             l1.9,0.8l0.2,2.1l-1.8,4.8l-0.5,3.2l-0.2,1.9l1.6,4.4l0.3,5.3l-0.8,2.4l0.6,0.8l1.5,0.8l0.6,3.4l2.6,3.9l1.5,1.5l7.9,0.2l10.8-0.6
             l21.5-1.3l5.4-0.7h4.6l0.2,2.9l2.6,0.8l0.3-4.4l-1.6-4.5l1.1-1.6l5.8,0.8l5,0.3l-0.8-6.3l2.3-10l1.5-4.2l-0.5-2.6l3.3-6.2l-0.5-1.4
@@ -237,7 +285,8 @@
             />
           </g>
           <g>
-            <path id="AL_00000042696159611170935250000007638814330135718534_" nodetypes="cccccccccccccccccccccccccccccccccccccccccccccccccc"
+            <path id="AL_00000042696159611170935250000007638814330135718534_"
+            nodetypes="cccccccccccccccccccccccccccccccccccccccccccccccccc"
             class="st0" d="
             M625.6,466.8l-1.6-15.2l-2.7-18.8l0.2-14.1l0.8-31l-0.2-16.7l0.2-6.4l7.8-0.4l27.8-2.6l8.9-0.7l-0.1,2.2l0.2,2.1l0.6,3.4l3.4,7.9
             l2.4,9.9l1.5,6.1l1.6,4.8l1.5,7l2.1,6.3l2.6,3.4l0.5,3.4l1.9,0.8l0.2,2.1l-1.8,4.8l-0.5,3.2l-0.2,1.9l1.6,4.4l0.3,5.3l-0.8,2.4
@@ -256,14 +305,17 @@
           </g>
           <g>
             <path id="NC_00000061437851048977347970000014322510942628075961_"
-            nodetypes="ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccscccccccccccccccccccccccccccccccc" class="st0" d="
+            nodetypes="ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccscccccccccccccccccccccccccccccccc"
+            class="st0" d="
             M832.1,298.5l1.7,4.7l3.6,6.5l2.4,2.4l0.6,2.3l-2.4,0.2l0.8,0.6l-0.3,4.2l-2.6,1.3l-0.6,2.1l-1.3,2.9l-3.7,1.6l-2.4-0.3l-1.5-0.2
             l-1.6-1.3l0.3,1.3v1h1.9l0.8,1.3l-1.9,6.3h4.2l0.6,1.6l2.3-2.3l1.3-0.5l-1.9,3.6l-3.1,4.8H828l-1.1-0.5l-2.7,0.6l-5.2,2.4l-6.5,5.3
             l-3.4,4.7l-1.9,6.5l-0.5,2.4l-4.7,0.5l-5.5,1.3l-9.9-8.2L774,350l-2.9-0.8l-12.6,1.5l-4.3,0.8l-1.6-3.2l-3-2.1l-16.5,0.5l-7.3,0.8
             l-9.1,4.5l-6.1,2.6l-1.6,0.3l-5.8,1l-7,0.8l-6.8,0.5l0.5-4.1l1.8-1.5l2.7-0.6l0.6-3.7l4.2-2.7l3.9-1.5l4.2-3.6l4.4-2.1l0.6-3.1
             l3.9-3.9l0.6-0.2c0,0,0,1.1,0.8,1.1s1.9,0.3,1.9,0.3l2.3-3.6l2.1-0.6l2.3,0.3l1.6-3.6l2.9-2.6l0.5-2.1v-4l4.5,0.7l7.1-1.3l15.8-1.9
-            l17.1-2.6l19.9-4l19.7-4.2l11.4-2.8L832.1,298.5z M836,331.5l2.6-2.5l3.2-2.6l1.5-0.6l0.2-2l-0.6-6.1l-1.5-2.3l-0.6-1.9l0.7-0.2
-            l2.7,5.5l0.4,4.4l-0.2,3.4L841,328l-2.8,2.4l-1.1,1.2L836,331.5z" sodipodi:="" />
+            l17.1-2.6l19.9-4l19.7-4.2l11.4-2.8L832.1,298.5z
+            M836,331.5l2.6-2.5l3.2-2.6l1.5-0.6l0.2-2l-0.6-6.1l-1.5-2.3l-0.6-1.9l0.7-0.2
+            l2.7,5.5l0.4,4.4l-0.2,3.4L841,328l-2.8,2.4l-1.1,1.2L836,331.5z"
+            sodipodi:="" />
             <path
               class="st1"
               d="M796.3,367l-10.3-8.5l-12.4-7.5l-2.6-0.7l-12.4,1.4l-5,0.9l-1.8-3.7l-2.5-1.8l-16.2,0.5l-7,0.8l-8.9,4.4
@@ -281,11 +333,14 @@
             />
           </g>
           <g>
-            <path id="TN_00000005950310715883987430000010219103752034872460_" nodetypes="ccccccccccccccccccccccccccccccccccccccsccccccccccccc"
-            class="st0" d=" M697.1,320.6l-51.9,5l-15.8,1.8l-4.6,0.5h-3.9v3.9l-8.4,0.5l-7,0.6l-11.1,0.1l-0.3,5.8l-2.1,6.3l-1,3l-1.3,4.4l-0.3,2.6l-4,2.3
+            <path id="TN_00000005950310715883987430000010219103752034872460_"
+            nodetypes="ccccccccccccccccccccccccccccccccccccccsccccccccccccc"
+            class="st0" d="
+            M697.1,320.6l-51.9,5l-15.8,1.8l-4.6,0.5h-3.9v3.9l-8.4,0.5l-7,0.6l-11.1,0.1l-0.3,5.8l-2.1,6.3l-1,3l-1.3,4.4l-0.3,2.6l-4,2.3
             l1.5,3.6l-1,4.4l-1,0.8l7.3-0.2l24.1-1.9l5.3-0.2l8.1-0.5l27.8-2.6l10.2-0.8l8.4-1l8.4-1.1l4.8-0.8l-0.1-4.5l1.8-1.5l2.7-0.6
             l0.6-3.7l4.2-2.7l3.9-1.5l4.2-3.6l4.4-2.1l0.9-3.5l4.3-3.9l0.6-0.2c0,0,0,1.1,0.8,1.1s1.9,0.3,1.9,0.3l2.3-3.6l2.1-0.6l2.3,0.3
-            l1.6-3.6l2.1-2.2l0.6-1l0.2-3.9l-1.5-0.3l-2.4,1.9l-7.9,0.2l-12,1.9L697.1,320.6z" sodipodi:="" />
+            l1.6-3.6l2.1-2.2l0.6-1l0.2-3.9l-1.5-0.3l-2.4,1.9l-7.9,0.2l-12,1.9L697.1,320.6z"
+            sodipodi:="" />
             <path
               class="st1"
               d="M582,367.1l3-2.4l0.8-3.7l-1.7-4.1l4.4-2.4l0.3-2.3l1.3-4.4l1-3l2.1-6.1l0.3-6.6l12-0.1l6.9-0.6l7.5-0.4v-3.9
@@ -313,7 +368,8 @@
             />
           </g>
           <g>
-            <path id="CT_00000068670659548587531780000014552889409267096242_" nodetypes="cccccccccccccccccc" class="st0" d="
+            <path id="CT_00000068670659548587531780000014552889409267096242_"
+            nodetypes="cccccccccccccccccc" class="st0" d="
             M873.2,180.1l-0.6-4.2l-0.8-4.4l-1.6-6l-4.2,0.9l-21.8,4.8l0.6,3.3l1.5,7.3v8.1l-1.1,2.3l1.8,2.1l5-3.4l3.6-3.2l1.9-2.1l0.8,0.6
             l2.7-1.5l5.2-1.1L873.2,180.1z" sodipodi:="" />
             <path
@@ -325,8 +381,10 @@
           </g>
           <g>
             <path id="MA_00000049206050106417338100000000962459398723016114_"
-            nodetypes="ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc" class="st0" d="
-            M900,173.9l2.2-0.7l0.5-1.7l1,0.1l1,2.3l-1.3,0.5l-3.9,0.1L900,173.9z M890.6,174.7l2.3-2.6h1.6l1.8,1.5l-2.4,1l-2.2,1L890.6,174.7 z
+            nodetypes="ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+            class="st0" d="
+            M900,173.9l2.2-0.7l0.5-1.7l1,0.1l1,2.3l-1.3,0.5l-3.9,0.1L900,173.9z
+            M890.6,174.7l2.3-2.6h1.6l1.8,1.5l-2.4,1l-2.2,1L890.6,174.7 z
             M855.8,152.7l17.5-4.2l2.3-0.6l2.1-3.2l3.7-1.7l2.9,4.4l-2.4,5.2l-0.3,1.5l1.9,2.6l1.1-0.8h1.8l2.3,2.6l3.9,6l3.6,0.5l2.3-1
             l1.8-1.8l-0.8-2.7l-2.1-1.6l-1.5,0.8l-1-1.3l0.5-0.5l2.1-0.2l1.8,0.8l1.9,2.4l1,2.9l0.3,2.4l-4.2,1.5l-3.9,1.9l-3.9,4.5l-1.9,1.5
             v-1l2.4-1.5l0.5-1.8l-0.8-3.1l-2.9,1.5l-0.8,1.5l0.5,2.3l-2.1,1l-2.7-4.5l-3.4-4.4l-2.1-1.8l-6.5,1.9l-5.1,1.1l-21.8,4.8l-0.4-4.9
@@ -345,13 +403,16 @@
           </g>
           <g>
             <path id="ME_00000012473966746430548450000001787400659404197520_"
-            nodetypes="ccccccccsccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccsccccc" class="st0" d="
+            nodetypes="ccccccccsccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccsccccc"
+            class="st0" d="
             M923.2,77.3l1.9,2.1l2.3,3.7V85l-2.1,4.7l-1.9,0.6l-3.4,3.1l-4.8,5.5c0,0-0.6,0-1.3,0c-0.6,0-1-2.1-1-2.1l-1.8,0.2l-1,1.5l-2.4,1.5
             l-1,1.5l1.6,1.5l-0.5,0.6l-0.5,2.7l-1.9-0.2v-1.6l-0.3-1.3l-1.5,0.3l-1.8-3.2l-2.1,1.3l1.3,1.5l0.3,1.1l-0.8,1.3l0.3,3.1l0.2,1.6
             l-1.6,2.6l-2.9,0.5l-0.3,2.9l-5.3,3.1l-1.3,0.5l-1.6-1.5l-3.1,3.6l1,3.2l-1.5,1.3l-0.2,4.4l-1.1,6.3l-2.5-1.2l-0.5-3.1l-3.9-1.1
             l-0.3-2.7l-7.3-23.4L864.4,92l1.4-0.1l1.5,0.4v-2.6l0.8-5.5l2.6-4.7l1.5-4l-1.9-2.4v-6l0.8-1l0.8-2.7l-0.2-1.5l-0.2-4.8l1.8-4.8
             l2.9-8.9l2.1-4.2h1.3L881,39v1.1l1.3,2.3L885,43l0.8-0.8v-1l4-2.9l1.8-1.8l1.5,0.2l6,2.4l1.9,1l9.1,29.9h6l0.8,1.9l0.2,4.8L920,79
-            h0.8l0.2-0.5l-0.5-1.1L923.2,77.3z M909,101.6l1.8,1.9c0,0,1.3,0.1,1.3-0.2s0.2-2,0.2-2l0.9-0.8l-0.8-1.8l-2,0.7L909,101.6z" sodipodi:="" />
+            h0.8l0.2-0.5l-0.5-1.1L923.2,77.3z
+            M909,101.6l1.8,1.9c0,0,1.3,0.1,1.3-0.2s0.2-2,0.2-2l0.9-0.8l-0.8-1.8l-2,0.7L909,101.6z"
+            sodipodi:="" />
             <path
               class="st1"
               d="M883.9,138.4l-4.1-1.9l-0.5-3l-3.9-1.1L875,129l-11.8-38.2l2.8-0.2l0.4,0.1v-1.4l0.8-5.7l2.6-4.8l1.2-3.4
@@ -368,7 +429,8 @@
             />
           </g>
           <g>
-            <path id="NH_00000098179214234133844990000010967224821665945787_" nodetypes="ccccccccccccccccccccccccccccccccc" class="st0" d="
+            <path id="NH_00000098179214234133844990000010967224821665945787_"
+            nodetypes="ccccccccccccccccccccccccccccccccc" class="st0" d="
             M880.8,142.4l0.9-1.1l1.1-3.3l-2.5-0.9l-0.5-3.1l-3.9-1.1l-0.3-2.7l-7.3-23.4l-4.6-14.5h-0.9l-0.6,1.6l-0.6-0.5l-1-1l-1.5,1.9v5
             l0.3,5.7l1.9,2.7v4l-3.7,5.1l-2.6,1.1v1.1l1.1,1.8v8.6l-0.8,9.2l-0.2,4.8l1,1.3l-0.2,4.5l-0.5,1.8l1.5,0.9l16.4-4.7l2.3-0.6
             l1.5-2.6L880.8,142.4z" sodipodi:="" />
@@ -382,9 +444,11 @@
             />
           </g>
           <g>
-            <path id="VT_00000030461059232417043730000006298230287967064724_" nodetypes="ccccccccccccccccccccccccccccc" class="st0" d="
+            <path id="VT_00000030461059232417043730000006298230287967064724_"
+            nodetypes="ccccccccccccccccccccccccccccc" class="st0" d="
             M844.3,153.7l-0.8-5.7l-2.4-10l-0.6-0.3l-2.9-1.3l0.8-2.9l-0.8-2.1l-2.7-4.6l1-3.9l-0.8-5.2l-2.4-6.5l-0.8-4.9l26.2-6.7l0.3,5.8
-            l1.9,2.7v4l-3.7,4l-2.6,1.1v1.1l1.1,1.8v8.6l-0.8,9.2l-0.2,4.8l1,1.3l-0.2,4.5l-0.5,1.8l0.7,1.6l-7,1.4L844.3,153.7z" sodipodi:="" />
+            l1.9,2.7v4l-3.7,4l-2.6,1.1v1.1l1.1,1.8v8.6l-0.8,9.2l-0.2,4.8l1,1.3l-0.2,4.5l-0.5,1.8l0.7,1.6l-7,1.4L844.3,153.7z"
+            sodipodi:="" />
             <path
               class="st1"
               d="M843.5,154.8l-0.9-6.6l-2.3-9.4l-0.2-0.1l-3.7-1.6l1-3.4l-0.7-1.7l-2.9-4.9l1-4.1l-0.8-4.9l-2.4-6.6l-1-5.8
@@ -395,14 +459,16 @@
           </g>
           <g>
             <path id="NY_00000052076963270824820540000004357461335922299567_"
-            nodetypes="cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc" class="st0" d="
+            nodetypes="cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+            class="st0" d="
             M828.6,189.4l-1.1-1l-2.6-0.2l-2.3-1.9l-1.6-6.1l-3.5,0.1l-2.4-2.7l-19.4,4.4l-43,8.7l-7.5,1.2l-0.7-6.5l1.4-1.1l1.3-1.1l1-1.6
             l1.8-1.1l1.9-1.8l0.5-1.6l2.1-2.7l1.1-1l-0.2-1l-1.3-3.1l-1.8-0.2l-1.9-6.1l2.9-1.8l4.4-1.5l4-1.3l3.2-0.5l6.3-0.2l1.9,1.3l1.6,0.2
             l2.1-1.3l2.6-1.1l5.2-0.5l2.1-1.8l1.8-3.2l1.6-1.9h2.1l1.9-1.1l0.2-2.3l-1.5-2.1l-0.3-1.5l1.1-2.1v-1.5h-1.8L790,138l-0.8-1.1
             l-0.2-2.6l5.8-5.5l0.6-0.8l1.5-2.9l2.9-4.5l2.7-3.7l2.1-2.4l2.4-1.8l3.1-1.2l5.5-1.3l3.2,0.2l4.5-1.5l7.6-2.1l0.5,5l2.4,6.5
             l0.8,5.2l-1,3.9l2.6,4.5l0.8,2.1l-0.8,2.9l2.9,1.3l0.6,0.3l3.1,11l-0.5,5.1l-0.5,10.8l0.8,5.5l0.8,3.6l1.5,7.3v8.1l-1.1,2.3l1.8,2
             l0.8,1.7l-1.9,1.8l0.3,1.3l1.3-0.3l1.5-1.3l2.3-2.6l1.1-0.6l1.6,0.6l2.3,0.2l7.9-3.9l2.9-2.7l1.3-1.5l4.2,1.6l-3.4,3.6l-3.9,2.9
-            l-7.1,5.3l-2.6,1l-5.8,1.9l-4,1.1l-1.2-0.5l-0.2-3.7l0.5-2.7l-0.2-2.1l-2.8-1.7l-4.5-1l-3.9-1.1L828.6,189.4z" sodipodi:="" />
+            l-7.1,5.3l-2.6,1l-5.8,1.9l-4,1.1l-1.2-0.5l-0.2-3.7l0.5-2.7l-0.2-2.1l-2.8-1.7l-4.5-1l-3.9-1.1L828.6,189.4z"
+            sodipodi:="" />
             <path
               class="st1"
               d="M844.6,205.1l-2.1-0.9l-0.3-4.4l0.5-2.7l-0.1-1.5l-2.2-1.3l-4.4-0.9l-4.1-1.2l-3.9-1.9l-0.9-0.8l-2.6-0.2
@@ -443,11 +509,13 @@
             />
           </g>
           <g>
-            <path id="PA_00000039840181850332777710000002830593465001515962_" nodetypes="cccccccccccccccccccccccccccccccccccccccccccc" class="st0" d="
+            <path id="PA_00000039840181850332777710000002830593465001515962_"
+            nodetypes="cccccccccccccccccccccccccccccccccccccccccccc" class="st0"
+            d="
             M822.2,226.5l1.1-0.6l2.3-0.6l1.5-2.7l1.6-2.3l3.2-3.1v-0.8l-2.4-1.6l-3.6-2.4l-1-2.6l-2.7-0.3l-0.2-1.1l-0.8-2.7l2.3-1.1l0.2-2.4
             l-1.3-1.3l0.2-1.6l1.9-3.1v-3.1l2.3-2.4l0.2-1.1l-2.6-0.2l-2.3-1.9l-2.4-5.3l-3-0.9l-2.3-2.1l-18.6,4l-43,8.7l-8.9,1.5l-0.5-7.1
-            l-5.5,5.6l-1.3,0.5l-4.2,3l2.9,19.1l2.5,9.7l3.6,19.3l3.3-0.6l11.9-1.5l37.9-7.7l14.9-2.8l8.3-1.6l0.3-0.2l2.1-1.6L822.2,226.5z" sodipodi:=""
-            />
+            l-5.5,5.6l-1.3,0.5l-4.2,3l2.9,19.1l2.5,9.7l3.6,19.3l3.3-0.6l11.9-1.5l37.9-7.7l14.9-2.8l8.3-1.6l0.3-0.2l2.1-1.6L822.2,226.5z"
+            sodipodi:="" />
             <path
               class="st1"
               d="M740.6,244.4l-3.8-20.3l-2.5-9.7l-3-19.8l4.9-3.5l1.1-0.4l6.9-7.1l0.6,8.2l7.8-1.3l43-8.7l19.1-4.1l2.5,2.3
@@ -459,7 +527,8 @@
             />
           </g>
           <g>
-            <path id="DE_00000093153657142070809670000016238169748371364283_" nodetypes="cccccccccccccccccccc" class="st0" d="
+            <path id="DE_00000093153657142070809670000016238169748371364283_"
+            nodetypes="cccccccccccccccccccc" class="st0" d="
             M822.4,230.4l0.6-2.1v-1.2l-1.3-0.1l-2.1,1.6l-1.5,1.5l1.5,4.2l2.3,5.7l2.1,9.7l1.6,6.3l5-0.2l6.1-1.2l-2.3-7.4l-1,0.5l-3.6-2.4
             l-1.8-4.7l-1.9-3.6l-2.3-1l-2.1-3.6L822.4,230.4z" sodipodi:="" />
             <path
@@ -471,13 +540,16 @@
           </g>
           <g>
             <path id="MD_00000115484545434029647240000003159163513336637582_"
-            nodetypes="ccccccccccccccccccccccccccccccccccccccccccccccccccsccccccccccccccccccccccccccccsccc" class="st0" d="
+            nodetypes="ccccccccccccccccccccccccccccccccccccccccccccccccccsccccccccccccccccccccccccccccsccc"
+            class="st0" d="
             M837,255.3l-6.1,1.3l-5.8,0.2l-1.8-7.1l-2.1-9.7l-2.3-5.7l-1.3-4.4l-7.5,1.6l-14.9,2.8l-37.5,7.6l1.1,5l1,5.7l0.3-0.3l2.1-2.4
             l2.3-2.6l2.4-0.6l1.5-1.5l1.8-2.6l1.3,0.6l2.9-0.3l2.6-2.1l2-1.5l1.8-0.5l1.6,1.1l2.9,1.5l1.9,1.8l1.2,1.5l4.1,1.7v2.9l5.5,1.3
             l1.1,0.5l1.4-2l2.9,2l-1.3,2.5l-0.8,4l-1.8,2.6v2.1l0.6,1.8l5.1,1.4l4.3-0.1l3.1,1l2.1,0.3l1-2.1l-1.5-2.1v-1.8l-2.4-2.1l-2.1-5.5
             l1.3-5.3l-0.2-2.1l-1.3-1.3c0,0,1.5-1.6,1.5-2.3c0-0.6,0.5-2.1,0.5-2.1l1.9-1.3l1.9-1.6l0.5,1l-1.5,1.6l-1.3,3.7l0.3,1.1l1.8,0.3
-            l0.5,5.5l-2.1,1l0.3,3.6l0.5-0.2l1.1-1.9l1.6,1.8l-1.6,1.3l-0.3,3.4l2.6,3.4l3.9,0.5l1.6-0.8l3.2,4.2l1.4,0.5l6.7-2.8l2-4 L837,255.3z
-            M820.3,264.3l1.1,2.5l0.2,1.8l1.1,1.9c0,0,0.9-0.9,0.9-1.2c0-0.3-0.7-3.1-0.7-3.1l-0.7-2.3L820.3,264.3z" sodipodi:="" />
+            l0.5,5.5l-2.1,1l0.3,3.6l0.5-0.2l1.1-1.9l1.6,1.8l-1.6,1.3l-0.3,3.4l2.6,3.4l3.9,0.5l1.6-0.8l3.2,4.2l1.4,0.5l6.7-2.8l2-4
+            L837,255.3z
+            M820.3,264.3l1.1,2.5l0.2,1.8l1.1,1.9c0,0,0.9-0.9,0.9-1.2c0-0.3-0.7-3.1-0.7-3.1l-0.7-2.3L820.3,264.3z"
+            sodipodi:="" />
             <path
               class="st1"
               d="M822.6,272l-1.9-3.1l-0.2-1.8l-1.5-3.3l-1.5-0.2l-2-2.6v1.2l1.6,2.3l-1.5,3.3l-3-0.5l-2.9-0.9l-4.3,0.1
@@ -496,14 +568,15 @@
           </g>
           <g>
             <path id="WV_00000028305443627854032150000002753273732026703241_"
-            nodetypes="cccccccccccccccccccccccccccccccccccccccccccscccccccccccccccccccccccccccccccccccccccccc" class="st0" d="
+            nodetypes="cccccccccccccccccccccccccccccccccccccccccccscccccccccccccccccccccccccccccccccccccccccc"
+            class="st0" d="
             M756.6,242l1.1,4.9l1.1,6.9l3.6-2.7l2.3-3.1l2.5-0.6l1.5-1.5l1.8-2.6l1.2,0.6l2.9-0.3l2.6-2.1l2-1.5l1.8-0.5l1.3,1l2.2,1.1l1.9,1.8
             l1.4,1.3l-0.1,4.7l-5.7-3.1l-4.5-1.8l-0.2,5.3l-0.5,2.1l-1.6,2.7l-0.6,1.6l-3.1,2.4l-0.5,2.3l-3.4,0.3l-0.3,3.1l-1.1,5.5h-2.6
             l-1.3-0.8l-1.6-2.7l-1.8,0.2l-0.3,4.4l-2.1,6.6l-5,10.8l0.8,1.3l-0.2,2.7l-2.1,1.9l-1.5-0.3l-3.2,2.4l-2.6-1l-1.8,4.7
             c0,0-3.7,0.8-4.4,1c-0.6,0.2-2.4-1.3-2.4-1.3l-2.4,2.3l-2.6,0.6l-2.9-0.8l-1.3-1.3l-2.2-3l-3.1-2l-2.6-2.7l-2.9-3.7l-0.6-2.3
             l-2.6-1.5l-0.8-1.6l-0.2-5.3l2.2-0.1l1.9-0.8l0.2-2.7l1.6-1.5l0.2-5l1-3.9l1.3-0.6l1.3,1.1l0.5,1.8l1.8-1l0.5-1.6l-1.1-1.8v-2.4
-            l1-1.3l2.3-3.4l1.3-1.5l2.1,0.5l2.3-1.6l3.1-3.4l2.3-3.9l0.3-5.7l0.5-5v-4.7l-1.1-3.1l1-1.5l1.3-1.3l3.5,19.8l4.6-0.8L756.6,242z" sodipodi:=""
-            />
+            l1-1.3l2.3-3.4l1.3-1.5l2.1,0.5l2.3-1.6l3.1-3.4l2.3-3.9l0.3-5.7l0.5-5v-4.7l-1.1-3.1l1-1.5l1.3-1.3l3.5,19.8l4.6-0.8L756.6,242z"
+            sodipodi:="" />
             <path
               class="st1"
               d="M729,303.9l-3.4-0.9l-1.6-1.6l-2.1-2.9l-3.2-2l-2.6-2.7l-3.1-3.9l-0.6-2.1l-2.5-1.4l-1-2.1l-0.3-6.5l3-0.1
@@ -523,13 +596,15 @@
           </g>
           <g>
             <path id="KY_00000057853347510888435730000016333158980381260467_"
-            nodetypes="cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc" class="st0" d="
+            nodetypes="cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+            class="st0" d="
             M721.8,297.8l-2.3,2.7l-4.2,3.6L711,310l-1.8,1.8v2.1l-3.9,2.1l-5.7,3.4l-3.5,0.4l-51.9,4.9l-15.8,1.8l-4.6,0.5h-3.9l-0.2,4.2
             l-8.2,0.1l-7,0.6l-10.4,0.2l1.9-0.2l2.2-1.8l2.1-1.1l0.2-3.2l0.9-1.8l-1.6-2.5l0.8-1.9l2.3-1.8l2.1-0.6l2.7,1.3l3.6,1.3l1.1-0.3
             l0.2-2.3l-1.3-2.4l0.3-2.3l1.9-1.5l2.6-0.6l1.6-0.6l-0.8-1.8l-0.6-1.9l1.1-0.8l1.1-3.3l3-1.7l5.8-1l3.6-0.5l1.5,1.9l1.8,0.8
             l1.8-3.2l2.9-1.5l1.9,1.6l0.8,1.1l2.1-0.5l-0.2-3.4l2.9-1.6l1.1-0.8l1.1,1.6h4.7l0.8-2.1l-0.3-2.3l2.9-3.6l4.7-3.9l0.5-4.5l2.7-0.3
             l3.9-1.8l2.7-1.9l-0.3-1.9l-1.5-1.5l0.6-2.2l4.1-0.2l2.4-0.8l2.9,1.6l1.6,4.4l5.8,0.3l1.8,1.8l2.1,0.2l2.4-1.5l3.1,0.5l1.3,1.5
-            l2.7-2.6l1.8-1.3h1.6l0.6,2.7l1.8,1l2.4,2.2l0.2,5.5l0.8,1.6l2.6,1.5l0.6,2.3l2.9,3.7l2.6,2.7L721.8,297.8z" sodipodi:="" />
+            l2.7-2.6l1.8-1.3h1.6l0.6,2.7l1.8,1l2.4,2.2l0.2,5.5l0.8,1.6l2.6,1.5l0.6,2.3l2.9,3.7l2.6,2.7L721.8,297.8z"
+            sodipodi:="" />
             <path
               class="st1"
               d="M594.2,333.1l-0.1-2l1.6-0.2l2.1-1.7l1.6-0.9l0.2-2.9l0.8-1.5l-1.6-2.5l1.1-2.6l2.6-2.1l2.6-0.8l3.1,1.5
@@ -548,7 +623,8 @@
           </g>
           <g>
             <path id="OH_00000010312870906154156940000014813246163042377096_"
-            nodetypes="cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc" class="st0" d="
+            nodetypes="cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+            class="st0" d="
             M731.4,195l-6.1,4.1l-3.9,2.3l-3.4,3.7l-4,3.9l-3.2,0.8l-2.9,0.5l-5.5,2.6l-2.1,0.2l-3.4-3.1l-5.2,0.6l-2.6-1.5l-2.4-1.4l-4.9,0.7
             l-10.2,1.6l-7.8,1.2l1.3,14.6l1.8,13.7l2.6,23.4l0.6,4.8l4.1-0.1l2.4-0.8l3.4,1.5l2.1,4.4h5.1l1.9,2.1l1.8-0.1l2.5-1.3l2.5,0.4
             l2,1.5l1.7-2.1l2.3-1.3l2.1-0.7l0.6,2.7l1.8,1l3.5,2.3l2.2-0.1l1.1-1.1l-0.1-1.4l1.6-1.5l0.2-5l1-3.9l1.5-1.4l1.5,0.9l0.8,1.2
@@ -570,14 +646,16 @@
           <g>
             <path id="MI_00000090258077516037760980000006784829037065438646_"
             nodetypes="ccccccccccccccsccccccccccccccccsccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
-            class="st0" d=" M667.8,114.2l0.6,2.5l3.2,0.2l1.3-1.2c0,0-0.1-1.5-0.4-1.6c-0.3-0.2-1.6-1.9-1.6-1.9l-2.2,0.2l-1.6,0.2l-0.3,1.1L667.8,114.2z
+            class="st0" d="
+            M667.8,114.2l0.6,2.5l3.2,0.2l1.3-1.2c0,0-0.1-1.5-0.4-1.6c-0.3-0.2-1.6-1.9-1.6-1.9l-2.2,0.2l-1.6,0.2l-0.3,1.1L667.8,114.2z
             M697.9,177.2l-3.2-8.2l-2.3-9.1l-2.4-3.2l-2.6-1.8l-1.6,1.1l-3.9,1.8l-1.9,5l-2.7,3.7l-1.1,0.6l-1.5-0.6c0,0-2.6-1.5-2.4-2.1
             s0.5-5,0.5-5l3.4-1.3l0.8-3.4l0.6-2.6l2.4-1.6l-0.3-10l-1.6-2.3l-1.3-0.8l-0.8-2.1l0.8-0.8l1.6,0.3l0.2-1.6L676,131l-1.3-2.6h-2.6
             l-4.5-1.5l-5.5-3.4h-2.7l-0.6,0.6l-1-0.5l-3.1-2.3l-2.9,1.8l-2.9,2.3l0.3,3.6l1,0.3l2.1,0.5l0.5,0.8l-2.6,0.8l-2.6,0.3l-1.5,1.8
             l-0.3,2.1l0.3,1.6l0.3,5.5l-3.6,2.1l-0.6-0.2v-4.2l1.3-2.4l0.6-2.4l-0.8-0.8l-1.9,0.8l-1,4.2l-2.7,1.1l-1.8,1.9l-0.2,1l0.6,0.8
             l-0.6,2.6l-2.3,0.5v1.1l0.8,2.4l-1.1,6.1l-1.6,4l0.6,4.7l0.5,1.1l-0.8,2.4l-0.3,0.8l-0.3,2.7l3.6,6l2.9,6.5l1.5,4.8l-0.8,4.7l-1,6
             l-2.4,5.2l-0.3,2.7l-3.3,3.1l4.4-0.2l21.4-2.3l7.3-1l0.1,1.7l6.9-1.2l10.3-1.5l3.9-0.5l0.1-0.6l0.2-1.5l2.1-3.7l2-1.7l-0.2-5.1
-            l1.6-1.6l1.1-0.3l0.2-3.6l1.5-3l1.1,0.6l0.2,0.6l0.8,0.2l1.9-1L697.9,177.2z M567.5,111.2l0.7-0.6l2.7-0.8l3.6-2.3v-1l0.6-0.6l6-1
+            l1.6-1.6l1.1-0.3l0.2-3.6l1.5-3l1.1,0.6l0.2,0.6l0.8,0.2l1.9-1L697.9,177.2z
+            M567.5,111.2l0.7-0.6l2.7-0.8l3.6-2.3v-1l0.6-0.6l6-1
             l2.4-1.9l4.4-2.1l0.2-1.3l1.9-2.9l1.8-0.8l1.3-1.8l2.3-2.3l4.4-2.4l4.7-0.5l1.1,1.1l-0.3,1l-3.7,1l-1.5,3.1l-2.3,0.8l-0.5,2.4
             l-2.4,3.2l-0.3,2.6l0.8,0.5l1-1.1l3.6-2.9l1.3,1.3h2.3l3.2,1l1.5,1.1l1.5,3.1l2.7,2.7l3.9-0.2l1.5-1l1.6,1.3l1.6,0.5l1.3-0.8h1.1
             l1.6-1l4-3.6l3.4-1.1l6.6-0.3l4.5-1.9l2.6-1.3l1.5,0.2v5.7l0.5,0.3l2.9,0.8l1.9-0.5l6.1-1.6l1.1-1.1l1.5,0.5v7l3.2,3.1l1.3,0.6
@@ -614,9 +692,11 @@
             />
           </g>
           <g>
-            <path id="WY_00000118361377614330902480000000029126082286061975_" nodetypes="ccccccccccccccccccc" class="st0" d="
+            <path id="WY_00000118361377614330902480000000029126082286061975_"
+            nodetypes="ccccccccccccccccccc" class="st0" d="
             M354.3,143.8l-10.5-0.8l-32.1-3.3l-16.2-2.1l-28.3-4.1l-19.9-3l-1.4,11.2l-3.8,24.3l-5.3,30.4l-1.5,10.5l-1.7,11.9l6.5,0.9
-            l25.9,2.5l20.6,2.3l36.8,4.1l23.8,2.9l4.5-44.2l1.4-25.4L354.3,143.8z" sodipodi:="" />
+            l25.9,2.5l20.6,2.3l36.8,4.1l23.8,2.9l4.5-44.2l1.4-25.4L354.3,143.8z"
+            sodipodi:="" />
             <path
               class="st1"
               d="M347.9,232.6l-24.8-3l-57.3-6.4l-25.9-2.5l-7.6-1.1l1.8-12.9l1.5-10.5l5.3-30.4l3.8-24.2l1.5-12.2l20.9,3.1
@@ -625,12 +705,14 @@
             />
           </g>
           <g>
-            <path id="MT_00000062150018936441954800000005338713720974343080_" nodetypes="cccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+            <path id="MT_00000062150018936441954800000005338713720974343080_"
+            nodetypes="cccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
             class="st0" d="
             M356.7,122.3l0.6-11.2l2.3-24.8c0.5-5,1.1-8.5,1.4-15.4l0.9-14.6l-30.7-2.8L302,50l-29.3-4l-32.3-5.3L222,37.3l-32.7-6.9l-4.5,21.3
             l3.4,7.5l-1.4,4.6l1.8,4.6l3.2,1.4l4.6,10.8l2.7,3.2l0.5,1.1L203,86l0.5,2.1l-7.1,17.6v2.5l2.5,3.2h0.9l4.8-3l0.7-1.1l1.6,0.7
             l-0.2,5.3l2.7,12.6l3,2.5l0.9,0.7l1.8,2.3l-0.5,3.4l0.7,3.4l1.1,0.9l2.3-2.3h2.7l3.2,1.6l2.5-0.9h4.1l3.7,1.6l2.7-0.5l0.5-3l3-0.7
-            l1.4,1.4l0.5,3.2l1.8,1.4l1.5-11.6l20.7,3l28.2,4l16.6,1.9l31.4,3.5l11,1.5l1.1-15.4L356.7,122.3z" sodipodi:="" />
+            l1.4,1.4l0.5,3.2l1.8,1.4l1.5-11.6l20.7,3l28.2,4l16.6,1.9l31.4,3.5l11,1.5l1.1-15.4L356.7,122.3z"
+            sodipodi:="" />
             <path
               class="st1"
               d="M355.1,144.2l-12.1-1.7l-31.4-3.5l-16.6-1.9l-28.2-4l-19.7-2.8l-1.6,12.3l-3.5-2.7l-0.5-3.3l-0.7-0.7l-1.8,0.4
@@ -646,7 +728,8 @@
           </g>
           <g>
             <path id="ID_00000102536062261731182670000012020260349958668971_"
-            nodetypes="cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc" class="st0" d="
+            nodetypes="cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+            class="st0" d="
             M141,176.6l4.4-17.5l4.3-17.7l1.4-4.2l2.5-5.9l-1.3-2.3l-2.5,0.1l-0.8-1l0.5-1.1l0.3-3.1l4.5-5.5l1.8-0.5l1.1-1.1l0.6-3.2l0.9-0.7
             l3.9-5.8l3.9-4.3l0.2-3.8l-3.4-2.6L162,92l0.4-9.7l3.7-16.5l4.5-20.8l3.8-13.5l0.8-3.8l13,2.5L184,51.7l2.9,7.7l-1.1,4.6l2,4.6
             l3.2,1.7l4.5,9.8l2.7,3.8l0.6,1.1l3.4,1.1l0.5,2.5l-6.9,16.8l0.3,3.3l2.7,2.9l1.9,0.5l4.8-3.6l0.4-0.5l0.2,0.8l0.3,4.1l2.6,12.9
@@ -669,7 +752,8 @@
             />
           </g>
           <path id="WA_00000033330776469684690040000000969622503599845269_"
-          nodetypes="ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccscccccc" class="st0" d="
+          nodetypes="ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccscccccc"
+          class="st0" d="
           M93.6,6.4L98,7.9l9.7,2.7l8.6,1.9l20,5.7l23,5.7l15.2,3.4l-1,3.9L169.4,45l-4.5,20.8l-3.2,16.1l-0.4,9.4l-13.2-3.9L132.5,84
           l-13.7,0.6l-1.6-1.5l-5.3,1.9l-4-0.3l-2.7-1.8l-1.6,0.5l-4.2-0.2l-1.9-1.4l-4.8-1.7l-1.4-0.2l-5-1.3l-1.8,1.5l-5.7-0.3L74,76
           l0.2-0.8l0.1-7.9l-2.1-3.9l-4.1-0.7l-0.4-2.4l-2.5-0.6l-2.9-0.5l-1.8,1l-2.3-2.9l0.3-2.9l2.7-0.3l1.6-4L60.2,49l0.2-3.7l4.4-0.6
@@ -692,7 +776,8 @@
           <g>
             <path id="TX_00000042007818698109768180000001789435518558425761_"
             nodetypes="ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
-            class="st0" d=" M357.1,333.4l22.7,1.1l31.1,1.1l-2.3,23.5l-0.3,18.2l0.1,2.1l4.3,3.8l1.7,0.8l1.8,0.3l0.7-1.3l0.9,0.9l1.7,0.5l1.6-0.7l1.1,0.4
+            class="st0" d="
+            M357.1,333.4l22.7,1.1l31.1,1.1l-2.3,23.5l-0.3,18.2l0.1,2.1l4.3,3.8l1.7,0.8l1.8,0.3l0.7-1.3l0.9,0.9l1.7,0.5l1.6-0.7l1.1,0.4
             l-0.3,3.4l4.3,1l2.7,0.8l4,0.5l2.2,1.8l3.2-1.6l2.8,0.4l2,2.8l1.1,0.3l-0.2,2l3.1,1.2l2.8-1.8l1.5,0.4l2.4,0.2l0.4,1.9l4.6,2
             l2.7-0.2l2-4.1h0.3l1.1,1.9l4.4,1l3.3,1.2l3.3,0.8l2.1-0.8l0.8-2.5h3.7l1.9,0.8l3.1-1.6h0.7l0.4,1.1h4.3l2.4-1.3l1.7,0.3l1.4,1.9
             l2.9,1.7l3.5,1.1l2.7,1.4l2.4,1.6l3.3-0.9l1.9,1l0.5,10.1l0.3,9.7l0.7,9.5l0.5,4l2.7,4.6l1.1,4.1l3.9,6.3l0.5,2.9l0.5,1l-0.7,7.5
@@ -702,7 +787,8 @@
             l-3.2-1.9l-0.6-2.3l0.6-0.6l0.3-3.4l-1.3-0.6l-0.6-1l1.3-4.4l-1.6-2.3l-3.2-1.3l-3.4-4.4l-3.6-6.6l-4.2-2.6l0.2-1.9l-5.3-12.3
             l-0.8-4.2l-1.8-1.9l-0.2-1.5l-6-5.3l-2.6-3.1v-1.1l-2.6-2.1l-6.8-1.1l-7.4-0.6l-3.1-2.3l-4.5,1.8L352,483l-2.3,3.2l-1,3.7l-4.4,6.1
             l-2.4,2.4l-2.6-1l-1.8-1.1l-1.9-0.6l-3.9-2.3v-0.6l-1.8-1.9l-5.2-2.1l-7.4-7.8l-2.3-4.7v-8.1l-3.2-6.5l-0.5-2.7l-1.6-1l-1.1-2.1
-            l-5-2.1l-1.3-1.6l-7.1-7.9l-1.3-3.2l-4.7-2.3l-1.5-4.4l-2.6-2.9l-1.9-0.5l-0.6-4.7l8,0.7l29,2.7l29,1.6l2.3-23.8l3.9-55.6l1.6-18.7 h1.4
+            l-5-2.1l-1.3-1.6l-7.1-7.9l-1.3-3.2l-4.7-2.3l-1.5-4.4l-2.6-2.9l-1.9-0.5l-0.6-4.7l8,0.7l29,2.7l29,1.6l2.3-23.8l3.9-55.6l1.6-18.7
+            h1.4
             M457.2,567.3l-0.6-7.1l-2.7-7.2l-0.6-7l1.5-8.2l3.3-6.9l3.5-5.4l3.2-3.6l0.6,0.2l-4.8,6.6l-4.4,6.5l-2,6.6l-0.3,5.2l0.9,6.1
             l2.6,7.2l0.5,5.2l0.2,1.5L457.2,567.3z" sodipodi:="" />
             <path
@@ -736,7 +822,8 @@
           <g>
             <path id="CA_00000142863153092498897510000004010494802438449581_"
             nodetypes="ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccscc"
-            class="st0" d=" M136.7,386.8l3.8-0.5l1.5-2l0.7-1.9l-3.2-0.1l-1.1-1.8l0.8-1.7v-6.2l2.2-1.3l2.7-2.6l0.4-4.9l1.6-3.5l1.9-2.1l3.3-1.7l1.3-0.7
+            class="st0" d="
+            M136.7,386.8l3.8-0.5l1.5-2l0.7-1.9l-3.2-0.1l-1.1-1.8l0.8-1.7v-6.2l2.2-1.3l2.7-2.6l0.4-4.9l1.6-3.5l1.9-2.1l3.3-1.7l1.3-0.7
             l0.8-1.5l-0.9-0.9l-1-1.5l-0.9-5.3l-2.9-5.2l0.1-2.8l-2.2-3.2l-15-23.2l-19.4-28.7l-22.4-33L76.1,231l1.8-7.2l6.8-25.9l8.1-31.4
             l-12.4-3.3L67,159.3l-12.6-4.1l-7.5-2.1l-11.4-3l-7.1-2.4l-1.6,4.7l-0.2,7.4l-5.2,11.8l-3.1,2.6l-0.3,1.1l-1.8,0.8l-1.5,4.2
             l-0.8,3.2l2.7,4.2l1.6,4.2l1.1,3.6L19,202l-1.8,3.1l-0.6,5.8l-1,3.7l1.8,3.9l2.7,4.5l2.3,4.8l1.3,4l-0.3,3.2l-0.3,0.5v2.1l5.7,6.3
@@ -764,11 +851,14 @@
             />
           </g>
           <g>
-            <path id="AZ_00000104703178474767460750000016349616145587234743_" nodetypes="ccccccccccccccccccccccccccccccccccccccccccccccccccc"
-            class="st0" d=" M137.7,387.5l-2.6,2.2l-0.3,1.5l0.5,1l18.9,10.7l12.1,7.6l14.7,8.6l16.8,10l12.3,2.4l25.1,2.7l2.5-12.5l3.8-27.2l7-52.9l4.3-31
+            <path id="AZ_00000104703178474767460750000016349616145587234743_"
+            nodetypes="ccccccccccccccccccccccccccccccccccccccccccccccccccc"
+            class="st0" d="
+            M137.7,387.5l-2.6,2.2l-0.3,1.5l0.5,1l18.9,10.7l12.1,7.6l14.7,8.6l16.8,10l12.3,2.4l25.1,2.7l2.5-12.5l3.8-27.2l7-52.9l4.3-31
             l-24.6-3.7l-27.2-4.6l-33.4-6.3l-2.9,18.1l-0.5,0.5l-1.7,2.6l-2.5-0.1l-1.3-2.7l-2.7-0.3l-0.9-1.1h-0.9l-0.9,0.6l-1.9,1l-0.1,7
             l-0.2,1.7l-0.6,12.6l-1.5,2.2l-0.6,3.3l2.7,4.9l1.3,5.8l0.8,1l1,0.6l-0.1,2.3l-1.6,1.4l-3.4,1.7l-1.9,1.9l-1.5,3.7l-0.6,4.9
-            l-2.9,2.7l-2.1,0.7l-0.1,5.8l-0.5,1.7l0.5,0.8l3.7,0.6l-0.6,2.7l-1.5,2.2L137.7,387.5z" sodipodi:="" />
+            l-2.9,2.7l-2.1,0.7l-0.1,5.8l-0.5,1.7l0.5,0.8l3.7,0.6l-0.6,2.7l-1.5,2.2L137.7,387.5z"
+            sodipodi:="" />
             <path
               class="st1"
               d="M236.1,435.2l-26-2.8l-12.5-2.5l-0.1-0.1l-16.8-10l-14.7-8.6l-12.2-7.6l-19.1-10.8l-0.8-1.6l0.5-2.1l3.1-2.5
@@ -782,10 +872,12 @@
             />
           </g>
           <g>
-            <path id="NV_00000125591519449233220510000015889528765684899770_" nodetypes="ccccccccccccccccccccccccccccccccccccc" class="st0" d="
+            <path id="NV_00000125591519449233220510000015889528765684899770_"
+            nodetypes="ccccccccccccccccccccccccccccccccccccc" class="st0" d="
             M140.7,177.6l21,4.5l9.7,1.9l9.3,1.8l6.6,1.6l-0.6,5.9l-3.5,17.3l-4.1,20l-1.9,9.7l-2.2,13.3l-3.2,16.4l-3.5,15.7l-2,10.2
             l-2.5,16.8l-0.5,1.1l-1.1,2.5l-1.9-0.1l-1.1-2.7l-2.7-0.5l-1.4-1l-2,0.3l-0.9,0.7l-1.3,1.3l-0.4,7L150,323l-0.4,12.1l-1.3,1.7
-            l-1.9-2.3l-14.5-22.7l-19.4-29L89.6,249l-12.4-18.6l1.6-6.6l7-25.9l7.9-31.3l33.6,8.1l13.7,3" sodipodi:="" />
+            l-1.9-2.3l-14.5-22.7l-19.4-29L89.6,249l-12.4-18.6l1.6-6.6l7-25.9l7.9-31.3l33.6,8.1l13.7,3"
+            sodipodi:="" />
             <path
               class="st1"
               d="M148.2,338.4l-2.7-3.3L131,312.4l-19.4-29l-22.7-33.8l-12.6-19l1.7-7l7-26l8.1-32.3l34.6,8.4l13.7,3l0,0
@@ -796,9 +888,11 @@
             />
           </g>
           <g>
-            <path id="UT_00000114060186407327171440000015440323604681824421_" nodetypes="ccccccccccccccccccccccccccc" class="st0" d="
+            <path id="UT_00000114060186407327171440000015440323604681824421_"
+            nodetypes="ccccccccccccccccccccccccccc" class="st0" d="
             M253,309.3l-24.6-3.5l-26.6-4.9l-33.8-6l1.6-9.2l3.2-15.2L176,254l2.2-13.6l1.9-8.9l3.8-20.5l3.5-17.5l1.1-5.6l12.7,2.3l12,2.1
-            l10.3,1.8l8.3,1.4l3.7,0.5l-1.5,10.6l-2.3,13.2l7.8,0.9l16.4,1.8l8.2,0.9l-2.1,22l-3.2,22.6l-3.8,27.8l-1.7,11.1L253,309.3z" sodipodi:="" />
+            l10.3,1.8l8.3,1.4l3.7,0.5l-1.5,10.6l-2.3,13.2l7.8,0.9l16.4,1.8l8.2,0.9l-2.1,22l-3.2,22.6l-3.8,27.8l-1.7,11.1L253,309.3z"
+            sodipodi:="" />
             <path
               class="st1"
               d="M253.8,310.4l-25.6-3.6l-26.6-4.9l-34.8-6.2l1.8-10.1l3.2-15.2l3.3-16.6l2.2-13.6l2-9l3.8-20.4l4.9-24
@@ -809,7 +903,8 @@
             />
           </g>
           <g>
-            <path id="CO_00000160189223321804674420000012450451301266926503_" nodetypes="ccccccccccccccc" class="st0" d="
+            <path id="CO_00000160189223321804674420000012450451301266926503_"
+            nodetypes="ccccccccccccccc" class="st0" d="
             M378.6,256.8l1.4-21.3l-32.1-3.1l-24.5-2.7l-37.3-4.1l-20.7-2.5l-2.6,22.2l-3.2,22.4l-3.8,28l-1.5,11.1l-0.3,2.8l33.9,3.8l37.7,4.3
             l32,3.2l16.6,0.8" sodipodi:="" />
             <polygon
@@ -820,9 +915,11 @@
             />
           </g>
           <g>
-            <path id="NM_00000094592290766154907460000011133416526999079557_" nodetypes="ccccccccccccccccccccc" class="st0" d="
+            <path id="NM_00000094592290766154907460000011133416526999079557_"
+            nodetypes="ccccccccccccccccccccc" class="st0" d="
             M282.7,431l-0.7-6.1l8.6,0.5l29.5,3.1l28.4,1.4l2-22.3l3.7-55.9l1.1-19.4l2,0.3v-11.1l-32.2-2.4l-36.9-4.4l-34.5-4.1l-4.2,30.8
-            l-7,53.2l-3.8,26.9l-2,13.3l15.5,2l1.3-10l16.7,2.6L282.7,431z" sodipodi:="" />
+            l-7,53.2l-3.8,26.9l-2,13.3l15.5,2l1.3-10l16.7,2.6L282.7,431z"
+            sodipodi:="" />
             <path
               class="st1"
               d="M253.2,438l-17.5-2.2l2.2-14.3l3.8-26.9l7-53.2l4.3-31.7l72.4,8.7l33.1,2.5v13.2l-2.1-0.4l-1.1,18.3l-3.7,55.9
@@ -832,13 +929,14 @@
             />
           </g>
           <g>
-            <path id="OR_00000116214129597635447850000008839358901187139201_" nodetypes="cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+            <path id="OR_00000116214129597635447850000008839358901187139201_"
+            nodetypes="cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
             class="st0" d="
             M140.3,176.7l4.3-17.9l4.7-17.9l1.1-4.2l2.4-5.6l-0.6-1.2h-2.5l-1.3-1.7l0.5-1.5l0.5-3.2l4.5-5.5l1.8-1.1l1.1-1.1l1.5-3.6l4-5.7
             l3.6-3.9l0.2-3.5l-3.3-2.5l-1.2-4.5l-13.2-3.7l-15.1-3.5L117.7,85l-0.5-1.4l-5.5,2.1l-4.5-0.6l-2.4-1.6l-1.3,0.7L99,84l-1.7-1.4
             l-5.3-2l-0.8,0.1l-4.3-1.5l-2,1.8l-6.2-0.3l-5.9-4.1l0.7-0.8l0.2-7.8l-2.3-3.9l-4.1-0.6L66.6,61l-2.4-0.5l-5.8,2.1l-2.3,6.5
-            l-3.2,10l-3.2,6.5l-5,14.1l-6.5,13.6l-8.1,12.6l-1.9,2.9l-0.8,8.6l-1.3,6l2.7,3.5l6.7,2.3l11.6,3.3L55,155l12.4,3.6l13.3,3.6 l13.2,3.6"
-            sodipodi:="" />
+            l-3.2,10l-3.2,6.5l-5,14.1l-6.5,13.6l-8.1,12.6l-1.9,2.9l-0.8,8.6l-1.3,6l2.7,3.5l6.7,2.3l11.6,3.3L55,155l12.4,3.6l13.3,3.6
+            l13.2,3.6" sodipodi:="" />
             <polygon
               class="st1"
               points="141.3,176.9 139.3,176.5 143.6,158.6 148.3,140.7 149.4,136.3 151.6,131.1 151.5,130.9 149,130.8 
@@ -855,9 +953,11 @@
             />
           </g>
           <g>
-            <path id="ND_00000035516098943604477370000011710692188134599836_" nodetypes="cccccccccccccccccccc" class="st0" d="
+            <path id="ND_00000035516098943604477370000011710692188134599836_"
+            nodetypes="cccccccccccccccccccc" class="st0" d="
             M471.3,127.7l-0.4-7.5l-2-7.3l-1.8-13.6l-0.5-9.8l-2-3.1L463,81V70.6l0.7-3.9l-2.1-5.5l-28.4-0.6L414.6,60l-26.5-1.3l-24.9-1.9
-            L361.9,71l-1.4,15.1l-2.3,24.9l-0.5,11l56.8,3.8L471.3,127.7z" sodipodi:="" />
+            L361.9,71l-1.4,15.1l-2.3,24.9l-0.5,11l56.8,3.8L471.3,127.7z"
+            sodipodi:="" />
             <path
               class="st1"
               d="M472.4,128.7l-57.8-1.8l-57.8-3.8l0.5-12l5-55.3l25.9,2l26.5,1.3l18.6,0.6l29.1,0.6l2.5,6.4l-0.7,4.1v10.1
@@ -866,10 +966,13 @@
             />
           </g>
           <g>
-            <path id="SD_00000004542971085813353950000013096257814612275612_" nodetypes="cccccccccccccccccccccccccccccccccccccccccc" class="st0" d="
+            <path id="SD_00000004542971085813353950000013096257814612275612_"
+            nodetypes="cccccccccccccccccccccccccccccccccccccccccc" class="st0"
+            d="
             M472.8,203.2l-1-1.1l-1.5-3.6l1.8-3.7l1.1-5.6l-2.6-2.1l-0.3-2.7l0.6-3l2.1-0.8l0.3-5.7l-0.1-30.1l-0.6-3l-4.1-3.6l-1-2v-1.9
             l1.9-1.3l1.5-1.9l0.2-2.7l-57.4-1.6l-56.2-3.9l-0.8,5.3l-1.6,15.9l-1.3,17.9l-1.6,24.6l16,1l19.6,1.1l18,1.3l23.8,1.3l10.7-0.8
-            l2.9,2.3l4.3,3l1,0.8l3.5-0.9l4-0.3l2.7-0.1l3.1,1.2l4.5,1.4l3.1,1.8l0.6,1.9l0.9,1.9l0.7-0.5L472.8,203.2z" sodipodi:="" />
+            l2.9,2.3l4.3,3l1,0.8l3.5-0.9l4-0.3l2.7-0.1l3.1,1.2l4.5,1.4l3.1,1.8l0.6,1.9l0.9,1.9l0.7-0.5L472.8,203.2z"
+            sodipodi:="" />
             <path
               class="st1"
               d="M470.9,205.1l-1.5-3.1l-0.5-1.5l-2.7-1.5l-4.5-1.4l-3-1.2l-2.5,0.1l-3.9,0.3l-3.9,1l-1.4-1l-4.3-2.9l-2.6-2.1
@@ -881,7 +984,8 @@
             />
           </g>
           <g>
-            <path id="NE_00000155840080171497790400000004428470284565982135_" nodetypes="ccccccccccccccccccccccccccccccccccccc" class="st0" d="
+            <path id="NE_00000155840080171497790400000004428470284565982135_"
+            nodetypes="ccccccccccccccccccccccccccccccccccccc" class="st0" d="
             M484.2,247l1.4,2.7l0.1,2.1l2.4,3.7l2.7,3.2h-5l-43.5-0.9l-40.8-0.9l-21.2-1l1.1-21.3l-33.4-2.7l4.3-44l15.5,1L388,190l17.8,1.1
             l23.8,1.1l10.7-0.5l2.1,2.3l4.8,3l1.1,0.9l4.3-1.4l3.9-0.5l2.7-0.2l1.8,1.4l5,1.6l3,1.6l0.5,1.6l0.9,2.1h1.8h0.8l1,5.2l2.7,8
             l1.2,4.6l2.1,3.8l0.5,4.9l1.4,4.3l0.5,6.5" sodipodi:="" />
@@ -898,7 +1002,8 @@
           </g>
           <g>
             <path id="IA_00000021811951796936411410000005396023964811435167_"
-            nodetypes="cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc" class="st0" d="
+            nodetypes="cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+            class="st0" d="
             M566.6,201.6l0.2,1.9l2.3,1.1l1.1,1.3l0.3,1.3l3.9,3.2l0.7,2.2l-0.8,2.9l-1.5,3.5l-0.8,2.7l-2.2,1.6l-1.7,0.6l-5.5,1.5l-0.7,2.3
             l-0.8,2.3l0.6,1.4l1.7,1.7v3.7l-2.2,1.6l-0.5,1.5v2.5l-1.5,0.5l-1.7,1.4l-0.5,1.5l0.5,1.7l-1.4,1.2l-2.3-2.7l-1.5-2.6l-8.3,0.8
             l-10.2,0.6l-25,0.7l-13,0.2l-9.4,0.2l-1.3,0.1l-1.7-4.5l-0.2-6.6l-1.6-4.1l-0.7-5.3l-2.3-3.7l-0.9-4.8l-2.7-7.5l-1.1-5.4l-1.4-2.2
@@ -918,11 +1023,14 @@
             />
           </g>
           <g>
-            <path id="MS_00000001664965161517168450000016324656308153043873_" nodetypes="ccccccccccccccccccccccccccccccccccccccccccccccccccccc"
-            class="st0" d=" M624.6,467l-0.3,1.3h-5.2l-1.5-0.8l-2.1-0.3l-6.8,1.9l-1.8-0.8l-2.6,4.2l-1.1,0.8l-1.1-2.5l-1.1-3.9l-3.4-3.2l1.1-7.5l-0.7-0.9
+            <path id="MS_00000001664965161517168450000016324656308153043873_"
+            nodetypes="ccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+            class="st0" d="
+            M624.6,467l-0.3,1.3h-5.2l-1.5-0.8l-2.1-0.3l-6.8,1.9l-1.8-0.8l-2.6,4.2l-1.1,0.8l-1.1-2.5l-1.1-3.9l-3.4-3.2l1.1-7.5l-0.7-0.9
             l-1.8,0.2l-8.2,0.7l-24.2,0.7l-0.5-1.6l0.7-8l3.4-6.2l5.3-9.1l-0.9-2.1h1.1l0.7-3.2l-2.3-1.8l0.2-1.8l-2.1-4.6l-0.3-5.3l1.4-2.7
             l-0.4-4.3l-1.4-3l1.4-1.4l-1.4-2.1l0.5-1.8l0.9-6.2l3-2.7l-0.7-2.1l3.7-5.3l2.7-0.9v-2.5l-0.7-1.4l2.7-5.3l2.7-1.1l0.1-3.4l8.7-0.1
-            l24.1-1.9l4.6-0.2v6.4l0.2,16.7l-0.8,31l-0.2,14.1l2.7,18.8L624.6,467z" sodipodi:="" />
+            l24.1-1.9l4.6-0.2v6.4l0.2,16.7l-0.8,31l-0.2,14.1l2.7,18.8L624.6,467z"
+            sodipodi:="" />
             <path
               class="st1"
               d="M602.9,474.7l-1.7-3.7l-1.1-3.6l-3.6-3.4l1.2-7.7l-0.1-0.1l-1.3,0.2l-8.3,0.7l-25.1,0.7l-0.7-2.5l0.7-8.4
@@ -936,11 +1044,14 @@
             />
           </g>
           <g>
-            <path id="IN_00000149346368457203543240000010450061746970730161_" nodetypes="ccccccccccccccccccccccccccccccccccccccccccccccccccc"
-            class="st0" d=" M618.4,300.9l0.1-2.9l0.5-4.5l2.3-2.9l1.8-3.9l2.6-4.2l-0.5-5.8l-1.8-2.7l-0.3-3.2l0.8-5.5l-0.5-7l-1.3-16l-1.3-15.4l-1-11.7
+            <path id="IN_00000149346368457203543240000010450061746970730161_"
+            nodetypes="ccccccccccccccccccccccccccccccccccccccccccccccccccc"
+            class="st0" d="
+            M618.4,300.9l0.1-2.9l0.5-4.5l2.3-2.9l1.8-3.9l2.6-4.2l-0.5-5.8l-1.8-2.7l-0.3-3.2l0.8-5.5l-0.5-7l-1.3-16l-1.3-15.4l-1-11.7
             l3.1,0.9l1.5,1l1.1-0.3l2.1-1.9l2.8-1.6l5.1-0.2l22-2.3l5.6-0.5l1.5,16l4.3,36.8l0.6,5.8L669,271l1.2,1.8l0.1,1.4l-2.5,1.6
             l-3.5,1.6l-3.2,0.6l-0.6,4.9l-4.6,3.3l-2.8,4l0.3,2.4l-0.6,1.5h-3.3l-1.6-1.6l-2.5,1.3l-2.7,1.5l0.2,3.1l-1.2,0.3l-0.5-1l-2.2-1.5
-            l-3.3,1.3l-1.6,3l-1.4-0.8l-1.5-1.6l-4.5,0.5l-5.6,1L618.4,300.9z" sodipodi:="" />
+            l-3.3,1.3l-1.6,3l-1.4-0.8l-1.5-1.6l-4.5,0.5l-5.6,1L618.4,300.9z"
+            sodipodi:="" />
             <path
               class="st1"
               d="M617.4,302.5l0.1-4.6l0.5-4.9l2.4-3l1.8-3.9l2.4-3.9l-0.4-5.2l-1.8-2.7l-0.4-3.6l0.8-5.5l-0.5-6.8l-1.3-16
@@ -954,13 +1065,15 @@
           </g>
           <g>
             <path id="IL_00000031892184289182295590000013800851379659126151_"
-            nodetypes="ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc" class="st0" d="
+            nodetypes="ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+            class="st0" d="
             M617.8,301.6V298l0.3-4.9l2.4-3.1l1.8-3.8l2.6-3.9l-0.4-5.3l-2-3.5l-0.1-3.3l0.7-5.3l-0.8-7.2l-1.1-15.8l-1.3-15l-0.9-11.6
             l-0.3-0.9l-0.8-2.6l-1.3-3.7l-1.6-1.8l-1.5-2.6l-0.2-5.5l-9.9,1.3l-27.2,1.7l-8.7-0.4l0.2,2.4l2.3,0.7l0.9,1.1l0.5,1.8l3.9,3.4
             l0.7,2.3l-0.7,3.4l-1.8,3.7l-0.7,2.5l-2.3,1.8l-1.8,0.7l-5.3,1.4l-0.7,1.8L562,230l0.7,1.4l1.8,1.6l-0.2,4.1l-1.8,1.6l-0.7,1.6v2.7
             l-1.8,0.5l-1.6,1.1l-0.2,1.4l0.2,2.1l-1.7,1.3l-1,2.8l0.5,3.7l2.3,7.3l7.3,7.5l5.5,3.7l-0.2,4.3l0.9,1.4l6.4,0.5l2.7,1.4l-0.7,3.7
             l-2.3,5.9l-0.7,3.2l2.3,3.9l6.4,5.3l4.6,0.7l2.1,5l2.1,3.2l-0.9,3l1.6,4.1l1.8,2.1l1.9-0.8l0.7-2.2l2-1.4l3.2-1.1l3.1,1.2l2.9,1.1
-            l0.8-0.2l-0.1-1.2l-1.1-2.8l0.4-2.4l2.3-1.6l2.4-1l1.2-0.4l-0.6-1.3l-0.8-2.2l1.2-1.3L617.8,301.6z" sodipodi:="" />
+            l0.8-0.2l-0.1-1.2l-1.1-2.8l0.4-2.4l2.3-1.6l2.4-1l1.2-0.4l-0.6-1.3l-0.8-2.2l1.2-1.3L617.8,301.6z"
+            sodipodi:="" />
             <path
               class="st1"
               d="M596.9,323.1l-2.4-2.7l-1.8-4.6l0.9-2.9l-1.9-3l-1.8-4.5l-4.3-0.6l-6.8-5.5l-2.6-4.4l0.8-3.7l2.3-5.9l0.5-2.8
@@ -979,13 +1092,15 @@
           </g>
           <g>
             <path id="MN_00000173150990742595048110000011274867826778670488_"
-            nodetypes="cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc" class="st0" d="
+            nodetypes="cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+            class="st0" d="
             M471.9,128.5l-0.5-8.5l-1.8-7.3l-1.8-13.5l-0.5-9.8l-1.8-3.4l-1.6-5V70.6l0.7-3.9l-1.8-5.5h30.1l0.3-8.2l0.6-0.2l2.3,0.5l1.9,0.8
             l0.8,5.5l1.5,6.1l1.6,1.6h4.8l0.3,1.5l6.3,0.3v2.1h4.8l0.3-1.3l1.1-1.1l2.3-0.6l1.3,1h2.9l3.9,2.6l5.3,2.4l2.4,0.5l0.5-1l1.5-0.5
             l0.5,2.9l2.6,1.3l0.5-0.5l1.3,0.2v2.1l2.6,1h3.1l1.6-0.8l3.2-3.2l2.6-0.5l0.8,1.8l0.5,1.3h1l1-0.8l8.9-0.3l1.8,3.1h0.6l0.7-1.1
             l4.4-0.4l-0.6,2.3l-3.9,1.8l-9.2,4.1l-4.8,2l-3.1,2.6l-2.4,3.6l-2.3,3.9l-1.8,0.8l-4.5,5l-1.3,0.2l-3.8,2.9l-2.8,3.2l-0.2,3
             l0.2,7.8l-1.6,1.6L530,128l-1.8,5.7l2.5,3.6l0.5,2.5l-1.1,3l-0.2,3.7l0.5,7.1l3.4,4.1h3l2.5,2.3l3.2,1.4l3.7,5l7.1,5l1.8,2.1
-            l0.2,5.5l-20.6,0.7l-60.2,0.5l-0.3-35.7l-0.5-3l-4.1-3.4l-1.1-1.8v-1.6l2.1-1.6l1.4-1.4L471.9,128.5z" sodipodi:="" />
+            l0.2,5.5l-20.6,0.7l-60.2,0.5l-0.3-35.7l-0.5-3l-4.1-3.4l-1.1-1.8v-1.6l2.1-1.6l1.4-1.4L471.9,128.5z"
+            sodipodi:="" />
             <path
               class="st1"
               d="M473.3,181.2l-0.3-36.6l-0.4-2.5l-4-3.4l-1.3-2.1v-2.4l2.4-1.9l1.1-1.1l0.2-2.8l-0.4-8.3l-1.8-7.3L467,99.3
@@ -1004,7 +1119,8 @@
           </g>
           <g>
             <path id="WI_00000121258353708958286410000006577426707037986731_"
-            nodetypes="cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc" class="st0" d="
+            nodetypes="cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+            class="st0" d="
             M612.9,197.2l0.4-3l-1.6-4.5l-0.6-6.1l-1.1-2.4l1-3.1l0.8-2.9l1.5-2.6l-0.6-3.4l-0.6-3.6l0.5-1.8l1.9-2.4l0.2-2.7l-0.8-1.3l0.6-2.6
             l0.5-3.2l2.7-5.7l2.9-6.8l0.2-2.3l-0.3-1l-0.8,0.5l-4.2,6.3l-2.7,4l-1.9,1.8l-0.8,2.3l-1.5,0.8l-1.1,1.9l-1.5-0.3l-0.2-1.8l1.3-2.4
             l2.1-4.7l1.8-1.6l1.1-2.3l-1.6-0.9l-1.4-1.4l-1.6-10.3l-3.7-1.1l-1.4-2.3l-12.6-2.7l-2.5-1.1l-8.2-2.3l-8.2-1.1l-4.2-5.4l-0.5,1.3
@@ -1030,12 +1146,14 @@
           </g>
           <g>
             <path id="MO_00000054968069642671403530000017973481283088551339_"
-            nodetypes="ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc" class="st0" d="
+            nodetypes="ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+            class="st0" d="
             M555.8,249.5l-2.5-3.1l-1.1-2.3l-7.8,0.7l-9.8,0.5l-25.4,0.9l-13.5,0.2l-7.9,0.1l-2.3,0.1l1.3,2.5l-0.2,2.3l2.5,3.9l3.1,4.1
             l3.1,2.7l2.3,0.2l1.4,0.9v3l-1.8,1.6l-0.5,2.3l2.1,3.4l2.5,3l2.5,1.8l1.4,11.7l-0.7,35.3l0.2,4.7l0.5,5.4l23.4-0.1l23.2-0.7
             l20.8-0.8l11.7-0.2l2.2,3.4l-0.7,3.3l-3.1,2.4l-0.6,1.8l5.4,0.5l3.9-0.7l1.7-5.5l0.7-5.9l2.3-2l1.7-1.5l2.1-1l0.1-2.9l0.6-1.7
             l-1-1.7l-2.7,0.1l-2.2-2.6l-1.4-4.2l0.8-2.5l-1.9-3.4l-1.8-4.6l-4.8-0.8l-7-5.6l-1.7-4.1l0.8-3.2l2.1-6.1l0.5-2.9l-1.9-1l-6.9-0.8
-            l-1-1.7l-0.1-4.2l-5.5-3.4l-7-7.8l-2.3-7.3l-0.2-4.2L555.8,249.5z" sodipodi:="" />
+            l-1-1.7l-0.1-4.2l-5.5-3.4l-7-7.8l-2.3-7.3l-0.2-4.2L555.8,249.5z"
+            sodipodi:="" />
             <path
               class="st1"
               d="M587.4,346.1l-6.7-0.6l1-3.3l3-2.4l0.5-2.6l-1.7-2.6l-11.1,0.2l-20.8,0.8l-23.2,0.7l-24.4,0.1l-0.5-6.3
@@ -1050,10 +1168,13 @@
             />
           </g>
           <g>
-            <path id="AR_00000137829906202910786580000006573990044458283652_" nodetypes="ccccccccccccccccccccccccccccccccccccccccccccc" class="st0"
-            d=" M591,345l-3.8,0.9l-6.2-0.5l0.7-3l3.2-2.7l0.5-2.3l-1.8-3l-11,0.5l-20.8,0.9l-23.3,0.7L505,337l1.6,6.9v8.2l1.4,11l0.2,37.8
+            <path id="AR_00000137829906202910786580000006573990044458283652_"
+            nodetypes="ccccccccccccccccccccccccccccccccccccccccccccc"
+            class="st0" d="
+            M591,345l-3.8,0.9l-6.2-0.5l0.7-3l3.2-2.7l0.5-2.3l-1.8-3l-11,0.5l-20.8,0.9l-23.3,0.7L505,337l1.6,6.9v8.2l1.4,11l0.2,37.8
             l2.3,1.9l3-1.4l2.7,1.1l0.4,10.3l22.9-0.1l18.9-0.8l10.1-0.2l1.1-2.1l-0.3-3.5l-1.8-3l1.6-1.5l-1.6-2.5l0.7-2.5l1.4-5.6l2.5-2.1
-            l-0.7-2.3l3.7-5.4l2.7-1.4l-0.1-1.5l-0.3-1.8l2.9-5.6l2.4-1.3l0.4-3.4l1.8-1.2l0.9-4.2l-1.3-4l4-2.4l0.6-2l1.2-4.3L591,345z" sodipodi:="" />
+            l-0.7-2.3l3.7-5.4l2.7-1.4l-0.1-1.5l-0.3-1.8l2.9-5.6l2.4-1.3l0.4-3.4l1.8-1.2l0.9-4.2l-1.3-4l4-2.4l0.6-2l1.2-4.3L591,345z"
+            sodipodi:="" />
             <path
               class="st1"
               d="M515.7,413.9l-0.4-10.7l-1.8-0.7l-3.2,1.5l-3.1-2.7l-0.2-38.2l-1.4-11V344l-1.9-7.9l24.6-0.5l23.3-0.7
@@ -1067,12 +1188,13 @@
           </g>
           <g>
             <path id="OK_00000127018175143795260630000013988366852805966215_"
-            nodetypes="ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc" class="st0" d="
+            nodetypes="ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+            class="st0" d="
             M375.3,322.6l-10.7-0.5l-6.4-0.5l0.3,0.2l-0.7,10.4l22,1.4l32.1,1.3l-2.3,24.4l-0.5,17.8l0.2,1.6l4.3,3.7l2.1,1.1l0.7-0.2l0.7-2.1
             l1.4,1.8h2.1v-1.4l2.7,1.4l-0.5,3.9l4.1,0.2l2.5,1.1l4.1,0.7l2.5,1.8l2.3-2.1l3.4,0.7l2.5,3.4h0.9v2.3l2.3,0.7l2.3-2.3l1.8,0.7h2.5
             l0.9,2.5l4.8,1.8l1.4-0.7l1.8-4.1h1.1l1.1,2.1l4.1,0.7l3.7,1.4l3,0.9l1.8-0.9l0.7-2.5h4.3l2.1,0.9l2.7-2.1h1.1l0.7,1.6h4.1l1.6-2.1
-            l1.8,0.5l2.1,2.5l3.2,1.8l3.2,0.9l1.9,1.1l-0.4-37.2l-1.4-11l-0.2-8.9l-1.4-6.5l-0.8-7.2l-0.1-3.8l-12.1,0.3l-46.4-0.5l-45-2.1 L375.3,322.6z"
-            sodipodi:="" />
+            l1.8,0.5l2.1,2.5l3.2,1.8l3.2,0.9l1.9,1.1l-0.4-37.2l-1.4-11l-0.2-8.9l-1.4-6.5l-0.8-7.2l-0.1-3.8l-12.1,0.3l-46.4-0.5l-45-2.1
+            L375.3,322.6z" sodipodi:="" />
             <path
               class="st1"
               d="M508.4,402.5l-3.4-1.9l-3.3-1l-3.4-1.9l-2-2.4l-0.9-0.2l-1.5,1.9h-5.3l-0.7-1.6h0.1l-2.9,2.2l-2.4-1.1h-3.4
@@ -1087,9 +1209,11 @@
             />
           </g>
           <g>
-            <path id="KS_00000059284031470568583690000018372208079013218977_" nodetypes="ccccccccccccccccccccc" class="st0" d="
+            <path id="KS_00000059284031470568583690000018372208079013218977_"
+            nodetypes="ccccccccccccccccccccc" class="st0" d="
             M503.4,325.1l-12.6,0.2l-46.1-0.5l-44.6-2.1l-24.6-1.3l4.1-64.7l21.8,0.8l40.5,1.4l44.1,0.5h5.1l3.2,3.2l2.8,0.2l0.9,1.1v2
-            l-1.8,1.6l-0.5,2.6l2.2,3.6l2.5,3.1l2.5,2L504,290L503.4,325.1z" sodipodi:="" />
+            l-1.8,1.6l-0.5,2.6l2.2,3.6l2.5,3.1l2.5,2L504,290L503.4,325.1z"
+            sodipodi:="" />
             <path
               class="st1"
               d="M490.8,326.3l-46.1-0.5l-44.6-2.1l-25.6-1.3l4.3-66.7l22.8,0.8L442,258l44.1,0.5h5.5l3.3,3.3l2.8,0.2l1.4,1.7
@@ -1113,14 +1237,17 @@
             />
           </g>
           <g>
-            <path id="VA_path3433_00000129927887180930091520000012564459848433403787_"
-            nodetypes="ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc" class="st0" d="
+            <path
+            id="VA_path3433_00000129927887180930091520000012564459848433403787_"
+            nodetypes="ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+            class="st0" d="
             M828.9,269.2l-0.1-1.9l6.5-2.5l-0.8,3.2l-2.9,3.8l-0.4,4.6l0.5,3.4l-1.8,5l-2.2,1.9l-1.5-4.6l0.4-5.4l1.6-4.2L828.9,269.2z
             M831.2,297.5L773,310.1l-37.4,5.3l-6.7-0.4l-2.6,1.9l-7.3,0.2l-8.4,1l-8.9,1l8.5-4.9v-2.1l1.5-2.1l10.6-11.5l3.9,4.5l3.8,1
             l2.5-1.1l2.2-1.3l2.5,1.3l3.9-1.4l1.9-4.6l2.6,0.5l2.9-2.1l1.8,0.5l2.8-3.7l0.3-2.1l-1-1.3l1-1.9l5.3-12.3l0.6-5.7l1.2-0.5l2.2,2.4
             l3.9-0.3l1.9-7.6l2.8-0.6l1-2.7l2.6-2.3l1.3-2.3l1.5-3.4l0.1-5.1l9.8,3.8c0.7,0.3,0.7-4.8,0.7-4.8l4.1,1.4l-0.5,2.6l8.2,2.9
             l1.3,1.8l-0.9,3.7l-1.3,1.3l-0.5,1.7l0.5,2.4l2,1.3l3.9,1.4l2.9,1l4.9,0.9l2.2,2.1l3.2,0.4l0.9,1.2l-0.4,4.7l1.4,1.1l-0.5,1.9
-            l1.2,0.8l-0.2,1.4l-2.7-0.1l0.1,1.6l2.3,1.5l0.1,1.4l1.8,1.8l0.5,2.5l-2.6,1.4l1.6,1.5l5.8-1.7L831.2,297.5z" sodipodi:="" />
+            l1.2,0.8l-0.2,1.4l-2.7-0.1l0.1,1.6l2.3,1.5l0.1,1.4l1.8,1.8l0.5,2.5l-2.6,1.4l1.6,1.5l5.8-1.7L831.2,297.5z"
+            sodipodi:="" />
             <path
               class="st1"
               d="M697.1,320.6l12-7v-1.8l1.8-2.5l11.3-12.3l4.5,5.1l3.1,0.8l2.2-1l2.7-1.6l2.6,1.4l3.1-1.1l2-4.9l3,0.6l2.9-2.2
@@ -1139,7 +1266,9 @@
             />
           </g>
           <g>
-            <path id="path1361_00000172426885023586768120000013458411092644948361_" nodetypes="cccccc" class="st0" d="M801.8,253.8
+            <path
+            id="path1361_00000172426885023586768120000013458411092644948361_"
+            nodetypes="cccccc" class="st0" d="M801.8,253.8
             l-1.1-1.6l-1-0.8l1.1-1.6l2.2,1.5L801.8,253.8z" sodipodi:=""/>
             <path
               class="st1"
@@ -1149,47 +1278,34 @@
           </g>
         </svg>
       </b-col>
-      <b-col cols="12" md="1" class="text-center mt-2 d-flex flex-column" v-if="smallStates && smallStates.length">
+      <b-col
+        cols="12"
+        md="1"
+        class="text-center mt-2 d-flex flex-column"
+        v-if="smallStates && smallStates.length"
+      >
         <ul class="small-states-legend d-flex legend-container">
           <li
             class="small-states-key"
             :id="state.id"
             v-for="state in smallStates"
             :key="state.id"
-            :style="{ fontSize: `${legendConfig.fontSize.value}${legendConfig.fontSize.type}` }"
+            :style="{
+              fontSize: `${legendConfig.fontSize.value}${legendConfig.fontSize.type}`,
+            }"
           >
-            <NuxtLink :to="createStateMapUrl(state.slug)">{{ state.id }}</NuxtLink>
+            <NuxtLink :to="createStateMapUrl(state.slug)">{{
+              state.id
+            }}</NuxtLink>
           </li>
         </ul>
       </b-col>
     </b-row>
     <b-row>
-      <b-col cols="12" md="7" class="mt-3 mx-auto state-list" v-if="mobileStatesLinkList">
-        <div class="row">
-          <div
-            class="d-flex flex-column mx-0 my-1 state-list-item col-6"
-            :style="{ fontSize: `${legendConfig.fontSize.value}${legendConfig.fontSize.type}` }"
-          >
-            <NuxtLink
-              v-for="state in mobileStatesLinkList.slice(0, Math.ceil(mobileStatesLinkList.length / 2) - 1)"
-              :key="state.id"
-              :to="createStateMapUrl(state.slug)"
-              >{{ state.name }}</NuxtLink
-            >
-          </div>
-          <div
-            class="d-flex flex-column mx-0 my-1 state-list-item col-6"
-            :style="{ fontSize: `${legendConfig.fontSize.value}${legendConfig.fontSize.type}` }"
-          >
-            <NuxtLink
-              v-for="state in mobileStatesLinkList.slice(Math.ceil(mobileStatesLinkList.length / 2), mobileStatesLinkList.length - 1)"
-              :key="state.id"
-              :to="createStateMapUrl(state.slug)"
-              >{{ state.name }}</NuxtLink
-            >
-          </div>
-        </div>
-      </b-col>
+      <StateLinksList
+        :state-links="mobileStatesLinkList"
+        v-if="mobileStatesLinkList && mobileStatesLinkList.length"
+      />
     </b-row>
   </b-container>
 </template>
@@ -1221,6 +1337,17 @@
       justify-content: flex-start;
       margin-top: 20px;
 
+      .show-list-desktop {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        width: 100%;
+        gap: 1rem;
+        align-items: center;
+        @include media-breakpoint-down(md) {
+          grid-template-columns: repeat(2, 1fr);
+          gap: 0.5rem;
+        }
+      }
       @include media-breakpoint-down(sm) {
         display: flex;
       }
@@ -1229,8 +1356,11 @@
         text-align: left;
         a {
           font-size: 1rem;
-          border-bottom: 1px solid #ccc;
-          padding: 10px;
+          padding: 4px;
+
+          @include media-breakpoint-down(md) {
+            text-align: center;
+          }
         }
       }
     }

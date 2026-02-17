@@ -78,7 +78,7 @@
           <b-col cols="12" md="6">
             <div id="action-banner-widget-bottom">
               <h2>{{ headline }}</h2>
-              <h3>{{ subheadline }}</h3>
+              <p class="lead">{{ subheadline }}</p>
               <CompareYourRateDropdown v-if="ctaType === 'rates-dropdown'" submit-text="CONTINUE" :compare-rate-config="ctaConfig" />
               <ZipCodeForm v-else-if="ctaType === 'zipcode-form'" :action="action" />
             </div>
@@ -199,25 +199,14 @@
 
       #action-banner-widget-bottom {
         h2 {
-          color: $blue-light;
-          font-size: 2.8em;
           margin-bottom: 0.4em;
-
-          @include media-breakpoint-down(md) {
-            font-size: 2em;
-          }
         }
 
-        h3 {
-          color: $gray-dark;
-          font-size: 1.6em;
+        .lead {
           margin-bottom: 1.6em;
 
           @include media-breakpoint-down(lg) {
             margin-bottom: 0.8em;
-          }
-          @include media-breakpoint-down(md) {
-            font-size: 1.4em;
           }
         }
       }

@@ -1,4 +1,6 @@
 <script setup>
+  import { generateRedirectUrl } from "~/composables/utils.js";
+
   const props = defineProps({
     compareRateConfig: {
       type: Object,
@@ -10,23 +12,58 @@
     },
   });
 
-  const { compareRateConfig, submitText } = props;
+  // Initialize with the first option value if this is a hardcoded dropdown
+  const isHardcodedDropdown = computed(() =>
+    props.compareRateConfig.name === 'compareYourRateDropdown' ||
+    props.compareRateConfig.name === 'compareYourRateDropdownMain'
+  );
 
-  const selectValue = ref("");
+  const getInitialValue = () => {
+    if (isHardcodedDropdown.value && props.compareRateConfig.options?.length > 0) {
+      return props.compareRateConfig.options[0].value.value;
+    }
+    return "";
+  };
+
+  const selectValue = ref(getInitialValue());
+
+  const getInitialTarget = () => {
+    if (isHardcodedDropdown.value && props.compareRateConfig.options?.length > 0) {
+      return props.compareRateConfig.options[0].value.target || "";
+    }
+    return "";
+  };
+
+  const selectedTarget = ref(getInitialTarget());
   const router = useRouter();
 
   const changeRoute = () => {
     if (goTo.value !== "") {
-      router.push({ path: `/${goTo.value}/` });
+      // Check if the selected option has a custom target URL
+      if (selectedTarget.value) {
+        // Use generateRedirectUrl to append URL params (ueid, zip, mst, etc.)
+        const urlWithParams = generateRedirectUrl(selectedTarget.value, {});
+        window.open(urlWithParams, '_blank');
+      } else {
+        // Default behavior: navigate internally
+        router.push({ path: `/${goTo.value}/` });
+      }
     }
   };
   // callabcks for emitted events from the input
   const handleValidSelect = (eventValue) => {
     selectValue.value = eventValue;
+
+    // Find the selected option to get its target URL if it has one
+    const selectedOption = props.compareRateConfig.options?.find(
+      opt => opt.value.value === eventValue
+    );
+    selectedTarget.value = selectedOption?.value?.target || "";
   };
   const handleInvalidSelect = () => {
     // Clear selectValue on invalid input
     selectValue.value = "";
+    selectedTarget.value = "";
   };
   // Computed for button disabled state
   const isButtonDisabled = computed(() => {
@@ -42,7 +79,7 @@
   <div class="compare-your-rate-dropdown">
     <SelectsMain
       :valid="true"
-      :config="compareRateConfig"
+      :config="props.compareRateConfig"
       @select-updated:model-value="handleValidSelect"
       @select-invalid:model-value="handleInvalidSelect"
     />
@@ -53,7 +90,7 @@
         :config="{
           size: 'lg',
           variant: 'primary',
-          label: submitText,
+          label: props.submitText,
           icon: 'arrow-right-short',
         }"
         @click="changeRoute"

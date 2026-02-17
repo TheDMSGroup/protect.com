@@ -1,5 +1,29 @@
 import { preprocessTextForLinks } from "@/composables/utils.js";
 
+/**
+ * Extract FAQs from spreadsheet data that uses the faq_question_N/faq_answer_N format.
+ * @param {Object} data - The spreadsheet row data (can be reactive ref or plain object)
+ * @param {number} maxFaqs - Maximum number of FAQs to extract (default: 4)
+ * @returns {Array|null} Array of FAQ objects { question, answer } or null if no custom FAQs
+ */
+export const extractFaqsFromData = (data, maxFaqs = 4) => {
+  if (!data) return null;
+
+  const hasCustomFaqs = data['faq_question_1'] && data['faq_answer_1'];
+  if (!hasCustomFaqs) return null;
+
+  const faqs = [];
+  for (let i = 1; i <= maxFaqs; i++) {
+    const question = data[`faq_question_${i}`];
+    const answer = data[`faq_answer_${i}`];
+    if (question && answer) {
+      faqs.push({ question, answer });
+    }
+  }
+
+  return faqs.length > 0 ? faqs : null;
+};
+
 // Fallback FAQs for when no specific FAQ data is available
 const FALLBACK_FAQS = [
   {

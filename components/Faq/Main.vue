@@ -1,11 +1,10 @@
 <template>
   <section ref="faqSection" class="faq-section">
     <div class="container">
-      <h2 class="text-center mb-4">Frequently Asked Questions</h2>
       <div class="faq-list">
         <div v-for="(item, index) in processedFaq" :key="index" class="faq-item">
           <h3>{{ item.question }}</h3>
-          <div class="answer-content" v-html="item.answer" />
+          <p class="answer-content" v-html="item.answer" />
         </div>
       </div>
     </div>
@@ -61,25 +60,8 @@
 </script>
 
 <style lang="scss" scoped>
-  // Local CSS variables needed for this component
-  :root {
-    --primary-color: #1e40af;
-    --background-color: #ffffff;
-    --surface-color: #f8fafc;
-    --border-light: #f1f5f9;
-    --spacing-lg: 1.5rem;
-    --spacing-xl: 2rem;
-    --spacing-2xl: 2.5rem;
-    --spacing-4xl: 4rem;
-    --radius-lg: 0.5rem;
-    --spacing-md: 1rem;
-  }
-
   // FAQ Section
   .faq-section {
-    padding: var(--spacing-4xl) 0;
-    background: var(--background-color);
-
     .container {
       @include media-breakpoint-down(sm) {
         padding: 0;
@@ -89,49 +71,31 @@
     .faq-list {
       display: flex;
       flex-direction: column;
-      gap: var(--spacing-xl);
+      gap: 2rem;
     }
 
     .faq-item {
-      background: var(--surface-color);
-      border-radius: var(--radius-lg);
-      padding: var(--spacing-2xl);
+      background: $gray-lighter;
+      border-radius: 0.5rem;
+      padding: 2.5rem;
       @include media-breakpoint-down(md) {
-        padding: var(--spacing-lg);
+        padding: 1.5rem;
       }
-      border: 1px solid var(--border-light);
+      border: 1px solid $gray-light;
 
       a {
-        color: var(--primary-color);
+        color: $blue;
         text-decoration: underline;
       }
 
       h3 {
-        margin-bottom: var(--spacing-lg);
-        color: var(--primary-color);
-        font-size: 1.25rem;
-        font-family: "Cantata One", serif;
-
-        @include media-breakpoint-down(md) {
-          font-size: 1.5rem;
-        }
+        margin-bottom: 1.5rem;
+        color: $blue;
       }
-
-      p {
-        color: black;
-        line-height: 1.7;
-        margin: 0;
-        font-size: 1.125rem;
-
-        @include media-breakpoint-down(md) {
-          font-size: 1.25rem;
-        }
-
-        ol {
-          padding-left: 1.5rem;
-          margin-top: var(--spacing-md);
-          margin-bottom: var(--spacing-md);
-        }
+      ol {
+        padding-left: 1.5rem;
+        margin-top: 1rem;
+        margin-bottom: 1rem;
       }
     }
   }

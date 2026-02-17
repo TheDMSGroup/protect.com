@@ -1,9 +1,11 @@
 <script setup>
 import { isValidMake, getMakeName, getVehicleImagePath, getMakeLogoPath } from "~/data/vehicles";
 import { redirectWithParams } from "@/composables/utils.js";
+import { extractFaqsFromData } from "@/composables/useFaq.js";
 
 const route = useRoute();
 const make = route.params.make;
+const useStageData = route.query.stage === 'true';
 
 if (!isValidMake(make)) {
   throw createError({
@@ -14,17 +16,17 @@ if (!isValidMake(make)) {
 
 const formattedMake = computed(() => getMakeName(make));
 
-// Fetch make data from Google Sheets
-const { data: makeData, error: makeError } = await useFetch(`/api/sheets/vehicle-makes`, {
-  query: { slug: make },
-  key: `make-${make}`,
-});
-
-// Fetch models for this make from Google Sheets
-const { data: modelsData } = await useFetch(`/api/sheets/vehicles-detail`, {
-  query: { make },
-  key: `models-${make}`,
-});
+// Fetch make data and models in parallel
+const [{ data: makeData }, { data: modelsData }] = await Promise.all([
+  useFetch(`/api/sheets/vehicle-makes`, {
+    query: { slug: make, stage: useStageData || undefined },
+    key: `make-${make}${useStageData ? '-stage' : ''}`,
+  }),
+  useFetch(`/api/sheets/vehicles-detail`, {
+    query: { make, stage: useStageData || undefined },
+    key: `models-${make}${useStageData ? '-stage' : ''}`,
+  }),
+]);
 
 // Extract model data from the fetched data
 const models = computed(() => {
@@ -38,44 +40,12 @@ const makeDescription = computed(() => {
   return makeData.value?.['make_description'] || '';
 });
 
-// Custom FAQs from spreadsheet
-const defaultFaqs = computed(() => {
-  // Check if spreadsheet has custom FAQs (using faq_question_1 and faq_answer_1 format)
-  const hasCustomFaqs = makeData.value?.['faq_question_1'] && makeData.value?.['faq_answer_1'];
+// FAQs - use custom from spreadsheet or fallback to defaults
+const displayFaqs = computed(() => {
+  const customFaqs = extractFaqsFromData(makeData.value);
+  if (customFaqs) return customFaqs;
 
-  if (hasCustomFaqs) {
-    const customFaqs = [
-      {
-        question: makeData.value['faq_question_1'],
-        answer: makeData.value['faq_answer_1'],
-      }
-    ];
-
-    if (makeData.value['faq_question_2'] && makeData.value['faq_answer_2']) {
-      customFaqs.push({
-        question: makeData.value['faq_question_2'],
-        answer: makeData.value['faq_answer_2'],
-      });
-    }
-
-    if (makeData.value['faq_question_3'] && makeData.value['faq_answer_3']) {
-      customFaqs.push({
-        question: makeData.value['faq_question_3'],
-        answer: makeData.value['faq_answer_3'],
-      });
-    }
-
-    if (makeData.value['faq_question_4'] && makeData.value['faq_answer_4']) {
-      customFaqs.push({
-        question: makeData.value['faq_question_4'],
-        answer: makeData.value['faq_answer_4'],
-      });
-    }
-
-    return customFaqs;
-  }
-
-  // Return default FAQs if no custom FAQs in spreadsheet
+  // Default FAQs if no custom FAQs in spreadsheet
   return [
     {
       question: `How much does ${formattedMake.value} insurance cost?`,
@@ -150,7 +120,7 @@ useSeoMeta({
         </nav>
         <div class="hero-content">
           <h1>{{ formattedMake }} Car Insurance</h1>
-          <p class="hero-subtitle">Find affordable insurance coverage for your {{ formattedMake }} vehicle</p>
+          <p class="lead">Find affordable insurance coverage for your {{ formattedMake }} vehicle</p>
           <button class="cta-button" @click="redirectWithParams('https://insure.protect.com', { vehicle1make: formattedMake.toUpperCase() })">Compare Quotes</button>
         </div>
       </b-container>
@@ -211,7 +181,7 @@ useSeoMeta({
                   <div class="price-value">${{ model.minimum_coverage_annual }}</div>
                 </div>
               </div>
-              <span class="learn-more">Get Model Rates →</span>
+              <span class="learn-more">Get {{ model.model }} Rates →</span>
             </div>
           </NuxtLink>
         </div>
@@ -304,8 +274,7 @@ useSeoMeta({
         <div class="section-header">
           <h2>Frequently Asked Questions</h2>
         </div>
-
-        <FaqAccordion :faqs="defaultFaqs" />
+        <FaqMain :faq="displayFaqs" />
       </b-container>
     </section>
 
@@ -349,19 +318,10 @@ useSeoMeta({
     }
 
     h1 {
-      font-size: 3rem;
-      margin-bottom: 1rem;
-      font-weight: 700;
       color: white;
-
-      @include media-breakpoint-down(md) {
-        font-size: 2.25rem;
-      }
     }
 
-    .hero-subtitle {
-      font-size: 1.25rem;
-      margin-bottom: 2rem;
+    .lead {
       color: white;
     }
   }
@@ -388,12 +348,6 @@ useSeoMeta({
   .about-make {
     padding: 60px 0;
     background: $gray-lighter;
-
-    h2 {
-      font-size: 2.25rem;
-      margin-bottom: 1.5rem;
-      color: $blue;
-    }
 
     p {
       font-size: 1.125rem;
@@ -427,17 +381,6 @@ useSeoMeta({
   .section-header {
     text-align: center;
     margin-bottom: 3rem;
-
-    h2 {
-      font-size: 2.25rem;
-      color: $blue;
-      margin-bottom: 1rem;
-    }
-
-    p {
-      font-size: 1.125rem;
-      color: $gray-dark;
-    }
   }
 
   .models-grid {
@@ -607,19 +550,6 @@ useSeoMeta({
       margin-bottom: 1.25rem;
       line-height: 1;
     }
-
-    h3 {
-      font-size: 1.25rem;
-      color: $blue;
-      margin-bottom: 0.75rem;
-    }
-
-    p {
-      color: $gray-dark;
-      font-size: 0.95rem;
-      line-height: 1.6;
-      margin-bottom: 0;
-    }
   }
 
   .faq-section {
@@ -634,20 +564,14 @@ useSeoMeta({
     text-align: center;
 
     h2 {
-      font-size: 2.5rem;
-      margin-bottom: 1rem;
       color: white;
-
-      @include media-breakpoint-down(md) {
-        font-size: 2rem;
-      }
     }
 
     p {
-      font-size: 1.25rem;
       margin-bottom: 2rem;
       color: white;
     }
   }
 }
 </style>
+

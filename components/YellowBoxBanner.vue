@@ -11,12 +11,15 @@
             :fetchpriority="lazyImage ? 'low' : 'auto'"
             decoding="async"
             :preload="!lazyImage"
-            :width="imageWidth"
-            :height="imageHeight"
-            style="height: auto;"
           />
         </b-col>
-        <b-col v-if="imageAlign === 'right'" cols="12" md="5" lg="7" class="d-block d-md-none d-lg-none d-xl-none">
+        <b-col
+          v-if="imageAlign === 'right'"
+          cols="12"
+          md="5"
+          lg="7"
+          class="d-block d-md-none d-lg-none d-xl-none"
+        >
           <NuxtImg
             class="image"
             :alt="imageAlt"
@@ -25,20 +28,18 @@
             :fetchpriority="lazyImage ? 'low' : 'auto'"
             decoding="async"
             :preload="!lazyImage"
-            :width="imageWidth"
-            :height="imageHeight"
-            style="height: auto;"
           />
         </b-col>
         <b-col cols="12" md="7" lg="5" class="wrapper">
-          <h2>{{ headline }}</h2>
+          <h2 class="heading">{{ headline }}</h2>
           <p>
             {{ content }}
           </p>
           <p v-if="action && actionMessage">
             <ButtonsMain
+              :disabled="false"
               :config="{
-                type: 'submit',
+                type: 'button',
                 size: 'lg',
                 variant: 'outline-primary',
                 label: actionMessage,
@@ -48,7 +49,13 @@
             />
           </p>
         </b-col>
-        <b-col v-if="imageAlign === 'right'" cols="12" md="5" lg="7" class="d-none d-md-block">
+        <b-col
+          v-if="imageAlign === 'right'"
+          cols="12"
+          md="5"
+          lg="7"
+          class="d-none d-md-block"
+        >
           <NuxtImg
             class="image"
             :alt="imageAlt"
@@ -57,9 +64,6 @@
             :fetchpriority="lazyImage ? 'low' : 'auto'"
             decoding="async"
             :preload="!lazyImage"
-            :width="imageWidth"
-            :height="imageHeight"
-            style="height: auto;"
           />
         </b-col>
       </b-row>
@@ -77,14 +81,6 @@
     imageAlt: {
       type: String,
       default: "",
-    },
-    imageWidth: {
-      type: Number,
-      default: 624,
-    },
-    imageHeight: {
-      type: Number,
-      default: 722,
     },
     headline: {
       type: String,
@@ -137,16 +133,7 @@
     }
 
     h2 {
-      font-size: 2.5rem;
       margin-bottom: 15px;
-
-      @include media-breakpoint-down(md) {
-        text-align: left;
-        font-size: 2.3rem;
-      }
-      @include media-breakpoint-down(sm) {
-        font-size: 2rem;
-      }
     }
 
     .container {
@@ -187,17 +174,7 @@
       display: block;
       width: 100%;
       max-width: 600px;
-      max-height: 600px;
-      object-fit: contain;
       margin: 50px auto 0 auto;
-    }
-    p {
-      font-weight: 400;
-      font-size: 1.5rem;
-
-      @include media-breakpoint-down(md) {
-        font-size: 1.35rem;
-      }
     }
     .btn {
       margin-top: 25px;

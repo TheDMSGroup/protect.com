@@ -42,7 +42,7 @@
 
 <script setup>
 import { computed } from 'vue';
-import { useStore } from "../stores/store";
+import { useStore } from "~/stores/store";
 const store = useStore();
 
 const props = defineProps({
@@ -102,14 +102,11 @@ const getQuotes = computed(() => {
     }
 
     h3 {
-      color: var(--text-primary);
       margin-bottom: var(--spacing-md);
-      font-size: 1.25rem;
     }
 
     p {
-      color: var(--text-secondary);
-      line-height: 1.6;
+      margin-bottom: 0;
     }
   }
 }

@@ -88,6 +88,9 @@
               </div>
             </div>
 
+            <!-- Typing Indicator -->
+            <ChatTypingIndicator v-if="isTyping" />
+
             <!-- Loading -->
             <div v-if="isLoadingResults" class="loading-container">
               <div class="spinner"></div>
@@ -260,6 +263,7 @@ const showMarriedMessage = ref(true)
 const discounts = ref([])
 const emojiIndex = ref(0)
 const messagesContainer = ref(null)
+const isTyping = ref(false)
 
 const celebrationEmojis = ['🎉', '🙌', '👍', '🎊', '✨', '💰', '🌟']
 
@@ -284,7 +288,7 @@ onMounted(() => {
   }
 })
 
-watch(messages, () => {
+watch([messages, isTyping], () => {
   nextTick(() => {
     if (messagesContainer.value) {
       messagesContainer.value.scrollTop = messagesContainer.value.scrollHeight
@@ -364,10 +368,34 @@ const getNextEmoji = () => {
   return emoji
 }
 
-const addBotMessage = (text, isPositive = false, replies = [], isCelebration = false) => {
-  messages.value.push({ type: 'bot', text, isPositive, isCelebration })
-  quickReplies.value = replies
-  awaitingAnswer.value = true
+const addBotMessage = (text, isPositive = false, replies = [], isCelebration = false, onComplete = null) => {
+  // Show typing indicator
+  isTyping.value = true
+
+  // Random delay between 800ms and 2000ms to simulate typing
+  const typingDelay = Math.floor(Math.random() * 1200) + 800
+
+  setTimeout(() => {
+    isTyping.value = false
+    messages.value.push({ type: 'bot', text, isPositive, isCelebration })
+
+    // Show quick replies after message appears
+    if (replies.length > 0) {
+      setTimeout(() => {
+        quickReplies.value = replies
+      }, 300)
+    } else {
+      quickReplies.value = replies
+    }
+    awaitingAnswer.value = true
+
+    // Call the completion callback if provided
+    if (onComplete) {
+      setTimeout(() => {
+        onComplete()
+      }, 300)
+    }
+  }, typingDelay)
 }
 
 const addUserMessage = (text) => {
@@ -602,9 +630,17 @@ const processResponse = async (response) => {
                 // Model not found, ask for model
                 const models = await getModels(year, matchedMake)
                 availableModels.value = models
-                searchSuggestions.value = models.slice(0, 6)
                 setTimeout(() => {
-                  addBotMessage(`Got your ${year} ${matchedMake}! I couldn't find "${model}" though. What model is it?`)
+                  addBotMessage(
+                    `Got your ${year} ${matchedMake}! I couldn't find "${model}" though. What model is it?`,
+                    false,
+                    [],
+                    false,
+                    () => {
+                      // Set search suggestions after message appears
+                      searchSuggestions.value = models.slice(0, 6)
+                    }
+                  )
                   currentQuestion.value = { type: 'vehicle_model', vehicleIndex: idx }
                 }, 400)
                 return
@@ -613,9 +649,17 @@ const processResponse = async (response) => {
               // No model provided, ask for it
               const models = await getModels(year, matchedMake)
               availableModels.value = models
-              searchSuggestions.value = models.slice(0, 6)
               setTimeout(() => {
-                addBotMessage(`Got your ${year} ${matchedMake}! What model is it?`)
+                addBotMessage(
+                  `Got your ${year} ${matchedMake}! What model is it?`,
+                  false,
+                  [],
+                  false,
+                  () => {
+                    // Set search suggestions after message appears
+                    searchSuggestions.value = models.slice(0, 6)
+                  }
+                )
                 currentQuestion.value = { type: 'vehicle_model', vehicleIndex: idx }
               }, 400)
               return
@@ -623,10 +667,18 @@ const processResponse = async (response) => {
           } else {
             // Make not found, ask for make
             availableMakes.value = makes
-            searchSuggestions.value = makes.slice(0, 6)
             formData.vehicles[idx].year = year.toString()
             setTimeout(() => {
-              addBotMessage(`Got ${year}! I couldn't find "${make}" though. What make is your vehicle?`)
+              addBotMessage(
+                `Got ${year}! I couldn't find "${make}" though. What make is your vehicle?`,
+                false,
+                [],
+                false,
+                () => {
+                  // Set search suggestions after message appears
+                  searchSuggestions.value = makes.slice(0, 6)
+                }
+              )
               currentQuestion.value = { type: 'vehicle_make', vehicleIndex: idx }
             }, 400)
             return
@@ -659,16 +711,24 @@ const processResponse = async (response) => {
         formData.vehicles[idx].year = yearNum.toString()
       }
 
-      // Fetch makes from API
-      addBotMessage(`Looking up makes for ${formData.vehicles[idx].year}...`)
+      // Fetch makes from API (show typing indicator while loading)
+      isTyping.value = true
       const makes = await getMakes(formData.vehicles[idx].year)
       availableMakes.value = makes
 
-      // Initialize search suggestions with top makes
-      searchSuggestions.value = makes.slice(0, 6)
-
+      // Hide typing indicator and show the question
+      isTyping.value = false
       setTimeout(() => {
-        addBotMessage(`What's the make of your ${formData.vehicles[idx].year} vehicle? Type to search or select below:`)
+        addBotMessage(
+          `What's the make of your ${formData.vehicles[idx].year} vehicle? Type to search or select below:`,
+          false,
+          [],
+          false,
+          () => {
+            // Set search suggestions after message appears
+            searchSuggestions.value = makes.slice(0, 6)
+          }
+        )
         currentQuestion.value = { type: 'vehicle_make', vehicleIndex: idx }
       }, 300)
       return
@@ -697,16 +757,24 @@ const processResponse = async (response) => {
 
       formData.vehicles[idx].make = matchedMake
 
-      // Fetch models from API
-      addBotMessage(`Looking up models for ${formData.vehicles[idx].year} ${formData.vehicles[idx].make}...`)
+      // Fetch models from API (show typing indicator while loading)
+      isTyping.value = true
       const models = await getModels(formData.vehicles[idx].year, formData.vehicles[idx].make)
       availableModels.value = models
 
-      // Initialize search suggestions with top models
-      searchSuggestions.value = models.slice(0, 6)
-
+      // Hide typing indicator and show the question
+      isTyping.value = false
       setTimeout(() => {
-        addBotMessage(`And what model is your ${formData.vehicles[idx].year} ${formData.vehicles[idx].make}? Type to search or select below:`)
+        addBotMessage(
+          `And what model is your ${formData.vehicles[idx].year} ${formData.vehicles[idx].make}? Type to search or select below:`,
+          false,
+          [],
+          false,
+          () => {
+            // Set search suggestions after message appears
+            searchSuggestions.value = models.slice(0, 6)
+          }
+        )
         currentQuestion.value = { type: 'vehicle_model', vehicleIndex: idx }
       }, 300)
       return
@@ -1083,62 +1151,72 @@ const repeatCurrentQuestion = () => {
   const idx = currentQuestion.value?.vehicleIndex || currentQuestion.value?.driverIndex || 0
 
   switch(currentQuestion.value?.type) {
+    // Vehicle questions
     case 'vehicle_count':
       addBotMessage("How many vehicles would you like to insure?", false, ['1', '2', '3', '4+'])
       break
-    case 'vehicle_info':
-      addBotMessage(`What's vehicle #${idx + 1}? (You can type like "2020 Honda Pilot")`)
+    case 'vehicle_year':
+      const recentYears = vehicleYears.slice(0, 6).map(String)
+      addBotMessage(`What year is vehicle ${idx + 1}? You can also type the full vehicle like "2020 Honda Pilot".`, false, recentYears)
       break
-    case 'add_another_vehicle':
-      addBotMessage("Would you like to add another vehicle?", false, ['No, that\'s all', 'Yes, add another'])
+    case 'vehicle_make':
+      searchSuggestions.value = availableMakes.value.slice(0, 6)
+      addBotMessage(`What's the make of your ${formData.vehicles[idx]?.year || ''} vehicle?`)
       break
+    case 'vehicle_model':
+      searchSuggestions.value = availableModels.value.slice(0, 6)
+      addBotMessage(`What model is your ${formData.vehicles[idx]?.year || ''} ${formData.vehicles[idx]?.make || ''}?`)
+      break
+
+    // Driver questions
     case 'driver_count':
       addBotMessage("How many drivers will be on this policy?", false, ['1', '2', '3', '4+'])
       break
-    case 'driver_first_name':
+    case 'driver_firstName':
       if (idx === 0) {
-        addBotMessage(`Let's start with your first name!`)
+        addBotMessage(`What's the first name of driver 1?`)
       } else {
-        addBotMessage(`What's driver #${idx + 1}'s first name?`)
+        addBotMessage(`What's driver ${idx + 1}'s first name?`)
       }
+      break
+    case 'driver_lastName':
+      addBotMessage(`And ${formData.drivers[idx]?.firstName || 'their'}'s last name?`)
       break
     case 'driver_dob':
-      if (idx === 0) {
-        addBotMessage(`What's your date of birth? (MM/DD/YYYY)`)
-      } else {
-        addBotMessage(`What's their date of birth? (MM/DD/YYYY)`)
-      }
+      addBotMessage(`What's ${formData.drivers[idx]?.firstName || 'their'}'s date of birth? (MM/DD/YYYY)`)
       break
     case 'driver_gender':
-      addBotMessage(`What's your gender?`, false, ['Male', 'Female', 'Non-binary'])
+      addBotMessage(`What's ${formData.drivers[idx]?.firstName || 'their'}'s gender?`, false, ['Male', 'Female'])
+      break
+    case 'driver_married':
+      addBotMessage(`Is ${formData.drivers[idx]?.firstName || 'the driver'} married?`, false, ['Yes', 'No'])
+      break
+    case 'driver_military':
+      addBotMessage(`Does anyone in your family have any military affiliation?`, false, ['Yes', 'No'])
       break
     case 'driver_employed':
-      addBotMessage(`Are you currently employed?`, false, ['Yes', 'No'])
+      addBotMessage(`Is ${formData.drivers[idx]?.firstName || 'the driver'} currently employed?`, false, ['Yes', 'No'])
       break
-    case 'driver_marital':
-      addBotMessage(`What's your marital status?`, false, ['Single', 'Married', 'Divorced', 'Widowed'])
+
+    // Insurance questions
+    case 'has_insurance':
+      addBotMessage("Do you currently have auto insurance?", false, ['Yes', 'No'])
       break
     case 'current_company':
-      addBotMessage("Select below OR type in your provider:", false, ['AAA', 'Allstate', 'American Family', 'Geico', 'Progressive', 'State Farm', 'The General'])
+      addBotMessage("Who's your current insurance provider?", false, ['GEICO', 'State Farm', 'Progressive', 'Allstate', 'Other'])
       break
     case 'coverage_length':
-      addBotMessage("How long have you been continuously covered with insurance?", false, ['Less than 1 year', '1-2 years', '3-5 years', '5+ years'])
+      addBotMessage("How long have you been with them?", false, ['Less than 1 year', '1-2 years', '3-5 years', '5+ years'])
       break
-    case 'commute_miles':
-      addBotMessage("How many miles is your daily commute? (one way)", false, ['<5', '5-10', '10+', 'Not sure'])
+
+    // Contact questions
+    case 'email':
+      addBotMessage("What's your email address?")
       break
-    case 'military':
-      addBotMessage("Do you have a military affiliation?", false, ['Active', 'Veteran', 'Family', 'None'])
+    case 'phone':
+      addBotMessage("And what's the best phone number to reach you?")
       break
-    case 'homeowner':
-      addBotMessage("Are you a homeowner?", false, ['Yes', 'No'])
-      break
-    case 'accidents':
-      addBotMessage("Have you had any accidents in the last 3 years?", false, ['Yes', 'No'])
-      break
-    case 'duis':
-      addBotMessage("Have you had any DUIs in the last 5 years?", false, ['Yes', 'No'])
-      break
+
     default:
       addBotMessage("Let's continue with the next question.")
   }
@@ -1304,11 +1382,11 @@ const submitToApi = async () => {
 .steps-container {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
 }
 
 .step-wrapper {
-  flex: 1;
+  flex: 0;
   display: flex;
   align-items: center;
 }

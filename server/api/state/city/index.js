@@ -84,7 +84,7 @@ export default defineEventHandler(async (event) => {
         ...item,
         stateName: matchedState?.name || "",
       }));
-    console.log("Filtered City Data:", filteredData);
+
     return {
       success: true,
       data: filteredData,

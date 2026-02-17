@@ -17,7 +17,7 @@
             <span>Bundle {{ content.type }} Insurance.</span>
             <span> Save <span class="hero-highlight">Big</span>.</span>
           </h1>
-          <p class="hero-subtitle">
+          <p class="lead">
             {{ content.subheader }}
           </p>
         </div>
@@ -41,8 +41,8 @@
     <section id="savings" class="savings-section">
       <div class="section-header">
         <div class="section-label">The Bundle Advantage</div>
-        <h2 class="section-title">{{ upperCaseDescriptor }} Save More When They Bundle</h2>
-        <p class="section-description">
+        <h2>{{ upperCaseDescriptor }} Save More When They Bundle</h2>
+        <p class="lead">
           Combining your {{ content.type }} isn't just convenient—it's one of the smartest ways to reduce your insurance costs significantly.
         </p>
       </div>
@@ -80,8 +80,8 @@
     <section id="ways" class="ways-to-save">
       <div class="section-header">
         <div class="section-label">Maximize Your Savings</div>
-        <h2 class="section-title">Other Ways to Save on Insurance</h2>
-        <p class="section-description">Beyond bundling, discover additional opportunities to reduce your insurance premiums.</p>
+        <h2>Other Ways to Save on Insurance</h2>
+        <p class="lead">Beyond bundling, discover additional opportunities to reduce your insurance premiums.</p>
       </div>
 
       <b-container>
@@ -129,9 +129,9 @@
       <b-container>
         <div class="section-header">
           <div class="section-label">Common Questions</div>
-          <h2 class="section-title">Why Bundle Your Insurance?</h2>
+          <h2>Why Bundle Your Insurance?</h2>
         </div>
-        <FaqAccordion :faqs="faqData" />
+        <FaqMain :faq="faqData" />
       </b-container>
     </section>
 
@@ -274,16 +274,6 @@
       }
     }
   }
-  h3 {
-    @include media-breakpoint-down(sm) {
-      font-size: 1.5rem;
-    }
-  }
-  p {
-    @include media-breakpoint-down(sm) {
-      font-size: 1rem;
-    }
-  }
   /* Hero Section */
   .hero {
     min-height: 60vh;
@@ -372,20 +362,7 @@
   }
 
   h1 {
-    font-family: "Cantata One", serif;
-    font-weight: 400;
-    line-height: 1.1;
-    margin-bottom: 1.5rem;
     color: $blue;
-    // animation: slideInLeft 1s ease-out 0.3s backwards;
-  }
-
-  .hero-subtitle {
-    font-size: 1.3rem;
-    color: $bundle-gray;
-    margin-bottom: 3rem;
-    line-height: 1.6;
-    // animation: slideInLeft 1s ease-out 0.4s backwards;
   }
 
   /* Form Card */
@@ -461,7 +438,7 @@
     position: relative;
     overflow: hidden;
 
-    .section-description {
+    .lead {
       color: white;
     }
   }
@@ -492,7 +469,7 @@
   }
 
   .savings-section {
-    .section-title {
+    h2 {
       color: white;
     }
     .section-label {
@@ -500,17 +477,8 @@
     }
   }
 
-  .section-title {
-    font-family: "Cantata One", serif;
-    font-weight: 400;
-    margin-bottom: 1.5rem;
-    line-height: 1.2;
+  h2 {
     color: $blue;
-  }
-
-  .section-description {
-    font-size: 1.2rem;
-    line-height: 1.7;
   }
 
   .savings-grid {
@@ -555,16 +523,12 @@
       }
     }
     h3 {
-      margin-bottom: 1rem;
       color: white;
-      font-family: inherit;
-      font-weight: bold !important;
     }
   }
 
   .savings-card p {
     color: rgba(255, 255, 255, 0.7);
-    line-height: 1.6;
   }
 
   /* Ways to Save Section */
@@ -650,18 +614,11 @@
   }
 
   .cta-content h2 {
-    font-family: "Cantata One", serif;
-    font-weight: 400;
     color: white;
-    margin-bottom: 2rem;
-    line-height: 1.2;
   }
 
   .cta-content p {
-    font-size: 1.3rem;
     color: rgba(255, 255, 255, 0.8);
-    margin-bottom: 3rem;
-    line-height: 1.7;
   }
 
   .cta-btn {

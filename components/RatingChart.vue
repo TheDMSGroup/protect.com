@@ -59,13 +59,14 @@
           </b-col>
           <b-col cols="12" lg="4">
             <ButtonsMain
+              :disabled="false"
               :config="{
                 type: 'submit',
                 size: 'lg',
                 variant: 'primary',
                 label: 'COMPARE RATES',
                 icon:'arrow-right-short',
-                click: goToAction,
+                click: goToAction
             }" />
           </b-col>
         </b-row>
@@ -368,13 +369,10 @@ margin-top: 50px;
         line-height: 1.3;
         color: #0c2c67;
         text-align: left;
-        font-size: 1.8rem;
-        font-weight: 600;
 
         @include media-breakpoint-down(md) {
           text-align: center;
           margin-bottom: 25px;
-          font-size: 1.5rem;
         }
       }
       .btn {
