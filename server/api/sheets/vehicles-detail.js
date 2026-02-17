@@ -21,7 +21,8 @@ export default defineEventHandler(async (event) => {
   const query = getQuery(event);
 
   const spreadsheetId = config.vehiclesSpreadsheetId;
-  const range = config.public.vehiclesModelsRange || 'Models!A:Z';
+  // Allow ?stage=true to override and use stage sheet
+  const range = query.stage === 'true' ? 'Stage-Models!A:Z' : 'Models!A:Z';
 
   if (!spreadsheetId) {
     throw createError({

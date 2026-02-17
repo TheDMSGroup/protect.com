@@ -6,6 +6,7 @@ import { extractFaqsFromData } from "@/composables/useFaq.js";
 const route = useRoute();
 const make = route.params.make;
 const model = route.params.model;
+const useStageData = route.query.stage === 'true';
 
 if (!isValidMake(make) || !isValidModel(make, model)) {
   throw createError({
@@ -19,12 +20,12 @@ const formattedMake = computed(() => getMakeName(make));
 // Fetch model data and all models for this make in parallel
 const [{ data: modelData }, { data: allModelsData }] = await Promise.all([
   useFetch(`/api/sheets/vehicles-detail`, {
-    query: { make, model },
-    key: `model-${make}-${model}`,
+    query: { make, model, stage: useStageData || undefined },
+    key: `model-${make}-${model}${useStageData ? '-stage' : ''}`,
   }),
   useFetch(`/api/sheets/vehicles-detail`, {
-    query: { make },
-    key: `all-models-${make}`,
+    query: { make, stage: useStageData || undefined },
+    key: `all-models-${make}${useStageData ? '-stage' : ''}`,
   }),
 ]);
 
