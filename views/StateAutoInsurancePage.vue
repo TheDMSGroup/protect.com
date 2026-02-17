@@ -76,6 +76,7 @@
           <h2>Explore Car Insurance Rates Across the US</h2>
           <StateAutoInsuranceUSMap
             :show-links-on-desktop="true"
+            :hide-legend="true"
             :hide-labels="true"
           />
         </b-container>

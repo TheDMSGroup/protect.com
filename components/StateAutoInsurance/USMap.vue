@@ -1,182 +1,3 @@
-<script setup>
-  import { useStore } from "@/stores/store.js";
-
-  const props = defineProps({
-    hideLabels: {
-      type: Boolean,
-      default: false,
-    },
-    showLinksOnDesktop: {
-      type: Boolean,
-      default: false,
-    },
-  });
-
-  const store = useStore();
-  const stateValueMapping = store.getStateValueMap();
-  const mapContainerRef = useTemplateRef("usMap");
-  const smallStates = ref([]);
-  const states = ref([]);
-  const excludedStates = [
-    stateValueMapping.find((state) => state.abbreviation === "AK"),
-    stateValueMapping.find((state) => state.abbreviation === "HI"),
-  ]
-    .filter(Boolean)
-    .map((state) => ({ ...state, id: state.abbreviation }));
-
-  const mobileStatesLinkList = computed(() =>
-    [...states.value]
-      .sort((a, b) => (a.name > b.name ? 1 : -1))
-      .map((state) => {
-        return {
-          name: state.name,
-          url: createStateMapUrl(state.slug),
-        };
-      })
-  );
-
-  const mapConfig = {
-    fontSize: {
-      value: 80,
-      type: "%",
-    },
-  };
-  const legendConfig = {
-    fontSize: {
-      value: 70,
-      type: "%",
-    },
-  };
-
-  const useStateEventListeners = () => {
-    if (!mapContainerRef.value) return;
-    mapContainerRef.value.querySelectorAll("a").forEach((stateLink) => {
-      stateLink.addEventListener("click", (e) => {
-        e.preventDefault();
-        navigateTo(e.target.closest("a").getAttribute("href"));
-      });
-    });
-  };
-
-  const initStates = () => {
-    if (!mapContainerRef.value) {
-      return;
-    }
-    if (!mapContainerRef.value) {
-      return;
-    }
-
-    const stateCodes = stateValueMapping.map((state) => state.abbreviation);
-    // Use querySelector to find SVG within container
-    const allPaths = [...mapContainerRef.value.querySelectorAll(".st0")];
-
-    states.value = allPaths
-      .filter((p) => stateCodes.includes(p.id.split("_")[0]))
-      .map((statePath) => ({
-        id: statePath.id.split("_")[0],
-        path: statePath,
-      }));
-    const detailMap = new Map(
-      stateValueMapping.map((detail) => [detail.abbreviation, detail])
-    );
-    const mergedStates = states.value.map((idItem) => ({
-      ...idItem,
-      ...detailMap.get(idItem.id),
-    }));
-    states.value = mergedStates;
-    states.value = states.value.concat(excludedStates);
-  };
-  const useStateMapLabels = () => {
-    if (!mapContainerRef.value) {
-      return;
-    }
-
-    states.value.forEach((state) => {
-      // Better approach - use SVG namespace
-      const a = document.createElementNS("http://www.w3.org/2000/svg", "a");
-      a.setAttributeNS(
-        "http://www.w3.org/1999/xlink",
-        "href",
-        `/car-insurance/${state.slug}`
-      );
-      a.setAttribute("aria-label", state.name);
-      const groupParent = state.path.parentNode;
-      Array.from(groupParent.children).forEach((child) => a.appendChild(child));
-      groupParent.prepend(a);
-      const currentStatePath = state.path;
-      const svgNS = "http://www.w3.org/2000/svg";
-      const text = document.createElementNS(svgNS, "text");
-      text.textContent = state.id;
-      const bbox = state.path.getBBox();
-      // if the path is big enough for state abbreviation, append it
-      if (bbox.width > 50 && bbox.height > 50) {
-        currentStatePath.parentNode.appendChild(text);
-        text.setAttribute("fill", "white");
-        text.style.fontWeight = "bold";
-        text.style.fontSize = `${mapConfig.fontSize.value}${mapConfig.fontSize.type}`;
-        text.style.pointerEvents = "none";
-        // place state abbreviations in center of state
-        const textBbox = text.getBBox();
-        let x = bbox.x + (bbox.width - textBbox.width) / 2;
-        let y = bbox.y + bbox.height / 2 + textBbox.height / 2;
-        // some problem states need extra help
-        switch (state.id) {
-          case "CA":
-            x -= 20;
-            break;
-          case "WV":
-          case "ME":
-            x -= 10;
-            break;
-          case "LA":
-          case "MN":
-            x -= 20;
-            break;
-          case "FL":
-            x += 50;
-            break;
-          case "MI":
-            x += 30;
-            y += 30;
-            break;
-          case "ID":
-            y += 35;
-            break;
-          default:
-            break;
-        }
-        text.setAttribute("x", x);
-        text.setAttribute("y", y);
-      } else {
-        if (!props.showLinksOnDesktop) {
-          smallStates.value = smallStates.value.concat(state);
-        }
-      }
-    });
-  };
-
-  if (!props.showLinksOnDesktop) {
-    smallStates.value = smallStates.value
-      .concat(excludedStates)
-      .sort((a, b) => (a.id > b.id ? 1 : -1));
-  }
-
-  const createStateMapUrl = (stateSlug) => {
-    return `/car-insurance/${stateSlug}`;
-  };
-
-  onMounted(() => {
-    // Use nextTick to ensure SVGUSMap component has rendered
-    nextTick(() => {
-      initStates();
-      if (!props.hideLabels) {
-        useStateMapLabels();
-      }
-      useStateEventListeners();
-    });
-  });
-</script>
-
 <template>
   <!-- eslint-disable -->
   <b-container ref="mapContainer" class="map-container">
@@ -1276,6 +1097,22 @@
             L801,251.2z"
             />
           </g>
+          <g>
+            <path
+              id="AK_00000172426885023586768120000013458411092644948361_"
+              xmlns="http://www.w3.org/2000/svg"
+              class="st0"
+              d="m 15.8,572 h 2.4 l .7,.7 -1,1.2 -1.9,.2 -2.5,1.3 -3.7,-.1 2.2,-.9 .3,-1.1 2.5,-.3 z m 8.3,-1.7 1.3,.5 h .9 l .5,1.2 .3,-.6 .9,.2 1.1,1.5 0,.5 -4.2,1.9 -2.4,-.1 -1,-.5 -1.1,.7 -2,0 -1.1,-1.4 4.7,-.5 z m 5.4,-.1 1,.1 .7,.7 v 1 l -1.3,.1 -.9,-1.1 z m 2.5,.3 1.3,-.1 -.1,1 -1.1,.6 z m .3,2.2 3.4,-.1 .2,1.1 -1.3,.1 -.3,-.5 -.8,.6 -.4,-.6 -.9,-.2 z m 166.3,7.6 2.1,.1 -1,1.9 -1.1,-.1 -.4,-.8 .5,-1.3 m -1.1,-2.9 .6,-1.3 -.2,-2.3 2.4,-.5 4.5,4.4 1.3,3.4 1.9,1.6 .3,5.1 -1.4,0 -1.3,-2.3 -3.1,-2.4 h -.6 l 1.1,2.8 1.7,.2 .2,2.1 -.9,.1 -4.1,-4.4 -.1,-.9 1.9,-1 0,-1 -.5,-.8 -1.6,-.6 -1.7,-1.3 1.4,.1 .5,-.4 -.6,-.9 -.6,.5 z m -3.6,-9.1 1.3,.1 2.4,2.5 -.2,.8 -.8,-.1 -.1,1.8 .5,.5 0,1.5 -.8,.3 -.4,1.2 -.8,-.4 -.4,-2.2 1.1,-1.4 -2.1,-2.2 .1,-1.2 z m 1.5,-1.5 1.9,.2 2.5,.1 3.4,3.2 -.2,.5 -1.1,.6 -1.1,-.2 -.1,-.7 -1.2,-1.6 -.3,.7 1,1.3 -.2,1.2 -.8,-.1 -1.3,.2 -.1,-1.7 -2.6,-2.8 z m -12.7,-8.9 .9,-.4 h 1.6 l .7,-.5 4.1,2.2 .1,1.5 -.5,.5 h -.8 l -1.4,-.7 1.1,1.3 1.8,0 .5,2 -.9,0 -2.2,-1.5 -1.1,-.2 .6,1.3 .1,.9 .8,-.6 1.7,1.2 1.3,-.1 -.2,.8 1.9,4.3 0,3.4 .4,2.1 -.8,.3 -1.2,-2 -.5,-1.5 -1.6,-1.6 -.2,-2.7 -.6,-1.7 h -.7 l .3,1.1 0,.5 -1.4,1 .1,-3.3 -1.6,-1.6 -1.3,-2.3 -1.2,-1.2 z m 7.2,-2.3 1.1,1.8 2.4,-.1 1,2.1 -.6,.6 2,3.2 v 1.3 l -1.2,.8 v .7 l -2,1.9 -.5,-1.4 -.1,-1.3 .6,-.7 v -1.1 l -1.5,-1.9 -.5,-3.7 -.9,-1.5 z m -56.7,-18.3 -4,4.1 v 1.6 l 2.1,-.8 .8,-1.9 2.2,-2.4 z m -31.6,16.6 0,.6 1.8,1.2 .2,-1.4 .6,.9 3.5,.1 .7,-.6 .2,-1.8 -.5,-.7 -1.4,0 0,-.8 .4,-.6 v -.4 l -1.5,-.3 -3.3,3.6 z m -8.1,6.2 1.5,5.8 h 2.1 l 2.4,-2.5 .3,1.2 6.3,-4 .7,-1 -1,-1.1 v -.7 l .5,-1.3 -.9,-.1 -2,1 0,-1.2 -2.7,-.6 -2.4,.3 -.2,3.4 -.8,-2 -1.5,-.1 -1,.6 z m -2.2,8.2 .1,-.7 2.1,-1.3 .6,.3 1.3,.2 1.3,1.2 -2.2,-.2 -.4,-.6 -1,.6 z m -5.2,3.3 -1.1,.8 1.5,1.4 .8,-.7 -.1,-1.3 z m -6.3,-7.9 1.4,.1 .4,.6 -1.8,.1 z m -13.9,11.9 v .5 l .7,.1 -.1,-.6 z m -.4,-3.2 -1,1 v .5 l .7,1.1 1,-1 -.7,-.1 z m -2,-.8 -.3,1 -1.3,.1 -.4,.2 0,1.3 -.5,.9 .6,0 .7,-.9 .8,-.1 .9,-1 .2,-1.3 z m -4.4,-2 -.2,1.8 1.4,.8 1.2,-.6 0,-1 1.7,-.3 -.1,-.6 -.9,-.2 -.7,.6 -.9,-.5 z m -4.9,-.1 1,.7 -.3,1.2 -1.4,-1.1 z m -4.2,1.3 1.4,.1 -.7,.8 z m -3.5,3 1.8,1.1 -1.7,.1 z m -25.4,-31.2 1.2,.6 -.8,.6 z m -.7,-6.3 .4,1.2 .8,-1.2 z m 24.3,-19.3 1.5,-.1 .9,.4 1.1,-.5 1.3,-.1 1.6,.8 .8,1.9 -.1,.9 -1.2,2 -2.4,-.2 -2.1,-1.8 -1,-.4 -1.1,-2 z m -21.1,-14.4 .1,1.9 2,2 v .5 l -.8,-.2 -1.7,-.8 -.3,-1.1 -.3,-1.6 z m 18.3,-23.3 v 1.2 l 1.9,1.8 h 2.3 l .6,1.1 v 1.6 l 2.1,1.9 1.8,1.2 -.1,.7 -.7,1.1 -1.4,-1.2 -2.1,.1 -.8,-.8 -.9,-2.1 -1.5,-2.2 -2.6,-.1 -1,-.7 1,-2.1 z m 16.8,-4.5 1,0 .1,1.1 h -1 z m 16.2,19.7 .9,.1 0,1.2 -1.7,-.5 z m 127.8,77.7 -1.2,.4 -.1,1.1 h 1.2 z m -157.6,-4.5 -1.3,-.4 -4.1,.6 -2.8,1.4 -.1,1.9 1.9,.7 1.5,-.9 1.7,-.1 4.7,1.4 .1,-1.3 -1.6,-1.1 z m 2.1,2.3 -.4,-1.4 1.2,.2 .1,1.4 1.8,0 .4,-2.5 .3,2.4 2.5,-.1 3.2,-3.3 .8,.1 -.7,1.3 1.4,.9 4.2,-.2 2.6,-1.2 1.4,-.1 .3,1.5 .6,-.5 .4,-1.4 5.9,.2 1.9,-1.6 -1.3,-1.1 .6,-1.2 2.6,.2 -.2,-1.2 2.5,.2 .7,-1.1 1.1,.2 4.6,-1.9 .2,-1.7 5.6,-2.4 2,-1.9 1.2,-.6 1.3,.8 2.3,-.9 1.1,-1.9 .5,-1.3 1.7,-.9 1.5,-.7 .4,-1.4 -1.1,-1.7 -2.2,-.2 -.2,-1.3 .8,-1.6 1.4,-.2 1.3,-1.5 1.9,-.1 3.4,-3.2 .4,-1.4 1.5,-2.3 3.8,-4.1 2.5,-.9 1.9,-.9 2.1,.8 1.4,2.6 -1.5,0 -1.4,-1.5 -3,2 -1.7,.1 -.2,3.1 -3.1,4.9 .6,2 2.3,0 -.6,1 -1.4,.1 -2.4,1.8 0,.9 1.9,1 3.4,-.6 1.4,-1.7 1.4,.1 3,-1.7 .5,-2.3 1.6,-.1 6.3,.8 1,-1.1 1,-4.5 -1.6,1.1 .6,-2.2 -1.6,-1.4 .8,-1.5 .1,1.5 3.4,0 .7,-1 1.6,-.1 -.3,1.7 1.9,.1 -1.9,1.3 4.1,1.1 -3.5,.4 -1.3,1.2 .9,1.4 4.6,-1.7 2.3,1.7 .7,-.9 .6,1.4 4,2.3 h 2.9 l 3.9,-.5 4.3,1.1 2,1.9 4.5,.4 1.8,-1.5 .8,2.4 -1.8,.7 1.2,1.2 7.4,3.8 1.4,2.5 5.4,4.1 3.3,-2 -.6,-2.2 -3.5,-2 3.1,1.2 .5,-.7 .9,1.3 0,2.7 2.1,-.6 2.1,1.8 -2.5,-9.8 1.2,1.3 1.4,6 2.2,2.5 2.4,-.4 1.8,3.5 h .9 l .6,5.6 3.4,.5 1.6,2.2 1.8,1.1 .4,2.8 -1.8,2.6 2.9,1.6 1.2,-2.4 -.2,3.1 -.8,.9 1.4,1.7 .7,-2.4 -.2,-1.2 .8,.2 .6,2.3 -1,1.4 .6,2.6 .5,.4 .3,-1.6 .7,.6 -.3,2 1.2,.2 -.4,.9 1.7,-.1 0,-1 h -1 l .1,-1.7 -.8,-.6 1.7,-.3 .5,-.8 0,-1.6 .5,1.3 -.6,1.8 1.2,3.9 1.8,.1 2.2,-4.2 .1,-1.9 -1.3,-4 -.1,-1.2 .5,-1.2 -.7,-.7 -1.7,.1 -2.5,-2 -1.7,0 -2,-1.4 -1.5,0 -.5,-1.6 -1.4,-.3 -.2,-1.5 -1,-.5 .1,-1.7 -5.1,-7.4 -1.8,-1.5 v -1.2 l -4.3,-3.5 -.7,-1.1 -1.6,-2 -1.9,-.6 0,-2.2 -1.2,-1.3 -1.7,-.7 -2.1,1.3 -1.6,2.1 -.4,2.4 -1.5,.1 -2.5,2.7 -.8,-.3 v -2.5 l -2.4,-2.2 -2.3,-2 -.5,-2 -2.5,-1.3 .2,-2.2 -2.8,-.1 -.7,1.1 -1.2,0 -.7,-.7 -1.2,.8 -1.8,-1.2 0,-85.8 -6.9,-4.1 -1.8,-.5 -2.2,1.1 -2.2,.1 -2.3,-1.6 -4.3,-.6 -5.8,-3.6 -5.7,-.4 -2,.5 -.2,-1.8 -1.8,-.7 1.1,-1 -.2,-.9 -3.2,-1.1 h -2.4 l -.4,.4 -.9,-.6 .1,-2.6 -.8,-.9 -2.5,2.9 -.8,-.1 v -.8 l 1.7,-.8 v -.8 l -1.9,-2.4 -1.1,-.1 -4.5,3.1 h -3.9 l .4,-.9 -1.8,-.1 -5.2,3.4 -1.8,0 -.6,-.8 -2.7,1.5 -3.6,3.7 -2.8,2.7 -1.5,1.2  -2.6,.1 -2.2,-.4 -2.3,-1.3 v 0 l -2.8,3.9 -.1,2.4 2.6,2.4 2.1,4.5 .2,5.3 2.9,2 3.4,.4 .7,.8 -1.5,2.3 .7,2.7 -1.7,-2.6 v -2.4 l -1.5,-.3 .1,1.2 .7,2.1 2.9,3.7 h -1.4 l -2.2,1.1 -6.2,-2.5 -.1,-2 1.4,-1.3 0,-1.4 -2.1,-.5 -2.3,.2 -4.8,.2 1.5,2.3 -1.9,-1.8 -8.4,1.2 -.8,1.5 4.9,4.7 -.8,1.4 -.3,2 -.7,.8 -.1,1.9 4.4,3.6 4.1,.2 4.6,1.9 h 2 l .8,-.6 3.8,.1 .1,-.8 1.2,1.1 .1,2 -2.5,-.1 .1,3.3 .5,3.2 -2.9,2.7 -1.9,-.1 -2,-.8 -1,.1 -3.1,2.1 -1.7,.2 -1.4,-2.8 -3.1,0 -2.2,2 -.5,1.8 -3.3,1.8 -5.3,4.3 -.3,3.1 .7,2.2 1,1.2 1,-.4 .9,1 -.8,.6 -1.5,.9 1.1,1.5 -2.6,1.1 .8,2.2 1.7,2.3 .8,4.1 4,1.5 2.6,-.8 1.7,-1.1 .5,2.1 .3,4.4 -1.9,1.4 0,4.4 -.6,.9 h -1.7 l 1.7,1.2 2.1,-.1 .4,-1 4.6,-.6 2,2.6 1.3,-.7 1.3,5.1 1,.5 1,-.7 .1,-2.4 .9,-1 .7,1.1 .2,1.6 1.6,.4 4.7,-1.2 .2,1.2 -2,1.1 -1.6,1.7 -2.8,7 -4.3,2 -1.4,1.5 -.3,1.4 -1,-.6 -9.3,3.3 -1.8,4.1 -1.3,-.4 .5,-1.1 -1.5,-1.4 -3.5,-.2 -5.3,3.2 -2.2,1.3 -2.3,0 -.5,2.4 z"
+            ></path>
+          </g>
+          <g>
+            <path
+              id="HI_00000172426885023586768120000013458411092644948361_"
+              xmlns="http://www.w3.org/2000/svg"
+              class="st0"
+              d="m 317,553.7 -.2,3.2 1.7,1.9 .1,1.2 -4.8,4.5 -.1,1.2 1.9,3.2 1.7,4.2 v 2.6 l -.5,1.2 .1,3.4 4.1,2.1 1.1,1.1 1.2,-1.1 2.1,-3.6 4.5,-2.9 3.3,-.5 2.5,-1 1.7,-1.2 3.2,-3.5 -2.8,-1.1 -1.4,-1.4 .1,-1.7 -.5,-.6 h -2 l .2,-2.5 -.7,-1.2 -2.6,-2.3 -4.5,-1.9 -2.8,-.2 -3.3,-2.7 -1.2,-.6 z m -15.3,-17 -1.1,1.5 -.1,1.7 2.7,2.4 1.9,.5 .6,1 .4,3 3.6,.2 5.3,-2.6 -.1,-2.5 -1.4,-.5 -3.5,-2.6 -1.8,-.3 -2.9,1.3 -1.5,-2.7 z m -1.5,11.5 .9,-1.4 2.5,-.3 .6,1.8 z m -7,-8.7 1.7,4 3.1,-.6 .3,-2 -1.4,-1.5 z m -4.1,-6.7 -1.1,2.4 h 5 l 4.8,1.6 2.5,-1.6 .2,-1.5 -4.8,.2 z m -16,-10.6 -1.9,2.1 -2.9,.6 .8,2.2 2.2,2.8 .1,1 2.1,-.3 2.3,.1 1.7,1.2 3.5,-.8 v -.7 l -1,-.8 -.5,-2.1 -.8,-.3 -.5,1 -1.2,-1.3 .2,-1.4 -1.8,-3.3 -1.1,-.7 z m -31.8,-12.4 -4.2,2.9 .2,2.3 2.4,1.2 1.9,1.3 2.7,.4 2.6,-2.2 -.2,-1.9 .8,-1.7 v -1.4 l -1,-.9 z m -10.8,4.8 -.3,1.2 -1.9,.9 -.6,1.8 1,.8 1.1,-1.5 1.9,-.6 .4,-2.6 z"
+            ></path>
+          </g>
         </svg>
       </b-col>
       <b-col
@@ -1301,7 +1138,7 @@
         </ul>
       </b-col>
     </b-row>
-    <b-row>
+    <b-row :class="showLinksOnDesktop ? 'd-block' : 'd-md-none'">
       <StateLinksList
         :state-links="mobileStatesLinkList"
         v-if="mobileStatesLinkList && mobileStatesLinkList.length"
@@ -1309,6 +1146,197 @@
     </b-row>
   </b-container>
 </template>
+
+<script setup>
+  import { useStore } from "@/stores/store.js";
+
+  const props = defineProps({
+    hideLabels: {
+      type: Boolean,
+      default: false,
+    },
+    showLinksOnDesktop: {
+      type: Boolean,
+      default: false,
+    },
+    hideLegend: {
+      type: Boolean,
+      default: false,
+    },
+  });
+
+  const store = useStore();
+  const stateValueMapping = store.getStateValueMap();
+  const mapContainerRef = useTemplateRef("usMap");
+  const smallStates = ref([]);
+  const states = ref([]);
+  const excludedStates = [
+    stateValueMapping.find((state) => state.abbreviation === "HI"),
+  ]
+    .filter(Boolean)
+    .map((state) => ({ ...state, id: state.abbreviation }));
+
+  const mobileStatesLinkList = computed(() =>
+    [...states.value]
+      .sort((a, b) => (a.name > b.name ? 1 : -1))
+      .map((state) => {
+        return {
+          name: state.name,
+          url: createStateMapUrl(state.slug),
+        };
+      })
+  );
+
+  const mapConfig = {
+    fontSize: {
+      value: 80,
+      type: "%",
+    },
+  };
+  const legendConfig = {
+    fontSize: {
+      value: 70,
+      type: "%",
+    },
+  };
+
+  const useStateEventListeners = () => {
+    console.log("Adding event listeners to state links");
+    console.log("Map container ref:", mapContainerRef.value);
+    if (!mapContainerRef.value) return;
+    mapContainerRef.value.querySelectorAll("a").forEach((stateLink) => {
+      console.log("Adding click listener to:", stateLink);
+      stateLink.addEventListener("click", (e) => {
+        e.preventDefault();
+        navigateTo(e.target.closest("a").getAttribute("href"));
+      });
+    });
+  };
+
+  const initStates = () => {
+    if (!mapContainerRef.value) {
+      return;
+    }
+    if (!mapContainerRef.value) {
+      return;
+    }
+
+    const stateCodes = stateValueMapping.map((state) => state.abbreviation);
+    // Use querySelector to find SVG within container
+    const allPaths = [...mapContainerRef.value.querySelectorAll(".st0")];
+
+    states.value = allPaths
+      .filter((p) => stateCodes.includes(p.id.split("_")[0]))
+      .map((statePath) => ({
+        id: statePath.id.split("_")[0],
+        path: statePath,
+      }));
+    const detailMap = new Map(
+      stateValueMapping.map((detail) => [detail.abbreviation, detail])
+    );
+    const mergedStates = states.value.map((idItem) => ({
+      ...idItem,
+      ...detailMap.get(idItem.id),
+    }));
+    states.value = mergedStates;
+    states.value = states.value.concat(excludedStates);
+
+    if (!mapContainerRef.value) {
+      return;
+    }
+
+    states.value.forEach((state) => {
+      // Better approach - use SVG namespace
+      const a = document.createElementNS("http://www.w3.org/2000/svg", "a");
+      a.setAttributeNS(
+        "http://www.w3.org/1999/xlink",
+        "href",
+        `/car-insurance/${state.slug}`
+      );
+      a.setAttribute("aria-label", state.name);
+      const groupParent = state.path.parentNode;
+      Array.from(groupParent.children).forEach((child) => a.appendChild(child));
+      groupParent.prepend(a);
+      const currentStatePath = state.path;
+      const svgNS = "http://www.w3.org/2000/svg";
+      const text = document.createElementNS(svgNS, "text");
+      text.textContent = state.id;
+      const bbox = state.path.getBBox();
+      // if the path is big enough for state abbreviation, append it
+      if (bbox.width > 50 && bbox.height > 50 && !props.hideLabels) {
+        useMapLabel(currentStatePath, text, bbox, state);
+      } else {
+        if (!props.hideLegend) {
+          smallStates.value = smallStates.value.concat(state);
+        }
+      }
+    });
+  };
+
+  const useMapLabel = (currentStatePath, text, bbox, state) => {
+    currentStatePath.parentNode.appendChild(text);
+    text.setAttribute("fill", "white");
+    text.style.fontWeight = "bold";
+    text.style.fontSize = `${mapConfig.fontSize.value}${mapConfig.fontSize.type}`;
+    text.style.pointerEvents = "none";
+    // place state abbreviations in center of state
+    const textBbox = text.getBBox();
+    let x = bbox.x + (bbox.width - textBbox.width) / 2;
+    let y = bbox.y + bbox.height / 2 + textBbox.height / 2;
+    // some problem states need extra help
+    switch (state.id) {
+      case "CA":
+        x -= 20;
+        break;
+      case "WV":
+      case "ME":
+        x -= 10;
+        break;
+      case "LA":
+      case "MN":
+        x -= 20;
+        break;
+      case "FL":
+        x += 50;
+        break;
+      case "MI":
+        x += 30;
+        y += 30;
+        break;
+      case "ID":
+        y += 35;
+        break;
+      case "AK":
+        y -= 20;
+        break;
+      default:
+        break;
+    }
+    text.setAttribute("x", x);
+    text.setAttribute("y", y);
+  };
+
+  if (!props.hideLegend) {
+    smallStates.value = smallStates.value
+      .concat(excludedStates)
+      .sort((a, b) => (a.id > b.id ? 1 : -1));
+  }
+
+  const createStateMapUrl = (stateSlug) => {
+    return `/car-insurance/${stateSlug}`;
+  };
+
+  onMounted(() => {
+    // Use nextTick to ensure SVGUSMap component has rendered
+    nextTick(() => {
+      initStates();
+      if (!props.hideLabels) {
+        useStateMapLabels();
+      }
+      useStateEventListeners();
+    });
+  });
+</script>
 
 <style scoped lang="scss">
   .map-container {
