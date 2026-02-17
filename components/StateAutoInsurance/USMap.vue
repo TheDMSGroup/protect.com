@@ -1201,11 +1201,8 @@
   };
 
   const useStateEventListeners = () => {
-    console.log("Adding event listeners to state links");
-    console.log("Map container ref:", mapContainerRef.value);
     if (!mapContainerRef.value) return;
     mapContainerRef.value.querySelectorAll("a").forEach((stateLink) => {
-      console.log("Adding click listener to:", stateLink);
       stateLink.addEventListener("click", (e) => {
         e.preventDefault();
         navigateTo(e.target.closest("a").getAttribute("href"));
@@ -1217,10 +1214,6 @@
     if (!mapContainerRef.value) {
       return;
     }
-    if (!mapContainerRef.value) {
-      return;
-    }
-
     const stateCodes = stateValueMapping.map((state) => state.abbreviation);
     // Use querySelector to find SVG within container
     const allPaths = [...mapContainerRef.value.querySelectorAll(".st0")];
@@ -1254,7 +1247,8 @@
         `/car-insurance/${state.slug}`
       );
       a.setAttribute("aria-label", state.name);
-      const groupParent = state.path.parentNode;
+      const groupParent = state.path?.parentNode;
+      if (!groupParent) return;
       Array.from(groupParent.children).forEach((child) => a.appendChild(child));
       groupParent.prepend(a);
       const currentStatePath = state.path;
@@ -1330,9 +1324,6 @@
     // Use nextTick to ensure SVGUSMap component has rendered
     nextTick(() => {
       initStates();
-      if (!props.hideLabels) {
-        useStateMapLabels();
-      }
       useStateEventListeners();
     });
   });

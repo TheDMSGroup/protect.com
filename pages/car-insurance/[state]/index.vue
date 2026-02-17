@@ -10,11 +10,9 @@
 <script setup>
   import { ref, computed } from "vue";
   import { useRoute } from "vue-router";
-  import { useStore } from "~/stores/store";
   import StateView from "~/views/StateAutoInsurancePage.vue";
 
   const route = useRoute();
-  const store = useStore();
   const topic = ref(route.params.state);
   // Set dynamic SEO meta tags using computed values
   const seoTitle = computed(() =>
@@ -53,8 +51,6 @@
     ogType: "website",
     twitterCard: "summary_large_image",
   });
-  const statesMap = computed(() => store.getStateValueMap());
-  // use composable check icons so we can dynamically call it in safely
 </script>
 
 <style lang="scss" scoped></style>
