@@ -2,7 +2,7 @@
   <header
     class="header"
     :class="{ drawerActive: menuIsVisible }"
-    @mouseleave="showSubMenu = false"
+    @mouseleave="closeDesktopSubMenus"
   >
     <div class="container">
       <div class="row">
@@ -123,7 +123,10 @@
             >
               <ul>
                 <li v-for="link in navLinks" :key="link.label">
-                  <NuxtLink :to="link.to" @mouseenter="mouseOverMenu(link)">
+                  <NuxtLink
+                    :to="link.to"
+                    @mouseenter="mouseOverMenu(link, $event)"
+                  >
                     {{ link.label }}
                   </NuxtLink>
                 </li>
@@ -136,10 +139,36 @@
                   :style="{ left: subMenuLeft + 'px' }"
                 >
                   <ul>
-                    <li v-for="sublink in subMenuLinks" :key="sublink.label">
+                    <li
+                      v-for="sublink in subMenuLinks"
+                      :key="sublink.label"
+                      @mouseenter="mouseOverSubMenu(sublink, $event)"
+                    >
                       <NuxtLink :to="sublink.to">{{ sublink.label }}</NuxtLink>
+                      <span
+                        v-if="hasChildren(sublink)"
+                        class="submenu-indicator"
+                        >›</span
+                      >
                     </li>
                   </ul>
+
+                  <div
+                    v-if="showNestedSubMenu"
+                    class="nested-sub-menu"
+                    :style="{ top: nestedSubMenuTop + 'px' }"
+                  >
+                    <ul>
+                      <li
+                        v-for="nestedLink in nestedSubMenuLinks"
+                        :key="nestedLink.label"
+                      >
+                        <NuxtLink :to="nestedLink.to">{{
+                          nestedLink.label
+                        }}</NuxtLink>
+                      </li>
+                    </ul>
+                  </div>
                 </div>
               </transition>
             </nav>
@@ -266,6 +295,7 @@
 <script setup>
   import { ref, onMounted, onBeforeUnmount } from "vue";
   import { useRoute, useRouter } from "vue-router";
+  import { states } from "@/utils/redirect-config";
 
   defineProps({
     header: { type: Object, default: null },
@@ -286,6 +316,15 @@
       to: "/car-insurance/",
       label: "Car Insurance",
       children: [
+        {
+          to: "/car-insurance/usa",
+          label: "Browse By State",
+          //if we want a nested menu of state links uncomment this
+          // children: states.map((state) => ({
+          //   to: `/car-insurance/${state.slug}`,
+          //   label: state.name,
+          // })),
+        },
         { to: "/car-insurance/rates-by-vehicle", label: "Rates By Vehicle" },
         { to: "/car-insurance/discounts", label: "Discounts" },
       ],
@@ -293,7 +332,18 @@
     { to: "/health-insurance/", label: "Health Insurance" },
     { to: "/home-insurance/", label: "Home Insurance" },
     { to: "/car-insurance/rate-calculator", label: "Rate Calculator" },
-    { to: "/articles/", label: "Articles" },
+    {
+      to: "/articles/",
+      label: "Articles",
+      children: [
+        { to: "/articles/insurance/car-insurance/", label: "Car Insurance" },
+        {
+          to: "/articles/insurance/health-insurance/",
+          label: "Health Insurance",
+        },
+        { to: "/articles/insurance/home-insurance/", label: "Home Insurance" },
+      ],
+    },
   ];
 
   // Methods
@@ -307,16 +357,43 @@
   const showSubMenu = ref(false);
   const subMenuLinks = ref([]);
   const subMenuLeft = ref(0);
+  const showNestedSubMenu = ref(false);
+  const nestedSubMenuLinks = ref([]);
+  const nestedSubMenuTop = ref(0);
   const expandedMobileMenus = ref({});
 
-  const mouseOverMenu = (link) => {
-    if (link.children) {
+  const normalizeChildren = (children) => {
+    if (!Array.isArray(children)) return [];
+    return children.flat(Infinity).filter(Boolean);
+  };
+
+  const hasChildren = (link) => {
+    return normalizeChildren(link?.children).length > 0;
+  };
+
+  const mouseOverMenu = (link, event) => {
+    if (showSubMenu.value) showSubMenu.value = false;
+    showNestedSubMenu.value = false;
+    if (hasChildren(link)) {
       showSubMenu.value = true;
-      subMenuLinks.value = link.children;
+      subMenuLinks.value = normalizeChildren(link.children);
       const element = event.currentTarget;
       const rect = element.getBoundingClientRect();
       subMenuLeft.value = rect.left;
     }
+  };
+
+  const mouseOverSubMenu = (link, event) => {
+    const children = normalizeChildren(link?.children);
+    if (children.length > 0) {
+      showNestedSubMenu.value = true;
+      nestedSubMenuLinks.value = children;
+      nestedSubMenuTop.value = event.currentTarget.offsetTop;
+      return;
+    }
+
+    showNestedSubMenu.value = false;
+    nestedSubMenuLinks.value = [];
   };
   const toggleMobileMenu = () => {
     menuIsVisible.value = !menuIsVisible.value;
@@ -337,6 +414,11 @@
 
   const toggleMobileSubmenu = (label) => {
     expandedMobileMenus.value[label] = !expandedMobileMenus.value[label];
+  };
+
+  const closeDesktopSubMenus = () => {
+    showSubMenu.value = false;
+    showNestedSubMenu.value = false;
   };
 
   // Lifecycle hooks
@@ -547,14 +629,22 @@
         z-index: 1000;
         border-bottom: 3px solid $blue;
         min-width: 220px;
+        overflow: visible;
 
         ul {
           list-style: none;
           margin: 0;
           padding: 0;
           flex-direction: column !important;
+          min-width: 100%;
+          width: 100%;
 
           li {
+            display: flex;
+            min-width: 100%;
+            width: 100%;
+            align-items: center;
+            justify-content: space-between;
             margin: 0;
             padding: 0 !important;
             transition: background-color 0.2s ease;
@@ -566,6 +656,7 @@
               display: block;
               padding: 10px 16px;
               transition: all 0.2s ease;
+              width: 100%;
 
               &:hover {
                 color: $blue !important;
@@ -574,6 +665,32 @@
                 padding-left: 20px;
               }
             }
+
+            .submenu-indicator {
+              color: $gray-dark;
+              font-size: 16px;
+              padding-right: 16px;
+              user-select: none;
+            }
+          }
+        }
+
+        .nested-sub-menu {
+          position: absolute;
+          left: 100%;
+          top: 0;
+          background-color: $white;
+          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+          min-width: 220px;
+          border-left: 1px solid #efefef;
+          border-bottom: 3px solid $blue;
+          padding: 0.75em 0;
+          z-index: 1001;
+
+          ul {
+            max-height: 90vh;
+            overflow-y: scroll;
+            overflow-x: hidden;
           }
         }
       }
