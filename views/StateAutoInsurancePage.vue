@@ -70,6 +70,16 @@
         :stateData="stateData"
         :zipcode="zipcode"
       />
+      <!--Interactive Map-->
+      <section v-if="props.topic === 'usa'" class="map-section">
+        <b-container>
+          <h2>Explore Car Insurance Rates Across the US</h2>
+          <StateAutoInsuranceUSMap
+            :show-links-on-desktop="true"
+            :hide-labels="true"
+          />
+        </b-container>
+      </section>
       <!-- Money Saving Tips Section -->
       <StatePageComponentsMoneySavingTips
         :stateData="stateData"
@@ -496,6 +506,18 @@
     }
     p {
       font-size: 1em;
+    }
+  }
+
+  .map-section {
+    margin: 7rem 0 3rem 0;
+
+    @include media-breakpoint-down(md) {
+      margin: 3rem 0 0;
+    }
+    h2 {
+      margin-bottom: var(--spacing-lg);
+      text-align: center;
     }
   }
   // Container custom styles
