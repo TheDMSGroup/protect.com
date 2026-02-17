@@ -71,7 +71,7 @@
         :zipcode="zipcode"
       />
       <!--Interactive Map-->
-      <section class="map-section">
+      <section v-if="props.topic === 'usa'" class="map-section">
         <b-container>
           <h2>Explore Car Insurance Rates Across the US</h2>
           <StateAutoInsuranceUSMap

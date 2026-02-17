@@ -25,7 +25,14 @@
     .map((state) => ({ ...state, id: state.abbreviation }));
 
   const mobileStatesLinkList = computed(() =>
-    [...states.value].sort((a, b) => (a.name > b.name ? 1 : -1))
+    [...states.value]
+      .sort((a, b) => (a.name > b.name ? 1 : -1))
+      .map((state) => {
+        return {
+          name: state.name,
+          url: createStateMapUrl(state.slug),
+        };
+      })
   );
 
   const mapConfig = {
@@ -1295,38 +1302,10 @@
       </b-col>
     </b-row>
     <b-row>
-      <b-col
-        :class="[
-          'mt-3',
-          'mx-auto',
-          'state-list',
-          { 'd-block': props.showLinksOnDesktop },
-        ]"
-        v-if="mobileStatesLinkList.length > 0"
-      >
-        <div class="row">
-          <div
-            :class="[
-              { 'show-list-desktop': props.showLinksOnDesktop },
-              { 'd-flex': !props.showLinksOnDesktop },
-              'flex-column',
-              'mx-0',
-              'my-1',
-              'state-list-item',
-            ]"
-            :style="{
-              fontSize: `${legendConfig.fontSize.value}${legendConfig.fontSize.type}`,
-            }"
-          >
-            <NuxtLink
-              v-for="state in mobileStatesLinkList"
-              :key="state.id"
-              :to="createStateMapUrl(state.slug)"
-              >{{ state.name }}</NuxtLink
-            >
-          </div>
-        </div>
-      </b-col>
+      <StateLinksList
+        :state-links="mobileStatesLinkList"
+        v-if="mobileStatesLinkList && mobileStatesLinkList.length"
+      />
     </b-row>
   </b-container>
 </template>
