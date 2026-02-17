@@ -8,7 +8,7 @@
             <div class="cta-icon">
               <img
                 :src="svgPath"
-                alt="SVG Icon"
+                alt=""
                 class="svg-icon"
                 loading="lazy"
               />
@@ -22,15 +22,17 @@
           <div class="cta-right">
             <div class="cta-form">
               <div class="form-group">
-                <label>Ready to see what you can save?</label>
+                <label for="cta-zipcode-input">Ready to see what you can save?</label>
                 <div class="form-row">
-                  <IconsGeoPin class="left-icon" />
+                  <IconsGeoPin class="left-icon" aria-hidden="true" />
                   <input
+                    id="cta-zipcode-input"
                     type="text"
                     v-model="localZipcode"
                     placeholder="Zip Code"
                     class="zipcode-input"
                     maxlength="5"
+                    aria-label="Enter your zip code"
                   />
                   <ClientOnly>
                     <button @click="getQuotes" class="compare-btn">
@@ -42,9 +44,10 @@
                   <span>
                     <img
                       :src="svgPath"
-                      alt="SVG Icon"
+                      alt=""
                       class="cta-icon-inline svg-icon"
                       loading="lazy"
+                      aria-hidden="true"
                     />No spam, just quotes
                   </span>
                 </div>
@@ -150,15 +153,11 @@
           .cta-text {
             h3 {
               color: white;
-              font-size: 1.875rem;
-              font-weight: 700 !important;
               margin-bottom: var(--spacing-xs);
-              font-family: "Nunito Sans", sans-serif;
             }
 
             p {
               color: rgba(255, 255, 255, 0.9);
-              font-size: 1rem;
               margin: 0;
             }
           }
@@ -241,10 +240,6 @@
           .cta-left {
             justify-content: center;
             gap: 10px;
-
-            .cta-text h3 {
-              font-size: 1.5rem;
-            }
           }
 
           // .cta-right .cta-form .form-section .input-group {
@@ -278,10 +273,7 @@
 
         h4 {
           color: #666;
-          font-size: 1.125rem;
-          font-weight: 600;
           margin-bottom: var(--spacing-lg);
-          font-family: "Nunito Sans", sans-serif;
         }
 
         .companies-logos {

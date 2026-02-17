@@ -7,7 +7,7 @@
             <img alt="Protect.com Logo" src="/assets/protect_logo_tm.svg" width="115" height="22" loading="lazy" />
           </div>
           <ul>
-            <li><NuxtLink to="/car-insurance">Auto Insurance</NuxtLink></li>
+            <li><NuxtLink to="/car-insurance">Car Insurance</NuxtLink></li>
             <!--<li><NuxtLink to="/insurance/life">Life Insurance</NuxtLink></li>-->
             <li><NuxtLink to="/health-insurance">Health Insurance</NuxtLink></li>
             <!-- <li><NuxtLink to="/insurance/medicare">Medicare</NuxtLink></li> -->

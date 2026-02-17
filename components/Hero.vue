@@ -101,7 +101,7 @@ export default {
     }
 
     .hero-left {
-      width: 50%;
+      width: 54%;
       display: flex;
       flex-direction: column;
       margin-top: 8em;
@@ -117,23 +117,7 @@ export default {
       }
 
       h1 {
-        font-size: 4em;
         margin-bottom: 0.32em;
-
-        @include media-breakpoint-down(xl) {
-          font-size: 2.8em;
-        }
-      }
-
-      h2 {
-        color: $gray-dark;
-        font-size: 2.3em;
-        font-family: 'Nunito Sans', sans-serif;
-        margin-bottom: 1.5em;
-
-        @media (max-width: 1200px) {
-          font-size: 1.6em;
-        }
       }
     }
 

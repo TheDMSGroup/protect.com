@@ -1,11 +1,12 @@
 <script setup>
-import { isValidMake, isValidModel, getMakeName, getModelsForMake, getVehicleImagePath, getMakeLogoPath } from "~/data/vehicles";
+import { isValidMake, isValidModel, getMakeName, getVehicleImagePath, getMakeLogoPath } from "~/data/vehicles";
 import { redirectWithParams } from "@/composables/utils.js";
 import { extractFaqsFromData } from "@/composables/useFaq.js";
 
 const route = useRoute();
 const make = route.params.make;
 const model = route.params.model;
+const useStageData = route.query.stage === 'true';
 
 if (!isValidMake(make) || !isValidModel(make, model)) {
   throw createError({
@@ -19,12 +20,12 @@ const formattedMake = computed(() => getMakeName(make));
 // Fetch model data and all models for this make in parallel
 const [{ data: modelData }, { data: allModelsData }] = await Promise.all([
   useFetch(`/api/sheets/vehicles-detail`, {
-    query: { make, model },
-    key: `model-${make}-${model}`,
+    query: { make, model, stage: useStageData || undefined },
+    key: `model-${make}-${model}${useStageData ? '-stage' : ''}`,
   }),
   useFetch(`/api/sheets/vehicles-detail`, {
-    query: { make },
-    key: `all-models-${make}`,
+    query: { make, stage: useStageData || undefined },
+    key: `all-models-${make}${useStageData ? '-stage' : ''}`,
   }),
 ]);
 
@@ -44,13 +45,6 @@ const vehicleImage = computed(() => getVehicleImagePath(make, model));
 const imageError = ref(false);
 const onImageError = () => {
   imageError.value = true;
-};
-
-// Track image errors for other models
-const otherModelImageErrors = ref({});
-const getOtherModelImage = (modelSlug) => getVehicleImagePath(make, modelSlug);
-const onOtherModelImageError = (modelSlug) => {
-  otherModelImageErrors.value[modelSlug] = true;
 };
 
 // Make logo
@@ -413,8 +407,7 @@ useSeoMeta({
         <div class="section-header">
           <h2>Frequently Asked Questions</h2>
         </div>
-
-        <FaqAccordion :faqs="displayFaqs" />
+        <FaqMain :faq="displayFaqs" />
       </b-container>
     </section>
 
@@ -551,14 +544,7 @@ useSeoMeta({
     }
 
     h1 {
-      font-size: 3rem;
-      margin-bottom: 1rem;
-      font-weight: 700;
       color: white;
-
-      @include media-breakpoint-down(md) {
-        font-size: 2.25rem;
-      }
     }
 
     .hero-subtitle {

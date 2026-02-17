@@ -7,17 +7,30 @@
 export const DEFAULT_VEHICLE_YEAR = "2026";
 
 export const vehicles = {
-  // acura: {
-  //   name: "Acura",
-  //   models: ["integra", "mdx", "rdx", "tlx", "ilx"],
-  // },
-  // honda: {
-  //   name: "Honda",
-  //   models: ["accord", "civic", "cr-v", "pilot"],
-  // },
-  ford: {
-    name: "Ford",
-    models: [
+  "chevrolet": {
+    "name": "Chevrolet",
+    "models": [
+      "blazer",
+      "blazer-ev",
+      "bolt-ev",
+      "colorado",
+      "corvette",
+      "equinox",
+      "equinox-ev",
+      "malibu",
+      "silverado-1500",
+      "silverado-ev",
+      "silverado-hd",
+      "suburban",
+      "tahoe",
+      "trailblazer",
+      "traverse",
+      "trax"
+    ]
+  },
+  "ford": {
+    "name": "Ford",
+    "models": [
       "bronco",
       "bronco-sport",
       "edge",
@@ -33,12 +46,128 @@ export const vehicles = {
       "mustang-mach-e",
       "ranger",
       "transit",
-      "transit-connect",
-    ],
+      "transit-connect"
+    ]
   },
-  toyota: {
-    name: "Toyota",
-    models: [
+  "honda": {
+    "name": "Honda",
+    "models": [
+      "accord",
+      "accord-hybrid",
+      "civic-hatchback",
+      "civic-sedan",
+      "civic-type-r",
+      "cr-v",
+      "cr-v-hybrid",
+      "hr-v",
+      "odyssey",
+      "passport",
+      "pilot",
+      "prelude-hybrid",
+      "prologue",
+      "ridgeline"
+    ]
+  },
+  "hyundai": {
+    "name": "Hyundai",
+    "models": [
+      "elantra",
+      "elantra-hybrid",
+      "elantra-n",
+      "ioniq-5",
+      "ioniq-6",
+      "ioniq-9",
+      "kona",
+      "palisade",
+      "santa-cruz",
+      "santa-fe",
+      "santa-fe-hybrid",
+      "sonata",
+      "sonata-hybrid",
+      "tucson",
+      "tucson-hybrid",
+      "venue"
+    ]
+  },
+  "jeep": {
+    "name": "Jeep",
+    "models": [
+      "cherokee",
+      "compass",
+      "gladiator",
+      "grand-cherokee",
+      "grand-cherokee-l",
+      "grand-wagoneer",
+      "grand-wagoneer-l",
+      // "recon",
+      "wagoneer",
+      "wagoneer-s",
+      "wrangler"
+    ]
+  },
+  "kia": {
+    "name": "Kia",
+    "models": [
+      "carnival",
+      "ev6",
+      "ev9",
+      "k4",
+      "k5",
+      "niro",
+      "seltos",
+      "sorento",
+      "sportage",
+      "telluride"
+    ]
+  },
+  "nissan": {
+    "name": "Nissan",
+    "models": [
+      "altima",
+      "ariya",
+      "armada",
+      "frontier",
+      "kicks",
+      "leaf",
+      "murano",
+      "pathfinder",
+      "rogue",
+      "sentra",
+      "titan",
+      "versa",
+      "z"
+    ]
+  },
+  "ram": {
+    "name": "Ram",
+    "models": [
+      "1500",
+      "1500-classic",
+      "1500-rev",
+      "2500",
+      "3500",
+      "promaster"
+    ]
+  },
+  "subaru": {
+    "name": "Subaru",
+    "models": [
+      "ascent",
+      "brz",
+      "crosstrek",
+      "crosstrek-hybrid",
+      "forester",
+      "forester-hybrid",
+      "impreza",
+      "legacy",
+      "outback",
+      "solterra",
+      "wrx"
+    ]
+  },
+  "toyota": {
+    "name": "Toyota",
+    "models": [
       "4-runner",
       "bz-4x",
       "camry",
@@ -58,9 +187,9 @@ export const vehicles = {
       "supra",
       "tacoma",
       "tundra",
-      "venza",
-    ],
-  },
+      "venza"
+    ]
+  }
 };
 
 // Helper to get formatted make name

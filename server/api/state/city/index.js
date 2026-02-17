@@ -85,31 +85,10 @@ export default defineEventHandler(async (event) => {
         stateName: matchedState?.name || "",
       }));
 
-    // Get other cities from the same state
-    const otherCities = data
-      .filter((item) => {
-        const stateMatch =
-          item.stateCode.toLowerCase() ===
-          matchedState?.abbreviation.toLowerCase();
-        const notCurrentCity =
-          formatLocationNameForMatch(item.name) !==
-          formatCitySlugForMatch(city);
-        return stateMatch && notCurrentCity;
-      })
-      .map((item) => item.name)
-      .filter((name, index, array) => array.indexOf(name) === index); // Remove duplicates
-
-    // Add otherCities to each city object
-    const dataWithOtherCities = filteredData.map((item) => ({
-      ...item,
-      otherCities: otherCities,
-    }));
-
-    console.log("Filtered Data:", dataWithOtherCities);
     return {
       success: true,
-      data: dataWithOtherCities,
-      total: dataWithOtherCities.length,
+      data: filteredData,
+      total: filteredData.length,
     };
   } catch (error) {
     console.error("Error fetching Google Sheets data:", error);

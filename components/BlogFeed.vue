@@ -143,15 +143,6 @@
           margin-left: 0;
         }
 
-        h2 {
-          color: $blue-light;
-          font-size: 3em;
-          line-height: 1.3em;
-
-          @include media-breakpoint-down(sm) {
-            font-size: 2.25em;
-          }
-        }
       }
 
       .feed-right {
@@ -182,9 +173,6 @@
           }
 
           h4 {
-            color: $gray-dark;
-            font-size: 1.9em;
-            font-weight: 600;
             margin-bottom: 0.4em;
           }
 

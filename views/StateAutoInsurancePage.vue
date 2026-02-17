@@ -10,7 +10,9 @@
       <div class="container">
         <h1>State Not Found</h1>
         <p>We couldn't find insurance information for the requested state.</p>
-        <router-link to="/" class="btn btn-primary">Return to Home Page</router-link>
+        <router-link to="/" class="btn btn-primary"
+          >Return to Home Page</router-link
+        >
       </div>
     </div>
 
@@ -23,36 +25,80 @@
             <!-- Left Content -->
             <div class="hero-left">
               <h1>{{ stateData.state }} Car Insurance</h1>
-              <p class="hero-subtitle">Find some of the best car insurance quotes in the {{ stateData.nickname }}!</p>
+              <p class="hero-subtitle">
+                Find some of the best car insurance quotes in the
+                {{ stateData.nickname }}!
+              </p>
 
               <!-- Desktop Quote Form -->
               <div class="desktop-quote-form">
                 <form @submit.prevent="getQuotes" class="quote-form-inline">
                   <div class="form-row">
                     <IconsGeoPin class="left-icon" />
-                    <input type="text" v-model="zipcode" placeholder="enter zipcode" class="zipcode-input" maxlength="5" />
-                    <button type="submit" class="compare-btn">COMPARE QUOTES</button>
+                    <input
+                      type="text"
+                      v-model="zipcode"
+                      placeholder="enter zipcode"
+                      class="zipcode-input"
+                      maxlength="5"
+                    />
+                    <button type="submit" class="compare-btn">
+                      COMPARE QUOTES
+                    </button>
                   </div>
-                  <p class="form-disclaimer"><img src="/assets/shield-icon-small.png" alt="shield icon" /> No spam, just quotes.</p>
+                  <p class="form-disclaimer">
+                    <img
+                      src="/assets/shield-icon-small.png"
+                      alt="shield icon"
+                    />
+                    No spam, just quotes.
+                  </p>
                 </form>
               </div>
             </div>
             <!-- Right Content - Provider Cards -->
-            <StatePageComponentsHeroProviderCards :stateData="stateData" :zipcode="zipcode" />
+            <StatePageComponentsHeroProviderCards
+              :stateData="stateData"
+              :zipcode="zipcode"
+            />
           </div>
         </div>
       </section>
       <StatePageComponentsInsuranceOverview :stateData="stateData" />
       <!-- CTA Section -->
-      <StatePageComponentsCtaSection :stateData="stateData" :zipcode="zipcode" />
+      <StatePageComponentsCtaSection
+        :stateData="stateData"
+        :zipcode="zipcode"
+      />
       <!-- Money Saving Tips Section -->
-      <StatePageComponentsMoneySavingTips :stateData="stateData" :zipcode="zipcode" />
+      <StatePageComponentsMoneySavingTips
+        :stateData="stateData"
+        :zipcode="zipcode"
+      />
       <!-- Explore CTA Section -->
       <StatePageComponentsJumpLinks :stateData="stateData" :zipcode="zipcode" />
       <!-- FAQ Section -->
-      <FaqMain :stateData="stateData" :faq="stateData.faqs ? stateData.faqs : defaultFaqs" />
+      <FaqMain
+        :stateData="stateData"
+        :faq="stateData.faqs ? stateData.faqs : defaultFaqs"
+      />
+      <!-- City Links-->
+      <section
+        v-if="cityLinks && cityLinks.length > 0 && !cityLinksError"
+        class="other-cities"
+      >
+        <b-container>
+          <h2 class="text-center">
+            Compare Rates In Cities Across {{ stateData.state }}
+          </h2>
+          <CityLinksList :city-links="cityLinks" />
+        </b-container>
+      </section>
       <!-- How Protect.com Works Section -->
-      <StatePageComponentsHowItWorks :stateData="stateData" :zipcode="zipcode" />
+      <StatePageComponentsHowItWorks
+        :stateData="stateData"
+        :zipcode="zipcode"
+      />
       <!-- Auto Rate Calculator Section -->
       <div class="calculator-section">
         <LazyAutoRateCalculator :componentProps="{ zipcode: zipcode }" />
@@ -71,17 +117,29 @@
                 rel="noopener noreferrer"
                 >Yahoo Finance</a
               >. Average full coverage car insurance rates by state provided by
-              <a href="https://www.bankrate.com/insurance/car/states/" target="_blank" rel="noopener noreferrer">Bankrate</a>. National average car
-              insurance costs by age provided by
-              <a href="https://wallethub.com/edu/ci/average-car-insurance-rates-by-age/69321" target="_blank" rel="noopener noreferrer">WalletHub</a>.
+              <a
+                href="https://www.bankrate.com/insurance/car/states/"
+                target="_blank"
+                rel="noopener noreferrer"
+                >Bankrate</a
+              >. National average car insurance costs by age provided by
+              <a
+                href="https://wallethub.com/edu/ci/average-car-insurance-rates-by-age/69321"
+                target="_blank"
+                rel="noopener noreferrer"
+                >WalletHub</a
+              >.
             </p>
             <p>
-              Car insurance rates vary by geographic region, number of drivers, vehicles, driving record, and many other factors. For the purposes of
-              this site and the rates you see, the standard profile has been applied:
+              Car insurance rates vary by geographic region, number of drivers,
+              vehicles, driving record, and many other factors. For the purposes
+              of this site and the rates you see, the standard profile has been
+              applied:
             </p>
             <p>
-              40 year old single driver, 2023 Toyota Camry, good credit score, clean driving record and commutes 5 days. Rates also assume bundling
-              and paperless billing discounts.
+              40 year old single driver, 2023 Toyota Camry, good credit score,
+              clean driving record and commutes 5 days. Rates also assume
+              bundling and paperless billing discounts.
             </p>
           </div>
         </div>
@@ -103,13 +161,25 @@
     title: String,
     description: String,
     dataZoneId: String,
+    cityLinks: {
+      type: Array,
+      default: () => [],
+    },
+    cityLinksError: {
+      type: Boolean,
+      default: false,
+    },
   });
 
   // Reactive zipcode variable
   const zipcode = ref("");
 
   // Fetch state insurance stats from Google Sheets API
-  const { data: stateInsuranceStats, pending: statsLoading, error: statsError } = await useFetch('/api/sheets/states');
+  const {
+    data: stateInsuranceStats,
+    pending: statsLoading,
+    error: statsError,
+  } = await useFetch("/api/sheets/states");
 
   const error = computed(() => statsError.value);
 
@@ -127,7 +197,10 @@
     const normalizedTopic = props.topic.toLowerCase().replace(/[-\s]/g, "");
     const stateStatInfo = stateInsuranceStats.value.filter((state) => {
       const stateName = state.State || state.state;
-      return stateName && stateName.toLowerCase().replace(/[-\s]/g, "") === normalizedTopic;
+      return (
+        stateName &&
+        stateName.toLowerCase().replace(/[-\s]/g, "") === normalizedTopic
+      );
     })[0];
 
     if (!stateStatInfo) {
@@ -138,32 +211,34 @@
     const stateName = stateStatInfo.State || stateStatInfo.state;
     const mappedState = {
       state: stateName,
-      stateAbbreviation: stateStatInfo['State Abbreviation'],
-      nickname: stateStatInfo['State Nickname'],
-      bodilyInjuryPerPerson: stateStatInfo['Bodily Injury Liability (per person)'],
-      bodilyInjuryPerAccident: stateStatInfo['Bodily Injury Liability (per accident)'],
-      propertyDamage: stateStatInfo['Property Damage Liability'],
-      combinedSplitLimit: stateStatInfo['Combined (Split Limit)'],
-      faultType: stateStatInfo['At-Fault / No-Fault State'],
-      avgAnnualCost: stateStatInfo['Avg. Annual Car Insurance Cost'],
-      avgMonthlyCost: stateStatInfo['Avg. Monthly Car Insurance Cost'],
-      avgAnnualMinCost: stateStatInfo['Avg. Annual Minimum Coverage'],
-      age16Cost: stateStatInfo['Age 16'],
-      age25Cost: stateStatInfo['Age 25'],
-      age45Cost: stateStatInfo['Age 45'],
-      age65Cost: stateStatInfo['Age 65'],
-      jumpLink: stateStatInfo['Jump Link'],
-      faqs: parseFaqs(stateStatInfo['FAQs']),
-      faq1: stateStatInfo['FAQ1'],
-      faq1a: stateStatInfo['FAQ1A'],
-      faq2: stateStatInfo['FAQ2'],
-      faq2a: stateStatInfo['FAQ2A'],
-      faq3: stateStatInfo['FAQ3'],
-      faq3a: stateStatInfo['FAQ3A'],
-      faq4: stateStatInfo['FAQ4'],
-      faq4a: stateStatInfo['FAQ4A'],
-      titleTag: stateStatInfo['Title Tag'],
-      metaDescription: stateStatInfo['Meta Description']
+      stateAbbreviation: stateStatInfo["State Abbreviation"],
+      nickname: stateStatInfo["State Nickname"],
+      bodilyInjuryPerPerson:
+        stateStatInfo["Bodily Injury Liability (per person)"],
+      bodilyInjuryPerAccident:
+        stateStatInfo["Bodily Injury Liability (per accident)"],
+      propertyDamage: stateStatInfo["Property Damage Liability"],
+      combinedSplitLimit: stateStatInfo["Combined (Split Limit)"],
+      faultType: stateStatInfo["At-Fault / No-Fault State"],
+      avgAnnualCost: stateStatInfo["Avg. Annual Car Insurance Cost"],
+      avgMonthlyCost: stateStatInfo["Avg. Monthly Car Insurance Cost"],
+      avgAnnualMinCost: stateStatInfo["Avg. Annual Minimum Coverage"],
+      age16Cost: stateStatInfo["Age 16"],
+      age25Cost: stateStatInfo["Age 25"],
+      age45Cost: stateStatInfo["Age 45"],
+      age65Cost: stateStatInfo["Age 65"],
+      jumpLink: stateStatInfo["Jump Link"],
+      faqs: parseFaqs(stateStatInfo["FAQs"]),
+      faq1: stateStatInfo["FAQ1"],
+      faq1a: stateStatInfo["FAQ1A"],
+      faq2: stateStatInfo["FAQ2"],
+      faq2a: stateStatInfo["FAQ2A"],
+      faq3: stateStatInfo["FAQ3"],
+      faq3a: stateStatInfo["FAQ3A"],
+      faq4: stateStatInfo["FAQ4"],
+      faq4a: stateStatInfo["FAQ4A"],
+      titleTag: stateStatInfo["Title Tag"],
+      metaDescription: stateStatInfo["Meta Description"],
     };
 
     // Parse currency values
@@ -188,7 +263,7 @@
         {
           question: state.faq1,
           answer: state.faq1a,
-        }
+        },
       ];
 
       // Add second FAQ if both question and answer exist
@@ -226,13 +301,17 @@
       },
       {
         question: `How much does auto insurance cost in ${state.state}?`,
-        answer: `The average annual cost of auto insurance in ${state.state} is ${formatCurrency(
+        answer: `The average annual cost of auto insurance in ${
+          state.state
+        } is ${formatCurrency(
           state.avgAnnualCost
         )}. However, rates vary significantly based on factors like age, driving record, location, and coverage levels.`,
       },
       {
         question: `Is ${state.state} a fault or no-fault state?`,
-        answer: `${state.state} is ${state?.faultType?.toLowerCase()} state. This affects how insurance claimsare handled after an accident.`,
+        answer: `${
+          state.state
+        } is ${state?.faultType?.toLowerCase()} state. This affects how insurance claimsare handled after an accident.`,
       },
       {
         question: `What factors affect my insurance rates in ${state.state}?`,
@@ -296,18 +375,31 @@
   useSeoMeta({
     title: () =>
       stateData.value
-        ? (stateData.value.titleTag || `${stateData.value.state} Car Insurance - Compare Quotes | Protect.com`)
+        ? stateData.value.titleTag ||
+          `${stateData.value.state} Car Insurance - Compare Quotes | Protect.com`
         : "Car Insurance - Compare Quotes | Protect.com",
     description: () =>
       stateData.value
-        ? (stateData.value.metaDescription || `Compare car insurance quotes in ${stateData.value.state}. Average annual cost: ${formatCurrency(
+        ? stateData.value.metaDescription ||
+          `Compare car insurance quotes in ${
+            stateData.value.state
+          }. Average annual cost: ${formatCurrency(
             stateData.value.avgAnnualCost
-          )}. Find the best rates in the ${stateData.value.nickname}.`)
+          )}. Find the best rates in the ${stateData.value.nickname}.`
         : "Compare car insurance quotes from top providers. Save money with Protect.com.",
-    ogTitle: () => (stateData.value ? (stateData.value.titleTag || `${stateData.value.state} Car Insurance - Compare Quotes`) : "Car Insurance - Compare Quotes"),
+    ogTitle: () =>
+      stateData.value
+        ? stateData.value.titleTag ||
+          `${stateData.value.state} Car Insurance - Compare Quotes`
+        : "Car Insurance - Compare Quotes",
     ogDescription: () =>
       stateData.value
-        ? (stateData.value.metaDescription || `Find the best car insurance rates in ${stateData.value.state}. Average cost: ${formatCurrency(stateData.value.avgAnnualCost)}/year.`)
+        ? stateData.value.metaDescription ||
+          `Find the best car insurance rates in ${
+            stateData.value.state
+          }. Average cost: ${formatCurrency(
+            stateData.value.avgAnnualCost
+          )}/year.`
         : "Compare car insurance quotes from top providers.",
     ogImage: () => getLicensePlateUrl(stateData.value?.state),
     ogType: "website",

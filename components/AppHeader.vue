@@ -298,7 +298,8 @@ svg.elixr-icon.protect-shield {
   max-height: 60%;
 }
 .header {
-  margin: 10px auto 0px;
+  padding-top: 5px;
+  padding-bottom: 5px;
   background-color: $white;
   z-index: 10000;
   // box-shadow: 0px 2px 2px 0px rgba(0,0,0,0.05);
@@ -329,6 +330,7 @@ svg.elixr-icon.protect-shield {
   width: 100%;
   margin: 10px auto;
   padding: 0 15px;
+  align-items: center;
 
   @include media-breakpoint-between(lg, xxl) {
     margin: auto;
@@ -347,14 +349,12 @@ svg.elixr-icon.protect-shield {
     a {
       img {
         height: 22px;
-        margin-top: 5px;
       }
     }
     @include media-breakpoint-between(lg, xxl) {
       a {
         img {
           height: 30px;
-          margin-top: 10px;
         }
       }
     }
