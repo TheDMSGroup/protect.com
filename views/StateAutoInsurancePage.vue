@@ -93,6 +93,15 @@
         :stateData="stateData"
         :faq="stateData.faqs ? stateData.faqs : defaultFaqs"
       />
+      <!-- How Protect.com Works Section -->
+      <StatePageComponentsHowItWorks
+        :stateData="stateData"
+        :zipcode="zipcode"
+      />
+      <!-- Auto Rate Calculator Section -->
+      <div class="calculator-section">
+        <LazyAutoRateCalculator :componentProps="{ zipcode: zipcode }" />
+      </div>
       <!-- City Links-->
       <section
         v-if="cityLinks && cityLinks.length > 0 && !cityLinksError"
@@ -105,15 +114,6 @@
           <CityLinksList :city-links="cityLinks" />
         </b-container>
       </section>
-      <!-- How Protect.com Works Section -->
-      <StatePageComponentsHowItWorks
-        :stateData="stateData"
-        :zipcode="zipcode"
-      />
-      <!-- Auto Rate Calculator Section -->
-      <div class="calculator-section">
-        <LazyAutoRateCalculator :componentProps="{ zipcode: zipcode }" />
-      </div>
       <section class="methodology">
         <div class="container">
           <div class="section-header">
@@ -468,6 +468,11 @@
   .calculator-section {
     padding: var(--spacing-xl) 0;
     background-color: var(--surface-light);
+  }
+
+  .other-cities {
+    padding: 4rem 0;
+    margin: 4rem 0;
   }
 
   .error {
