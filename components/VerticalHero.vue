@@ -1,5 +1,62 @@
+<template>
+  <div class="hero-wrapper vertical-hero">
+    <b-container :class="heroClass">
+      <div class="hero">
+        <div class="hero-left">
+          <b-row>
+            <b-col class="headline-col" cols="12">
+              <h1>{{ headline }}</h1>
+              <p class="lead">{{ subheadline }}</p>
+            </b-col>
+            <b-col v-if="ctaType" class="cta-col" cols="12">
+              <b-row v-if="ctaType && ctaType == 'buttons'" class="btn-row">
+                <b-col
+                  v-for="(btn, index) in ctaConfig.options"
+                  :key="index"
+                  cols="12"
+                  lg="6"
+                >
+                  <NuxtLink class="vertical-btn" :to="'/' + btn.value">
+                    <!-- <NuxtImg :src="buildImageUrl(btn.icon)" :alt="btn.text" width="785" height="780"/> -->
+                    <p class="btn-title">
+                      {{ btn.text }}
+                    </p>
+                  </NuxtLink>
+                </b-col>
+              </b-row>
+              <div
+                v-else-if="ctaType && ctaType == 'rates-dropdown'"
+                class="compare-dropdown"
+              >
+                <CompareYourRateDropdown
+                  submit-text="CONTINUE"
+                  :compare-rate-config="ctaConfig"
+                />
+              </div>
+            </b-col>
+          </b-row>
+        </div>
+        <div class="hero-right">
+          <img
+            src="/assets/protect_main_hero_flat.png"
+            srcset="
+              /assets/protect_main_hero_flat.png        1000w,
+              /assets/protect_main_hero_flat_mobile.png  600w,
+              /assets/protect_main_hero_flat_mobile.png  300w
+            "
+            sizes="(max-width: 600px) 300px, 1000px"
+            alt="Auto Insurance Shield"
+            width="700"
+            height="800"
+          />
+        </div>
+      </div>
+    </b-container>
+    <div class="skews" />
+  </div>
+</template>
+
 <script setup>
-  import { buildImageUrl } from "@/composables/images";
   const props = defineProps({
     heroImage: {
       type: String,
@@ -27,54 +84,8 @@
     },
   });
 
-  const { heroImage, headline, subheadline, ctaType, ctaConfig, heroClass } = props;
+  const { headline, subheadline, ctaType, ctaConfig, heroClass } = props;
 </script>
-
-<template>
-  <div class="hero-wrapper vertical-hero">
-    <b-container :class="heroClass">
-      <div class="hero">
-        <div class="hero-left">
-          <b-row>
-            <b-col class="headline-col" cols="12">
-              <h1>{{ headline }}</h1>
-              <p class="lead">{{ subheadline }}</p>
-            </b-col>
-            <b-col v-if="ctaType" class="cta-col" cols="12">
-              <b-row v-if="ctaType && ctaType == 'buttons'" class="btn-row">
-                <b-col v-for="(btn, index) in ctaConfig.options" :key="index" cols="12" lg="6">
-                  <NuxtLink class="vertical-btn" :to="'/' + btn.value">
-                    <!-- <NuxtImg :src="buildImageUrl(btn.icon)" :alt="btn.text" width="785" height="780"/> -->
-                    <p class="btn-title">
-                      {{ btn.text }}
-                    </p>
-                  </NuxtLink>
-                </b-col>
-              </b-row>
-              <div v-else-if="ctaType && ctaType == 'rates-dropdown'" class="compare-dropdown">
-                <CompareYourRateDropdown submit-text="CONTINUE" :compare-rate-config="ctaConfig" />
-              </div>
-            </b-col>
-          </b-row>
-        </div>
-        <div class="hero-right">
-          <NuxtImg
-            :src="buildImageUrl(heroImage)"
-            alt="Auto Insurance Shield"
-            width="700"
-            height="800"
-            sizes="sm:100vw md:50vw lg:45vw xl:700px"
-            style="height: auto"
-            fetchpriority="high"
-            fit="inside"
-            format="webp"
-          />
-        </div>
-      </div>
-    </b-container>
-    <div class="skews" />
-  </div>
-</template>
 
 <style scoped lang="scss">
   .hero-wrapper {
@@ -106,12 +117,6 @@
               line-height: 1.5;
               max-width: 500px;
             }
-          }
-        }
-        .hero-right {
-          img {
-            max-width: unset;
-            width: unset;
           }
         }
       }
