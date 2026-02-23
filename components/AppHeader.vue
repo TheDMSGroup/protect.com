@@ -1,24 +1,49 @@
 <template>
-  <header class="header" :class="{ drawerActive: menuIsVisible }">
+  <header
+    class="header"
+    :class="{ drawerActive: menuIsVisible }"
+    @mouseleave="closeDesktopSubMenus"
+  >
     <div class="container">
       <div class="row">
         <div class="header-inner">
           <div class="left-header">
             <!-- @click="showNavMenuMobile = !showNavMenuMobile" -->
             <div
-            id="menu-button"
-            class="d-block d-lg-none"
-            v-if="!showNavSearchHeaderMobile"
+              id="menu-button"
+              class="d-block d-lg-none"
+              v-if="!showNavSearchHeaderMobile"
             >
               <svg
                 v-if="!showNavMenuMobile"
                 @click="toggleMobileMenu"
-                xmlns="http://www.w3.org/2000/svg" width="30" height="15" viewBox="0 0 30 15"
+                xmlns="http://www.w3.org/2000/svg"
+                width="30"
+                height="15"
+                viewBox="0 0 30 15"
               >
                 <g transform="translate(-49.744 -579)">
-                  <rect width="26.923" height="1.5" rx="0.75" transform="translate(52.821 579)" fill="#0c2c67"/>
-                  <rect width="30" height="1.5" rx="0.75" transform="translate(49.744 585.75)" fill="#0c2c67"/>
-                  <rect width="19.231" height="1.5" rx="0.75" transform="translate(60.513 592.5)" fill="#0c2c67"/>
+                  <rect
+                    width="26.923"
+                    height="1.5"
+                    rx="0.75"
+                    transform="translate(52.821 579)"
+                    fill="#0c2c67"
+                  />
+                  <rect
+                    width="30"
+                    height="1.5"
+                    rx="0.75"
+                    transform="translate(49.744 585.75)"
+                    fill="#0c2c67"
+                  />
+                  <rect
+                    width="19.231"
+                    height="1.5"
+                    rx="0.75"
+                    transform="translate(60.513 592.5)"
+                    fill="#0c2c67"
+                  />
                 </g>
               </svg>
               <svg
@@ -26,36 +51,55 @@
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 35.65 35.65"
                 class="close-icon"
-                @click="toggleSearch">
+                @click="toggleSearch"
+              >
                 <g>
                   <g id="icons">
-                    <polygon class="cls-1"
+                    <polygon
+                      class="cls-1"
                       points="35.65 2.53 33.12 0 17.82 15.29 2.53 0 0 2.53 15.29 17.82 0
                       33.12 2.53 35.65 17.82 20.35 33.12 35.65 35.65 33.12 20.35 17.82 35.65 2.53"
-                      />
-                      </g>
+                    />
                   </g>
+                </g>
               </svg>
               <svg
-                v-else width="2em" height="2em" viewBox="0 0 16 16" class="bi bi-x" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                <path fill-rule="evenodd"
-                d="M4.646 4.646a.5.5 0 0 1 .708 0L8
+                v-else
+                width="2em"
+                height="2em"
+                viewBox="0 0 16 16"
+                class="bi bi-x"
+                fill="currentColor"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  fill-rule="evenodd"
+                  d="M4.646 4.646a.5.5 0 0 1 .708 0L8
                 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647
-                2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
+                2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"
+                />
               </svg>
             </div>
             <svg
               v-if="showNavSearchHeaderMobile"
               @click="toggleSearch"
-              width="2em" height="2em" viewBox="0 0 16 16"
+              width="2em"
+              height="2em"
+              viewBox="0 0 16 16"
               fill="currentColor"
-              xmlns="http://www.w3.org/2000/svg">
-              <path fill-rule="evenodd"
-              d="M4.646 4.646a.5.5 0 0 1 .708 0L8
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M4.646 4.646a.5.5 0 0 1 .708 0L8
               7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647
-              2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
+              2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"
+              />
             </svg>
-              <div v-if="showNavMenuMobile || showNavSearchHeaderMobile" id="logo-mobile-menu-open">
+            <div
+              v-if="showNavMenuMobile || showNavSearchHeaderMobile"
+              id="logo-mobile-menu-open"
+            >
               <a @click="go('/')">
                 <!-- <protect-shield /> -->
               </a>
@@ -63,19 +107,70 @@
           </div>
           <div class="logo">
             <NuxtLink to="/">
-              <img src="../public/assets/protect_logo.svg" alt="protect logo" srcset="" />
+              <img
+                src="../public/assets/protect_logo.svg"
+                alt="protect logo"
+                srcset=""
+              />
             </NuxtLink>
           </div>
-          <div id="spacer"></div> <!-- This is just temp -->
+          <div id="spacer"></div>
+          <!-- This is just temp -->
           <div class="right-header">
-            <nav class="d-none d-lg-block navigation" :class="{ 'show-mobs': showNavMenuMobile }">
+            <nav
+              class="d-none d-lg-block navigation"
+              :class="{ 'show-mobs': showNavMenuMobile }"
+            >
               <ul>
                 <li v-for="link in navLinks" :key="link.label">
-                  <NuxtLink :to="link.to">
+                  <NuxtLink
+                    :to="link.to"
+                    @mouseenter="mouseOverMenu(link, $event)"
+                  >
                     {{ link.label }}
                   </NuxtLink>
                 </li>
               </ul>
+
+              <transition name="fade">
+                <div
+                  v-if="showSubMenu"
+                  class="sub-menu-dropdown"
+                  :style="{ left: subMenuLeft + 'px' }"
+                >
+                  <ul>
+                    <li
+                      v-for="sublink in subMenuLinks"
+                      :key="sublink.label"
+                      @mouseenter="mouseOverSubMenu(sublink, $event)"
+                    >
+                      <NuxtLink :to="sublink.to">{{ sublink.label }}</NuxtLink>
+                      <span
+                        v-if="hasChildren(sublink)"
+                        class="submenu-indicator"
+                        >›</span
+                      >
+                    </li>
+                  </ul>
+
+                  <div
+                    v-if="showNestedSubMenu"
+                    class="nested-sub-menu"
+                    :style="{ top: nestedSubMenuTop + 'px' }"
+                  >
+                    <ul>
+                      <li
+                        v-for="nestedLink in nestedSubMenuLinks"
+                        :key="nestedLink.label"
+                      >
+                        <NuxtLink :to="nestedLink.to">{{
+                          nestedLink.label
+                        }}</NuxtLink>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </transition>
             </nav>
             <!-- <img
               v-if="!showNavMenuMobile && !showNavSearchHeaderMobile"
@@ -89,21 +184,39 @@
             -->
             <div class="d-none d-lg-none">
               <span v-if="showNavMenuMobile || showNavSearchHeaderMobile">
-                <a @click="go('/join/')" class="mobile-menu-open-button"><button>Join</button></a>
-                <a @click="go('/login/')" class="mobile-menu-open-button"><button>Login</button></a>
+                <a @click="go('/join/')" class="mobile-menu-open-button"
+                  ><button>Join</button></a
+                >
+                <a @click="go('/login/')" class="mobile-menu-open-button"
+                  ><button>Login</button></a
+                >
               </span>
 
-              <svg v-else xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 19 19">
+              <svg
+                v-else
+                xmlns="http://www.w3.org/2000/svg"
+                width="25"
+                height="25"
+                viewBox="0 0 19 19"
+              >
                 <g transform="translate(-516.724 -178.989)">
-                  <path d="M532.945,181.773a9.513,9.513,0,1,0,2.779,6.719A9.439,9.439,0,0,0,532.945,181.773Zm-6.719,
+                  <path
+                    d="M532.945,181.773a9.513,9.513,0,1,0,2.779,6.719A9.439,9.439,0,0,0,532.945,181.773Zm-6.719,
                   15.222a8.448,8.448,0,0,1-6.015-2.488c-.1-.1-.2-.218-.3-.328a1.442,1.442,0,0,1,
                   .882-1.082l3.315-1.308-.348-.882-3.315,1.308a2.386,2.386,0,0,0-1.228,1.1,8.505,8.505,0,1,1,14,
                   .013,2.392,2.392,0,0,0-1.234-1.109l-3.315-1.307-.348.882,3.314,1.308a1.442,1.442,0,0,1,.886,
-                  1.1c-.094.1-.182.212-.282.312A8.45,8.45,0,0,1,526.226,196.995Z" fill="#66c296"/>
-                  <path d="M528.647,183.715a3.647,3.647,0,0,0-4.861-.016,4.316,4.316,0,0,0-.78,3.407c.237,
+                  1.1c-.094.1-.182.212-.282.312A8.45,8.45,0,0,1,526.226,196.995Z"
+                    fill="#66c296"
+                  />
+                  <path
+                    d="M528.647,183.715a3.647,3.647,0,0,0-4.861-.016,4.316,4.316,0,0,0-.78,3.407c.237,
                   2.428,1.491,4,3.195,4s2.923-1.53,3.195-3.991A4.25,4.25,0,0,0,528.647,183.715Zm-.2,3.293c-.214,
                   1.941-1.077,3.146-2.251,3.146s-2.064-1.233-2.25-3.14a3.456,3.456,0,0,1,.537-2.678,2.732,2.732,
-                  0,0,1,3.453.012A3.4,3.4,0,0,1,528.451,187.008Z" fill="#66c296"/></g></svg>
+                  0,0,1,3.453.012A3.4,3.4,0,0,1,528.451,187.008Z"
+                    fill="#66c296"
+                  />
+                </g>
+              </svg>
             </div>
           </div>
         </div>
@@ -114,22 +227,65 @@
         <div class="mobile-drawer-header">
           <svg
             @click="toggleMobileMenu"
-            width="2em" height="2em" viewBox="0 0 16 16"
+            width="2em"
+            height="2em"
+            viewBox="0 0 16 16"
             fill="currentColor"
-            xmlns="http://www.w3.org/2000/svg">
-            <path fill-rule="evenodd"
-            d="M4.646 4.646a.5.5 0 0 1 .708 0L8
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              fill-rule="evenodd"
+              d="M4.646 4.646a.5.5 0 0 1 .708 0L8
             7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647
-            2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
+            2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"
+            />
           </svg>
-          <NuxtLink to="/" @click="toggleMobileMenu" class="mobile-drawer-logo" aria-label="Go to homepage">
-            <LazyIconsProtectShield/>
+          <NuxtLink
+            to="/"
+            @click="toggleMobileMenu"
+            class="mobile-drawer-logo"
+            aria-label="Go to homepage"
+          >
+            <LazyIconsProtectShield />
           </NuxtLink>
         </div>
         <div v-for="link in navLinks" :key="link.label" class="item">
-          <button @click="goMobile(link.to)" class="next-level">
-            <span class="title">{{ link.label }}</span>
+          <button class="next-level" :class="{ 'has-children': link.children }">
+            <span class="title" @click="goMobile(link.to)">
+              {{ link.label }}
+            </span>
+            <svg
+              v-if="link.children"
+              class="chevron"
+              :class="{ 'chevron-open': expandedMobileMenus[link.label] }"
+              @click="toggleMobileSubmenu(link.label)"
+              width="1em"
+              height="1em"
+              viewBox="0 0 16 16"
+              fill="currentColor"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"
+              />
+            </svg>
           </button>
+
+          <transition name="accordion">
+            <div
+              v-if="link.children && expandedMobileMenus[link.label]"
+              class="mobile-submenu"
+            >
+              <ul>
+                <li v-for="sublink in link.children" :key="sublink.label">
+                  <button @click="goMobile(sublink.to)" class="submenu-link">
+                    <span class="title">{{ sublink.label }}</span>
+                  </button>
+                </li>
+              </ul>
+            </div>
+          </transition>
         </div>
       </nav>
     </aside>
@@ -137,414 +293,664 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onBeforeUnmount } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
+  import { ref, onMounted, onBeforeUnmount } from "vue";
+  import { useRoute, useRouter } from "vue-router";
+  import { states } from "@/utils/redirect-config";
 
-defineProps({
-  header: { type: Object, default: null },
-});
+  defineProps({
+    header: { type: Object, default: null },
+  });
 
-const route = useRoute();
-const router = useRouter();
+  const route = useRoute();
+  const router = useRouter();
 
-// Reactive state
-const showNavMenuMobile = ref(false);
-const showNavSearchHeaderMobile = ref(false);
-const menuIsVisible = ref(false);
-const isMobile = ref(false);
+  // Reactive state
+  const showNavMenuMobile = ref(false);
+  const showNavSearchHeaderMobile = ref(false);
+  const menuIsVisible = ref(false);
+  const isMobile = ref(false);
 
-// Navigation config - single source for both mobile and desktop
-const navLinks = [
-  { to: '/car-insurance/', label: 'Car Insurance' },
-  { to: '/health-insurance/', label: 'Health Insurance' },
-  { to: '/home-insurance/', label: 'Home Insurance' },
-  { to: '/car-insurance/rate-calculator', label: 'Rate Calculator' },
-  { to: '/articles/', label: 'Articles' },
-];
+  // Navigation config - single source for both mobile and desktop
+  const navLinks = [
+    {
+      to: "/car-insurance/",
+      label: "Car Insurance",
+      children: [
+        {
+          to: "/car-insurance/usa",
+          label: "Browse By State",
+          //if we want a nested menu of state links uncomment this
+          // children: states.map((state) => ({
+          //   to: `/car-insurance/${state.slug}`,
+          //   label: state.name,
+          // })),
+        },
+        { to: "/car-insurance/rates-by-vehicle", label: "Rates By Vehicle" },
+        { to: "/car-insurance/discounts", label: "Discounts" },
+      ],
+    },
+    { to: "/health-insurance/", label: "Health Insurance" },
+    { to: "/home-insurance/", label: "Home Insurance" },
+    { to: "/car-insurance/rate-calculator", label: "Rate Calculator" },
+    {
+      to: "/articles/",
+      label: "Articles",
+      children: [
+        { to: "/articles/insurance/car-insurance/", label: "Car Insurance" },
+        {
+          to: "/articles/insurance/health-insurance/",
+          label: "Health Insurance",
+        },
+        { to: "/articles/insurance/home-insurance/", label: "Home Insurance" },
+      ],
+    },
+  ];
 
-// Methods
-const onResize = () => {
-  isMobile.value = window.innerWidth < 992;
-  if (!isMobile.value) {
+  // Methods
+  const onResize = () => {
+    isMobile.value = window.innerWidth < 992;
+    if (!isMobile.value) {
+      showNavMenuMobile.value = false;
+    }
+  };
+
+  const showSubMenu = ref(false);
+  const subMenuLinks = ref([]);
+  const subMenuLeft = ref(0);
+  const showNestedSubMenu = ref(false);
+  const nestedSubMenuLinks = ref([]);
+  const nestedSubMenuTop = ref(0);
+  const expandedMobileMenus = ref({});
+
+  const normalizeChildren = (children) => {
+    if (!Array.isArray(children)) return [];
+    return children.flat(Infinity).filter(Boolean);
+  };
+
+  const hasChildren = (link) => {
+    return normalizeChildren(link?.children).length > 0;
+  };
+
+  const mouseOverMenu = (link, event) => {
+    if (showSubMenu.value) showSubMenu.value = false;
+    showNestedSubMenu.value = false;
+    if (hasChildren(link)) {
+      showSubMenu.value = true;
+      subMenuLinks.value = normalizeChildren(link.children);
+      const element = event.currentTarget;
+      const rect = element.getBoundingClientRect();
+      subMenuLeft.value = rect.left;
+    }
+  };
+
+  const mouseOverSubMenu = (link, event) => {
+    const children = normalizeChildren(link?.children);
+    if (children.length > 0) {
+      showNestedSubMenu.value = true;
+      nestedSubMenuLinks.value = children;
+      nestedSubMenuTop.value = event.currentTarget.offsetTop;
+      return;
+    }
+
+    showNestedSubMenu.value = false;
+    nestedSubMenuLinks.value = [];
+  };
+  const toggleMobileMenu = () => {
+    menuIsVisible.value = !menuIsVisible.value;
+  };
+
+  const go = (path) => {
+    if (route.path !== path) {
+      router.push(path);
+    }
     showNavMenuMobile.value = false;
-  }
-};
+  };
 
-const toggleMobileMenu = () => {
-  menuIsVisible.value = !menuIsVisible.value;
-};
+  const goMobile = (path) => {
+    go(path);
+    toggleMobileMenu();
+    expandedMobileMenus.value = {};
+  };
 
-const go = (path) => {
-  if (route.path !== path) {
-    router.push(path);
-  }
-  showNavMenuMobile.value = false;
-};
+  const toggleMobileSubmenu = (label) => {
+    expandedMobileMenus.value[label] = !expandedMobileMenus.value[label];
+  };
 
-const goMobile = (path) => {
-  go(path);
-  toggleMobileMenu();
-};
+  const closeDesktopSubMenus = () => {
+    showSubMenu.value = false;
+    showNestedSubMenu.value = false;
+  };
 
-// Lifecycle hooks
-onMounted(() => {
-  onResize();
-  window.addEventListener('resize', onResize, { passive: true });
-});
+  // Lifecycle hooks
+  onMounted(() => {
+    onResize();
+    window.addEventListener("resize", onResize, { passive: true });
+  });
 
-onBeforeUnmount(() => {
-  window.removeEventListener('resize', onResize, { passive: true });
-});
+  onBeforeUnmount(() => {
+    window.removeEventListener("resize", onResize, { passive: true });
+  });
 </script>
 
 <style lang="scss">
-.fade-enter-active,
-.fade-leave-active {
-  transition-duration: 0.3s;
-  transition-property: height, opacity;
-  transition-timing-function: ease;
-  overflow: hidden;
-  transform: translateX(100deg) 1s ease-in;
-}
-.rotate-point-up {
-  transform: rotate(180deg);
-}
-.rotate-point-right {
-  transform: rotate(-90deg);
-}
-#nav-mobile-login-button button {
-  border: 2px solid $green;
-  width: 90%;
-  margin: 0 auto;
-  font-weight: bold;
-  font-size: 14px;
-}
-#nav-mobile-search {
-  width: 90%;
-  margin: 20px auto;
-  .input-group {
-    height: 50px;
-    input {
+  .fade-enter-active,
+  .fade-leave-active {
+    transition-duration: 0.3s;
+    transition-property: height, opacity;
+    transition-timing-function: ease;
+    overflow: hidden;
+    transform: translateX(100deg) 1s ease-in;
+  }
+  .rotate-point-up {
+    transform: rotate(180deg);
+  }
+  .rotate-point-right {
+    transform: rotate(-90deg);
+  }
+  #nav-mobile-login-button button {
+    border: 2px solid $green;
+    width: 90%;
+    margin: 0 auto;
+    font-weight: bold;
+    font-size: 14px;
+  }
+  #nav-mobile-search {
+    width: 90%;
+    margin: 20px auto;
+    .input-group {
       height: 50px;
-      font-size: 12px;
-    }
-    .input-group-text.indicator {
-      cursor: pointer;
-      .elixr-icon {
-        width: 20px;
-        max-height: 25px;
+      input {
+        height: 50px;
+        font-size: 12px;
       }
-    }
-  }
-}
-
-svg.elixr-icon.protect-shield {
-  padding-top: 5px;
-  width: 20px;
-  max-height: 25px;
-}
-#logo-mobile-menu-open {
-  border: none;
-  background: none;
-
-}
-#menu-button {
-  cursor: pointer;
-  border: none;
-  background: none;
-  margin-left: 10px;
-}
-#sidebar-no-header {
-  top: 72px;
-  width: 500px;
-}
-.nav-link-sub, .nav-link-main {
-  font-family: 'Nunito Sans', sans-serif;
-  height: 40px;
-  cursor: pointer;
-  border-right: none;
-  border-left: none;
-}
-.mobile-nav {
-  .list-group {
-    border-radius: 0;
-
-    .list-group-item {
-      border-right: 0;
-    }
-  }
-  .list-group:not(:last-child) .nav-link-main {
-    border-bottom: unset;
-  }
-}
-.mobile-menu-open-button button {
-  border: none;
-  background: none;
-  color: #66C296;
-}
-.collapse {
-  border-top: 1px solid rgba($black, .1);
-}
-.nav-link-main {
-  color: #0C2C67;
-  font-weight: bold;
-}
-.nav-link-sub {
-  background: #F4F8F8 !important;
-}
-.elixr-icon {
-  // height: 100%;
-  width: 10px;
-  max-height: 60%;
-}
-.header {
-  margin: 10px auto 0px;
-  background-color: $white;
-  z-index: 10000;
-  // box-shadow: 0px 2px 2px 0px rgba(0,0,0,0.05);
-  border-bottom: 1px solid #F1F1F1;
-
-  a {
-    cursor: pointer;
-    color: #0C2C67;
-
-    &:hover {
-      color: #040f22;
-      text-decoration: underline;
-    }
-  }
-
-  .container {
-    margin: auto;
-
-    @include media-breakpoint-down(lg) {
-      max-width: 100%;
-    }
-  }
-}
-
-.header-inner {
-  display: flex;
-  justify-content: space-between;
-  width: 100%;
-  margin: 10px auto;
-  padding: 0 15px;
-
-  @include media-breakpoint-between(lg, xxl) {
-    margin: auto;
-  }
-
-  @include media-breakpoint-down(md) {
-    height: 32px;
-    padding: 0;
-  }
-  .logo {
-    display: flex;
-    align-items: center;
-    //margin-left: 10px;
-    margin-right: 15px;
-    height: 30px;
-    a {
-      img {
-        height: 22px;
-        margin-top: 5px;
-      }
-    }
-    @include media-breakpoint-between(lg, xxl) {
-      a {
-        img {
-          height: 30px;
-          margin-top: 10px;
+      .input-group-text.indicator {
+        cursor: pointer;
+        .elixr-icon {
+          width: 20px;
+          max-height: 25px;
         }
       }
     }
   }
-  #spacer {
-    flex-grow: 1;
-  }
-  .left-header {
-    align-items: left;
-    justify-content: flex-start;
-    display: none;
 
-    @include media-breakpoint-down(lg) {
-      display: flex;
+  svg.elixr-icon.protect-shield {
+    padding-top: 5px;
+    width: 20px;
+    max-height: 25px;
+  }
+  #logo-mobile-menu-open {
+    border: none;
+    background: none;
+  }
+  #menu-button {
+    cursor: pointer;
+    border: none;
+    background: none;
+    margin-left: 10px;
+  }
+  #sidebar-no-header {
+    top: 72px;
+    width: 500px;
+  }
+  .nav-link-sub,
+  .nav-link-main {
+    font-family: "Nunito Sans", sans-serif;
+    height: 40px;
+    cursor: pointer;
+    border-right: none;
+    border-left: none;
+  }
+  .mobile-nav {
+    .list-group {
+      border-radius: 0;
+
+      .list-group-item {
+        border-right: 0;
+      }
+    }
+    .list-group:not(:last-child) .nav-link-main {
+      border-bottom: unset;
     }
   }
-  .right-header {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
+  .mobile-menu-open-button button {
+    border: none;
+    background: none;
+    color: #66c296;
+  }
+  .collapse {
+    border-top: 1px solid rgba($black, 0.1);
+  }
+  .nav-link-main {
+    color: #0c2c67;
+    font-weight: bold;
+  }
+  .nav-link-sub {
+    background: #f4f8f8 !important;
+  }
+  .elixr-icon {
+    // height: 100%;
+    width: 10px;
+    max-height: 60%;
+  }
+  .header {
+    padding-top: 5px;
+    padding-bottom: 5px;
+    background-color: $white;
+    z-index: 10000;
+    // box-shadow: 0px 2px 2px 0px rgba(0,0,0,0.05);
+    border-bottom: 1px solid #f1f1f1;
 
-    @include media-breakpoint-up(lg) {
-      min-width: 685px;
+    a {
+      cursor: pointer;
+      color: #0c2c67;
+
+      &:hover {
+        color: #040f22;
+        text-decoration: underline;
+      }
+    }
+
+    .container {
+      margin: auto;
+
+      @include media-breakpoint-down(lg) {
+        max-width: 100%;
+      }
+    }
+  }
+
+  .header-inner {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    margin: 10px auto;
+    padding: 0 15px;
+    align-items: center;
+
+    @include media-breakpoint-between(lg, xxl) {
+      margin: auto;
     }
 
     @include media-breakpoint-down(md) {
-      min-width: 40px;
+      height: 32px;
+      padding: 0;
     }
-
-    .navigation {
-      ul {
-        list-style: none;
-        display: flex;
-        flex-wrap: wrap;
-        flex-direction: row;
-        padding: 0;
-        margin: 0;
-
-        li {
-          padding: 15px;
-
-          a {
-            color: $gray-dark;
-            font-weight: 500;
-            font-size: 16px;
-
-            &:hover {
-              color: $blue !important;
-              text-decoration: none;
-            };
-          }
-        }
-      }
-    }
-
-    .icon {
-      width: 100%;
-      max-width: 23px;
-      margin: 0 1em 0 0;
-      cursor: pointer;
-    }
-
-    .login {
-      margin-left: 1.5em;
-
-      button {
-        font-weight: 600;
-        font-size: 0.875em;
-      }
-    }
-  }
-}
-
-.show-mobs {
-  display: block;
-  @include media-breakpoint-between(lg, xxl) {
-    display: none;
-  }
-}
-#spacer {
-  display: none;
-  @include media-breakpoint-between(lg, xxl) {
-    display: block;
-  }
-}
-
-aside.drawer-nav {
-  transition: 0.6s all;
-  max-width: 768px;
-  background: #fff;
-  position: fixed;
-  height: 100vh;
-  transform: translateX(-100%);
-  overflow: hidden;
-  overflow-y: auto;
-  z-index: -9999;
-  width: 100%;
-  top: 0;
-  left: 0;
-
-  .mobile-drawer-header {
-    display: flex;
-    padding: 1em;
-
-    svg {
-      margin-right: 0.5em;
-      cursor: pointer;
-    }
-  }
-
-  nav {
-    display: flex;
-    flex-direction: column;
-  }
-
-  .mobile-menu-hamburger {
-    cursor: pointer;
-  }
-
-  .item {
-    display: flex;
-    justify-content: space-between;
-    border-top: 1px solid #efefef;
-    font-weight: 600;
-    height: 46px;
-    overflow-x: hidden;
-
-    &:last-child {
-      border-bottom: 1px solid #efefef;
-    }
-
-    .next-level {
-      background-color: $white;
-      outline: none;
-      border: 0;
-      flex: 1;
+    .logo {
       display: flex;
-      justify-content: space-between;
       align-items: center;
-      padding: 0.6em 1em;
+      //margin-left: 10px;
+      margin-right: 15px;
+      height: 30px;
+      a {
+        img {
+          height: 22px;
+          margin-top: 5px;
+        }
+      }
+      @include media-breakpoint-between(lg, xxl) {
+        a {
+          img {
+            height: 30px;
+          }
+        }
+      }
+    }
+    #spacer {
+      flex-grow: 1;
+    }
+    .left-header {
+      align-items: left;
+      justify-content: flex-start;
+      display: none;
 
-      .right-arrow {
-        width: 8px;
-        fill: $blue;
+      @include media-breakpoint-down(lg) {
+        display: flex;
+      }
+    }
+    .right-header {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+
+      @include media-breakpoint-up(lg) {
+        min-width: 685px;
+      }
+
+      @include media-breakpoint-down(md) {
+        min-width: 40px;
+      }
+
+      .sub-menu-dropdown {
+        position: absolute;
+        top: 100%;
+        left: 50%;
+        background-color: $white;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+        padding: 0.75em 0;
+        z-index: 1000;
+        border-bottom: 3px solid $blue;
+        min-width: 220px;
+        overflow: visible;
+
+        ul {
+          list-style: none;
+          margin: 0;
+          padding: 0;
+          flex-direction: column !important;
+          min-width: 100%;
+          width: 100%;
+
+          li {
+            display: flex;
+            min-width: 100%;
+            width: 100%;
+            align-items: center;
+            justify-content: space-between;
+            margin: 0;
+            padding: 0 !important;
+            transition: background-color 0.2s ease;
+
+            a {
+              color: $gray-dark;
+              font-weight: 500;
+              font-size: 14px;
+              display: block;
+              padding: 10px 16px;
+              transition: all 0.2s ease;
+              width: 100%;
+
+              &:hover {
+                color: $blue !important;
+                background-color: #f5f5f5;
+                text-decoration: none;
+                padding-left: 20px;
+              }
+            }
+
+            .submenu-indicator {
+              color: $gray-dark;
+              font-size: 16px;
+              padding-right: 16px;
+              user-select: none;
+            }
+          }
+        }
+
+        .nested-sub-menu {
+          position: absolute;
+          left: 100%;
+          top: 0;
+          background-color: $white;
+          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+          min-width: 220px;
+          border-left: 1px solid #efefef;
+          border-bottom: 3px solid $blue;
+          padding: 0.75em 0;
+          z-index: 1001;
+
+          ul {
+            max-height: 90vh;
+            overflow-y: scroll;
+            overflow-x: hidden;
+          }
+        }
+      }
+      .navigation {
+        ul {
+          list-style: none;
+          display: flex;
+          flex-wrap: wrap;
+          flex-direction: row;
+          padding: 0;
+          margin: 0;
+
+          li {
+            padding: 15px;
+
+            a {
+              color: $gray-dark;
+              font-weight: 500;
+              font-size: 16px;
+
+              &:hover {
+                color: $blue !important;
+                text-decoration: none;
+              }
+            }
+          }
+        }
+      }
+
+      .icon {
+        width: 100%;
+        max-width: 23px;
+        margin: 0 1em 0 0;
+        cursor: pointer;
+      }
+
+      .login {
+        margin-left: 1.5em;
+
+        button {
+          font-weight: 600;
+          font-size: 0.875em;
+        }
       }
     }
   }
-}
 
-.drawerActive {
-  .drawer-nav {
-    transform: translateX(0);
-    z-index: 99999;
-    box-shadow: $box-shadow;
+  .show-mobs {
+    display: block;
+    @include media-breakpoint-between(lg, xxl) {
+      display: none;
+    }
   }
-}
-#searchOverLayMobile {
-  .search-box {
-    padding-bottom: 1em;
-    .search-container .search-input-container {
-      padding-bottom: 0;
-      border: none;
-      .input-and-button .inputs-wrapper .input-group{
-        height: 50px;
-        input {
-          height: 100%;
-          padding: 0 10px;
+  #spacer {
+    display: none;
+    @include media-breakpoint-between(lg, xxl) {
+      display: block;
+    }
+  }
+
+  aside.drawer-nav {
+    transition: 0.6s all;
+    max-width: 768px;
+    background: #fff;
+    position: fixed;
+    height: 100vh;
+    transform: translateX(-100%);
+    overflow: hidden;
+    overflow-y: auto;
+    z-index: -9999;
+    width: 100%;
+    top: 0;
+    left: 0;
+
+    .mobile-drawer-header {
+      display: flex;
+      padding: 1em;
+
+      svg {
+        margin-right: 0.5em;
+        cursor: pointer;
+      }
+    }
+
+    nav {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .mobile-menu-hamburger {
+      cursor: pointer;
+    }
+
+    .item {
+      display: flex;
+      flex-direction: column;
+      border-top: 1px solid #efefef;
+      font-weight: 600;
+      overflow: hidden;
+
+      &:last-child {
+        border-bottom: 1px solid #efefef;
+      }
+
+      .next-level {
+        background-color: $white;
+        outline: none;
+        border: 0;
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.6em 1em;
+        height: 46px;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+
+        &:hover {
+          background-color: #f9f9f9;
         }
-        .input-group-append {
-          height: 50px;
-          .input-group-text.indicator svg{
-            height: 25px;
+
+        &.has-children {
+          cursor: pointer;
+        }
+
+        .title {
+          flex: 1;
+          text-align: left;
+        }
+
+        .chevron {
+          width: 22px;
+          height: 22px;
+          transition: transform 0.3s ease;
+          color: $blue;
+          cursor: pointer;
+          flex-shrink: 0;
+          margin-left: 10px;
+
+          &.chevron-open {
+            transform: rotate(180deg);
+          }
+        }
+
+        .right-arrow {
+          width: 8px;
+          fill: $blue;
+        }
+      }
+
+      .mobile-submenu {
+        background-color: #f9f9f9;
+        padding: 0;
+
+        ul {
+          list-style: none;
+          margin: 0;
+          padding: 0;
+
+          li {
+            border-top: 1px solid #efefef;
+
+            .submenu-link {
+              background-color: transparent;
+              outline: none;
+              border: 0;
+              width: 100%;
+              display: block;
+              padding: 0.6em 1em 0.6em 2em;
+              height: 44px;
+              cursor: pointer;
+              font-weight: 500;
+              font-size: 14px;
+              transition: background-color 0.2s ease;
+              text-align: left;
+
+              &:hover {
+                background-color: #efefef;
+              }
+
+              .title {
+                color: $gray-dark;
+              }
+            }
           }
         }
       }
     }
   }
-}
-div#searchOverLayMobile {
-  .container.search-container.collapsed {
-    height: 50px;
-  }
-  .results.hidden {
-    visibility: hidden;
-    height: 0;
-  }
-}
 
-header {
-  position: sticky;
-  top: 0;
-}
+  .drawerActive {
+    .drawer-nav {
+      transform: translateX(0);
+      z-index: 99999;
+      box-shadow: $box-shadow;
+    }
+  }
+  #searchOverLayMobile {
+    .search-box {
+      padding-bottom: 1em;
+      .search-container .search-input-container {
+        padding-bottom: 0;
+        border: none;
+        .input-and-button .inputs-wrapper .input-group {
+          height: 50px;
+          input {
+            height: 100%;
+            padding: 0 10px;
+          }
+          .input-group-append {
+            height: 50px;
+            .input-group-text.indicator svg {
+              height: 25px;
+            }
+          }
+        }
+      }
+    }
+  }
+  div#searchOverLayMobile {
+    .container.search-container.collapsed {
+      height: 50px;
+    }
+    .results.hidden {
+      visibility: hidden;
+      height: 0;
+    }
+  }
+
+  header {
+    position: sticky;
+    top: 0;
+  }
+
+  .fade-enter-active,
+  .fade-leave-active {
+    transition: opacity 0.3s ease;
+  }
+
+  .fade-enter-from,
+  .fade-leave-to {
+    opacity: 0;
+  }
+
+  .accordion-enter-active,
+  .accordion-leave-active {
+    transition: all 0.3s ease;
+    overflow: hidden;
+  }
+
+  .accordion-enter-from,
+  .accordion-leave-to {
+    max-height: 0;
+    opacity: 0;
+  }
+
+  .accordion-enter-to,
+  .accordion-leave-from {
+    max-height: 500px;
+    opacity: 1;
+  }
 </style>

@@ -1,17 +1,17 @@
 <script setup>
-const store = useStore();
-const assetsBaseUrl = store.assetsBaseUrl;
+  const store = useStore();
+  const assetsBaseUrl = store.assetsBaseUrl;
 
-const props = defineProps({
-  testimonialConfig: {
-    type: Object,
-    required: true,
-  },
-});
+  const props = defineProps({
+    testimonialConfig: {
+      type: Object,
+      required: true,
+    },
+  });
 
-const imageOverlap = computed(() => {
-  return props.testimonialConfig.imageOverlap === false ? " no-overlap" : "";
-});
+  const imageOverlap = computed(() => {
+    return props.testimonialConfig.imageOverlap === false ? " no-overlap" : "";
+  });
 </script>
 
 <template>
@@ -29,12 +29,14 @@ const imageOverlap = computed(() => {
             >
               <NuxtImg
                 :src="`${assetsBaseUrl}/testimonials/${testimonialConfig.image}`"
-                :alt="testimonialConfig.title"
+                :alt="`Photo of ${
+                  testimonialConfig.byline?.split(',')[0] || 'customer'
+                }`"
                 format="webp"
                 loading="lazy"
                 width="450"
                 height="604"
-                style="height: auto;"
+                style="height: auto"
               />
             </b-col>
             <b-col
@@ -43,7 +45,7 @@ const imageOverlap = computed(() => {
                 `${testimonialConfig.textWrapperClass || 'default'}`
               "
             >
-              <h2>{{ testimonialConfig.title }}</h2>
+              <h2 class="heading">{{ testimonialConfig.title }}</h2>
               <span class="h4">{{ testimonialConfig.subhead }}</span>
               <p>{{ testimonialConfig.quote }}</p>
               <small class="byline">{{ testimonialConfig.byline }}</small>
@@ -56,123 +58,123 @@ const imageOverlap = computed(() => {
 </template>
 
 <style lang="scss" scoped>
-#testimonials.no-overlap {
-  /* styles for images that don't overlap */
-  background-color: rgba(103, 194, 151, 0.06);
+  #testimonials.no-overlap {
+    /* styles for images that don't overlap */
+    background-color: rgba(103, 194, 151, 0.06);
 
-  .wrapper {
-    @include media-breakpoint-down(sm) {
-      padding-bottom: 0;
+    .wrapper {
+      @include media-breakpoint-down(sm) {
+        padding-bottom: 0;
+      }
+    }
+
+    /* if we don't want the image to overlap - we default to align bottom */
+    .testimonial-image {
+      display: flex;
+      flex-wrap: wrap;
+      align-content: flex-end;
     }
   }
 
-  /* if we don't want the image to overlap - we default to align bottom */
-  .testimonial-image {
-    display: flex;
-    flex-wrap: wrap;
-    align-content: flex-end;
+  #testimonials:not(.no-overlap)::after {
+    background-color: rgba(103, 194, 151, 0.06);
+    position: absolute;
+    content: "";
+    width: 100%;
+    height: 80%;
+    bottom: 0;
+    left: 0;
+    z-index: 1;
+
+    @include media-breakpoint-down(sm) {
+      height: 85%;
+    }
   }
-}
 
-#testimonials:not(.no-overlap)::after {
-  background-color: rgba(103, 194, 151, 0.06);
-  position: absolute;
-  content: "";
-  width: 100%;
-  height: 80%;
-  bottom: 0;
-  left: 0;
-  z-index: 1;
-
-  @include media-breakpoint-down(sm) {
-    height: 85%;
-  }
-}
-
-#testimonials {
-  margin-bottom: 100px;
-  position: relative;
-  .container {
-    padding-top: 75px;
+  #testimonials {
+    margin-bottom: 100px;
     position: relative;
-    z-index: 2;
-  }
-  .wrapper {
-    padding: 0px 75px 0px 75px;
-    @include media-breakpoint-down(md) {
-      padding: 0px;
+    .container {
+      padding-top: 75px;
+      position: relative;
+      z-index: 2;
     }
-    @include media-breakpoint-down(sm) {
-      padding: 0;
-    }
-
-    .testimonial-container {
+    .wrapper {
+      padding: 0px 75px 0px 75px;
+      @include media-breakpoint-down(md) {
+        padding: 0px;
+      }
       @include media-breakpoint-down(sm) {
         padding: 0;
       }
-      .row {
-        margin-bottom: 20px;
-      }
 
-      .image-left {
-        .testimonial-image {
-          order: 1;
+      .testimonial-container {
+        @include media-breakpoint-down(sm) {
+          padding: 0;
         }
-        .testimonial-text {
-          order: 2;
+        .row {
+          margin-bottom: 20px;
+        }
 
-          * {
-            margin: 10px 0;
+        .image-left {
+          .testimonial-image {
+            order: 1;
+          }
+          .testimonial-text {
+            order: 2;
+
+            * {
+              margin: 10px 0;
+            }
           }
         }
-      }
-      .image-right {
-        .testimonial-image {
-          order: 2;
+        .image-right {
+          .testimonial-image {
+            order: 2;
+          }
+          .testimonial-text {
+            order: 1;
+          }
         }
         .testimonial-text {
-          order: 1;
+          @include media-breakpoint-down(md) {
+            padding-top: 35px;
+          }
         }
-      }
-      .testimonial-text {
-        @include media-breakpoint-down(md) {
-          padding-top: 35px;
-        }
-      }
-      .testimonial-image {
-        @include media-breakpoint-down(sm) {
-          order: 2;
-          flex: 0 0 100%;
-          max-width: 100%;
-          justify-content: center;
-        }
-        img {
-          max-width: 100%;
+        .testimonial-image {
           @include media-breakpoint-down(sm) {
-            max-width: 200px;
-            margin: auto;
-            display: block;
+            order: 2;
+            flex: 0 0 100%;
+            max-width: 100%;
+            justify-content: center;
+          }
+          img {
+            max-width: 100%;
+            @include media-breakpoint-down(sm) {
+              max-width: 200px;
+              margin: auto;
+              display: block;
+            }
           }
         }
-      }
-      .testimonial-text {
-        display: flex;
-        justify-content: center;
-        flex-direction: column;
-        text-align: left;
+        .testimonial-text {
+          display: flex;
+          justify-content: center;
+          flex-direction: column;
+          text-align: left;
 
-        @include media-breakpoint-down(md) {
-          padding-bottom: 2em;
-        }
-        @include media-breakpoint-down(sm) {
-          order: 1;
-        }
-        .byline {
-          color: black;
-          font-weight: bold;
+          @include media-breakpoint-down(md) {
+            padding-bottom: 2em;
+          }
+          @include media-breakpoint-down(sm) {
+            order: 1;
+          }
+          .byline {
+            color: black;
+            font-weight: bold;
+          }
         }
       }
     }
   }
-}
 </style>

@@ -25,13 +25,9 @@
       type: String,
       default: "",
     },
-    subheadlineType: {
-      type: String,
-      default: "large",
-    },
   });
 
-  const { heroImage, headline, subheadline, ctaType, ctaConfig, heroClass, subheadlineType } = props;
+  const { heroImage, headline, subheadline, ctaType, ctaConfig, heroClass } = props;
 </script>
 
 <template>
@@ -42,8 +38,7 @@
           <b-row>
             <b-col class="headline-col" cols="12">
               <h1>{{ headline }}</h1>
-              <h2 v-if="subheadlineType !== 'small'">{{ subheadline }}</h2>
-              <p v-else>{{ subheadline }}</p>
+              <p class="lead">{{ subheadline }}</p>
             </b-col>
             <b-col v-if="ctaType" class="cta-col" cols="12">
               <b-row v-if="ctaType && ctaType == 'buttons'" class="btn-row">
@@ -95,20 +90,20 @@
     .container.home-seo-hero {
       .hero {
         .hero-left {
-          width: 50%;
+          width: 53%;
           @include media-breakpoint-down(md) {
             width: 100%;
           }
-          h1 {
-            font-size: 3.75rem;
-            @include media-breakpoint-down(xl) {
-              font-size: 3rem;
-            }
-          }
+          // h1 {
+          //   font-size: 3.75rem;
+          //   @include media-breakpoint-down(xl) {
+          //     font-size: 3rem;
+          //   }
+          // }
           p {
             @include media-breakpoint-down(xl) {
-              font-size: 1rem;
-              line-height: 1.4;
+              font-size: 1.2rem;
+              line-height: 1.5;
               max-width: 500px;
             }
           }
@@ -153,36 +148,25 @@
           margin-top: 3em;
           margin-bottom: 0;
         }
-        h1 {
-          font-size: 4.3rem;
-          font-family: "Cantata One", serif;
-          letter-spacing: -0.07rem;
-          line-height: 4.9rem;
+        // h1 {
+        //   font-size: 4.3rem;
+        //   font-family: "Cantata One", serif;
+        //   letter-spacing: -0.07rem;
+        //   line-height: 4.9rem;
 
-          @include media-breakpoint-down(xl) {
-            font-size: 3.3em;
-            line-height: 1.2;
-          }
-          @include media-breakpoint-down(lg) {
-            font-size: 2.5em;
-            max-width: 450px;
-          }
-        }
+        //   @include media-breakpoint-down(xl) {
+        //     font-size: 3.3em;
+        //     line-height: 1.2;
+        //   }
+        //   @include media-breakpoint-down(lg) {
+        //     font-size: 2.5em;
+        //     max-width: 450px;
+        //   }
+        // }
 
-        h2 {
-          color: $gray-dark;
-          font-size: 2.39rem;
-          font-family: "Nunito Sans", sans-serif;
-          font-weight: 400;
+        .lead {
           margin-top: 1.3rem;
           margin-bottom: 2.3rem;
-          letter-spacing: -0.019rem;
-          line-height: 2.85rem;
-
-          @include media-breakpoint-down(lg) {
-            font-size: 1.6em;
-            line-height: 1.3em;
-          }
         }
 
         .mobile-shield-image {
@@ -207,6 +191,7 @@
 
         @include media-breakpoint-down(md) {
           width: 100%;
+          padding-bottom: 1px;
         }
 
         img {

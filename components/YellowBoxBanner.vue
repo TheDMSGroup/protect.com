@@ -1,5 +1,5 @@
 <template lang="html">
-  <section class="yellow-box-banner" :aria-labelledby="headingId">
+  <section class="yellow-box-banner">
     <b-container :class="{ 'right-image': imageAlign === 'right' }">
       <b-row>
         <b-col v-if="imageAlign === 'left'" cols="12" md="5" lg="7">
@@ -11,12 +11,15 @@
             :fetchpriority="lazyImage ? 'low' : 'auto'"
             decoding="async"
             :preload="!lazyImage"
-            :width="imageWidth"
-            :height="imageHeight"
-            style="height: auto;"
           />
         </b-col>
-        <b-col v-if="imageAlign === 'right'" cols="12" md="5" lg="7" class="d-block d-md-none d-lg-none d-xl-none">
+        <b-col
+          v-if="imageAlign === 'right'"
+          cols="12"
+          md="5"
+          lg="7"
+          class="d-block d-md-none d-lg-none d-xl-none"
+        >
           <NuxtImg
             class="image"
             :alt="imageAlt"
@@ -25,13 +28,10 @@
             :fetchpriority="lazyImage ? 'low' : 'auto'"
             decoding="async"
             :preload="!lazyImage"
-            :width="imageWidth"
-            :height="imageHeight"
-            style="height: auto;"
           />
         </b-col>
         <b-col cols="12" md="7" lg="5" class="wrapper">
-          <h2 :id="headingId">{{ headline }}</h2>
+          <h2 class="heading">{{ headline }}</h2>
           <p>
             {{ content }}
           </p>
@@ -49,7 +49,13 @@
             />
           </p>
         </b-col>
-        <b-col v-if="imageAlign === 'right'" cols="12" md="5" lg="7" class="d-none d-md-block">
+        <b-col
+          v-if="imageAlign === 'right'"
+          cols="12"
+          md="5"
+          lg="7"
+          class="d-none d-md-block"
+        >
           <NuxtImg
             class="image"
             :alt="imageAlt"
@@ -58,9 +64,6 @@
             :fetchpriority="lazyImage ? 'low' : 'auto'"
             decoding="async"
             :preload="!lazyImage"
-            :width="imageWidth"
-            :height="imageHeight"
-            style="height: auto;"
           />
         </b-col>
       </b-row>
@@ -78,14 +81,6 @@
     imageAlt: {
       type: String,
       default: "",
-    },
-    imageWidth: {
-      type: Number,
-      default: 624,
-    },
-    imageHeight: {
-      type: Number,
-      default: 722,
     },
     headline: {
       type: String,
@@ -115,9 +110,6 @@
 
   const router = useRouter();
 
-  // Generate unique ID for heading to link with aria-labelledby
-  const headingId = `yellow-banner-heading-${Math.random().toString(36).substring(2, 11)}`;
-
   const goToAction = () => {
     if (props.action.includes("#")) {
       const element = document.querySelector(props.action);
@@ -141,17 +133,7 @@
     }
 
     h2 {
-      font-size: 2.5rem;
       margin-bottom: 15px;
-      color: #3a3a3a;
-
-      @include media-breakpoint-down(md) {
-        text-align: left;
-        font-size: 2.3rem;
-      }
-      @include media-breakpoint-down(sm) {
-        font-size: 2rem;
-      }
     }
 
     .container {
@@ -192,18 +174,7 @@
       display: block;
       width: 100%;
       max-width: 600px;
-      max-height: 600px;
-      object-fit: contain;
       margin: 50px auto 0 auto;
-    }
-    p {
-      font-weight: 400;
-      font-size: 1.5rem;
-      color: #4a4a4a;
-
-      @include media-breakpoint-down(md) {
-        font-size: 1.35rem;
-      }
     }
     .btn {
       margin-top: 25px;

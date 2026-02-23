@@ -18,6 +18,7 @@
         value: {
           icon: "car",
           value: "car-insurance",
+          target: "https://insure.protect.com",
         },
         text: "Car Insurance",
       },
@@ -58,6 +59,7 @@
             value: {
               icon: 'car',
               value: 'car-insurance',
+              target: 'https://insure.protect.com'
             },
             text: 'Car Insurance',
           },
@@ -65,6 +67,7 @@
             value: {
               icon: 'health-insurance',
               value: 'health-insurance',
+              target: 'https://health.protect.com'
             },
             text: 'Health Insurance',
           },
@@ -72,11 +75,12 @@
             value: {
               icon: 'home',
               value: 'home-insurance',
+              target: 'https://homeinsurance.protect.com'
             },
             text: 'Home Insurance',
           },
         ],
-        icon: 'scales',
+        icon: 'car',
         name: 'compareYourRateDropdown',
         placeholderText: 'Compare rates for...',
         label: 'Compare Your Rate Selections',
@@ -121,10 +125,9 @@
         headline="Calculate your new rate"
         subheadline="Discover how much you can save with Protect.com."
         image="dad-bike.png"
-        image-alt="dad riding a bike with a child in a carrier on the rear and a puppy in the front basket"
+        image-alt="Dad riding a bike with a child in a carrier on the rear and a puppy in the front basket"
         container-class="dad-bike"
         :lazy-image="true"
-        image-alt-description="Dad riding a bike with a child in a carrier on the rear and a puppy in the front basket"
       />
     </div>
   </div>
