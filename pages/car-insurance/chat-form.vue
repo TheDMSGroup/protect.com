@@ -1249,19 +1249,19 @@ const getMockResults = () => ({
 })
 
 const submitToApi = async () => {
+  const { proxy } = useScriptGoogleTagManager();
   isLoadingResults.value = true
 
   try {
     // Check for mastodonoff URL parameter
     const urlParams = new URLSearchParams(window.location.search)
     const useMockData = urlParams.get('mastodonoff') === 'true'
+    const rtclid = urlParams.get('rtclid') || window.rtClickId || null;
 
     // Build the payload from form data
     const payload = buildLeadPayload(formData, {
-      // Add any additional options here (UTM params, etc.)
+      rtclid
     })
-
-    console.log('Mastodon API Request Payload:', payload)
 
     let result
     if (useMockData) {
