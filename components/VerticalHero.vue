@@ -48,6 +48,7 @@
             alt="Auto Insurance Shield"
             width="700"
             height="800"
+            fetchpriority="high"
           />
         </div>
       </div>
@@ -192,7 +193,7 @@
       .hero-right {
         width: 45%;
         display: flex;
-        height: 100%;
+        height: auto;
 
         @include media-breakpoint-down(md) {
           width: 100%;
@@ -201,7 +202,9 @@
 
         img {
           display: block;
-          height: 100%;
+          height: auto;
+          max-width: unset;
+          width: unset;
           object-fit: contain;
           object-position: top right;
 

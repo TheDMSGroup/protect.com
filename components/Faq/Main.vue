@@ -2,7 +2,11 @@
   <section ref="faqSection" class="faq-section">
     <div class="container">
       <div class="faq-list">
-        <div v-for="(item, index) in processedFaq" :key="index" class="faq-item">
+        <div
+          v-for="(item, index) in processedFaq"
+          :key="index"
+          class="faq-item"
+        >
           <h3>{{ item.question }}</h3>
           <p class="answer-content" v-html="item.answer" />
         </div>
@@ -72,30 +76,28 @@
       display: flex;
       flex-direction: column;
       gap: 2rem;
-    }
 
-    .faq-item {
-      background: $gray-lighter;
-      border-radius: 0.5rem;
-      padding: 2.5rem;
-      @include media-breakpoint-down(md) {
-        padding: 1.5rem;
-      }
-      border: 1px solid $gray-light;
+      .faq-item {
+        background: $gray-lighter;
+        border-radius: 0.5rem;
+        padding: 2.5rem;
+        @include media-breakpoint-down(md) {
+          padding: 1.5rem;
+        }
+        border: 1px solid $gray-light;
+        :deep(a) {
+          text-decoration: underline;
+        }
 
-      a {
-        color: $blue;
-        text-decoration: underline;
-      }
-
-      h3 {
-        margin-bottom: 1.5rem;
-        color: $blue;
-      }
-      ol {
-        padding-left: 1.5rem;
-        margin-top: 1rem;
-        margin-bottom: 1rem;
+        h3 {
+          margin-bottom: 1.5rem;
+          color: $blue;
+        }
+        ol {
+          padding-left: 1.5rem;
+          margin-top: 1rem;
+          margin-bottom: 1rem;
+        }
       }
     }
   }
