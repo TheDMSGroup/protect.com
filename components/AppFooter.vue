@@ -78,6 +78,16 @@
           </div>
         </div> -->
       </div>
+      <div class="container footerStates">
+      <h3>Insurance By State:</h3>
+      <ul>
+        <li v-for="state in states":key="state.name">
+          <NuxtLink :to="`/car-insurance/${state.slug}`">
+            {{ state.abbreviation }}
+          </NuxtLink>
+        </li>
+      </ul>
+    </div>
       <div class="row footer-columns">
         <div class="privacy-policies">
           <p>
@@ -100,7 +110,29 @@
   </footer>
 </template>
 
+<script setup>
+  import {states} from "@/utils/redirect-config";
+
+</script>
+
 <style scoped lang="scss">
+  .footerStates{
+    margin:20px 0;
+  }
+
+  .footerStates li{
+    display:inline-flex;
+    margin:0 5px;
+  }
+
+  .footerStates li a{
+    font-size:14px;
+  }
+
+  .footerStates h3{
+    text-align:center;
+  }
+
   .footer {
     width: 100%;
     text-align: left;
