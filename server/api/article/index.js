@@ -124,21 +124,66 @@ export default defineEventHandler(async (event) => {
       // Made more flexible to handle spaces and nested content
       const componentRegex = /\{\{component_(\w+)(?:,\s*\|([^|]+)\|)?\s*\}\}/g;
 
+      const escapeHtml = (value = "") =>
+        String(value)
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#39;");
+
+      const sanitizeUrl = (value = "") => {
+        const url = String(value || "").trim();
+        if (!url) return "";
+
+        if (url.startsWith("#") || url.startsWith("/")) {
+          return escapeHtml(url);
+        }
+
+        const lower = url.toLowerCase();
+        if (lower.startsWith("http://") || lower.startsWith("https://") || lower.startsWith("mailto:") || lower.startsWith("tel:")) {
+          return escapeHtml(url);
+        }
+
+        return "";
+      };
+
+      const createUniqueHeadingIdGenerator = () => {
+        const seenIds = new Map();
+
+        return (text) => {
+          const baseId = String(text || "")
+            .replace(/[^a-zA-Z0-9]+/g, "-")
+            .replace(/(^-|-$)/g, "")
+            .toLowerCase() || "section";
+
+          const currentCount = seenIds.get(baseId) || 0;
+          seenIds.set(baseId, currentCount + 1);
+
+          return currentCount === 0 ? baseId : `${baseId}-${currentCount + 1}`;
+        };
+      };
+
+      const getHeadingIdForToc = createUniqueHeadingIdGenerator();
+      const getHeadingIdForRender = createUniqueHeadingIdGenerator();
+
       // Helper function to extract headings from AST (always runs)
       const extractHeadings = (nodes) => {
         const headingsList = [];
         const levelMap = { one: 1, two: 2, three: 3, four: 4, five: 5, six: 6 };
 
         const generateHeading = (headingNode) => {
-          const level = headingNode.type.split("-")[1];
+          const nodeType = headingNode?.type || "heading-two";
+          const level = nodeType.split("-")[1];
           const headingLevel = levelMap[level] || 2;
-          const text = headingNode.children?.map((c) => c.text || "").join("");
-          const id = text.replace(/[^a-zA-Z0-9]+/g, "-").toLowerCase();
+          const text = headingNode?.children?.map((c) => c.text || "").join("") || "";
+          const id = getHeadingIdForToc(text);
 
           return { text, id, level: headingLevel };
         };
         nodes.forEach((node) => {
-          if (node.type.startsWith("heading-") || (node.children.length === 1 && node.children[0].bold && node.children[0].text.length > 0)) {
+          const children = Array.isArray(node?.children) ? node.children : [];
+          if (node?.type?.startsWith("heading-") || (children.length === 1 && children[0].bold && (children[0].text || "").length > 0)) {
             headingsList.push(generateHeading(node));
           }
         });
@@ -156,7 +201,7 @@ export default defineEventHandler(async (event) => {
 
       // Helper function to render text with formatting
       const renderTextNode = (textNode) => {
-        let text = textNode.text || "";
+        let text = escapeHtml(textNode.text || "");
 
         if (textNode.bold) {
           text = `<strong>${text}</strong>`;
@@ -183,12 +228,19 @@ export default defineEventHandler(async (event) => {
             if (child.type === "link") {
               const linkText = renderChildren(child.children);
               const target = child.openInNewTab ? ' target="_blank" rel="noopener noreferrer"' : "";
-              const title = child.title ? ` title="${child.title}"` : "";
-              return `<a href="${child.href}"${target}${title}>${linkText}</a>`;
+              const title = child.title ? ` title="${escapeHtml(child.title)}"` : "";
+              const href = sanitizeUrl(child.href);
+              return href ? `<a href="${href}"${target}${title}>${linkText}</a>` : linkText;
             } else if (child.type === "text") {
               return renderTextNode(child);
             } else if (child.text !== undefined) {
               return renderTextNode(child);
+            } else if (child.type === "bulleted-list" || child.type === "numbered-list") {
+              return renderNode(child);
+            } else if (Array.isArray(child.children)) {
+              const nestedContent = renderChildren(child.children);
+              const childType = escapeHtml(child.type || "unknown-inline-node");
+              return `<span data-rich-text-node="${childType}">${nestedContent}</span>`;
             }
             return "";
           })
@@ -206,7 +258,7 @@ export default defineEventHandler(async (event) => {
           const headingLevel = levelMap[level] || 2;
           const content = renderChildren(node.children);
           const text = node.children?.map((c) => c.text || "").join("");
-          const id = text.replace(/[^a-zA-Z0-9]+/g, "-").toLowerCase();
+          const id = getHeadingIdForRender(text);
 
           // Return heading node with id for scrolling
           return {
@@ -225,7 +277,7 @@ export default defineEventHandler(async (event) => {
           // Check if this paragraph is being used as a heading (single bold child)
           if (node.children?.length === 1 && node.children[0].bold && node.children[0].text && node.children[0].text.length > 0) {
             const text = node.children[0].text;
-            const id = text.replace(/[^a-zA-Z0-9]+/g, "-").toLowerCase();
+            const id = getHeadingIdForRender(text);
 
             // Return as a pseudo-heading with ID
             return {
@@ -261,26 +313,27 @@ export default defineEventHandler(async (event) => {
 
         // Handle code blocks
         if (node.type === "code-block") {
-          const code = node.children?.map((c) => c.text || "").join("\n");
+          const code = escapeHtml(node.children?.map((c) => c.text || "").join("\n") || "");
           return `<pre><code>${code}</code></pre>`;
         }
 
         // Handle images
         if (node.type === "image") {
-          const alt = node.title || "";
-          const width = node.width ? ` width="${node.width}"` : "";
-          const height = node.height ? ` height="${node.height}"` : "";
-          return `<img src="${node.src}" alt="${alt}"${width}${height} />`;
+          const alt = escapeHtml(node.title || "");
+          const src = sanitizeUrl(node.src);
+          const width = Number.isFinite(Number(node.width)) ? ` width="${Number(node.width)}"` : "";
+          const height = Number.isFinite(Number(node.height)) ? ` height="${Number(node.height)}"` : "";
+          return src ? `<img src="${src}" alt="${alt}"${width}${height} />` : "";
         }
 
         // Handle tables
         if (node.type === "table") {
           const rows = node.children
             ?.map((row) => {
-              if (row.type === "table_row") {
+              if (row.type === "table_row" || row.type === "table-row") {
                 const cells = row.children
                   ?.map((cell) => {
-                    const tag = cell.type === "table_head" ? "th" : "td";
+                    const tag = cell.type === "table_head" || cell.type === "table-header-cell" || cell.type === "table_header_cell" ? "th" : "td";
                     return `<${tag}>${renderChildren(cell.children)}</${tag}>`;
                   })
                   .join("");
@@ -292,7 +345,17 @@ export default defineEventHandler(async (event) => {
           return `<table>${rows}</table>`;
         }
 
-        return "";
+        if (Array.isArray(node.children)) {
+          const fallbackContent = renderChildren(node.children);
+          const nodeType = escapeHtml(node.type || "unknown-node");
+          console.warn("Unhandled rich text node type:", node.type);
+          return `<div data-rich-text-node="${nodeType}">${fallbackContent}</div>`;
+        }
+
+        const nodeType = escapeHtml(node.type || "unknown-node");
+        const fallbackText = node.text !== undefined ? renderTextNode(node) : "";
+        console.warn("Unhandled rich text node type:", node.type);
+        return `<div data-rich-text-node="${nodeType}">${fallbackText}</div>`;
       };
 
       // Process all nodes
