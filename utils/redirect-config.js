@@ -103,7 +103,8 @@ export function getOfficialSlug(inputSlug) {
  */
 export function processRedirect(path) {
   // Early return for non-relevant paths
-  if (!path.startsWith("/insurance/") && !path.includes("car-insurance")) {
+  // Use startsWith to avoid matching paths that merely contain "car-insurance" in the slug
+  if (!path.startsWith("/insurance/") && !path.startsWith("/car-insurance")) {
     return null;
   }
 
@@ -115,7 +116,7 @@ export function processRedirect(path) {
   }
 
   // Handle car insurance state redirects
-  if (path.includes("car-insurance")) {
+  if (path.startsWith("/car-insurance")) {
     const pathParts = path.split("/");
     const stateSegment = pathParts[2];
 
