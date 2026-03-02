@@ -1,3 +1,5 @@
+import { astToHtmlString } from "@graphcms/rich-text-html-renderer";
+
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig();
   const apiUrl = config.graphqlApiUrl;
@@ -7,32 +9,6 @@ export default defineEventHandler(async (event) => {
 
   console.log("Fetching article with urlSlug:", urlSlug);
 
-  function generateFallbackProps(componentName) {
-    // Add component-specific props
-    switch (componentName) {
-      case "Faq":
-        return {
-          faq: [
-            {
-              question: "What is Protect.com?",
-              answer:
-                "Protect.com is your one-stop destination for discovering savings on car insurance. We built this site to help people compare different quotes from top providers without having to fill out dozens of forms. We show you providers that we think offer you the lowest rates based on your vehicle and lifecycle, taking the guesswork out of the auto insurance buying process.",
-            },
-            {
-              question: "How did we gather this info?",
-              answer:
-                "Protect.com is your one-stop destination for discovering savings on car insurance. We built this site to help people compare different quotes from top providers without having to fill out dozens of forms. We show you providers that we think offer you the lowest rates based on your vehicle and lifecycle, taking the guesswork out of the auto insurance buying process.",
-            },
-          ],
-        };
-      case "ZipCodeForm":
-        return {
-          action: "insure.protect.com",
-        };
-      default:
-        return {};
-    }
-  }
   const getSingleArticle = async () => {
     const graphqlQuery = `
       query GetArticleBySlugAndRelatedArticles($urlSlug: String!) {
@@ -119,35 +95,6 @@ export default defineEventHandler(async (event) => {
         return article;
       }
 
-      // Updated regex to match: {{component_Name, |{props: 'here'}| }}
-      // Captures: component name and optional props object
-      // Made more flexible to handle spaces and nested content
-      const componentRegex = /\{\{component_(\w+)(?:,\s*\|([^|]+)\|)?\s*\}\}/g;
-
-      const escapeHtml = (value = "") =>
-        String(value)
-          .replace(/&/g, "&amp;")
-          .replace(/</g, "&lt;")
-          .replace(/>/g, "&gt;")
-          .replace(/"/g, "&quot;")
-          .replace(/'/g, "&#39;");
-
-      const sanitizeUrl = (value = "") => {
-        const url = String(value || "").trim();
-        if (!url) return "";
-
-        if (url.startsWith("#") || url.startsWith("/")) {
-          return escapeHtml(url);
-        }
-
-        const lower = url.toLowerCase();
-        if (lower.startsWith("http://") || lower.startsWith("https://") || lower.startsWith("mailto:") || lower.startsWith("tel:")) {
-          return escapeHtml(url);
-        }
-
-        return "";
-      };
-
       const createUniqueHeadingIdGenerator = () => {
         const seenIds = new Map();
 
@@ -167,6 +114,17 @@ export default defineEventHandler(async (event) => {
       const getHeadingIdForToc = createUniqueHeadingIdGenerator();
       const getHeadingIdForRender = createUniqueHeadingIdGenerator();
 
+      const extractPlainText = (node) => {
+        if (!node) return "";
+        if (typeof node.text === "string") return node.text;
+        if (Array.isArray(node.children)) {
+          return node.children.map((child) => extractPlainText(child)).join("");
+        }
+        return "";
+      };
+
+      const stripHtmlTags = (value = "") => String(value).replace(/<[^>]*>/g, "").trim();
+
       // Helper function to extract headings from AST (always runs)
       const extractHeadings = (nodes) => {
         const headingsList = [];
@@ -176,7 +134,7 @@ export default defineEventHandler(async (event) => {
           const nodeType = headingNode?.type || "heading-two";
           const level = nodeType.split("-")[1];
           const headingLevel = levelMap[level] || 2;
-          const text = headingNode?.children?.map((c) => c.text || "").join("") || "";
+          const text = extractPlainText(headingNode).trim();
           const id = getHeadingIdForToc(text);
 
           return { text, id, level: headingLevel };
@@ -192,273 +150,53 @@ export default defineEventHandler(async (event) => {
       };
 
       // Always extract headings for table of contents
-      const contentLinks = extractHeadings(articleContent.content.raw.children);
+      const contentLinks = extractHeadings(articleContent.content.raw.children || []);
       articleContent.contentLinks = contentLinks;
 
-      // Always build contentParts from AST
-      const contentParts = [];
-      const componentNames = [];
-
-      // Helper function to render text with formatting
-      const renderTextNode = (textNode) => {
-        let text = escapeHtml(textNode.text || "");
-
-        if (textNode.bold) {
-          text = `<strong>${text}</strong>`;
-        }
-        if (textNode.italic) {
-          text = `<em>${text}</em>`;
-        }
-        if (textNode.underline) {
-          text = `<u>${text}</u>`;
-        }
-        if (textNode.code) {
-          text = `<code>${text}</code>`;
-        }
-
-        return text;
+      const headingRenderer = (tagName, children) => {
+        const text = stripHtmlTags(children);
+        const id = getHeadingIdForRender(text);
+        return `<${tagName} id="${id}">${children}</${tagName}>`;
       };
 
-      // Helper function to render children nodes
-      const renderChildren = (children) => {
-        if (!children || !Array.isArray(children)) return "";
-
-        return children
-          .map((child) => {
-            if (child.type === "link") {
-              const linkText = renderChildren(child.children);
-              const target = child.openInNewTab ? ' target="_blank" rel="noopener noreferrer"' : "";
-              const title = child.title ? ` title="${escapeHtml(child.title)}"` : "";
-              const href = sanitizeUrl(child.href);
-              return href ? `<a href="${href}"${target}${title}>${linkText}</a>` : linkText;
-            } else if (child.type === "text") {
-              return renderTextNode(child);
-            } else if (child.text !== undefined) {
-              return renderTextNode(child);
-            } else if (child.type === "bulleted-list" || child.type === "numbered-list") {
-              return renderNode(child);
-            } else if (Array.isArray(child.children)) {
-              const nestedContent = renderChildren(child.children);
-              const childType = escapeHtml(child.type || "unknown-inline-node");
-              return `<span data-rich-text-node="${childType}">${nestedContent}</span>`;
+      const parsedHtml = astToHtmlString({
+        content: articleContent.content.raw,
+        references: articleContent.content.references || [],
+        renderers: {
+          h1: ({ children }) => headingRenderer("h1", children),
+          h2: ({ children }) => headingRenderer("h2", children),
+          h3: ({ children }) => headingRenderer("h3", children),
+          h4: ({ children }) => headingRenderer("h4", children),
+          h5: ({ children }) => headingRenderer("h5", children),
+          h6: ({ children }) => headingRenderer("h6", children),
+          p: ({ children }) => {
+            const boldOnlyMatch = String(children || "").match(/^\s*<(strong|b)>([\s\S]*?)<\/\1>\s*$/i);
+            if (!boldOnlyMatch) {
+              return `<p>${children}</p>`;
             }
-            return "";
-          })
-          .join("");
-      };
 
-      // Helper function to render a full node
-      const renderNode = (node) => {
-        if (!node.type) return "";
+            const text = stripHtmlTags(boldOnlyMatch[2]);
+            if (!text) {
+              return `<p>${children}</p>`;
+            }
 
-        // Handle headings
-        if (node.type.startsWith("heading-")) {
-          const level = node.type.split("-")[1];
-          const levelMap = { one: 1, two: 2, three: 3, four: 4, five: 5, six: 6 };
-          const headingLevel = levelMap[level] || 2;
-          const content = renderChildren(node.children);
-          const text = node.children?.map((c) => c.text || "").join("");
-          const id = getHeadingIdForRender(text);
-
-          // Return heading node with id for scrolling
-          return {
-            type: "heading",
-            level: headingLevel,
-            id,
-            content,
-            html: `<h${headingLevel} id="${id}">${content}</h${headingLevel}>`,
-          };
-        }
-
-        // Handle paragraphs
-        if (node.type === "paragraph") {
-          const content = renderChildren(node.children);
-
-          // Check if this paragraph is being used as a heading (single bold child)
-          if (node.children?.length === 1 && node.children[0].bold && node.children[0].text && node.children[0].text.length > 0) {
-            const text = node.children[0].text;
             const id = getHeadingIdForRender(text);
-
-            // Return as a pseudo-heading with ID
-            return {
-              type: "heading",
-              level: 3, // Treat bold paragraphs as h3
-              id,
-              content,
-              html: `<p id="${id}"><strong>${text}</strong></p>`,
-            };
-          }
-
-          return `<p>${content}</p>`;
-        }
-
-        // Handle lists
-        if (node.type === "bulleted-list" || node.type === "numbered-list") {
-          const tag = node.type === "numbered-list" ? "ol" : "ul";
-          const items = node.children
-            ?.map((child) => {
-              if (child.type === "list-item" || child.type === "list-item-child") {
-                return `<li>${renderChildren(child.children)}</li>`;
-              }
-              return "";
-            })
-            .join("");
-          return `<${tag}>${items}</${tag}>`;
-        }
-
-        // Handle blockquotes
-        if (node.type === "block-quote") {
-          return `<blockquote>${renderChildren(node.children)}</blockquote>`;
-        }
-
-        // Handle code blocks
-        if (node.type === "code-block") {
-          const code = escapeHtml(node.children?.map((c) => c.text || "").join("\n") || "");
-          return `<pre><code>${code}</code></pre>`;
-        }
-
-        // Handle images
-        if (node.type === "image") {
-          const alt = escapeHtml(node.title || "");
-          const src = sanitizeUrl(node.src);
-          const width = Number.isFinite(Number(node.width)) ? ` width="${Number(node.width)}"` : "";
-          const height = Number.isFinite(Number(node.height)) ? ` height="${Number(node.height)}"` : "";
-          return src ? `<img src="${src}" alt="${alt}"${width}${height} />` : "";
-        }
-
-        // Handle tables
-        if (node.type === "table") {
-          const rows = node.children
-            ?.map((row) => {
-              if (row.type === "table_row" || row.type === "table-row") {
-                const cells = row.children
-                  ?.map((cell) => {
-                    const tag = cell.type === "table_head" || cell.type === "table-header-cell" || cell.type === "table_header_cell" ? "th" : "td";
-                    return `<${tag}>${renderChildren(cell.children)}</${tag}>`;
-                  })
-                  .join("");
-                return `<tr>${cells}</tr>`;
-              }
-              return "";
-            })
-            .join("");
-          return `<table>${rows}</table>`;
-        }
-
-        if (Array.isArray(node.children)) {
-          const fallbackContent = renderChildren(node.children);
-          const nodeType = escapeHtml(node.type || "unknown-node");
-          console.warn("Unhandled rich text node type:", node.type);
-          return `<div data-rich-text-node="${nodeType}">${fallbackContent}</div>`;
-        }
-
-        const nodeType = escapeHtml(node.type || "unknown-node");
-        const fallbackText = node.text !== undefined ? renderTextNode(node) : "";
-        console.warn("Unhandled rich text node type:", node.type);
-        return `<div data-rich-text-node="${nodeType}">${fallbackText}</div>`;
-      };
-
-      // Process all nodes
-      articleContent.content.raw.children.forEach((node) => {
-        const result = renderNode(node);
-
-        // Handle heading nodes with IDs
-        if (result && typeof result === "object" && result.type === "heading") {
-          contentParts.push({
-            type: "text",
-            content: result.html,
-            tag: node.type,
-            id: result.id,
-            isHeading: true,
-          });
-          return;
-        }
-
-        const html = result || "";
-
-        // Check if it's a component marker with the new pattern
-        // Pattern: {{component_Name, |{props}| }}
-        let match;
-        const componentMatches = [];
-
-        // Reset regex lastIndex for global flag
-        componentRegex.lastIndex = 0;
-
-        while ((match = componentRegex.exec(html)) !== null) {
-          componentMatches.push({
-            fullMatch: match[0],
-            componentName: match[1],
-            propsString: match[2], // Can be undefined if no props
-            index: match.index,
-          });
-        }
-
-        if (componentMatches.length > 0) {
-          let lastIndex = 0;
-
-          componentMatches.forEach((componentMatch) => {
-            const { fullMatch, componentName, propsString, index } = componentMatch;
-
-            componentNames.push(componentName);
-
-            // Add text before this component
-            if (index > lastIndex) {
-              const textBefore = html.substring(lastIndex, index).trim();
-              if (textBefore) {
-                contentParts.push({
-                  type: "text",
-                  content: textBefore,
-                  tag: node.type,
-                });
-              }
-            }
-
-            // Parse props if they exist
-            let props = {};
-            if (propsString) {
-              try {
-                // Remove leading/trailing whitespace and parse JSON
-                props = JSON.parse(propsString.trim());
-              } catch (e) {
-                //generate fallback on parse error either from malformed JSON or no props passed
-                props = generateFallbackProps(componentName);
-                console.warn(`Failed to parse props for component ${componentName}:`, propsString, e, "Fallback props will be used.");
-              }
-            }
-
-            // Add the component with props
-            contentParts.push({
-              type: "component",
-              name: componentName,
-              componentProps: props,
-            });
-
-            lastIndex = index + fullMatch.length;
-          });
-
-          // Add any remaining text after the last component
-          if (lastIndex < html.length) {
-            const textAfter = html.substring(lastIndex).trim();
-            if (textAfter) {
-              contentParts.push({
-                type: "text",
-                content: textAfter,
-                tag: node.type,
-              });
-            }
-          }
-        } else if (html) {
-          contentParts.push({
-            type: "text",
-            content: html,
-            tag: node.type,
-          });
-        }
+            return `<p id="${id}">${children}</p>`;
+          },
+        },
       });
 
-      // Add processed data to article
-      articleContent.contentParts = contentParts;
-      articleContent.componentNames = [...new Set(componentNames)];
+      articleContent.contentHtml = parsedHtml;
+      articleContent.contentParts = parsedHtml
+        ? [
+            {
+              type: "text",
+              content: parsedHtml,
+              tag: "rich-text",
+            },
+          ]
+        : [];
+      articleContent.componentNames = [];
 
       return {
         response: article,
