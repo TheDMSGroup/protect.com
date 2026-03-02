@@ -113,9 +113,9 @@ Place api routes and server middleware here. For client side middleware, see [`/
 
 ### 4. `/composables`
 
-Vue3 version of mixins. Composables follow a few simple rules. We are working to conform to the recommended styling set forth by the Vue team. 
+Vue3 version of mixins. Composables follow a few simple rules. We are working to conform to the recommended styling set forth by the Vue team.
 
-  1. Each composable should be prefixed with `use`. 
+  1. Each composable should be prefixed with `use`.
     A composable that returns some formatted text could be called `useTextFormatter`.
   2. Prefer inline composables where possible. This can help organize your composition api code. See an example [here](/pages/article/[slug].vue) (useArticleFromCacheOrApi). Explainer video [here](https://www.youtube.com/watch?v=iKaDFAxzJyw&t=897s).
   3. Any composables that can be re-used throughout the app should be placed in `/composables`
@@ -137,7 +137,7 @@ Prefer to use `scoped` attribute on styles in individual `.vue` files.
 
 ## API Integration
 
-You can create and interface with API endpoints defined in `/server/api`. Some endpoints used in this project are: 
+You can create and interface with API endpoints defined in `/server/api`. Some endpoints used in this project are:
 
 - Multiple Articles API:
   [`server/api/articles/index.js`](server/api/articles/index.js)
@@ -148,24 +148,24 @@ New endpoints should be placed in `/server/api/{context}/index.js`
 
 ### Using an endpoint
 
-See [here](/pages/article/[slug].vue) (useArticleFromCacheOrApi). for an example. 
-Ensure to follow the pattern defined in `useArticleFromCacheOrApi` as it leverages both our custom api endpoint and Nuxt's built in caching mechanisms. 
+See [here](/pages/article/[slug].vue) (useArticleFromCacheOrApi). for an example.
+Ensure to follow the pattern defined in `useArticleFromCacheOrApi` as it leverages both our custom api endpoint and Nuxt's built in caching mechanisms.
 
 Prefer to use API endpoints within your page, rather than a component. See [`pages/article/[slug].vue`](pages/article/[slug].vue) and [Data Flow](#data-flow)
 
-Sticking point: Your cache key must be unique to each type of API call, or else Nuxt cannot effectively cache your requests. Example: 
+Sticking point: Your cache key must be unique to each type of API call, or else Nuxt cannot effectively cache your requests. Example:
 ```javascript
 const cacheKey = `articles-${vertical}-${route.params.slug}`;
 // create a cache key like "articles-auto-some-unque-article-slug"
 ```
 
-The above code will generate a cache key unique to the vertical and article slug, so the next time a user navgiates to `some-unque-article-slug` in the session, the cache can be used rather than another API request. 
+The above code will generate a cache key unique to the vertical and article slug, so the next time a user navgiates to `some-unque-article-slug` in the session, the cache can be used rather than another API request.
 
 ## Data Flow
 
 This project strives to adhere to the unidirectional data flow paradigm (one-way data flow), or "Props down, events up". This ensures we can track where our data comes from, and not mutate state or data from a child component lower in the tree.
 
-Examples: 
+Examples:
 
 [`pages/article/[slug].vue`](pages/article/[slug].vue)
 
@@ -282,7 +282,6 @@ Notice how we accept all incoming params from our parent component as props. We 
 
 ```
 
-
 ## Useful composables
 
 There are a few composables that can be relevant for any new component/page.
@@ -376,7 +375,7 @@ This function gathers all availible url params, and also appends any data you ha
   </script>
   ```
 
-## Code Styling 
+## Code Styling
 
 Prefer the following layout for new vue files
 
@@ -391,7 +390,7 @@ Prefer the following layout for new vue files
 
   <style>
     /* scss code here */
-  </style>    
+  </style>
 ```
 
 Prefer this layout for script setup blocks
@@ -428,9 +427,9 @@ npm run generate
 
 ## Contributing
 
-We strive to use semantic branch names as much as possible. 
+We strive to use semantic branch names as much as possible.
 
-The basic prefixes for branch naming is defined below, the prefixes should be followed by a concise decsription or task id. 
+The basic prefixes for branch naming is defined below, the prefixes should be followed by a concise decsription or task id.
 
 Example `feature/bundle-page-DSN-1588`
 
