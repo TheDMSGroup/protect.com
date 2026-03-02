@@ -418,7 +418,7 @@ const fetchMastodonBids = async () => {
   // Check for mastodonoff URL parameter
   const urlParams = new URLSearchParams(window.location.search)
   const useMockData = urlParams.get('mastodonoff') === 'true'
-  const rtclid = urlParams.get('rtclid') || window.rtClickId || null;
+  const rtkclid = urlParams.get('rtkclid') || window.rtkClickId || null;
   try {
     let result
     // Build minimal payload from collected data
@@ -432,7 +432,7 @@ const fetchMastodonBids = async () => {
         user_agent: typeof navigator !== 'undefined' ? navigator.userAgent : '',
         source_url: typeof window !== 'undefined' ? window.location.href : '',
         custom: {
-          rtclid
+          rtkclid
         }
       }
     }
