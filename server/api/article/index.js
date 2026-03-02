@@ -1,5 +1,12 @@
 import { astToHtmlString } from "@graphcms/rich-text-html-renderer";
 
+/**
+ * Fetches an article by slug, transforms rich-text content to HTML, and returns
+ * content metadata for rendering (including jump links).
+ *
+ * @param {import('h3').H3Event} event - Incoming Nitro/H3 request event.
+ * @returns {Promise<object>} Article payload with parsed content.
+ */
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig();
   const apiUrl = config.graphqlApiUrl;
@@ -9,6 +16,12 @@ export default defineEventHandler(async (event) => {
 
   console.log("Fetching article with urlSlug:", urlSlug);
 
+  /**
+   * Queries Hygraph for the primary article and related content, then enriches
+   * the response with content HTML and heading link metadata.
+   *
+   * @returns {Promise<object>} Normalized article response object.
+   */
   const getSingleArticle = async () => {
     const graphqlQuery = `
       query GetArticleBySlugAndRelatedArticles($urlSlug: String!) {
@@ -95,9 +108,21 @@ export default defineEventHandler(async (event) => {
         return article;
       }
 
+      /**
+       * Creates a stateful ID generator that slugifies heading text and appends
+       * numeric suffixes for duplicates.
+       *
+       * @returns {(text: string) => string} Unique heading ID generator.
+       */
       const createUniqueHeadingIdGenerator = () => {
         const seenIds = new Map();
 
+        /**
+         * Generates a unique, URL-friendly heading ID.
+         *
+         * @param {string} text - Heading text content.
+         * @returns {string} Stable unique ID for anchor linking.
+         */
         return (text) => {
           const baseId = String(text || "")
             .replace(/[^a-zA-Z0-9]+/g, "-")
@@ -114,6 +139,12 @@ export default defineEventHandler(async (event) => {
       const getHeadingIdForToc = createUniqueHeadingIdGenerator();
       const getHeadingIdForRender = createUniqueHeadingIdGenerator();
 
+      /**
+       * Recursively extracts plain text from a rich-text AST node.
+       *
+       * @param {object|null|undefined} node - Rich-text AST node.
+       * @returns {string} Concatenated plain-text content.
+       */
       const extractPlainText = (node) => {
         if (!node) return "";
         if (typeof node.text === "string") return node.text;
@@ -123,13 +154,31 @@ export default defineEventHandler(async (event) => {
         return "";
       };
 
+      /**
+       * Removes HTML tags from a string for text-based ID generation.
+       *
+       * @param {string} [value=""] - HTML string value.
+       * @returns {string} Trimmed plain text.
+       */
       const stripHtmlTags = (value = "") => String(value).replace(/<[^>]*>/g, "").trim();
 
-      // Helper function to extract headings from AST (always runs)
+      /**
+       * Extracts heading metadata from rich-text nodes for jump-link rendering.
+       * Includes native heading nodes and single-bold-paragraph pseudo headings.
+       *
+       * @param {Array<object>} nodes - Root rich-text child nodes.
+       * @returns {Array<{text: string, id: string, level: number}>} Heading links.
+       */
       const extractHeadings = (nodes) => {
         const headingsList = [];
         const levelMap = { one: 1, two: 2, three: 3, four: 4, five: 5, six: 6 };
 
+        /**
+         * Converts a heading AST node to a normalized heading metadata object.
+         *
+         * @param {object} headingNode - Rich-text heading node.
+         * @returns {{text: string, id: string, level: number}} Heading metadata.
+         */
         const generateHeading = (headingNode) => {
           const nodeType = headingNode?.type || "heading-two";
           const level = nodeType.split("-")[1];
@@ -153,6 +202,13 @@ export default defineEventHandler(async (event) => {
       const contentLinks = extractHeadings(articleContent.content.raw.children || []);
       articleContent.contentLinks = contentLinks;
 
+      /**
+       * Renders a heading element with an auto-generated anchor ID.
+       *
+       * @param {string} tagName - HTML heading tag name (`h1`...`h6`).
+       * @param {string} children - Inner HTML content.
+       * @returns {string} Heading HTML string with `id` attribute.
+       */
       const headingRenderer = (tagName, children) => {
         const text = stripHtmlTags(children);
         const id = getHeadingIdForRender(text);
