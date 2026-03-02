@@ -54,7 +54,7 @@
   <b-row class="vertical_card_row">
     <template v-if="cardPosition === 'left'">
       <b-col cols="12" :lg="12 - Number(largeColSize)" class="img_col">
-        <NuxtImg
+        <img
           :src="buildImageUrl(cardImage)"
           :alt="title"
           width="600"
@@ -101,7 +101,7 @@
         />
       </b-col>
       <b-col cols="12" :lg="12 - Number(largeColSize)" class="img_col">
-        <NuxtImg
+        <img
           :src="buildImageUrl(cardImage)"
           :alt="title"
           width="600"

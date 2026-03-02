@@ -418,7 +418,7 @@ const fetchMastodonBids = async () => {
   // Check for mastodonoff URL parameter
   const urlParams = new URLSearchParams(window.location.search)
   const useMockData = urlParams.get('mastodonoff') === 'true'
-
+  const rtclid = urlParams.get('rtclid') || window.rtClickId || null;
   try {
     let result
     // Build minimal payload from collected data
@@ -430,18 +430,22 @@ const fetchMastodonBids = async () => {
         currently_insured: collectedData.value.isInsured || false,
         home_ownership: collectedData.value.ownsHome || false,
         user_agent: typeof navigator !== 'undefined' ? navigator.userAgent : '',
-        source_url: typeof window !== 'undefined' ? window.location.href : ''
+        source_url: typeof window !== 'undefined' ? window.location.href : '',
+        custom: {
+          rtclid
+        }
       }
     }
     if (store.visitorInfo?.mst) {
       payload.source_token = store.visitorInfo.mst;
     }
     if (useMockData) {
-      console.log('Using mock Mastodon API data (mastodonoff=true)')
+      console.log('Using mock Mastodon API data (mastodonoff=true)', payload)
       // Simulate API delay
       await new Promise(resolve => setTimeout(resolve, 1500))
       result = getMockResults()
     } else {
+      // Submit to Mastodon API
       result = await submitLead(payload)
     }
 

@@ -57,11 +57,11 @@
           <div ref="messagesContainer" class="messages-container">
             <div v-for="(msg, idx) in messages" :key="idx" :class="['message-wrapper', `align-${msg.type === 'user' ? 'end' : msg.type === 'phone' || msg.type === 'tcpa' ? 'center' : 'start'}`]">
               <!-- Phone Button -->
-              <a v-if="msg.type === 'phone'" :href="`tel:${msg.number}`" class="phone-button">
+              <a v-if="msg.type === 'phone'" :href="`tel:${phoneNumber}`" class="phone-button">
                 <svg class="phone-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                 </svg>
-                Call {{ msg.number }}
+                Call {{ formattedPhoneNumber }}
               </a>
 
               <!-- TCPA Consent -->
@@ -234,9 +234,26 @@
 </template>
 
 <script setup>
-import { ref, reactive, watch, nextTick, onMounted } from 'vue'
+import { ref, reactive, watch, nextTick, onMounted, computed } from 'vue'
 import { useVehicleApi } from '~/composables/useVehicleApi'
 import { useMastodonApi } from '~/composables/useMastodonApi'
+
+const route = useRoute()
+const config = useRuntimeConfig()
+
+// Get phone number: URL param takes priority, then config, otherwise null (no phone features)
+const phoneNumber = computed(() => route.query.c2cnumber || config.public.c2cnumber || null)
+const hasPhoneNumber = computed(() => !!phoneNumber.value)
+
+// Format phone number for display (e.g., 800-555-5555)
+const formattedPhoneNumber = computed(() => {
+  if (!phoneNumber.value) return ''
+  const num = phoneNumber.value.replace(/\D/g, '') // Remove non-digits
+  if (num.length === 10) {
+    return `${num.slice(0, 3)}-${num.slice(3, 6)}-${num.slice(6)}`
+  }
+  return phoneNumber.value
+})
 
 const { getMakes, getModels, getYears, findMatch } = useVehicleApi()
 const { submitLead, buildLeadPayload } = useMastodonApi()
@@ -282,7 +299,10 @@ onMounted(() => {
     apiResults.value = getMockResults()
   } else {
     setTimeout(() => {
-      addBotMessage("Hi! I'm here to help you get a quote for your auto insurance. I'll guide you through a few questions to find you the best rate. Ready to get started?", false, ['Yes', 'No, I\'d rather talk to someone on the phone'])
+      const welcomeReplies = hasPhoneNumber.value
+        ? ['Yes', 'No, I\'d rather talk to someone on the phone']
+        : ['Yes']
+      addBotMessage("Hi! I'm here to help you get a quote for your auto insurance. I'll guide you through a few questions to find you the best rate. Ready to get started?", false, welcomeReplies)
       currentQuestion.value = { type: 'welcome', expecting: 'confirmation' }
     }, 500)
   }
@@ -503,13 +523,12 @@ const processResponse = async (response) => {
   }
 
   if (currentStep.value === 'welcome') {
-    if (lowerResponse.includes('phone') || lowerResponse.includes('no')) {
+    if (hasPhoneNumber.value && (lowerResponse.includes('phone') || lowerResponse.includes('no'))) {
       setTimeout(() => {
-        addBotMessage("No problem! I'd be happy to connect you with someone. Give us a call at:")
+        addBotMessage("No problem! I'd be happy to connect you with someone. Give us a call at:", false, [], false, () => {
+          messages.value.push({ type: 'phone' })
+        })
       }, 800)
-      setTimeout(() => {
-        messages.value.push({ type: 'phone', number: '800-555-5555' })
-      }, 1600)
       return
     }
 
@@ -1088,13 +1107,12 @@ const handleOffTopicQuestion = (question) => {
     lowerQ.includes('call me') ||
     lowerQ.includes('phone call')
 
-  if (wantsAgent) {
+  if (wantsAgent && hasPhoneNumber.value) {
     setTimeout(() => {
-      addBotMessage("No problem! I'd be happy to connect you with someone. Give us a call at:")
+      addBotMessage("No problem! I'd be happy to connect you with someone. Give us a call at:", false, [], false, () => {
+        messages.value.push({ type: 'phone' })
+      })
     }, 800)
-    setTimeout(() => {
-      messages.value.push({ type: 'phone', number: '800-555-5555' })
-    }, 1600)
     return true
   }
 
@@ -1249,19 +1267,19 @@ const getMockResults = () => ({
 })
 
 const submitToApi = async () => {
+  const { proxy } = useScriptGoogleTagManager();
   isLoadingResults.value = true
 
   try {
     // Check for mastodonoff URL parameter
     const urlParams = new URLSearchParams(window.location.search)
     const useMockData = urlParams.get('mastodonoff') === 'true'
+    const rtclid = urlParams.get('rtclid') || window.rtClickId || null;
 
     // Build the payload from form data
     const payload = buildLeadPayload(formData, {
-      // Add any additional options here (UTM params, etc.)
+      rtclid
     })
-
-    console.log('Mastodon API Request Payload:', payload)
 
     let result
     if (useMockData) {
@@ -1291,13 +1309,23 @@ const submitToApi = async () => {
       })
     } else {
       // Fallback if no bids returned
-      addBotMessage("We couldn't find any quotes at this time. Please try again later or call us for assistance.")
-      messages.value.push({ type: 'phone', number: '800-555-5555' })
+      const fallbackMsg = hasPhoneNumber.value
+        ? "We couldn't find any quotes at this time. Please try again later or call us for assistance."
+        : "We couldn't find any quotes at this time. Please try again later."
+      addBotMessage(fallbackMsg)
+      if (hasPhoneNumber.value) {
+        messages.value.push({ type: 'phone' })
+      }
     }
   } catch (err) {
     console.error('Error submitting to API:', err)
-    addBotMessage("Something went wrong while getting your quotes. Please try again or call us for assistance.")
-    messages.value.push({ type: 'phone', number: '800-555-5555' })
+    const errorMsg = hasPhoneNumber.value
+      ? "Something went wrong while getting your quotes. Please try again or call us for assistance."
+      : "Something went wrong while getting your quotes. Please try again later."
+    addBotMessage(errorMsg)
+    if (hasPhoneNumber.value) {
+      messages.value.push({ type: 'phone' })
+    }
   } finally {
     isLoadingResults.value = false
   }

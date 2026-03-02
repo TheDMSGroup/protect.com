@@ -15,12 +15,16 @@
             <!-- ZIP Code Input -->
             <div class="dg-zip-input-wrapper">
               <input
+                v-model="zipcode"
                 type="text"
                 class="dg-zip-input"
                 placeholder="Enter Your ZIP Code"
                 aria-label="Enter your ZIP code"
               />
-              <button class="dg-cta-btn dg-cta-primary">
+              <button class="dg-cta-btn dg-cta-primary"
+                @click="
+                  redirectWithParams('https://insure.protect.com', { zip: zipcode })
+                ">
                 Compare Free Quotes
               </button>
             </div>
@@ -390,12 +394,18 @@
         <h2>Ready to start comparing rates?</h2>
         <div class="dg-zip-input-wrapper">
           <input
+            v-model="zipcode"
             type="text"
             class="dg-zip-input"
             placeholder="Enter Your ZIP Code"
             aria-label="Enter your ZIP code"
           />
-          <button class="dg-cta-btn dg-cta-primary">See My Free Quotes</button>
+          <button class="dg-cta-btn dg-cta-primary"
+            @click="
+              redirectWithParams('https://insure.protect.com', { zip: zipcode })
+            ">
+            See My Free Quotes
+          </button>
         </div>
         <p class="dg-trust-line">No junk mail. No spam calls. Free quotes.</p>
       </div>
@@ -404,7 +414,10 @@
 </template>
 
 <script setup>
+  import { ref } from "vue";
   import { redirectWithParams } from "@/composables/utils.js";
+
+  const zipcode = ref("");
 
   const insuranceBrands = [
     { name: "Liberty Mutual Insurance", src: "provider-liberty.png" },

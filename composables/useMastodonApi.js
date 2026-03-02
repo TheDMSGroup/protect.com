@@ -27,6 +27,11 @@ export const useMastodonApi = () => {
     loading.value = true
     error.value = null
 
+    // Push to dataLayer for analytics
+    if (typeof window !== 'undefined' && window.dataLayer) {
+      window.dataLayer.push({ event: 'portal_lead' })
+    }
+
     try {
       const response = await fetch(MASTODON_API_URL, {
         method: 'POST',
@@ -121,6 +126,7 @@ export const useMastodonApi = () => {
           mastodon_auction_id: options.mastodonAuctionId || '',
           mastodon_click_id: options.mastodonClickId || '',
           publisher_click_id: options.publisherClickId || '',
+          rtclid: options.rtclid || '',
           adgroupid: options.adgroupid || '',
           accountid: options.accountid || '',
           targetid: options.targetid || '',

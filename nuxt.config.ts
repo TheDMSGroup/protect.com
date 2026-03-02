@@ -98,6 +98,8 @@ export default defineNuxtConfig({
       statesRange: "Sheet1!A:Z",
       vehiclesMakesRange: "Makes!A:Z",
       vehiclesModelsRange: "Models!A:Z",
+      // Default click-to-call phone number (can be overridden via ?c2cnumber query param)
+      c2cnumber: "",
     },
   },
   sitemap: {
