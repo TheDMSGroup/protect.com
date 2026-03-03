@@ -56,6 +56,7 @@
       margin: 20px auto;
       border-bottom: 1px solid #e6e6e6;
       padding-bottom: 15px;
+      font-size: 1rem;
     }
   }
 </style>

@@ -86,20 +86,16 @@ export default {
       display: -ms-flexbox;
       display: flex;
       background-color: #ddd;
-      height: 200px;
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      overflow: hidden;
 
-      a {
-        padding: 0;
-        display: -webkit-box;
-        display: -ms-flexbox;
-        display: flex;
+      :deep(img) {
         width: 100%;
-
-        img {
-          width: 100%;
-          object-fit: cover;
-          max-height: 300px;
-        }
+        height: 100%;
+        object-fit: cover;
+        object-position: center;
+        display: block;
       }
     }
     .article-body {

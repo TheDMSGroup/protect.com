@@ -22,6 +22,16 @@
     contentLinks,
     recentArticles,
   } = toRefs(props.article);
+
+  const subverticalDisplay = computed(() => {
+    if (!subvertical.value) return "";
+    let display = subvertical.value.replace("auto", "car");
+    display = display
+      .split("-")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" ");
+    return display;
+  });
 </script>
 
 <template lang="html">
@@ -32,12 +42,19 @@
           <span class="links">
             <NuxtLink to="/articles/">Articles</NuxtLink>
             <span v-if="vertical" class="arrow">></span>
-            <NuxtLink v-if="vertical" :to="`/articles/${vertical}`" class="article-slug">{{
-              vertical[0].toUpperCase() + vertical.slice(1)
-            }}</NuxtLink>
+            <NuxtLink
+              v-if="vertical"
+              :to="`/articles/${vertical}`"
+              class="article-slug"
+              >{{ vertical[0].toUpperCase() + vertical.slice(1) }}</NuxtLink
+            >
             <span v-if="subvertical" class="arrow">></span>
-            <NuxtLink v-if="subvertical" :to="`/articles/${vertical}/${subvertical}`" class="article-slug">
-              {{ subvertical[0].toUpperCase() + subvertical.slice(1) }}
+            <NuxtLink
+              v-if="subvertical"
+              :to="`/articles/${vertical}/${subvertical}`"
+              class="article-slug"
+            >
+              {{ subverticalDisplay }}
             </NuxtLink>
           </span>
         </div>
@@ -46,16 +63,18 @@
     </div>
     <div class="blog-article container">
       <div class="row">
-        <div class="col-lg-4 col-md-3 sidebar">
+        <div class="col-md-4 sidebar">
           <ArticlesContentLinks :content-links="contentLinks" />
         </div>
-        <div class="col-lg-8 col-md-12">
+        <div class="col-lg-8 col-md-12 px-4">
           <h1 class="article-title">{{ title }}</h1>
           <div v-if="excerpt && excerpt.length > 0" class="snippet">
             {{ excerpt }}
           </div>
           <p v-if="date && date.length > 0" class="author">
-            <span v-if="author && author.name.length > 0">{{ author.name }} <span class="divider">|</span></span>
+            <span v-if="author && author?.name?.length > 0"
+              >{{ author.name }} <span class="divider">|</span></span
+            >
             <span class="mobile-second-line">
               <span class="date">
                 {{ date }}
@@ -73,12 +92,25 @@
           </div>
           <div class="article-body">
             <div class="article-left">
-              <ArticlesDynamicShell :components="components" :content="content" />
+              <ArticlesDynamicShell
+                :components="components"
+                :content="content"
+              />
               <ul class="related-articles">
-                <li v-for="relatedArticle in relatedArticles" :key="relatedArticle.title">
-                  <NuxtLink :to="relatedArticle.urlSlug" class="related-article-link">
+                <li
+                  v-for="relatedArticle in relatedArticles"
+                  :key="relatedArticle.title"
+                >
+                  <NuxtLink
+                    :to="relatedArticle.urlSlug"
+                    class="related-article-link"
+                  >
                     {{ relatedArticle.title }}
-                    <svg class="green-right-arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 14.45 12.6">
+                    <svg
+                      class="green-right-arrow"
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 14.45 12.6"
+                    >
                       <g>
                         <path
                           d="M14.37,6.09l-6-6A.31.31,0,0,0,8.15,0a.3.3,0,0,
@@ -130,7 +162,7 @@
                     </a>
                 </p>
               </div>
-            </div> -->
+            </div> 
             </div>
 
             <div class="col-lg-3 col-md-3 article-sidebar">
@@ -155,7 +187,7 @@
                 </ul>
               </div>
 
-              <!-- <div class="sidebar-section">
+              <div class="sidebar-section">
               <TopPicks :picks="ourTopPicks"/>
             </div> -->
             </div>
@@ -172,7 +204,11 @@
             <div class="row feed-posts">
               <!-- TO DO: make posts dynamic when possible -->
               <div class="post">
-                <BlogFeedItem v-for="recentArticle in recentArticles" :key="recentArticle.urlSlug" :article="recentArticle" />
+                <BlogFeedItem
+                  v-for="recentArticle in recentArticles"
+                  :key="recentArticle.urlSlug"
+                  :article="recentArticle"
+                />
               </div>
             </div>
           </div>
@@ -341,6 +377,10 @@
             }
 
             img {
+              width: 14px;
+              height: 14px;
+              object-fit: contain;
+              display: inline-block;
               position: relative;
               top: -2px;
               margin-right: 4px;
@@ -356,9 +396,13 @@
           flex-wrap: wrap;
         }
 
+        img {
+          height: auto;
+        }
+
         .article-left {
-          width: 68%;
-          margin-right: 40px;
+          // width: 68%;
+          // margin-right: 40px;
 
           @include media-breakpoint-down(xs) {
             width: 100%;
