@@ -25,7 +25,7 @@ export default defineEventHandler(async (event) => {
   const getSingleArticle = async () => {
     const graphqlQuery = `
       query GetArticleBySlugAndRelatedArticles($urlSlug: String!) {
-        article(stage: DRAFT, where: { urlSlug: $urlSlug }) {
+        article(stage: PUBLISHED, where: { urlSlug: $urlSlug }) {
           ...ArticleDetailFragment
           relatedArticles {
             ...RelatedArticleFragment
@@ -33,6 +33,7 @@ export default defineEventHandler(async (event) => {
         }
         recentArticles: articles(
           where: { urlSlug_not: $urlSlug, domain: protectCom }
+          stage: PUBLISHED
           orderBy: publishedAt_DESC
           first: 4
         ) {
@@ -164,7 +165,7 @@ export default defineEventHandler(async (event) => {
 
       /**
        * Extracts heading metadata from rich-text nodes for jump-link rendering.
-       * Includes native heading nodes and single-bold-paragraph pseudo headings.
+        * Includes native heading nodes only.
        *
        * @param {Array<object>} nodes - Root rich-text child nodes.
        * @returns {Array<{text: string, id: string, level: number}>} Heading links.
@@ -189,9 +190,12 @@ export default defineEventHandler(async (event) => {
           return { text, id, level: headingLevel };
         };
         nodes.forEach((node) => {
-          const children = Array.isArray(node?.children) ? node.children : [];
-          if (node?.type?.startsWith("heading-") || (children.length === 1 && children[0].bold && (children[0].text || "").length > 0)) {
+          if (node?.type?.startsWith("heading-")) {
             headingsList.push(generateHeading(node));
+          }else if(node?.children?.length > 0){
+            // Recursively check for nested headings within child nodes (e.g., in rich-text)
+            const childHeadings = extractHeadings(node.children);
+            headingsList.push(...childHeadings);
           }
         });
 
