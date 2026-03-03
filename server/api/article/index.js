@@ -204,6 +204,7 @@ export default defineEventHandler(async (event) => {
 
       /**
        * Renders a heading element with an auto-generated anchor ID.
+       * Utilizes custom renderers to inject `id` attributes for native headings and bold-only paragraphs.
        *
        * @param {string} tagName - HTML heading tag name (`h1`...`h6`).
        * @param {string} children - Inner HTML content.
@@ -273,6 +274,5 @@ export default defineEventHandler(async (event) => {
     }
   };
   const singleArticleData = await getSingleArticle();
-  //console.log(singleArticleData);
   return singleArticleData;
 });
