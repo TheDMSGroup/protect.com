@@ -60,6 +60,12 @@ export default defineEventHandler(async (event) => {
         }
         content {
           raw
+          references {
+        ... on AppComponent {
+          id
+          componentName
+        }
+      }
         }
         contentTag {
           tagValue
@@ -125,10 +131,11 @@ export default defineEventHandler(async (event) => {
          * @returns {string} Stable unique ID for anchor linking.
          */
         return (text) => {
-          const baseId = String(text || "")
-            .replace(/[^a-zA-Z0-9]+/g, "-")
-            .replace(/(^-|-$)/g, "")
-            .toLowerCase() || "section";
+          const baseId =
+            String(text || "")
+              .replace(/[^a-zA-Z0-9]+/g, "-")
+              .replace(/(^-|-$)/g, "")
+              .toLowerCase() || "section";
 
           const currentCount = seenIds.get(baseId) || 0;
           seenIds.set(baseId, currentCount + 1);
@@ -161,11 +168,14 @@ export default defineEventHandler(async (event) => {
        * @param {string} [value=""] - HTML string value.
        * @returns {string} Trimmed plain text.
        */
-      const stripHtmlTags = (value = "") => String(value).replace(/<[^>]*>/g, "").trim();
+      const stripHtmlTags = (value = "") =>
+        String(value)
+          .replace(/<[^>]*>/g, "")
+          .trim();
 
       /**
        * Extracts heading metadata from rich-text nodes for jump-link rendering.
-        * Includes native heading nodes only.
+       * Includes native heading nodes only.
        *
        * @param {Array<object>} nodes - Root rich-text child nodes.
        * @returns {Array<{text: string, id: string, level: number}>} Heading links.
@@ -192,7 +202,7 @@ export default defineEventHandler(async (event) => {
         nodes.forEach((node) => {
           if (node?.type?.startsWith("heading-")) {
             headingsList.push(generateHeading(node));
-          }else if(node?.children?.length > 0){
+          } else if (node?.children?.length > 0) {
             // Recursively check for nested headings within child nodes (e.g., in rich-text)
             const childHeadings = extractHeadings(node.children);
             headingsList.push(...childHeadings);
@@ -203,7 +213,9 @@ export default defineEventHandler(async (event) => {
       };
 
       // Always extract headings for table of contents
-      const contentLinks = extractHeadings(articleContent.content.raw.children || []);
+      const contentLinks = extractHeadings(
+        articleContent.content.raw.children || []
+      );
       articleContent.contentLinks = contentLinks;
 
       /**
@@ -220,6 +232,11 @@ export default defineEventHandler(async (event) => {
         return `<${tagName} id="${id}">${children}</${tagName}>`;
       };
 
+      const embeddedComponents = [];
+      const embedMarkerPrefix = "__APP_COMPONENT_EMBED__";
+
+      articleContent.componentNames = [];
+
       const parsedHtml = astToHtmlString({
         content: articleContent.content.raw,
         references: articleContent.content.references || [],
@@ -231,7 +248,9 @@ export default defineEventHandler(async (event) => {
           h5: ({ children }) => headingRenderer("h5", children),
           h6: ({ children }) => headingRenderer("h6", children),
           p: ({ children }) => {
-            const boldOnlyMatch = String(children || "").match(/^\s*<(strong|b)>([\s\S]*?)<\/\1>\s*$/i);
+            const boldOnlyMatch = String(children || "").match(
+              /^\s*<(strong|b)>([\s\S]*?)<\/\1>\s*$/i
+            );
             if (!boldOnlyMatch) {
               return `<p>${children}</p>`;
             }
@@ -244,20 +263,86 @@ export default defineEventHandler(async (event) => {
             const id = getHeadingIdForRender(text);
             return `<p id="${id}">${children}</p>`;
           },
+          embed: {
+            AppComponent: ({ componentName, nodeId }) => {
+              const componentData = {
+                type: "component",
+                name:
+                  String(componentName).slice(0, 1).toUpperCase() +
+                  String(componentName).slice(1), // Ensure component name is capitalized
+                nodeId,
+                componentProps: {},
+              };
+
+              const componentIndex = embeddedComponents.push(componentData) - 1;
+              return `<!--${embedMarkerPrefix}:${componentIndex}-->`;
+            },
+          },
         },
       });
 
-      articleContent.contentHtml = parsedHtml;
-      articleContent.contentParts = parsedHtml
-        ? [
-            {
+      const contentParts = [];
+      const parsedHtmlString = String(parsedHtml || "");
+      const embedMarkerRegex = new RegExp(
+        `<!--${embedMarkerPrefix}:(\\d+)-->`,
+        "g"
+      );
+
+      let previousIndex = 0;
+      let markerMatch = embedMarkerRegex.exec(parsedHtmlString);
+
+      while (markerMatch) {
+        const markerStartIndex = markerMatch.index;
+        const markerEndIndex = markerStartIndex + markerMatch[0].length;
+
+        if (markerStartIndex > previousIndex) {
+          const htmlPart = parsedHtmlString.slice(
+            previousIndex,
+            markerStartIndex
+          );
+          if (htmlPart.trim()) {
+            contentParts.push({
               type: "text",
-              content: parsedHtml,
+              content: htmlPart,
               tag: "rich-text",
-            },
-          ]
-        : [];
-      articleContent.componentNames = [];
+            });
+          }
+        }
+
+        const componentIndex = Number(markerMatch[1]);
+        const embeddedComponent = embeddedComponents[componentIndex];
+        if (embeddedComponent) {
+          contentParts.push(embeddedComponent);
+          if (embeddedComponent.name) {
+            articleContent.componentNames.push(embeddedComponent.name);
+          }
+        }
+
+        previousIndex = markerEndIndex;
+        markerMatch = embedMarkerRegex.exec(parsedHtmlString);
+      }
+
+      if (previousIndex < parsedHtmlString.length) {
+        const htmlPart = parsedHtmlString.slice(previousIndex);
+        if (htmlPart.trim()) {
+          contentParts.push({
+            type: "text",
+            content: htmlPart,
+            tag: "rich-text",
+          });
+        }
+      }
+
+      if (!contentParts.length && parsedHtmlString.trim()) {
+        contentParts.push({
+          type: "text",
+          content: parsedHtmlString,
+          tag: "rich-text",
+        });
+      }
+
+      articleContent.contentHtml = parsedHtml;
+      articleContent.contentParts = contentParts;
 
       return {
         response: article,

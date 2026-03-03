@@ -4,8 +4,13 @@
       <template v-if="part.type === 'text'">
         <div v-html="part.content" />
       </template>
-      <template v-else-if="part.type === 'component' && loadedComponents[part.name]">
-        <component :is="loadedComponents[part.name]" v-bind="componentProps[part.name] || {}" />
+      <template
+        v-else-if="part.type === 'component' && loadedComponents[part.name]"
+      >
+        <component
+          :is="loadedComponents[part.name]"
+          v-bind="componentProps[part.name] || {}"
+        />
       </template>
     </div>
   </div>
@@ -27,6 +32,8 @@
   // Store loaded components - load immediately for SSR
   //use shallowRef so we don't have deep reactivity on each components, only on the top level object
   const loadedComponents = shallowRef({});
+
+  console.log("DynamicShell received components:", props.components);
 
   // Inline composable to load components synchronously on both server and client
   const useDynamicComponents = async () => {
