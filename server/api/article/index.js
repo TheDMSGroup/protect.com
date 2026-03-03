@@ -269,6 +269,10 @@ export default defineEventHandler(async (event) => {
             const id = getHeadingIdForRender(text);
             return `<p id="${id}">${children}</p>`;
           },
+          img: ({ src, alt }) => {
+            const altAttribute = alt ? ` alt="${alt}"` : "";
+            return `<img src="${src}"${altAttribute} />`;
+          },
           embed: {
             AppComponent: ({ componentName, nodeId }) => {
               const componentData = {
