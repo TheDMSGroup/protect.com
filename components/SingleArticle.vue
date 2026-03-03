@@ -409,48 +409,6 @@
             margin-right: 0;
           }
 
-          .article-content {
-            margin-bottom: 1em;
-            padding-right: 1.5em;
-
-            p {
-              font-size: 1em;
-              font-weight: 400;
-            }
-
-            code {
-              white-space: pre-wrap;
-            }
-
-            table {
-              width: 100%;
-              max-width: 100%;
-              margin-bottom: 1rem;
-              background-color: transparent;
-
-              td,
-              th {
-                padding: 0.75rem;
-                vertical-align: top;
-                border-top: 1px solid #dee2e6;
-              }
-              thead th {
-                vertical-align: bottom;
-                border-bottom: 2px solid #dee2e6;
-              }
-            }
-
-            img {
-              width: 100%;
-              height: auto;
-            }
-
-            iframe {
-              width: 100%;
-              height: 400px;
-            }
-          }
-
           .related-articles {
             width: 100%;
             list-style: none;
@@ -512,11 +470,6 @@
 
             @include media-breakpoint-down(md) {
               flex-direction: column;
-            }
-
-            p {
-              font-size: 0.875em;
-              font-weight: 400;
             }
 
             .author-left {
