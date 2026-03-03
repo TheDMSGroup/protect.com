@@ -22,6 +22,16 @@
     contentLinks,
     recentArticles,
   } = toRefs(props.article);
+
+  const subverticalDisplay = computed(() => {
+    if (!subvertical.value) return "";
+    let display = subvertical.value.replace("auto", "car");
+    display = display
+      .split("-")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" ");
+    return display;
+  });
 </script>
 
 <template lang="html">
@@ -44,7 +54,7 @@
               :to="`/articles/${vertical}/${subvertical}`"
               class="article-slug"
             >
-              {{ subvertical[0].toUpperCase() + subvertical.slice(1) }}
+              {{ subverticalDisplay }}
             </NuxtLink>
           </span>
         </div>
