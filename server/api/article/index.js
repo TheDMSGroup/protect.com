@@ -195,13 +195,19 @@ export default defineEventHandler(async (event) => {
           const level = nodeType.split("-")[1];
           const headingLevel = levelMap[level] || 2;
           const text = extractPlainText(headingNode).trim();
+          if (!text) {
+            return null;
+          }
           const id = getHeadingIdForToc(text);
 
           return { text, id, level: headingLevel };
         };
         nodes.forEach((node) => {
           if (node?.type?.startsWith("heading-")) {
-            headingsList.push(generateHeading(node));
+            const heading = generateHeading(node);
+            if (heading) {
+              headingsList.push(heading);
+            }
           } else if (node?.children?.length > 0) {
             // Recursively check for nested headings within child nodes (e.g., in rich-text)
             const childHeadings = extractHeadings(node.children);
