@@ -12,7 +12,7 @@
     >
       <component
         :is="loadedComponents[part.name]"
-        v-bind="componentProps[part.name] || {}"
+        v-bind="part.componentProps || {}"
       />
     </template>
   </div>
@@ -54,15 +54,6 @@
     await Promise.all(promises);
   };
   await useDynamicComponents();
-
-  const componentProps = computed(() => {
-    const propsMap = {};
-    props.components.forEach((component) => {
-      //no need to set fallbacks here, they are handled during parsing in /server/api/article/index.js
-      propsMap[component.name] = component.componentProps;
-    });
-    return propsMap;
-  });
 </script>
 
 <style scoped>
