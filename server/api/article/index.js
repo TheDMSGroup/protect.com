@@ -64,6 +64,7 @@ export default defineEventHandler(async (event) => {
         ... on AppComponent {
           id
           componentName
+          props
         }
       }
         }
@@ -274,14 +275,14 @@ export default defineEventHandler(async (event) => {
             return `<img src="${src}"${altAttribute} />`;
           },
           embed: {
-            AppComponent: ({ componentName, nodeId }) => {
+            AppComponent: ({ componentName, nodeId, props }) => {
               const componentData = {
                 type: "component",
                 name:
                   String(componentName).slice(0, 1).toUpperCase() +
                   String(componentName).slice(1), // Ensure component name is capitalized
                 nodeId,
-                componentProps: {},
+                componentProps: props || {},
               };
 
               const componentIndex = embeddedComponents.push(componentData) - 1;
