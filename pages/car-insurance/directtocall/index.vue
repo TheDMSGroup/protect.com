@@ -163,6 +163,7 @@
 </template>
 
 <script setup>
+console.log("Version A");
 import { ref, watch, nextTick, onMounted, onBeforeUnmount, computed } from 'vue'
 import { useMastodonApi } from '~/composables/useMastodonApi'
 
@@ -419,12 +420,11 @@ const fetchMastodonBids = async () => {
   const urlParams = new URLSearchParams(window.location.search)
   const useMockData = urlParams.get('mastodonoff') === 'true'
   const rtclid = urlParams.get('rtclid') || sessionStorage.getItem('rtkclickid') || window.rtkClickId || null;
-  const source_token = urlParams.get('mst') || 'r0TV0W_hUOqv_Uow4brhX-wkx5F9TQ';
   try {
     let result
     // Build minimal payload from collected data
     const payload = {
-      source_token,
+      source_token: 'r0TV0W_hUOqv_Uow4brhX-wkx5F9TQ',
       limit: 3,
       data: {
         zipcode: collectedData.value.zipcode || store.visitorInfo.zip || '',
