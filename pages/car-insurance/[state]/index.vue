@@ -5,6 +5,13 @@
       :city-links="cityLinks"
       :city-links-error="cityLinksError"
     />
+    <BreadcrumbsMain
+      :links="[
+        { label: 'Car Insurance', url: '/car-insurance' },
+        { label: 'Car Insurance Rates by State', url: '/car-insurance/usa' },
+        { label: `${formattedTopic} Car Insurance` },
+      ]"
+    />
   </div>
 </template>
 <script setup>
@@ -14,6 +21,14 @@
 
   const route = useRoute();
   const topic = ref(route.params.state);
+  const formattedTopic = computed(() => {
+    return topic.value
+      ? topic.value
+          .split("-")
+          .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+          .join(" ")
+      : "";
+  });
   // Set dynamic SEO meta tags using computed values
   const seoTitle = computed(() =>
     topic.value
@@ -53,4 +68,18 @@
   });
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+  .breadcrumbs {
+    a {
+      text-decoration: none;
+      color: #007bff;
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+    a,
+    span {
+      padding: 0 10px;
+    }
+  }
+</style>
