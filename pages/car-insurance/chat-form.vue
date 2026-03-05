@@ -308,12 +308,16 @@ onMounted(() => {
   }
 })
 
-watch([messages, isTyping], () => {
+const scrollToBottom = () => {
   nextTick(() => {
     if (messagesContainer.value) {
       messagesContainer.value.scrollTop = messagesContainer.value.scrollHeight
     }
   })
+}
+
+watch([messages, isTyping], () => {
+  scrollToBottom()
 }, { deep: true })
 
 /**
@@ -391,18 +395,21 @@ const getNextEmoji = () => {
 const addBotMessage = (text, isPositive = false, replies = [], isCelebration = false, onComplete = null) => {
   // Show typing indicator
   isTyping.value = true
+  scrollToBottom()
 
-  // Random delay between 800ms and 2000ms to simulate typing
-  const typingDelay = Math.floor(Math.random() * 1200) + 800
+  // Random delay between 800ms and 1750ms to simulate typing
+  const typingDelay = Math.floor(Math.random() * 950) + 800
 
   setTimeout(() => {
     isTyping.value = false
     messages.value.push({ type: 'bot', text, isPositive, isCelebration })
+    scrollToBottom()
 
     // Show quick replies after message appears
     if (replies.length > 0) {
       setTimeout(() => {
         quickReplies.value = replies
+        scrollToBottom()
       }, 300)
     } else {
       quickReplies.value = replies
@@ -413,6 +420,7 @@ const addBotMessage = (text, isPositive = false, replies = [], isCelebration = f
     if (onComplete) {
       setTimeout(() => {
         onComplete()
+        scrollToBottom()
       }, 300)
     }
   }, typingDelay)
@@ -420,6 +428,7 @@ const addBotMessage = (text, isPositive = false, replies = [], isCelebration = f
 
 const addUserMessage = (text) => {
   messages.value.push({ type: 'user', text })
+  scrollToBottom()
 }
 
 const handleSend = () => {
@@ -865,7 +874,7 @@ const processResponse = async (response) => {
       }
 
       setTimeout(() => {
-        addBotMessage(`Great! What's the first name of driver 1?`)
+        addBotMessage(`Great! What's your name?`)
         currentQuestion.value = { type: 'driver_firstName', driverIndex: 0 }
       }, 800)
       return
@@ -873,12 +882,45 @@ const processResponse = async (response) => {
 
     if (currentQuestion.value?.type === 'driver_firstName') {
       const idx = currentQuestion.value.driverIndex
-      formData.drivers[idx].firstName = response
 
-      setTimeout(() => {
-        addBotMessage(`And ${response}'s last name?`)
-        currentQuestion.value = { type: 'driver_lastName', driverIndex: idx }
-      }, 800)
+      // Parse name - check if user provided multiple words (first + last name)
+      const nameParts = response.trim().split(/\s+/).filter(part => part.length > 0)
+
+      if (nameParts.length === 1) {
+        // Single word - just first name, ask for last name
+        formData.drivers[idx].firstName = nameParts[0]
+        setTimeout(() => {
+          const message = idx === 0
+            ? `And your last name?`
+            : `And ${nameParts[0]}'s last name?`
+          addBotMessage(message)
+          currentQuestion.value = { type: 'driver_lastName', driverIndex: idx }
+        }, 800)
+      } else if (nameParts.length === 2) {
+        // Two words - first and last name
+        formData.drivers[idx].firstName = nameParts[0]
+        formData.drivers[idx].lastName = nameParts[1]
+        setTimeout(() => {
+          const message = idx === 0
+            ? `Got it! What's your date of birth? (MM/DD/YYYY)`
+            : `Got it! What's ${nameParts[0]} ${nameParts[1]}'s date of birth? (MM/DD/YYYY)`
+          addBotMessage(message)
+          currentQuestion.value = { type: 'driver_dob', driverIndex: idx }
+        }, 800)
+      } else {
+        // Three or more words - treat last word as last name, everything else as first/middle
+        const lastName = nameParts[nameParts.length - 1]
+        const firstName = nameParts.slice(0, -1).join(' ')
+        formData.drivers[idx].firstName = firstName
+        formData.drivers[idx].lastName = lastName
+        setTimeout(() => {
+          const message = idx === 0
+            ? `Got it! What's your date of birth? (MM/DD/YYYY)`
+            : `Got it! What's ${firstName} ${lastName}'s date of birth? (MM/DD/YYYY)`
+          addBotMessage(message)
+          currentQuestion.value = { type: 'driver_dob', driverIndex: idx }
+        }, 800)
+      }
       return
     }
 
@@ -887,7 +929,10 @@ const processResponse = async (response) => {
       formData.drivers[idx].lastName = response
 
       setTimeout(() => {
-        addBotMessage(`What's ${formData.drivers[idx].firstName}'s date of birth? (MM/DD/YYYY)`)
+        const message = idx === 0
+          ? `What's your date of birth? (MM/DD/YYYY)`
+          : `What's ${formData.drivers[idx].firstName}'s date of birth? (MM/DD/YYYY)`
+        addBotMessage(message)
         currentQuestion.value = { type: 'driver_dob', driverIndex: idx }
       }, 800)
       return
@@ -911,7 +956,10 @@ const processResponse = async (response) => {
       formData.drivers[idx].dob = dob
 
       setTimeout(() => {
-        addBotMessage(`What's ${formData.drivers[idx].firstName}'s gender?`, false, ['Male', 'Female'])
+        const message = idx === 0
+          ? `What's your gender?`
+          : `What's ${formData.drivers[idx].firstName}'s gender?`
+        addBotMessage(message, false, ['Male', 'Female'])
         currentQuestion.value = { type: 'driver_gender', driverIndex: idx }
       }, 800)
       return
@@ -922,7 +970,10 @@ const processResponse = async (response) => {
       formData.drivers[idx].gender = response
 
       setTimeout(() => {
-        addBotMessage(`Is ${formData.drivers[idx].firstName} married?`, false, ['Yes', 'No'])
+        const message = idx === 0
+          ? `Are you married?`
+          : `Is ${formData.drivers[idx].firstName} married?`
+        addBotMessage(message, false, ['Yes', 'No'])
         currentQuestion.value = { type: 'driver_married', driverIndex: idx }
       }, 800)
       return
@@ -944,7 +995,10 @@ const processResponse = async (response) => {
             }, 800)
           } else {
             setTimeout(() => {
-              addBotMessage(`Is ${formData.drivers[idx].firstName} currently employed?`, false, ['Yes', 'No'])
+              const message = idx === 0
+                ? `Are you currently employed?`
+                : `Is ${formData.drivers[idx].firstName} currently employed?`
+              addBotMessage(message, false, ['Yes', 'No'])
               currentQuestion.value = { type: 'driver_employed', driverIndex: idx }
             }, 800)
           }
@@ -958,7 +1012,10 @@ const processResponse = async (response) => {
           }, 800)
         } else {
           setTimeout(() => {
-            addBotMessage(`Is ${formData.drivers[idx].firstName} currently employed?`, false, ['Yes', 'No'])
+            const message = idx === 0
+              ? `Are you currently employed?`
+              : `Is ${formData.drivers[idx].firstName} currently employed?`
+            addBotMessage(message, false, ['Yes', 'No'])
             currentQuestion.value = { type: 'driver_employed', driverIndex: idx }
           }, 800)
         }
@@ -975,7 +1032,10 @@ const processResponse = async (response) => {
         setTimeout(() => {
           addBotMessage(`${getNextEmoji()} Thank you for your service! Military families often qualify for special discounts.`, true)
           setTimeout(() => {
-            addBotMessage(`Is ${formData.drivers[idx].firstName} currently employed?`, false, ['Yes', 'No'])
+            const message = idx === 0
+              ? `Are you currently employed?`
+              : `Is ${formData.drivers[idx].firstName} currently employed?`
+            addBotMessage(message, false, ['Yes', 'No'])
             currentQuestion.value = { type: 'driver_employed', driverIndex: idx }
           }, 800)
         }, 800)
