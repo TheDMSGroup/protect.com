@@ -1,7 +1,6 @@
 
 <template>
   <div class="insurance-app">
-
     <!-- Progress Steps -->
     <div class="progress-bar">
       <div class="progress-content">
@@ -237,6 +236,7 @@
 import { ref, reactive, watch, nextTick, onMounted, computed } from 'vue'
 import { useVehicleApi } from '~/composables/useVehicleApi'
 import { useMastodonApi } from '~/composables/useMastodonApi'
+import { useTrustedForm } from '~/composables/useTrustedForm'
 
 const route = useRoute()
 const config = useRuntimeConfig()
@@ -257,6 +257,7 @@ const formattedPhoneNumber = computed(() => {
 
 const { getMakes, getModels, getYears, findMatch } = useVehicleApi()
 const { submitLead, buildLeadPayload } = useMastodonApi()
+const { loadTrustedForm, getCertificateUrl } = useTrustedForm()
 const vehicleYears = getYears()
 const availableMakes = ref([])
 const availableModels = ref([])
@@ -284,6 +285,15 @@ const isTyping = ref(false)
 
 const celebrationEmojis = ['🎉', '🙌', '👍', '🎊', '✨', '💰', '🌟']
 
+const TCPA_DISCLOSURE = 'By clicking "Get Auto & Home Quotes", I provide my express consent via e-signature to be contacted, for marketing purposes, by or on behalf of Quotza.com partners, by telephone, which may include artificial, generative AI, or pre-recorded voice messages and/or SMS text messages, delivered via automatic telephone dialing system at the number I provided regarding Auto & Home Insurance offers, even if my number is on a Federal, State or Company Do Not Call list. I also represent that I am the subscriber and primary user of the telephone number that I have provided above. I understand that my consent is not required to make a purchase or obtain services and that I may opt-out at any time. In order to proceed without providing consent, skip. I certify that I am a US resident over 18, and I agree to the Privacy Policy and Terms & Conditions. I understand and agree that third parties, including, but not limited to, Jornaya and Active Prospect are being employed to monitor my activity on this website today.'
+
+// Capitalize first letter of each word in a name
+const capitalizeName = (name) => {
+  return name.split(/\s+/).map(word =>
+    word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+  ).join(' ')
+}
+
 const steps = [
   { id: 'vehicles', label: 'Vehicles' },
   { id: 'drivers', label: 'Drivers' },
@@ -293,6 +303,9 @@ const steps = [
 
 // Lifecycle - use onMounted to avoid hydration mismatch
 onMounted(() => {
+  // Load TrustedForm script
+  loadTrustedForm()
+
   // Check for previewfeed URL param to show mock results immediately
   const urlParams = new URLSearchParams(window.location.search)
   if (urlParams.get('previewfeed') === 'true') {
@@ -523,7 +536,11 @@ const handleKeypress = (event) => {
   // vehicle_year now allows letters for smart input like "2020 Honda Pilot"
 }
 const processResponse = async (response) => {
-  const lowerResponse = response.toLowerCase()
+  // Normalize y/n to yes/no
+  const normalizedResponse = response.trim().toLowerCase() === 'y' ? 'Yes'
+    : response.trim().toLowerCase() === 'n' ? 'No'
+    : response
+  const lowerResponse = normalizedResponse.toLowerCase()
 
   // Check for off-topic questions first
   if (awaitingAnswer.value) {
@@ -888,29 +905,32 @@ const processResponse = async (response) => {
 
       if (nameParts.length === 1) {
         // Single word - just first name, ask for last name
-        formData.drivers[idx].firstName = nameParts[0]
+        const firstName = capitalizeName(nameParts[0])
+        formData.drivers[idx].firstName = firstName
         setTimeout(() => {
           const message = idx === 0
             ? `And your last name?`
-            : `And ${nameParts[0]}'s last name?`
+            : `And ${firstName}'s last name?`
           addBotMessage(message)
           currentQuestion.value = { type: 'driver_lastName', driverIndex: idx }
         }, 800)
       } else if (nameParts.length === 2) {
         // Two words - first and last name
-        formData.drivers[idx].firstName = nameParts[0]
-        formData.drivers[idx].lastName = nameParts[1]
+        const firstName = capitalizeName(nameParts[0])
+        const lastName = capitalizeName(nameParts[1])
+        formData.drivers[idx].firstName = firstName
+        formData.drivers[idx].lastName = lastName
         setTimeout(() => {
           const message = idx === 0
             ? `Got it! What's your date of birth? (MM/DD/YYYY)`
-            : `Got it! What's ${nameParts[0]} ${nameParts[1]}'s date of birth? (MM/DD/YYYY)`
+            : `Got it! What's ${firstName} ${lastName}'s date of birth? (MM/DD/YYYY)`
           addBotMessage(message)
           currentQuestion.value = { type: 'driver_dob', driverIndex: idx }
         }, 800)
       } else {
         // Three or more words - treat last word as last name, everything else as first/middle
-        const lastName = nameParts[nameParts.length - 1]
-        const firstName = nameParts.slice(0, -1).join(' ')
+        const lastName = capitalizeName(nameParts[nameParts.length - 1])
+        const firstName = capitalizeName(nameParts.slice(0, -1).join(' '))
         formData.drivers[idx].firstName = firstName
         formData.drivers[idx].lastName = lastName
         setTimeout(() => {
@@ -926,7 +946,7 @@ const processResponse = async (response) => {
 
     if (currentQuestion.value?.type === 'driver_lastName') {
       const idx = currentQuestion.value.driverIndex
-      formData.drivers[idx].lastName = response
+      formData.drivers[idx].lastName = capitalizeName(response)
 
       setTimeout(() => {
         const message = idx === 0
@@ -967,7 +987,7 @@ const processResponse = async (response) => {
 
     if (currentQuestion.value?.type === 'driver_gender') {
       const idx = currentQuestion.value.driverIndex
-      formData.drivers[idx].gender = response
+      formData.drivers[idx].gender = normalizedResponse
 
       setTimeout(() => {
         const message = idx === 0
@@ -981,9 +1001,9 @@ const processResponse = async (response) => {
 
     if (currentQuestion.value?.type === 'driver_married') {
       const idx = currentQuestion.value.driverIndex
-      formData.drivers[idx].married = response
+      formData.drivers[idx].married = normalizedResponse
 
-      if (response.toLowerCase() === 'yes') {
+      if (lowerResponse === 'yes') {
         addDiscount('Married Discount')
         setTimeout(() => {
           addBotMessage(`${getNextEmoji()} Great! Married drivers often qualify for lower rates.`, true)
@@ -1025,9 +1045,9 @@ const processResponse = async (response) => {
 
     if (currentQuestion.value?.type === 'driver_military') {
       const idx = currentQuestion.value.driverIndex
-      formData.drivers[idx].military = response
+      formData.drivers[idx].military = normalizedResponse
 
-      if (response.toLowerCase() === 'yes') {
+      if (lowerResponse === 'yes') {
         addDiscount('Military Discount')
         setTimeout(() => {
           addBotMessage(`${getNextEmoji()} Thank you for your service! Military families often qualify for special discounts.`, true)
@@ -1050,7 +1070,7 @@ const processResponse = async (response) => {
 
     if (currentQuestion.value?.type === 'driver_employed') {
       const idx = currentQuestion.value.driverIndex
-      formData.drivers[idx].employed = response
+      formData.drivers[idx].employed = normalizedResponse
 
       // Check if there are more drivers to add
       if (idx < formData.drivers.length - 1) {
@@ -1338,12 +1358,14 @@ const submitToApi = async () => {
 
     // Build the payload from form data
     const payload = buildLeadPayload(formData, {
-      rtclid
+      rtclid,
+      trustedFormCertId: getCertificateUrl(),
+      tcpaDisclosure: TCPA_DISCLOSURE
     })
 
     let result
     if (useMockData) {
-      console.log('Using mock Mastodon API data (mastodonoff=true)')
+      console.log('Using mock Mastodon API data (mastodonoff=true)', payload)
       // Simulate API delay
       await new Promise(resolve => setTimeout(resolve, 1500))
       result = getMockResults()

@@ -21,14 +21,23 @@ export const preprocessTextForLinks = (fullText, linkData, className = "") => {
   return processedFullText;
 };
 
+// All tracking params to persist in redirect URLs
+const TRACKING_PARAMS = [
+  'gclid', 'msclkid', 'fbc', 'fbp', 'fbclid', 'clickid', 'rtclid',
+  'campaignid', 'ueid', 'variant', 'referrer', 'adgroupid', 'accountid',
+  'targetid', 'gbraid', 'wbraid', 'segment', 'mst',
+  'utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term'
+];
+
 export const generateRedirectUrl = (route, paramsToAppend) => {
   const store = useStore();
-  if (store.visitorInfo?.ueid && !paramsToAppend.ueid) {
-    paramsToAppend.ueid = store.visitorInfo.ueid;
-  }
-  if (store.visitorInfo?.mst && !paramsToAppend.mst) {
-    paramsToAppend.mst = store.visitorInfo.mst;
-  }
+
+  // Append all tracking params from store if not already in paramsToAppend
+  TRACKING_PARAMS.forEach(param => {
+    if (store.visitorInfo?.[param] && !paramsToAppend[param]) {
+      paramsToAppend[param] = store.visitorInfo[param];
+    }
+  });
 
   //append any params we need to the current URL params - vue router is persisting params across navigations
   const params = new URLSearchParams(window.location.search);
