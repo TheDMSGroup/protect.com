@@ -424,11 +424,24 @@
         </p>
       </div>
     </section>
+
+    <BreadcrumbsMain
+      :links="[
+        { label: 'Car Insurance', url: '/car-insurance' },
+        { label: 'Car Insurance Rates by State', url: '/car-insurance/usa' },
+        {
+          label: `${stateName} Car Insurance`,
+          url: `/car-insurance/${stateNameSlug}`,
+        },
+        { label: cityName ? `${cityName}, ${stateCode} Car Insurance` : '' },
+      ]"
+    />
   </div>
 </template>
 
 <script setup>
   import { useStore } from "@/stores/store";
+  import { states } from "@/utils/redirect-config";
 
   definePageMeta({
     middleware: "city-validation",
@@ -446,6 +459,7 @@
     pending,
     cityName,
     stateName,
+    stateCode,
     coverageRateAnnual,
     coverageRateMonthly,
     stateMinCoverage,
@@ -537,7 +551,10 @@
     });
 
     const stateCode = computed(() => {
-      return cityInfo.value ? cityInfo.value.stateCode : "";
+      const stateObject = Object.values(states).find(
+        (state) => state.slug === stateNameSlug
+      );
+      return stateObject ? stateObject.abbreviation : "";
     });
 
     const cityState = computed(() => {
@@ -590,7 +607,7 @@
         cityInfo.value ? cityInfo.value.coverageRates.annual : null
       )
     );
-    console.log("rateComparison:", rateComparison.value);
+
     const coverageRateAnnual = computed(() => {
       return cityInfo.value
         ? useNumberFormatter(cityInfo.value.coverageRates.annual)
@@ -634,6 +651,8 @@
     const zipCodeUrl = computed(() => {
       return "/get-quote";
     });
+
+    console.log("state code:", stateCode.value);
 
     return {
       error,

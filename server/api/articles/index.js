@@ -17,7 +17,6 @@ export default defineEventHandler(async (event) => {
       statusMessage: "Domain is required",
     });
   }
-  console.log("Query params:", { vertical, subvertical, domain, articleType });
 
   const getArticlesFeed = async () => {
     // Build where clause conditionally
@@ -43,7 +42,10 @@ export default defineEventHandler(async (event) => {
       query GetArticlesFeed(${variableDefinitions.join(", ")}) {
         articles(where: { 
           ${whereClause}
-        }) {
+        }
+        stage: PUBLISHED
+        orderBy: publishedAt_DESC  
+        ) {
           ...ArticleFragment
         }
       }
@@ -80,8 +82,6 @@ export default defineEventHandler(async (event) => {
       }
     }
 
-    //console.log("GraphQL Query:", graphqlQuery);
-    console.log("Variables:", variables);
     const options = {
       method: "POST",
       headers: {
@@ -94,7 +94,6 @@ export default defineEventHandler(async (event) => {
     };
     try {
       const { data: articlesFeed } = await $fetch(apiUrl, options);
-      //console.log("Fetched articles:", articlesFeed);
       return articlesFeed;
     } catch (err) {
       // Log server-side for debugging

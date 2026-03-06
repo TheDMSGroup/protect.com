@@ -1,7 +1,6 @@
 
 <template>
   <div class="insurance-app">
-
     <!-- Progress Steps -->
     <div class="progress-bar">
       <div class="progress-content">
@@ -237,6 +236,7 @@
 import { ref, reactive, watch, nextTick, onMounted, computed } from 'vue'
 import { useVehicleApi } from '~/composables/useVehicleApi'
 import { useMastodonApi } from '~/composables/useMastodonApi'
+import { useTrustedForm } from '~/composables/useTrustedForm'
 
 const route = useRoute()
 const config = useRuntimeConfig()
@@ -257,6 +257,7 @@ const formattedPhoneNumber = computed(() => {
 
 const { getMakes, getModels, getYears, findMatch } = useVehicleApi()
 const { submitLead, buildLeadPayload } = useMastodonApi()
+const { loadTrustedForm, getCertificateUrl } = useTrustedForm()
 const vehicleYears = getYears()
 const availableMakes = ref([])
 const availableModels = ref([])
@@ -284,6 +285,15 @@ const isTyping = ref(false)
 
 const celebrationEmojis = ['🎉', '🙌', '👍', '🎊', '✨', '💰', '🌟']
 
+const TCPA_DISCLOSURE = 'By clicking "Get Auto & Home Quotes", I provide my express consent via e-signature to be contacted, for marketing purposes, by or on behalf of Quotza.com partners, by telephone, which may include artificial, generative AI, or pre-recorded voice messages and/or SMS text messages, delivered via automatic telephone dialing system at the number I provided regarding Auto & Home Insurance offers, even if my number is on a Federal, State or Company Do Not Call list. I also represent that I am the subscriber and primary user of the telephone number that I have provided above. I understand that my consent is not required to make a purchase or obtain services and that I may opt-out at any time. In order to proceed without providing consent, skip. I certify that I am a US resident over 18, and I agree to the Privacy Policy and Terms & Conditions. I understand and agree that third parties, including, but not limited to, Jornaya and Active Prospect are being employed to monitor my activity on this website today.'
+
+// Capitalize first letter of each word in a name
+const capitalizeName = (name) => {
+  return name.split(/\s+/).map(word =>
+    word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+  ).join(' ')
+}
+
 const steps = [
   { id: 'vehicles', label: 'Vehicles' },
   { id: 'drivers', label: 'Drivers' },
@@ -293,6 +303,9 @@ const steps = [
 
 // Lifecycle - use onMounted to avoid hydration mismatch
 onMounted(() => {
+  // Load TrustedForm script
+  loadTrustedForm()
+
   // Check for previewfeed URL param to show mock results immediately
   const urlParams = new URLSearchParams(window.location.search)
   if (urlParams.get('previewfeed') === 'true') {
@@ -308,12 +321,16 @@ onMounted(() => {
   }
 })
 
-watch([messages, isTyping], () => {
+const scrollToBottom = () => {
   nextTick(() => {
     if (messagesContainer.value) {
       messagesContainer.value.scrollTop = messagesContainer.value.scrollHeight
     }
   })
+}
+
+watch([messages, isTyping], () => {
+  scrollToBottom()
 }, { deep: true })
 
 /**
@@ -391,18 +408,21 @@ const getNextEmoji = () => {
 const addBotMessage = (text, isPositive = false, replies = [], isCelebration = false, onComplete = null) => {
   // Show typing indicator
   isTyping.value = true
+  scrollToBottom()
 
-  // Random delay between 800ms and 2000ms to simulate typing
-  const typingDelay = Math.floor(Math.random() * 1200) + 800
+  // Random delay between 800ms and 1750ms to simulate typing
+  const typingDelay = Math.floor(Math.random() * 950) + 800
 
   setTimeout(() => {
     isTyping.value = false
     messages.value.push({ type: 'bot', text, isPositive, isCelebration })
+    scrollToBottom()
 
     // Show quick replies after message appears
     if (replies.length > 0) {
       setTimeout(() => {
         quickReplies.value = replies
+        scrollToBottom()
       }, 300)
     } else {
       quickReplies.value = replies
@@ -413,6 +433,7 @@ const addBotMessage = (text, isPositive = false, replies = [], isCelebration = f
     if (onComplete) {
       setTimeout(() => {
         onComplete()
+        scrollToBottom()
       }, 300)
     }
   }, typingDelay)
@@ -420,6 +441,7 @@ const addBotMessage = (text, isPositive = false, replies = [], isCelebration = f
 
 const addUserMessage = (text) => {
   messages.value.push({ type: 'user', text })
+  scrollToBottom()
 }
 
 const handleSend = () => {
@@ -514,7 +536,11 @@ const handleKeypress = (event) => {
   // vehicle_year now allows letters for smart input like "2020 Honda Pilot"
 }
 const processResponse = async (response) => {
-  const lowerResponse = response.toLowerCase()
+  // Normalize y/n to yes/no
+  const normalizedResponse = response.trim().toLowerCase() === 'y' ? 'Yes'
+    : response.trim().toLowerCase() === 'n' ? 'No'
+    : response
+  const lowerResponse = normalizedResponse.toLowerCase()
 
   // Check for off-topic questions first
   if (awaitingAnswer.value) {
@@ -865,7 +891,7 @@ const processResponse = async (response) => {
       }
 
       setTimeout(() => {
-        addBotMessage(`Great! What's the first name of driver 1?`)
+        addBotMessage(`Great! What's your name?`)
         currentQuestion.value = { type: 'driver_firstName', driverIndex: 0 }
       }, 800)
       return
@@ -873,21 +899,60 @@ const processResponse = async (response) => {
 
     if (currentQuestion.value?.type === 'driver_firstName') {
       const idx = currentQuestion.value.driverIndex
-      formData.drivers[idx].firstName = response
 
-      setTimeout(() => {
-        addBotMessage(`And ${response}'s last name?`)
-        currentQuestion.value = { type: 'driver_lastName', driverIndex: idx }
-      }, 800)
+      // Parse name - check if user provided multiple words (first + last name)
+      const nameParts = response.trim().split(/\s+/).filter(part => part.length > 0)
+
+      if (nameParts.length === 1) {
+        // Single word - just first name, ask for last name
+        const firstName = capitalizeName(nameParts[0])
+        formData.drivers[idx].firstName = firstName
+        setTimeout(() => {
+          const message = idx === 0
+            ? `And your last name?`
+            : `And ${firstName}'s last name?`
+          addBotMessage(message)
+          currentQuestion.value = { type: 'driver_lastName', driverIndex: idx }
+        }, 800)
+      } else if (nameParts.length === 2) {
+        // Two words - first and last name
+        const firstName = capitalizeName(nameParts[0])
+        const lastName = capitalizeName(nameParts[1])
+        formData.drivers[idx].firstName = firstName
+        formData.drivers[idx].lastName = lastName
+        setTimeout(() => {
+          const message = idx === 0
+            ? `Got it! What's your date of birth? (MM/DD/YYYY)`
+            : `Got it! What's ${firstName} ${lastName}'s date of birth? (MM/DD/YYYY)`
+          addBotMessage(message)
+          currentQuestion.value = { type: 'driver_dob', driverIndex: idx }
+        }, 800)
+      } else {
+        // Three or more words - treat last word as last name, everything else as first/middle
+        const lastName = capitalizeName(nameParts[nameParts.length - 1])
+        const firstName = capitalizeName(nameParts.slice(0, -1).join(' '))
+        formData.drivers[idx].firstName = firstName
+        formData.drivers[idx].lastName = lastName
+        setTimeout(() => {
+          const message = idx === 0
+            ? `Got it! What's your date of birth? (MM/DD/YYYY)`
+            : `Got it! What's ${firstName} ${lastName}'s date of birth? (MM/DD/YYYY)`
+          addBotMessage(message)
+          currentQuestion.value = { type: 'driver_dob', driverIndex: idx }
+        }, 800)
+      }
       return
     }
 
     if (currentQuestion.value?.type === 'driver_lastName') {
       const idx = currentQuestion.value.driverIndex
-      formData.drivers[idx].lastName = response
+      formData.drivers[idx].lastName = capitalizeName(response)
 
       setTimeout(() => {
-        addBotMessage(`What's ${formData.drivers[idx].firstName}'s date of birth? (MM/DD/YYYY)`)
+        const message = idx === 0
+          ? `What's your date of birth? (MM/DD/YYYY)`
+          : `What's ${formData.drivers[idx].firstName}'s date of birth? (MM/DD/YYYY)`
+        addBotMessage(message)
         currentQuestion.value = { type: 'driver_dob', driverIndex: idx }
       }, 800)
       return
@@ -911,7 +976,10 @@ const processResponse = async (response) => {
       formData.drivers[idx].dob = dob
 
       setTimeout(() => {
-        addBotMessage(`What's ${formData.drivers[idx].firstName}'s gender?`, false, ['Male', 'Female'])
+        const message = idx === 0
+          ? `What's your gender?`
+          : `What's ${formData.drivers[idx].firstName}'s gender?`
+        addBotMessage(message, false, ['Male', 'Female'])
         currentQuestion.value = { type: 'driver_gender', driverIndex: idx }
       }, 800)
       return
@@ -919,10 +987,13 @@ const processResponse = async (response) => {
 
     if (currentQuestion.value?.type === 'driver_gender') {
       const idx = currentQuestion.value.driverIndex
-      formData.drivers[idx].gender = response
+      formData.drivers[idx].gender = normalizedResponse
 
       setTimeout(() => {
-        addBotMessage(`Is ${formData.drivers[idx].firstName} married?`, false, ['Yes', 'No'])
+        const message = idx === 0
+          ? `Are you married?`
+          : `Is ${formData.drivers[idx].firstName} married?`
+        addBotMessage(message, false, ['Yes', 'No'])
         currentQuestion.value = { type: 'driver_married', driverIndex: idx }
       }, 800)
       return
@@ -930,9 +1001,9 @@ const processResponse = async (response) => {
 
     if (currentQuestion.value?.type === 'driver_married') {
       const idx = currentQuestion.value.driverIndex
-      formData.drivers[idx].married = response
+      formData.drivers[idx].married = normalizedResponse
 
-      if (response.toLowerCase() === 'yes') {
+      if (lowerResponse === 'yes') {
         addDiscount('Married Discount')
         setTimeout(() => {
           addBotMessage(`${getNextEmoji()} Great! Married drivers often qualify for lower rates.`, true)
@@ -944,7 +1015,10 @@ const processResponse = async (response) => {
             }, 800)
           } else {
             setTimeout(() => {
-              addBotMessage(`Is ${formData.drivers[idx].firstName} currently employed?`, false, ['Yes', 'No'])
+              const message = idx === 0
+                ? `Are you currently employed?`
+                : `Is ${formData.drivers[idx].firstName} currently employed?`
+              addBotMessage(message, false, ['Yes', 'No'])
               currentQuestion.value = { type: 'driver_employed', driverIndex: idx }
             }, 800)
           }
@@ -958,7 +1032,10 @@ const processResponse = async (response) => {
           }, 800)
         } else {
           setTimeout(() => {
-            addBotMessage(`Is ${formData.drivers[idx].firstName} currently employed?`, false, ['Yes', 'No'])
+            const message = idx === 0
+              ? `Are you currently employed?`
+              : `Is ${formData.drivers[idx].firstName} currently employed?`
+            addBotMessage(message, false, ['Yes', 'No'])
             currentQuestion.value = { type: 'driver_employed', driverIndex: idx }
           }, 800)
         }
@@ -968,14 +1045,17 @@ const processResponse = async (response) => {
 
     if (currentQuestion.value?.type === 'driver_military') {
       const idx = currentQuestion.value.driverIndex
-      formData.drivers[idx].military = response
+      formData.drivers[idx].military = normalizedResponse
 
-      if (response.toLowerCase() === 'yes') {
+      if (lowerResponse === 'yes') {
         addDiscount('Military Discount')
         setTimeout(() => {
           addBotMessage(`${getNextEmoji()} Thank you for your service! Military families often qualify for special discounts.`, true)
           setTimeout(() => {
-            addBotMessage(`Is ${formData.drivers[idx].firstName} currently employed?`, false, ['Yes', 'No'])
+            const message = idx === 0
+              ? `Are you currently employed?`
+              : `Is ${formData.drivers[idx].firstName} currently employed?`
+            addBotMessage(message, false, ['Yes', 'No'])
             currentQuestion.value = { type: 'driver_employed', driverIndex: idx }
           }, 800)
         }, 800)
@@ -990,7 +1070,7 @@ const processResponse = async (response) => {
 
     if (currentQuestion.value?.type === 'driver_employed') {
       const idx = currentQuestion.value.driverIndex
-      formData.drivers[idx].employed = response
+      formData.drivers[idx].employed = normalizedResponse
 
       // Check if there are more drivers to add
       if (idx < formData.drivers.length - 1) {
@@ -1278,12 +1358,14 @@ const submitToApi = async () => {
 
     // Build the payload from form data
     const payload = buildLeadPayload(formData, {
-      rtclid
+      rtclid,
+      trustedFormCertId: getCertificateUrl(),
+      tcpaDisclosure: TCPA_DISCLOSURE
     })
 
     let result
     if (useMockData) {
-      console.log('Using mock Mastodon API data (mastodonoff=true)')
+      console.log('Using mock Mastodon API data (mastodonoff=true)', payload)
       // Simulate API delay
       await new Promise(resolve => setTimeout(resolve, 1500))
       result = getMockResults()
