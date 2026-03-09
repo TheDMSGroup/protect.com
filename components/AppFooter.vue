@@ -129,6 +129,10 @@
 
   .footerStates h3{
     color:#0C2C67;
+    @include media-breakpoint-down(md) {
+       margin-top:20px;
+       font-size:21px;
+    }
   }
 
   .protectLinks a{
