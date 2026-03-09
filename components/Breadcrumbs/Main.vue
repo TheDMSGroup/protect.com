@@ -21,6 +21,12 @@
   .breadcrumbs {
     display: flex;
     flex-wrap: wrap;
+
+    .breadcrumb-item {
+      @include mobile {
+        margin: 2.5px 0;
+      }
+    }
     a {
       text-decoration: none;
       color: #007bff;
@@ -33,7 +39,7 @@
       padding: 0 10px;
       @include mobile {
         padding: 0 2.5px;
-        font-size: 0.85rem;
+        font-size: 15px;
       }
     }
   }
