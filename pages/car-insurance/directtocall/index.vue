@@ -163,6 +163,7 @@
 </template>
 
 <script setup>
+console.log("Version A");
 import { ref, watch, nextTick, onMounted, onBeforeUnmount, computed } from 'vue'
 import { useMastodonApi } from '~/composables/useMastodonApi'
 
@@ -418,7 +419,7 @@ const fetchMastodonBids = async () => {
   // Check for mastodonoff URL parameter
   const urlParams = new URLSearchParams(window.location.search)
   const useMockData = urlParams.get('mastodonoff') === 'true'
-  const rtkclid = urlParams.get('rtkclid') || window.rtkClickId || null;
+  const rtclid = urlParams.get('rtclid') || sessionStorage.getItem('rtkclickid') || window.rtkClickId || null;
   try {
     let result
     // Build minimal payload from collected data
@@ -432,7 +433,7 @@ const fetchMastodonBids = async () => {
         user_agent: typeof navigator !== 'undefined' ? navigator.userAgent : '',
         source_url: typeof window !== 'undefined' ? window.location.href : '',
         custom: {
-          rtkclid
+          rtclid
         }
       }
     }

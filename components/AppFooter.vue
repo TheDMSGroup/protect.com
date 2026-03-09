@@ -6,12 +6,23 @@
           <div class="logo">
             <img alt="Protect.com Logo" src="/assets/protect_logo_tm.svg" width="115" height="22" loading="lazy" />
           </div>
-          <ul>
+          <ul class="protectLinks">
             <li><NuxtLink to="/car-insurance">Car Insurance</NuxtLink></li>
+            <li><NuxtLink to="/car-insurance/rates-by-vehicle">Car Insurance By Vehicle</NuxtLink></li>
             <!--<li><NuxtLink to="/insurance/life">Life Insurance</NuxtLink></li>-->
             <li><NuxtLink to="/health-insurance">Health Insurance</NuxtLink></li>
             <!-- <li><NuxtLink to="/insurance/medicare">Medicare</NuxtLink></li> -->
             <li><NuxtLink to="/home-insurance">Home Insurance</NuxtLink></li>
+          </ul>
+        </div>
+        <div class="footer-column footerStates">
+          <h3>Car Insurance By State</h3>
+          <ul>
+            <li v-for="state in states":key="state.name">
+              <NuxtLink :to="`/car-insurance/${state.slug}`">
+                {{ state.abbreviation }}
+              </NuxtLink>
+            </li>
           </ul>
         </div>
         <!--<div class="footer-column">
@@ -78,6 +89,7 @@
           </div>
         </div> -->
       </div>
+    
       <div class="row footer-columns">
         <div class="privacy-policies">
           <p>
@@ -101,6 +113,32 @@
 </template>
 
 <style scoped lang="scss">
+  .footerStates{
+    margin:0px 0;
+    width:75% !important;
+  }
+
+  .footerStates li{
+    display:inline-flex;
+    margin:0 4px;
+  }
+
+  .footerStates li a{
+    font-size:14px;
+  }
+
+  .footerStates h3{
+    color:#0C2C67;
+    @include media-breakpoint-down(md) {
+       margin-top:20px;
+       font-size:21px;
+    }
+  }
+
+  .protectLinks a{
+    font-size:18px;
+  }
+
   .footer {
     width: 100%;
     text-align: left;
