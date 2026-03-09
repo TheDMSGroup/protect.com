@@ -44,5 +44,3 @@ export async function useArticleComponentLoader(name) {
     };
   }
 }
-
-export { componentRegistry };

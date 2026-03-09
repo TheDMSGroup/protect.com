@@ -1,3 +1,12 @@
+import { astToHtmlString } from "@graphcms/rich-text-html-renderer";
+
+/**
+ * Fetches an article by slug, transforms rich-text content to HTML, and returns
+ * content metadata for rendering (including jump links).
+ *
+ * @param {import('h3').H3Event} event - Incoming Nitro/H3 request event.
+ * @returns {Promise<object>} Article payload with parsed content.
+ */
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig();
   const apiUrl = config.graphqlApiUrl;
@@ -7,36 +16,16 @@ export default defineEventHandler(async (event) => {
 
   console.log("Fetching article with urlSlug:", urlSlug);
 
-  function generateFallbackProps(componentName) {
-    // Add component-specific props
-    switch (componentName) {
-      case "Faq":
-        return {
-          faq: [
-            {
-              question: "What is Protect.com?",
-              answer:
-                "Protect.com is your one-stop destination for discovering savings on car insurance. We built this site to help people compare different quotes from top providers without having to fill out dozens of forms. We show you providers that we think offer you the lowest rates based on your vehicle and lifecycle, taking the guesswork out of the auto insurance buying process.",
-            },
-            {
-              question: "How did we gather this info?",
-              answer:
-                "Protect.com is your one-stop destination for discovering savings on car insurance. We built this site to help people compare different quotes from top providers without having to fill out dozens of forms. We show you providers that we think offer you the lowest rates based on your vehicle and lifecycle, taking the guesswork out of the auto insurance buying process.",
-            },
-          ],
-        };
-      case "ZipCodeForm":
-        return {
-          action: "insure.protect.com",
-        };
-      default:
-        return {};
-    }
-  }
+  /**
+   * Queries Hygraph for the primary article and related content, then enriches
+   * the response with content HTML and heading link metadata.
+   *
+   * @returns {Promise<object>} Normalized article response object.
+   */
   const getSingleArticle = async () => {
     const graphqlQuery = `
       query GetArticleBySlugAndRelatedArticles($urlSlug: String!) {
-        article(stage: DRAFT, where: { urlSlug: $urlSlug }) {
+        article(stage: PUBLISHED, where: { urlSlug: $urlSlug }) {
           ...ArticleDetailFragment
           relatedArticles {
             ...RelatedArticleFragment
@@ -44,6 +33,7 @@ export default defineEventHandler(async (event) => {
         }
         recentArticles: articles(
           where: { urlSlug_not: $urlSlug, domain: protectCom }
+          stage: PUBLISHED
           orderBy: publishedAt_DESC
           first: 4
         ) {
@@ -70,6 +60,13 @@ export default defineEventHandler(async (event) => {
         }
         content {
           raw
+          references {
+        ... on AppComponent {
+          id
+          componentName
+          props
+        }
+      }
         }
         contentTag {
           tagValue
@@ -119,27 +116,103 @@ export default defineEventHandler(async (event) => {
         return article;
       }
 
-      // Updated regex to match: {{component_Name, |{props: 'here'}| }}
-      // Captures: component name and optional props object
-      // Made more flexible to handle spaces and nested content
-      const componentRegex = /\{\{component_(\w+)(?:,\s*\|([^|]+)\|)?\s*\}\}/g;
+      /**
+       * Creates a stateful ID generator that slugifies heading text and appends
+       * numeric suffixes for duplicates.
+       *
+       * @returns {(text: string) => string} Unique heading ID generator.
+       */
+      const createUniqueHeadingIdGenerator = () => {
+        const seenIds = new Map();
 
-      // Helper function to extract headings from AST (always runs)
+        /**
+         * Generates a unique, URL-friendly heading ID.
+         *
+         * @param {string} text - Heading text content.
+         * @returns {string} Stable unique ID for anchor linking.
+         */
+        return (text) => {
+          const baseId =
+            String(text || "")
+              .replace(/[^a-zA-Z0-9]+/g, "-")
+              .replace(/(^-|-$)/g, "")
+              .toLowerCase() || "section";
+
+          const currentCount = seenIds.get(baseId) || 0;
+          seenIds.set(baseId, currentCount + 1);
+
+          return currentCount === 0 ? baseId : `${baseId}-${currentCount + 1}`;
+        };
+      };
+
+      const getHeadingIdForToc = createUniqueHeadingIdGenerator();
+      const getHeadingIdForRender = createUniqueHeadingIdGenerator();
+
+      /**
+       * Recursively extracts plain text from a rich-text AST node.
+       *
+       * @param {object|null|undefined} node - Rich-text AST node.
+       * @returns {string} Concatenated plain-text content.
+       */
+      const extractPlainText = (node) => {
+        if (!node) return "";
+        if (typeof node.text === "string") return node.text;
+        if (Array.isArray(node.children)) {
+          return node.children.map((child) => extractPlainText(child)).join("");
+        }
+        return "";
+      };
+
+      /**
+       * Removes HTML tags from a string for text-based ID generation.
+       *
+       * @param {string} [value=""] - HTML string value.
+       * @returns {string} Trimmed plain text.
+       */
+      const stripHtmlTags = (value = "") =>
+        String(value)
+          .replace(/<[^>]*>/g, "")
+          .trim();
+
+      /**
+       * Extracts heading metadata from rich-text nodes for jump-link rendering.
+       * Includes native heading nodes only.
+       *
+       * @param {Array<object>} nodes - Root rich-text child nodes.
+       * @returns {Array<{text: string, id: string, level: number}>} Heading links.
+       */
       const extractHeadings = (nodes) => {
         const headingsList = [];
         const levelMap = { one: 1, two: 2, three: 3, four: 4, five: 5, six: 6 };
 
+        /**
+         * Converts a heading AST node to a normalized heading metadata object.
+         *
+         * @param {object} headingNode - Rich-text heading node.
+         * @returns {{text: string, id: string, level: number}} Heading metadata.
+         */
         const generateHeading = (headingNode) => {
-          const level = headingNode.type.split("-")[1];
+          const nodeType = headingNode?.type || "heading-two";
+          const level = nodeType.split("-")[1];
           const headingLevel = levelMap[level] || 2;
-          const text = headingNode.children?.map((c) => c.text || "").join("");
-          const id = text.replace(/[^a-zA-Z0-9]+/g, "-").toLowerCase();
+          const text = extractPlainText(headingNode).trim();
+          if (!text) {
+            return null;
+          }
+          const id = getHeadingIdForToc(text);
 
           return { text, id, level: headingLevel };
         };
         nodes.forEach((node) => {
-          if (node.type.startsWith("heading-") || (node.children.length === 1 && node.children[0].bold && node.children[0].text.length > 0)) {
-            headingsList.push(generateHeading(node));
+          if (node?.type?.startsWith("heading-")) {
+            const heading = generateHeading(node);
+            if (heading) {
+              headingsList.push(heading);
+            }
+          } else if (node?.children?.length > 0) {
+            // Recursively check for nested headings within child nodes (e.g., in rich-text)
+            const childHeadings = extractHeadings(node.children);
+            headingsList.push(...childHeadings);
           }
         });
 
@@ -147,255 +220,140 @@ export default defineEventHandler(async (event) => {
       };
 
       // Always extract headings for table of contents
-      const contentLinks = extractHeadings(articleContent.content.raw.children);
+      const contentLinks = extractHeadings(
+        articleContent.content.raw.children || []
+      );
       articleContent.contentLinks = contentLinks;
 
-      // Always build contentParts from AST
-      const contentParts = [];
-      const componentNames = [];
-
-      // Helper function to render text with formatting
-      const renderTextNode = (textNode) => {
-        let text = textNode.text || "";
-
-        if (textNode.bold) {
-          text = `<strong>${text}</strong>`;
-        }
-        if (textNode.italic) {
-          text = `<em>${text}</em>`;
-        }
-        if (textNode.underline) {
-          text = `<u>${text}</u>`;
-        }
-        if (textNode.code) {
-          text = `<code>${text}</code>`;
-        }
-
-        return text;
+      /**
+       * Renders a heading element with an auto-generated anchor ID.
+       * Utilizes custom renderers to inject `id` attributes for native headings and bold-only paragraphs.
+       *
+       * @param {string} tagName - HTML heading tag name (`h1`...`h6`).
+       * @param {string} children - Inner HTML content.
+       * @returns {string} Heading HTML string with `id` attribute.
+       */
+      const headingRenderer = (tagName, children) => {
+        const text = stripHtmlTags(children);
+        const id = getHeadingIdForRender(text);
+        return `<${tagName} id="${id}">${children}</${tagName}>`;
       };
 
-      // Helper function to render children nodes
-      const renderChildren = (children) => {
-        if (!children || !Array.isArray(children)) return "";
+      const embeddedComponents = [];
+      const embedMarkerPrefix = "__APP_COMPONENT_EMBED__";
 
-        return children
-          .map((child) => {
-            if (child.type === "link") {
-              const linkText = renderChildren(child.children);
-              const target = child.openInNewTab ? ' target="_blank" rel="noopener noreferrer"' : "";
-              const title = child.title ? ` title="${child.title}"` : "";
-              return `<a href="${child.href}"${target}${title}>${linkText}</a>`;
-            } else if (child.type === "text") {
-              return renderTextNode(child);
-            } else if (child.text !== undefined) {
-              return renderTextNode(child);
-            }
-            return "";
-          })
-          .join("");
-      };
+      articleContent.componentNames = [];
 
-      // Helper function to render a full node
-      const renderNode = (node) => {
-        if (!node.type) return "";
-
-        // Handle headings
-        if (node.type.startsWith("heading-")) {
-          const level = node.type.split("-")[1];
-          const levelMap = { one: 1, two: 2, three: 3, four: 4, five: 5, six: 6 };
-          const headingLevel = levelMap[level] || 2;
-          const content = renderChildren(node.children);
-          const text = node.children?.map((c) => c.text || "").join("");
-          const id = text.replace(/[^a-zA-Z0-9]+/g, "-").toLowerCase();
-
-          // Return heading node with id for scrolling
-          return {
-            type: "heading",
-            level: headingLevel,
-            id,
-            content,
-            html: `<h${headingLevel} id="${id}">${content}</h${headingLevel}>`,
-          };
-        }
-
-        // Handle paragraphs
-        if (node.type === "paragraph") {
-          const content = renderChildren(node.children);
-
-          // Check if this paragraph is being used as a heading (single bold child)
-          if (node.children?.length === 1 && node.children[0].bold && node.children[0].text && node.children[0].text.length > 0) {
-            const text = node.children[0].text;
-            const id = text.replace(/[^a-zA-Z0-9]+/g, "-").toLowerCase();
-
-            // Return as a pseudo-heading with ID
-            return {
-              type: "heading",
-              level: 3, // Treat bold paragraphs as h3
-              id,
-              content,
-              html: `<p id="${id}"><strong>${text}</strong></p>`,
-            };
-          }
-
-          return `<p>${content}</p>`;
-        }
-
-        // Handle lists
-        if (node.type === "bulleted-list" || node.type === "numbered-list") {
-          const tag = node.type === "numbered-list" ? "ol" : "ul";
-          const items = node.children
-            ?.map((child) => {
-              if (child.type === "list-item" || child.type === "list-item-child") {
-                return `<li>${renderChildren(child.children)}</li>`;
-              }
-              return "";
-            })
-            .join("");
-          return `<${tag}>${items}</${tag}>`;
-        }
-
-        // Handle blockquotes
-        if (node.type === "block-quote") {
-          return `<blockquote>${renderChildren(node.children)}</blockquote>`;
-        }
-
-        // Handle code blocks
-        if (node.type === "code-block") {
-          const code = node.children?.map((c) => c.text || "").join("\n");
-          return `<pre><code>${code}</code></pre>`;
-        }
-
-        // Handle images
-        if (node.type === "image") {
-          const alt = node.title || "";
-          const width = node.width ? ` width="${node.width}"` : "";
-          const height = node.height ? ` height="${node.height}"` : "";
-          return `<img src="${node.src}" alt="${alt}"${width}${height} />`;
-        }
-
-        // Handle tables
-        if (node.type === "table") {
-          const rows = node.children
-            ?.map((row) => {
-              if (row.type === "table_row") {
-                const cells = row.children
-                  ?.map((cell) => {
-                    const tag = cell.type === "table_head" ? "th" : "td";
-                    return `<${tag}>${renderChildren(cell.children)}</${tag}>`;
-                  })
-                  .join("");
-                return `<tr>${cells}</tr>`;
-              }
-              return "";
-            })
-            .join("");
-          return `<table>${rows}</table>`;
-        }
-
-        return "";
-      };
-
-      // Process all nodes
-      articleContent.content.raw.children.forEach((node) => {
-        const result = renderNode(node);
-
-        // Handle heading nodes with IDs
-        if (result && typeof result === "object" && result.type === "heading") {
-          contentParts.push({
-            type: "text",
-            content: result.html,
-            tag: node.type,
-            id: result.id,
-            isHeading: true,
-          });
-          return;
-        }
-
-        const html = result || "";
-
-        // Check if it's a component marker with the new pattern
-        // Pattern: {{component_Name, |{props}| }}
-        let match;
-        const componentMatches = [];
-
-        // Reset regex lastIndex for global flag
-        componentRegex.lastIndex = 0;
-
-        while ((match = componentRegex.exec(html)) !== null) {
-          componentMatches.push({
-            fullMatch: match[0],
-            componentName: match[1],
-            propsString: match[2], // Can be undefined if no props
-            index: match.index,
-          });
-        }
-
-        if (componentMatches.length > 0) {
-          let lastIndex = 0;
-
-          componentMatches.forEach((componentMatch) => {
-            const { fullMatch, componentName, propsString, index } = componentMatch;
-
-            componentNames.push(componentName);
-
-            // Add text before this component
-            if (index > lastIndex) {
-              const textBefore = html.substring(lastIndex, index).trim();
-              if (textBefore) {
-                contentParts.push({
-                  type: "text",
-                  content: textBefore,
-                  tag: node.type,
-                });
-              }
+      const parsedHtml = astToHtmlString({
+        content: articleContent.content.raw,
+        references: articleContent.content.references || [],
+        renderers: {
+          h1: ({ children }) => headingRenderer("h1", children),
+          h2: ({ children }) => headingRenderer("h2", children),
+          h3: ({ children }) => headingRenderer("h3", children),
+          h4: ({ children }) => headingRenderer("h4", children),
+          h5: ({ children }) => headingRenderer("h5", children),
+          h6: ({ children }) => headingRenderer("h6", children),
+          p: ({ children }) => {
+            const boldOnlyMatch = String(children || "").match(
+              /^\s*<(strong|b)>([\s\S]*?)<\/\1>\s*$/i
+            );
+            if (!boldOnlyMatch) {
+              return `<p>${children}</p>`;
             }
 
-            // Parse props if they exist
-            let props = {};
-            if (propsString) {
-              try {
-                // Remove leading/trailing whitespace and parse JSON
-                props = JSON.parse(propsString.trim());
-              } catch (e) {
-                //generate fallback on parse error either from malformed JSON or no props passed
-                props = generateFallbackProps(componentName);
-                console.warn(`Failed to parse props for component ${componentName}:`, propsString, e, "Fallback props will be used.");
-              }
+            const text = stripHtmlTags(boldOnlyMatch[2]);
+            if (!text) {
+              return `<p>${children}</p>`;
             }
 
-            // Add the component with props
-            contentParts.push({
-              type: "component",
-              name: componentName,
-              componentProps: props,
-            });
+            const id = getHeadingIdForRender(text);
+            return `<p id="${id}">${children}</p>`;
+          },
+          img: ({ src, alt }) => {
+            const altAttribute = alt ? ` alt="${alt}"` : "";
+            return `<img src="${src}"${altAttribute} />`;
+          },
+          embed: {
+            AppComponent: ({ componentName, nodeId, props }) => {
+              const componentData = {
+                type: "component",
+                name:
+                  String(componentName).slice(0, 1).toUpperCase() +
+                  String(componentName).slice(1), // Ensure component name is capitalized
+                nodeId,
+                componentProps: props || {},
+              };
 
-            lastIndex = index + fullMatch.length;
-          });
-
-          // Add any remaining text after the last component
-          if (lastIndex < html.length) {
-            const textAfter = html.substring(lastIndex).trim();
-            if (textAfter) {
-              contentParts.push({
-                type: "text",
-                content: textAfter,
-                tag: node.type,
-              });
-            }
-          }
-        } else if (html) {
-          contentParts.push({
-            type: "text",
-            content: html,
-            tag: node.type,
-          });
-        }
+              const componentIndex = embeddedComponents.push(componentData) - 1;
+              return `<!--${embedMarkerPrefix}:${componentIndex}-->`;
+            },
+          },
+        },
       });
 
-      // Add processed data to article
+      const contentParts = [];
+      const parsedHtmlString = String(parsedHtml || "");
+      const embedMarkerRegex = new RegExp(
+        `<!--${embedMarkerPrefix}:(\\d+)-->`,
+        "g"
+      );
+
+      let previousIndex = 0;
+      let markerMatch = embedMarkerRegex.exec(parsedHtmlString);
+
+      while (markerMatch) {
+        const markerStartIndex = markerMatch.index;
+        const markerEndIndex = markerStartIndex + markerMatch[0].length;
+
+        if (markerStartIndex > previousIndex) {
+          const htmlPart = parsedHtmlString.slice(
+            previousIndex,
+            markerStartIndex
+          );
+          if (htmlPart.trim()) {
+            contentParts.push({
+              type: "text",
+              content: htmlPart,
+              tag: "rich-text",
+            });
+          }
+        }
+
+        const componentIndex = Number(markerMatch[1]);
+        const embeddedComponent = embeddedComponents[componentIndex];
+        if (embeddedComponent) {
+          contentParts.push(embeddedComponent);
+          if (embeddedComponent.name) {
+            articleContent.componentNames.push(embeddedComponent.name);
+          }
+        }
+
+        previousIndex = markerEndIndex;
+        markerMatch = embedMarkerRegex.exec(parsedHtmlString);
+      }
+
+      if (previousIndex < parsedHtmlString.length) {
+        const htmlPart = parsedHtmlString.slice(previousIndex);
+        if (htmlPart.trim()) {
+          contentParts.push({
+            type: "text",
+            content: htmlPart,
+            tag: "rich-text",
+          });
+        }
+      }
+
+      if (!contentParts.length && parsedHtmlString.trim()) {
+        contentParts.push({
+          type: "text",
+          content: parsedHtmlString,
+          tag: "rich-text",
+        });
+      }
+
+      articleContent.contentHtml = parsedHtml;
       articleContent.contentParts = contentParts;
-      articleContent.componentNames = [...new Set(componentNames)];
 
       return {
         response: article,
@@ -416,6 +374,5 @@ export default defineEventHandler(async (event) => {
     }
   };
   const singleArticleData = await getSingleArticle();
-  //console.log(singleArticleData);
   return singleArticleData;
 });

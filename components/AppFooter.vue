@@ -4,14 +4,37 @@
       <div class="row footer-columns">
         <div class="footer-column">
           <div class="logo">
-            <img alt="Protect.com Logo" src="/assets/protect_logo_tm.svg" width="115" height="22" loading="lazy" />
+            <img
+              alt="Protect.com Logo"
+              src="/assets/protect_logo_tm.svg"
+              width="115"
+              height="22"
+              loading="lazy"
+            />
           </div>
-          <ul>
+          <ul class="protectLinks">
             <li><NuxtLink to="/car-insurance">Car Insurance</NuxtLink></li>
+            <li>
+              <NuxtLink to="/car-insurance/rates-by-vehicle"
+                >Car Insurance By Vehicle</NuxtLink
+              >
+            </li>
             <!--<li><NuxtLink to="/insurance/life">Life Insurance</NuxtLink></li>-->
-            <li><NuxtLink to="/health-insurance">Health Insurance</NuxtLink></li>
+            <li>
+              <NuxtLink to="/health-insurance">Health Insurance</NuxtLink>
+            </li>
             <!-- <li><NuxtLink to="/insurance/medicare">Medicare</NuxtLink></li> -->
             <li><NuxtLink to="/home-insurance">Home Insurance</NuxtLink></li>
+          </ul>
+        </div>
+        <div class="footer-column footerStates">
+          <h3>Car Insurance By State</h3>
+          <ul>
+            <li v-for="state in states" :key="state.name">
+              <NuxtLink :to="`/car-insurance/${state.slug}`">
+                {{ state.abbreviation }}
+              </NuxtLink>
+            </li>
           </ul>
         </div>
         <!--<div class="footer-column">
@@ -78,21 +101,32 @@
           </div>
         </div> -->
       </div>
+
       <div class="row footer-columns">
         <div class="privacy-policies">
           <p>
-            <a href="https://dmsunsub.io/" target="_blank">Do Not Sell Or Share My Personal Information</a> |
-            <NuxtLink to="/privacy-policy">Privacy Policy</NuxtLink> | <NuxtLink to="/terms">Terms Of Use</NuxtLink> |
+            <a href="https://dmsunsub.io/" target="_blank"
+              >Do Not Sell Or Share My Personal Information</a
+            >
+            | <NuxtLink to="/privacy-policy">Privacy Policy</NuxtLink> |
+            <NuxtLink to="/terms">Terms Of Use</NuxtLink> |
             <NuxtLink to="/privacy-notice">California Privacy Notice</NuxtLink>
           </p>
           <p>
-            The specified use of this site is to accurately match users to the auto insurance companies to best meet their needs. We do not provide
-            insurance and we do not represent any specific insurance provider or automobile makes and/or models. Auto Insurance is a top online
-            insurance marketplaces that connects consumers with multiple insurance companies and local agents across the United States. We are not an
-            insurance company or agency and we are not directly affiliated with any particular insurance company. If you do not receive a quote from a
-            specific company you were searching for, we recommend contacting that company directly so you can compare the quotes you receive from us
-            with one from them. All trademarks and copyrights are the property of their respective owners. Protect.com® and its logos are trademarks
-            or registered trademarks of Digital Media Solutions, LLC. All rights reserved.
+            The specified use of this site is to accurately match users to the
+            auto insurance companies to best meet their needs. We do not provide
+            insurance and we do not represent any specific insurance provider or
+            automobile makes and/or models. Auto Insurance is a top online
+            insurance marketplaces that connects consumers with multiple
+            insurance companies and local agents across the United States. We
+            are not an insurance company or agency and we are not directly
+            affiliated with any particular insurance company. If you do not
+            receive a quote from a specific company you were searching for, we
+            recommend contacting that company directly so you can compare the
+            quotes you receive from us with one from them. All trademarks and
+            copyrights are the property of their respective owners. Protect.com®
+            and its logos are trademarks or registered trademarks of Digital
+            Media Solutions, LLC. All rights reserved.
           </p>
         </div>
       </div>
@@ -101,6 +135,32 @@
 </template>
 
 <style scoped lang="scss">
+  .footerStates {
+    margin: 0px 0;
+    width: 75% !important;
+  }
+
+  .footerStates li {
+    display: inline-flex;
+    margin: 0 4px;
+  }
+
+  .footerStates li a {
+    font-size: 14px;
+  }
+
+  .footerStates h3 {
+    color: #0c2c67;
+    @include media-breakpoint-down(md) {
+      margin-top: 20px;
+      font-size: 21px;
+    }
+  }
+
+  .protectLinks a {
+    font-size: 18px;
+  }
+
   .footer {
     width: 100%;
     text-align: left;
