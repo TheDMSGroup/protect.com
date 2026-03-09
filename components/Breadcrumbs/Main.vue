@@ -17,7 +17,7 @@
   });
 </script>
 
-<style scoped>
+<style scoped lang="scss">
   .breadcrumbs {
     display: flex;
     flex-wrap: wrap;
@@ -31,6 +31,10 @@
     a,
     span {
       padding: 0 10px;
+      @include mobile {
+        padding: 0 2.5px;
+        font-size: 0.85rem;
+      }
     }
   }
 </style>

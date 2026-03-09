@@ -9,7 +9,11 @@
       :links="[
         { label: 'Car Insurance', url: '/car-insurance' },
         { label: 'Car Insurance Rates by State', url: '/car-insurance/usa' },
-        { label: `${formattedTopic} Car Insurance` },
+        {
+          label: `${
+            states.find((state) => state.slug === topic)?.name
+          } Car Insurance`,
+        },
       ]"
     />
   </div>
@@ -18,17 +22,10 @@
   import { ref, computed } from "vue";
   import { useRoute } from "vue-router";
   import StateView from "~/views/StateAutoInsurancePage.vue";
+  import { states } from "~/utils/redirect-config";
 
   const route = useRoute();
   const topic = ref(route.params.state);
-  const formattedTopic = computed(() => {
-    return topic.value
-      ? topic.value
-          .split("-")
-          .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-          .join(" ")
-      : "";
-  });
   // Set dynamic SEO meta tags using computed values
   const seoTitle = computed(() =>
     topic.value
