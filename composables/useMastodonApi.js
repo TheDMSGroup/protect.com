@@ -182,7 +182,6 @@ export const useMastodonApi = () => {
    * Format drivers array for API
    */
   const formatDrivers = (drivers) => {
-    console.log('formatDrivers input:', JSON.stringify(drivers))
     return drivers.map((driver, index) => ({
       gender: parseGender(driver.gender),
       marital_status: ['yes', 'y', 'married'].includes(driver.married?.toLowerCase()) ? 'Married' : 'Single',
