@@ -66,14 +66,17 @@
               <!-- TCPA Consent -->
               <div v-else-if="msg.type === 'tcpa'" class="tcpa-container">
                 <div class="tcpa-text">
-                  By clicking "Get Auto & Home Quotes", I provide my express consent via e-signature to be contacted, for marketing purposes, by or on behalf of Quotza.com
-                  <a href="https://easy.quotza.com/partners.php" target="_blank" rel="noopener noreferrer">partners</a>, by telephone, which may include artificial, generative AI, or pre-recorded voice messages and/or SMS text messages, delivered via automatic telephone dialing system at the number I provided regarding Auto & Home Insurance offers, even if my number is on a Federal, State or Company Do Not Call list. I also represent that I am the subscriber and primary user of the telephone number that I have provided above. I understand that my consent is not required to make a purchase or obtain services and that I may opt-out at any time. In order to proceed without providing consent, skip. I certify that I am a US resident over 18, and I agree to the
-                  <a href="https://easy.quotza.com/privacy.php" target="_blank" rel="noopener noreferrer">Privacy Policy</a> and
-                  <a href="http://easy.quotza.com/terms.php" target="_blank" rel="noopener noreferrer">Terms & Conditions</a>. I understand and agree that third parties, including, but not limited to, Jornaya and Active Prospect are being employed to monitor my activity on this website today.
+                  <span v-if="tcpaHtml" v-html="tcpaHtml"></span>
+                  <span v-else>
+                    By clicking "Get Auto Quotes", I provide my express consent via e-signature to be contacted, for marketing purposes, by or on behalf of Protect.com
+                    <a href="https://protect.com/partners" target="_blank" rel="noopener noreferrer">partners</a>, by telephone, which may include artificial, generative AI, or pre-recorded voice messages and/or SMS text messages, delivered via automatic telephone dialing system at the number I provided regarding Auto Insurance offers, even if my number is on a Federal, State or Company Do Not Call list. I also represent that I am the subscriber and primary user of the telephone number that I have provided above. I understand that my consent is not required to make a purchase or obtain services and that I may opt-out at any time. In order to proceed without providing consent, skip. I certify that I am a US resident over 18, and I agree to the
+                    <a href="https://protect.com/privacy" target="_blank" rel="noopener noreferrer">Privacy Policy</a> and
+                    <a href="https://protect.com/terms" target="_blank" rel="noopener noreferrer">Terms & Conditions</a>. I understand and agree that third parties, including, but not limited to, Jornaya and Active Prospect are being employed to monitor my activity on this website today.
+                  </span>
                 </div>
                 <div class="tcpa-buttons">
                   <button @click="handleQuickReply('Yes, I agree')" class="tcpa-accept">
-                    Get Auto & Home Quotes
+                    {{ tcpaButtonText }}
                   </button>
                   <button @click="handleQuickReply('skip')" class="tcpa-skip">
                     Skip
@@ -285,7 +288,74 @@ const isTyping = ref(false)
 
 const celebrationEmojis = ['🎉', '🙌', '👍', '🎊', '✨', '💰', '🌟']
 
-const TCPA_DISCLOSURE = 'By clicking "Get Auto & Home Quotes", I provide my express consent via e-signature to be contacted, for marketing purposes, by or on behalf of Quotza.com partners, by telephone, which may include artificial, generative AI, or pre-recorded voice messages and/or SMS text messages, delivered via automatic telephone dialing system at the number I provided regarding Auto & Home Insurance offers, even if my number is on a Federal, State or Company Do Not Call list. I also represent that I am the subscriber and primary user of the telephone number that I have provided above. I understand that my consent is not required to make a purchase or obtain services and that I may opt-out at any time. In order to proceed without providing consent, skip. I certify that I am a US resident over 18, and I agree to the Privacy Policy and Terms & Conditions. I understand and agree that third parties, including, but not limited to, Jornaya and Active Prospect are being employed to monitor my activity on this website today.'
+// TCPA content from dynamic script
+const tcpaHtml = ref('')
+const tcpaDisclosure = ref('')
+
+/**
+ * Load the TCPA script and generate TCPA HTML
+ */
+const loadTcpaScript = () => {
+  return new Promise((resolve) => {
+    if (typeof document === 'undefined') {
+      resolve()
+      return
+    }
+
+    if (!document.querySelector('#tcpa-script')) {
+      const s = document.createElement('script')
+      s.src = 'https://ue-sites.s3.us-east-1.amazonaws.com/js/create-tcpa/d/js/client.js'
+      s.id = 'tcpa-script'
+      s.addEventListener('load', () => {
+        generateTcpaContent().then(resolve)
+      })
+      document.head.appendChild(s)
+    } else {
+      generateTcpaContent().then(resolve)
+    }
+  })
+}
+
+// TCPA button text - used in template
+const tcpaButtonText = ref('Get Auto Quotes')
+
+/**
+ * Generate TCPA content using the loaded script
+ */
+const generateTcpaContent = async () => {
+  if (typeof window === 'undefined' || !window.generateTCPA) return
+
+  const buttonText = 'Get Auto Quotes'
+  const vertical = 'Auto Insurance'
+
+  const fragment = await window.generateTCPA({
+    buttonText,
+    siteName: 'Protect.com',
+    vertical,
+    brandSlug: 'protect',
+    pageSlug: 'tcpa-auto'
+  })
+
+  // Convert DocumentFragment to HTML string
+  const tempDiv = document.createElement('div')
+  tempDiv.appendChild(fragment.cloneNode(true))
+
+  // Extract just the label/text content (not the buttons)
+  const label = tempDiv.querySelector('label')
+  if (label) {
+    tcpaHtml.value = label.innerHTML
+  } else {
+    // Fallback - use full HTML but remove buttons
+    const buttons = tempDiv.querySelectorAll('button')
+    buttons.forEach(btn => btn.remove())
+    tcpaHtml.value = tempDiv.innerHTML
+  }
+
+  tcpaButtonText.value = buttonText
+
+  // Store plain text version for API submission
+  tcpaDisclosure.value = `By clicking "${buttonText}", I provide my express consent via e-signature to be contacted, for marketing purposes, by or on behalf of Protect.com partners, by telephone, which may include artificial, generative AI, or pre-recorded voice messages and/or SMS text messages, delivered via automatic telephone dialing system at the number I provided regarding ${vertical} offers, even if my number is on a Federal, State or Company Do Not Call list. I also represent that I am the subscriber and primary user of the telephone number that I have provided above. I understand that my consent is not required to make a purchase or obtain services and that I may opt-out at any time. In order to proceed without providing consent, skip. I certify that I am a US resident over 18, and I agree to the Privacy Policy and Terms & Conditions. I understand and agree that third parties, including, but not limited to, Jornaya and Active Prospect are being employed to monitor my activity on this website today.`
+}
 
 // Capitalize first letter of each word in a name
 const capitalizeName = (name) => {
@@ -305,6 +375,9 @@ const steps = [
 onMounted(() => {
   // Load TrustedForm script
   loadTrustedForm()
+
+  // Load TCPA script
+  loadTcpaScript()
 
   // Check for previewfeed URL param to show mock results immediately
   const urlParams = new URLSearchParams(window.location.search)
@@ -1151,9 +1224,10 @@ const processResponse = async (response) => {
       formData.contact.phone = response
 
       setTimeout(() => {
-        addBotMessage(`${getNextEmoji()} Awesome! One last step - please review our consent terms:`, true)
-        currentQuestion.value = { type: 'tcpa_consent' }
-        messages.value.push({ type: 'tcpa' })
+        addBotMessage(`${getNextEmoji()} Awesome! One last step - please review our consent terms:`, true, [], false, () => {
+          currentQuestion.value = { type: 'tcpa_consent' }
+          messages.value.push({ type: 'tcpa' })
+        })
       }, 800)
       return
     }
@@ -1360,7 +1434,7 @@ const submitToApi = async () => {
     const payload = buildLeadPayload(formData, {
       rtclid,
       trustedFormCertId: getCertificateUrl(),
-      tcpaDisclosure: TCPA_DISCLOSURE
+      tcpaDisclosure: tcpaDisclosure.value
     })
 
     let result
