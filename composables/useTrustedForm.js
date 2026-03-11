@@ -93,9 +93,23 @@ export const useTrustedForm = () => {
     return ''
   }
 
+  /**
+   * Get just the TrustedForm certificate ID (without the URL prefix)
+   * @returns {string} - The certificate ID or empty string if not available
+   */
+  const getCertificateId = () => {
+    const url = getCertificateUrl()
+    if (!url) return ''
+
+    // Extract ID from URL like "https://cert.trustedform.com/190c604de02f1b1e240499ad62f122ab9117c7ed"
+    const match = url.match(/\/([a-f0-9]+)$/)
+    return match ? match[1] : url
+  }
+
   return {
     loadTrustedForm,
     getCertificateUrl,
+    getCertificateId,
     isLoaded
   }
 }

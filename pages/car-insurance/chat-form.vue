@@ -259,7 +259,7 @@ const formattedPhoneNumber = computed(() => {
 
 const { getMakes, getModels, getYears, findMatch } = useVehicleApi()
 const { submitLead, buildLeadPayload } = useMastodonApi()
-const { loadTrustedForm, getCertificateUrl } = useTrustedForm()
+const { loadTrustedForm, getCertificateId } = useTrustedForm()
 const vehicleYears = getYears()
 const availableMakes = ref([])
 const availableModels = ref([])
@@ -363,6 +363,60 @@ const capitalizeName = (name) => {
   return name.split(/\s+/).map(word =>
     word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
   ).join(' ')
+}
+
+// Insurance companies for fuzzy matching (with common misspellings/aliases)
+const insuranceCompanyMap = {
+  'geico': 'GEICO',
+  'geco': 'GEICO',
+  'gieco': 'GEICO',
+  'gecio': 'GEICO',
+  'state farm': 'State Farm',
+  'statefarm': 'State Farm',
+  'state': 'State Farm',
+  'progressive': 'Progressive',
+  'progresive': 'Progressive',
+  'allstate': 'Allstate',
+  'allsate': 'Allstate',
+  'all state': 'Allstate',
+  'usaa': 'USAA',
+  'liberty mutual': 'Liberty Mutual',
+  'liberty': 'Liberty Mutual',
+  'libertymutual': 'Liberty Mutual',
+  'nationwide': 'Nationwide',
+  'nation wide': 'Nationwide',
+  'farmers': 'Farmers',
+  'farmer': 'Farmers',
+  'american family': 'American Family',
+  'americanfamily': 'American Family',
+  'amfam': 'American Family',
+  'travelers': 'Travelers',
+  'travellers': 'Travelers',
+  'traveler': 'Travelers'
+}
+
+const insuranceCompanies = ['GEICO', 'State Farm', 'Progressive', 'Allstate', 'USAA', 'Liberty Mutual', 'Nationwide', 'Farmers', 'American Family', 'Travelers']
+
+/**
+ * Fuzzy match insurance company name
+ * Returns matched company or 'Other' if no close match found
+ */
+const matchInsuranceCompany = (input) => {
+  const normalized = input.trim().toLowerCase()
+
+  // Check map for exact or common misspellings
+  if (insuranceCompanyMap[normalized]) {
+    return insuranceCompanyMap[normalized]
+  }
+
+  // Check if input starts with a known company name
+  for (const [key, value] of Object.entries(insuranceCompanyMap)) {
+    if (normalized.startsWith(key) || key.startsWith(normalized)) {
+      return value
+    }
+  }
+
+  return 'Other'
 }
 
 const steps = [
@@ -1197,10 +1251,11 @@ const processResponse = async (response) => {
     }
 
     if (currentQuestion.value?.type === 'current_company') {
-      formData.insurance.currentCompany = response
+      const matchedCompany = matchInsuranceCompany(response)
+      formData.insurance.currentCompany = matchedCompany
 
       setTimeout(() => {
-        addBotMessage(`How long have you been with ${response}?`, false, ['Less than 1 year', '1-2 years', '3-5 years', '5+ years'])
+        addBotMessage(`How long have you been with ${matchedCompany}?`, false, ['Less than 1 year', '1-2 years', '3-5 years', '5+ years'])
         currentQuestion.value = { type: 'coverage_length' }
       }, 800)
       return
@@ -1453,7 +1508,7 @@ const submitToApi = async () => {
     // Build the payload from form data
     const payload = buildLeadPayload(formData, {
       rtclid,
-      trustedFormCertId: getCertificateUrl(),
+      trustedFormCertId: getCertificateId(),
       tcpaDisclosure: tcpaSkipped.value ? '' : tcpaDisclosure.value
     })
 
