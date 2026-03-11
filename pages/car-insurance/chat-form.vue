@@ -365,55 +365,41 @@ const capitalizeName = (name) => {
   ).join(' ')
 }
 
-// Insurance companies for fuzzy matching (with common misspellings/aliases)
+// Insurance companies for fuzzy matching (common typos/aliases for when users type and submit without selecting)
 const insuranceCompanyMap = {
-  'geico': 'GEICO',
+  'triple a': 'AAA',
   'geco': 'GEICO',
   'gieco': 'GEICO',
   'gecio': 'GEICO',
-  'state farm': 'State Farm',
   'statefarm': 'State Farm',
-  'state': 'State Farm',
-  'progressive': 'Progressive',
   'progresive': 'Progressive',
-  'allstate': 'Allstate',
   'allsate': 'Allstate',
   'all state': 'Allstate',
-  'usaa': 'USAA',
-  'liberty mutual': 'Liberty Mutual',
-  'liberty': 'Liberty Mutual',
   'libertymutual': 'Liberty Mutual',
-  'nationwide': 'Nationwide',
   'nation wide': 'Nationwide',
-  'farmers': 'Farmers',
   'farmer': 'Farmers',
-  'american family': 'American Family',
   'americanfamily': 'American Family',
   'amfam': 'American Family',
-  'travelers': 'Travelers',
   'travellers': 'Travelers',
   'traveler': 'Travelers'
 }
 
-const insuranceCompanies = ['GEICO', 'State Farm', 'Progressive', 'Allstate', 'USAA', 'Liberty Mutual', 'Nationwide', 'Farmers', 'American Family', 'Travelers']
+const insuranceCompanies = ['AAA', 'Allstate', 'American Family', 'Farmers', 'GEICO', 'Liberty Mutual', 'Nationwide', 'Progressive', 'State Farm', 'Travelers', 'USAA', 'Other']
 
 /**
- * Fuzzy match insurance company name
- * Returns matched company or 'Other' if no close match found
+ * Match insurance company name
+ * Returns matched company or 'Other' if no match found
  */
 const matchInsuranceCompany = (input) => {
   const normalized = input.trim().toLowerCase()
 
-  // Check map for exact or common misspellings
+  // Check exact match against company list (case-insensitive)
+  const exactMatch = insuranceCompanies.find(c => c.toLowerCase() === normalized)
+  if (exactMatch) return exactMatch
+
+  // Check typo map
   if (insuranceCompanyMap[normalized]) {
     return insuranceCompanyMap[normalized]
-  }
-
-  // Check if input starts with a known company name
-  for (const [key, value] of Object.entries(insuranceCompanyMap)) {
-    if (normalized.startsWith(key) || key.startsWith(normalized)) {
-      return value
-    }
   }
 
   return 'Other'
@@ -605,28 +591,26 @@ const handleTcpaTextClick = (event) => {
 const handleSearchInput = () => {
   const query = inputValue.value.trim().toLowerCase()
 
-  // Only show suggestions for make/model questions
-  if (!['vehicle_make', 'vehicle_model'].includes(currentQuestion.value?.type)) {
+  // Only show suggestions for make/model/insurance questions
+  if (!['vehicle_make', 'vehicle_model', 'current_company'].includes(currentQuestion.value?.type)) {
     searchSuggestions.value = []
     return
   }
 
-  if (!query) {
-    // Show priority makes when empty
-    if (currentQuestion.value?.type === 'vehicle_make') {
-      searchSuggestions.value = availableMakes.value.slice(0, 6)
-    } else if (currentQuestion.value?.type === 'vehicle_model') {
-      searchSuggestions.value = availableModels.value.slice(0, 6)
-    }
-    return
-  }
-
-  // Filter based on current question type
+  // Get the appropriate list based on question type
   let list = []
   if (currentQuestion.value?.type === 'vehicle_make') {
     list = availableMakes.value
   } else if (currentQuestion.value?.type === 'vehicle_model') {
     list = availableModels.value
+  } else if (currentQuestion.value?.type === 'current_company') {
+    list = insuranceCompanies
+  }
+
+  if (!query) {
+    // Show first 6 options when empty
+    searchSuggestions.value = list.slice(0, 6)
+    return
   }
 
   // Find matches (starts with or contains)
@@ -1237,7 +1221,15 @@ const processResponse = async (response) => {
       if (lowerResponse === 'yes') {
         addDiscount('Continuous Coverage Discount')
         setTimeout(() => {
-          addBotMessage(`${getNextEmoji()} Great! Continuous coverage can help you save. Who's your current insurance provider?`, true, ['GEICO', 'State Farm', 'Progressive', 'Allstate', 'Other'])
+          addBotMessage(
+            `${getNextEmoji()} Great! Continuous coverage can help you save. Who's your current insurance provider?`,
+            true,
+            [],
+            false,
+            () => {
+              searchSuggestions.value = insuranceCompanies.slice(0, 6)
+            }
+          )
           currentQuestion.value = { type: 'current_company' }
         }, 800)
       } else {
