@@ -17,6 +17,10 @@ export default defineNuxtPlugin(() => {
       geoip2.city((location) => {
         const visitorGeoInfo = {};
 
+        if (location.traits && location.traits.ip_address) {
+          visitorGeoInfo.ip_address = location.traits.ip_address;
+        }
+
         if (location.postal && location.postal.code) {
           visitorGeoInfo.zip = location.postal.code;
         }

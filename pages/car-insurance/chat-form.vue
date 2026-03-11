@@ -62,10 +62,9 @@
                 </svg>
                 Call {{ formattedPhoneNumber }}
               </a>
-
               <!-- TCPA Consent -->
               <div v-else-if="msg.type === 'tcpa'" class="tcpa-container">
-                <div class="tcpa-text">
+                <div class="tcpa-text" @click="handleTcpaTextClick">
                   <span v-if="tcpaHtml" v-html="tcpaHtml"></span>
                   <span v-else>
                     By clicking "Get Auto Quotes", I provide my express consent via e-signature to be contacted, for marketing purposes, by or on behalf of Protect.com
@@ -260,7 +259,7 @@ const formattedPhoneNumber = computed(() => {
 
 const { getMakes, getModels, getYears, findMatch } = useVehicleApi()
 const { submitLead, buildLeadPayload } = useMastodonApi()
-const { loadTrustedForm, getCertificateUrl } = useTrustedForm()
+const { loadTrustedForm, getCertificateId } = useTrustedForm()
 const vehicleYears = getYears()
 const availableMakes = ref([])
 const availableModels = ref([])
@@ -273,7 +272,8 @@ const formData = reactive({
   vehicles: [],
   drivers: [],
   insurance: {},
-  contact: {}
+  contact: {},
+  tcpaConsent: true
 })
 const currentQuestion = ref(null)
 const quickReplies = ref([])
@@ -291,6 +291,7 @@ const celebrationEmojis = ['🎉', '🙌', '👍', '🎊', '✨', '💰', '🌟'
 // TCPA content from dynamic script
 const tcpaHtml = ref('')
 const tcpaDisclosure = ref('')
+const tcpaSkipped = ref(false)
 
 /**
  * Load the TCPA script and generate TCPA HTML
@@ -362,6 +363,46 @@ const capitalizeName = (name) => {
   return name.split(/\s+/).map(word =>
     word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
   ).join(' ')
+}
+
+// Insurance companies for fuzzy matching (common typos/aliases for when users type and submit without selecting)
+const insuranceCompanyMap = {
+  'triple a': 'AAA',
+  'geco': 'GEICO',
+  'gieco': 'GEICO',
+  'gecio': 'GEICO',
+  'statefarm': 'State Farm',
+  'progresive': 'Progressive',
+  'allsate': 'Allstate',
+  'all state': 'Allstate',
+  'libertymutual': 'Liberty Mutual',
+  'nation wide': 'Nationwide',
+  'farmer': 'Farmers',
+  'americanfamily': 'American Family',
+  'amfam': 'American Family',
+  'travellers': 'Travelers',
+  'traveler': 'Travelers'
+}
+
+const insuranceCompanies = ['AAA', 'Allstate', 'American Family', 'Farmers', 'GEICO', 'Liberty Mutual', 'Nationwide', 'Progressive', 'State Farm', 'Travelers', 'USAA', 'Other']
+
+/**
+ * Match insurance company name
+ * Returns matched company or 'Other' if no match found
+ */
+const matchInsuranceCompany = (input) => {
+  const normalized = input.trim().toLowerCase()
+
+  // Check exact match against company list (case-insensitive)
+  const exactMatch = insuranceCompanies.find(c => c.toLowerCase() === normalized)
+  if (exactMatch) return exactMatch
+
+  // Check typo map
+  if (insuranceCompanyMap[normalized]) {
+    return insuranceCompanyMap[normalized]
+  }
+
+  return 'Other'
 }
 
 const steps = [
@@ -537,31 +578,39 @@ const handleQuickReply = (reply) => {
   awaitingAnswer.value = false
 }
 
+const handleTcpaTextClick = (event) => {
+  // Handle clicks on dynamically injected #tcpa_skip link
+  if (event.target.id === 'tcpa_skip' || event.target.closest('#tcpa_skip')) {
+    event.preventDefault()
+    tcpaSkipped.value = true
+    formData.tcpaConsent = false
+    handleQuickReply('skip')
+  }
+}
+
 const handleSearchInput = () => {
   const query = inputValue.value.trim().toLowerCase()
 
-  // Only show suggestions for make/model questions
-  if (!['vehicle_make', 'vehicle_model'].includes(currentQuestion.value?.type)) {
+  // Only show suggestions for make/model/insurance questions
+  if (!['vehicle_make', 'vehicle_model', 'current_company'].includes(currentQuestion.value?.type)) {
     searchSuggestions.value = []
     return
   }
 
-  if (!query) {
-    // Show priority makes when empty
-    if (currentQuestion.value?.type === 'vehicle_make') {
-      searchSuggestions.value = availableMakes.value.slice(0, 6)
-    } else if (currentQuestion.value?.type === 'vehicle_model') {
-      searchSuggestions.value = availableModels.value.slice(0, 6)
-    }
-    return
-  }
-
-  // Filter based on current question type
+  // Get the appropriate list based on question type
   let list = []
   if (currentQuestion.value?.type === 'vehicle_make') {
     list = availableMakes.value
   } else if (currentQuestion.value?.type === 'vehicle_model') {
     list = availableModels.value
+  } else if (currentQuestion.value?.type === 'current_company') {
+    list = insuranceCompanies
+  }
+
+  if (!query) {
+    // Show first 6 options when empty
+    searchSuggestions.value = list.slice(0, 6)
+    return
   }
 
   // Find matches (starts with or contains)
@@ -1134,7 +1183,10 @@ const processResponse = async (response) => {
         }, 800)
       } else {
         setTimeout(() => {
-          addBotMessage(`Is ${formData.drivers[idx].firstName} currently employed?`, false, ['Yes', 'No'])
+          const message = idx === 0
+            ? `Are you currently employed?`
+            : `Is ${formData.drivers[idx].firstName} currently employed?`
+          addBotMessage(message, false, ['Yes', 'No'])
           currentQuestion.value = { type: 'driver_employed', driverIndex: idx }
         }, 800)
       }
@@ -1169,7 +1221,15 @@ const processResponse = async (response) => {
       if (lowerResponse === 'yes') {
         addDiscount('Continuous Coverage Discount')
         setTimeout(() => {
-          addBotMessage(`${getNextEmoji()} Great! Continuous coverage can help you save. Who's your current insurance provider?`, true, ['GEICO', 'State Farm', 'Progressive', 'Allstate', 'Other'])
+          addBotMessage(
+            `${getNextEmoji()} Great! Continuous coverage can help you save. Who's your current insurance provider?`,
+            true,
+            [],
+            false,
+            () => {
+              searchSuggestions.value = insuranceCompanies.slice(0, 6)
+            }
+          )
           currentQuestion.value = { type: 'current_company' }
         }, 800)
       } else {
@@ -1183,10 +1243,11 @@ const processResponse = async (response) => {
     }
 
     if (currentQuestion.value?.type === 'current_company') {
-      formData.insurance.currentCompany = response
+      const matchedCompany = matchInsuranceCompany(response)
+      formData.insurance.currentCompany = matchedCompany
 
       setTimeout(() => {
-        addBotMessage(`How long have you been with ${response}?`, false, ['Less than 1 year', '1-2 years', '3-5 years', '5+ years'])
+        addBotMessage(`How long have you been with ${matchedCompany}?`, false, ['Less than 1 year', '1-2 years', '3-5 years', '5+ years'])
         currentQuestion.value = { type: 'coverage_length' }
       }, 800)
       return
@@ -1234,11 +1295,17 @@ const processResponse = async (response) => {
 
     if (currentQuestion.value?.type === 'tcpa_consent') {
       if (lowerResponse.includes('agree') || lowerResponse.includes('yes')) {
+        // User agreed to TCPA consent
+        tcpaSkipped.value = false
+        formData.tcpaConsent = true
         setTimeout(() => {
           addBotMessage(`${getNextEmoji()} Thank you! Let me find the best quotes for you...`, true)
           submitToApi()
         }, 800)
       } else {
+        // User skipped TCPA consent
+        tcpaSkipped.value = true
+        formData.tcpaConsent = false
         setTimeout(() => {
           addBotMessage(`No problem! We'll still find you some great quotes.`)
           submitToApi()
@@ -1433,8 +1500,8 @@ const submitToApi = async () => {
     // Build the payload from form data
     const payload = buildLeadPayload(formData, {
       rtclid,
-      trustedFormCertId: getCertificateUrl(),
-      tcpaDisclosure: tcpaDisclosure.value
+      trustedFormCertId: getCertificateId(),
+      tcpaDisclosure: tcpaSkipped.value ? '' : tcpaDisclosure.value
     })
 
     let result
@@ -1881,6 +1948,9 @@ const submitToApi = async () => {
 .tcpa-text a {
   color: #2563eb;
   text-decoration: underline;
+}
+.tcpa-text :deep(p) {
+  font-size: .8rem !important;
 }
 
 .tcpa-buttons {
