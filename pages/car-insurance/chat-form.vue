@@ -62,10 +62,9 @@
                 </svg>
                 Call {{ formattedPhoneNumber }}
               </a>
-
               <!-- TCPA Consent -->
               <div v-else-if="msg.type === 'tcpa'" class="tcpa-container">
-                <div class="tcpa-text">
+                <div class="tcpa-text" @click="handleTcpaTextClick">
                   <span v-if="tcpaHtml" v-html="tcpaHtml"></span>
                   <span v-else>
                     By clicking "Get Auto Quotes", I provide my express consent via e-signature to be contacted, for marketing purposes, by or on behalf of Protect.com
@@ -273,7 +272,8 @@ const formData = reactive({
   vehicles: [],
   drivers: [],
   insurance: {},
-  contact: {}
+  contact: {},
+  tcpaConsent: true
 })
 const currentQuestion = ref(null)
 const quickReplies = ref([])
@@ -291,6 +291,7 @@ const celebrationEmojis = ['🎉', '🙌', '👍', '🎊', '✨', '💰', '🌟'
 // TCPA content from dynamic script
 const tcpaHtml = ref('')
 const tcpaDisclosure = ref('')
+const tcpaSkipped = ref(false)
 
 /**
  * Load the TCPA script and generate TCPA HTML
@@ -535,6 +536,16 @@ const handleQuickReply = (reply) => {
   quickReplies.value = []
   searchSuggestions.value = []
   awaitingAnswer.value = false
+}
+
+const handleTcpaTextClick = (event) => {
+  // Handle clicks on dynamically injected #tcpa_skip link
+  if (event.target.id === 'tcpa_skip' || event.target.closest('#tcpa_skip')) {
+    event.preventDefault()
+    tcpaSkipped.value = true
+    formData.tcpaConsent = false
+    handleQuickReply('skip')
+  }
 }
 
 const handleSearchInput = () => {
@@ -1134,7 +1145,10 @@ const processResponse = async (response) => {
         }, 800)
       } else {
         setTimeout(() => {
-          addBotMessage(`Is ${formData.drivers[idx].firstName} currently employed?`, false, ['Yes', 'No'])
+          const message = idx === 0
+            ? `Are you currently employed?`
+            : `Is ${formData.drivers[idx].firstName} currently employed?`
+          addBotMessage(message, false, ['Yes', 'No'])
           currentQuestion.value = { type: 'driver_employed', driverIndex: idx }
         }, 800)
       }
@@ -1234,11 +1248,17 @@ const processResponse = async (response) => {
 
     if (currentQuestion.value?.type === 'tcpa_consent') {
       if (lowerResponse.includes('agree') || lowerResponse.includes('yes')) {
+        // User agreed to TCPA consent
+        tcpaSkipped.value = false
+        formData.tcpaConsent = true
         setTimeout(() => {
           addBotMessage(`${getNextEmoji()} Thank you! Let me find the best quotes for you...`, true)
           submitToApi()
         }, 800)
       } else {
+        // User skipped TCPA consent
+        tcpaSkipped.value = true
+        formData.tcpaConsent = false
         setTimeout(() => {
           addBotMessage(`No problem! We'll still find you some great quotes.`)
           submitToApi()
@@ -1434,7 +1454,7 @@ const submitToApi = async () => {
     const payload = buildLeadPayload(formData, {
       rtclid,
       trustedFormCertId: getCertificateUrl(),
-      tcpaDisclosure: tcpaDisclosure.value
+      tcpaDisclosure: tcpaSkipped.value ? '' : tcpaDisclosure.value
     })
 
     let result
@@ -1881,6 +1901,9 @@ const submitToApi = async () => {
 .tcpa-text a {
   color: #2563eb;
   text-decoration: underline;
+}
+.tcpa-text :deep(p) {
+  font-size: .8rem !important;
 }
 
 .tcpa-buttons {
