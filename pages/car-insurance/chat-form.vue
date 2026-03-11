@@ -208,7 +208,11 @@
             </h3>
             <div class="summary-details">
               <div>{{ formData.contact.email }}</div>
-              <div v-if="formData.contact.phone">{{ formData.contact.phone }}</div>
+              <div v-if="formData.contact.phone">{{ formatPhoneDisplay(formData.contact.phone) }}</div>
+              <div v-if="formData.contact.address">{{ formData.contact.address }}</div>
+              <div v-if="formData.contact.city || formData.contact.state || formData.contact.zipcode">
+                {{ [formData.contact.city, formData.contact.state].filter(Boolean).join(', ') }} {{ formData.contact.zipcode }}
+              </div>
             </div>
           </div>
 
@@ -239,6 +243,7 @@ import { ref, reactive, watch, nextTick, onMounted, computed } from 'vue'
 import { useVehicleApi } from '~/composables/useVehicleApi'
 import { useMastodonApi } from '~/composables/useMastodonApi'
 import { useTrustedForm } from '~/composables/useTrustedForm'
+import { useGooglePlaces } from '~/composables/useGooglePlaces'
 
 const route = useRoute()
 const config = useRuntimeConfig()
@@ -260,6 +265,7 @@ const formattedPhoneNumber = computed(() => {
 const { getMakes, getModels, getYears, findMatch } = useVehicleApi()
 const { submitLead, buildLeadPayload } = useMastodonApi()
 const { loadTrustedForm, getCertificateId } = useTrustedForm()
+const { loadGooglePlaces, getAddressSuggestions, getPlaceDetails } = useGooglePlaces()
 const vehicleYears = getYears()
 const availableMakes = ref([])
 const availableModels = ref([])
@@ -365,6 +371,19 @@ const capitalizeName = (name) => {
   ).join(' ')
 }
 
+// Format phone number for display (e.g., 1234567890 -> (123) 456-7890)
+const formatPhoneDisplay = (phone) => {
+  if (!phone) return ''
+  const digits = phone.replace(/\D/g, '')
+  if (digits.length === 10) {
+    return `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6)}`
+  }
+  if (digits.length === 11 && digits[0] === '1') {
+    return `(${digits.slice(1, 4)}) ${digits.slice(4, 7)}-${digits.slice(7)}`
+  }
+  return phone
+}
+
 // Insurance companies for fuzzy matching (common typos/aliases for when users type and submit without selecting)
 const insuranceCompanyMap = {
   'triple a': 'AAA',
@@ -419,6 +438,9 @@ onMounted(() => {
 
   // Load TCPA script
   loadTcpaScript()
+
+  // Load Google Places for address autocomplete
+  loadGooglePlaces()
 
   // Check for previewfeed URL param to show mock results immediately
   const urlParams = new URLSearchParams(window.location.search)
@@ -566,6 +588,7 @@ const handleSend = () => {
   inputValue.value = ''
   quickReplies.value = []
   searchSuggestions.value = []
+  addressSuggestionsData.value = []
   awaitingAnswer.value = false
 }
 
@@ -575,6 +598,7 @@ const handleQuickReply = (reply) => {
   inputValue.value = ''
   quickReplies.value = []
   searchSuggestions.value = []
+  addressSuggestionsData.value = []
   awaitingAnswer.value = false
 }
 
@@ -588,8 +612,28 @@ const handleTcpaTextClick = (event) => {
   }
 }
 
-const handleSearchInput = () => {
-  const query = inputValue.value.trim().toLowerCase()
+// Store address suggestions with place IDs for lookup
+const addressSuggestionsData = ref([])
+
+const handleSearchInput = async () => {
+  const query = inputValue.value.trim()
+  const queryLower = query.toLowerCase()
+
+  // Handle address autocomplete separately (async)
+  if (currentQuestion.value?.type === 'address') {
+    if (query.length < 3) {
+      searchSuggestions.value = []
+      addressSuggestionsData.value = []
+      return
+    }
+    const suggestions = await getAddressSuggestions(query)
+    addressSuggestionsData.value = suggestions
+    // Display full address (description) but we'll store mainText when selected
+    searchSuggestions.value = suggestions.map(s => s.description)
+    // Scroll to show suggestions
+    nextTick(() => scrollToBottom())
+    return
+  }
 
   // Only show suggestions for make/model/insurance questions
   if (!['vehicle_make', 'vehicle_model', 'current_company'].includes(currentQuestion.value?.type)) {
@@ -607,15 +651,15 @@ const handleSearchInput = () => {
     list = insuranceCompanies
   }
 
-  if (!query) {
+  if (!queryLower) {
     // Show first 6 options when empty
     searchSuggestions.value = list.slice(0, 6)
     return
   }
 
   // Find matches (starts with or contains)
-  const startsWithMatches = list.filter(item => item.toLowerCase().startsWith(query))
-  const containsMatches = list.filter(item => !item.toLowerCase().startsWith(query) && item.toLowerCase().includes(query))
+  const startsWithMatches = list.filter(item => item.toLowerCase().startsWith(queryLower))
+  const containsMatches = list.filter(item => !item.toLowerCase().startsWith(queryLower) && item.toLowerCase().includes(queryLower))
 
   // Combine: startsWith first, then contains, limit to 6
   searchSuggestions.value = [...startsWithMatches, ...containsMatches].slice(0, 6)
@@ -633,6 +677,9 @@ const getInputPlaceholder = () => {
   }
   if (currentQuestion.value?.type === 'vehicle_model') {
     return 'Type to search models...'
+  }
+  if (currentQuestion.value?.type === 'address') {
+    return 'Start typing your address...'
   }
   return 'Type your answer...'
 }
@@ -657,6 +704,14 @@ const handleKeypress = (event) => {
   }
   // vehicle_year now allows letters for smart input like "2020 Honda Pilot"
 }
+// Helper to ask for phone number after address
+const askForPhone = () => {
+  setTimeout(() => {
+    addBotMessage(`And what's the best phone number to reach you?`)
+    currentQuestion.value = { type: 'phone' }
+  }, 800)
+}
+
 const processResponse = async (response) => {
   // Normalize y/n to yes/no
   const normalizedResponse = response.trim().toLowerCase() === 'y' ? 'Yes'
@@ -1245,9 +1300,11 @@ const processResponse = async (response) => {
     if (currentQuestion.value?.type === 'current_company') {
       const matchedCompany = matchInsuranceCompany(response)
       formData.insurance.currentCompany = matchedCompany
+      // Use friendly text in message but store actual value
+      const displayName = matchedCompany === 'Other' ? 'your current provider' : matchedCompany
 
       setTimeout(() => {
-        addBotMessage(`How long have you been with ${matchedCompany}?`, false, ['Less than 1 year', '1-2 years', '3-5 years', '5+ years'])
+        addBotMessage(`How long have you been with ${displayName}?`, false, ['Less than 1 year', '1-2 years', '3-5 years', '5+ years'])
         currentQuestion.value = { type: 'coverage_length' }
       }, 800)
       return
@@ -1275,9 +1332,51 @@ const processResponse = async (response) => {
       formData.contact.email = response
 
       setTimeout(() => {
-        addBotMessage(`And what's the best phone number to reach you?`)
-        currentQuestion.value = { type: 'phone' }
+        addBotMessage(`What's your home address? This helps us find accurate rates for your area.`, true)
+        currentQuestion.value = { type: 'address' }
       }, 800)
+      return
+    }
+
+    if (currentQuestion.value?.type === 'address') {
+      // Check if user selected from suggestions (match by full description)
+      const selectedSuggestion = addressSuggestionsData.value.find(s => s.description === response)
+
+      if (selectedSuggestion) {
+        // Get detailed address from Google Places
+        getPlaceDetails(selectedSuggestion.placeId).then(details => {
+          if (details) {
+            // Store just the street address (mainText), not the full address
+            formData.contact.address = selectedSuggestion.mainText
+            if (details.city) formData.contact.city = details.city
+            if (details.state) formData.contact.state = details.state
+            if (details.zipcode) formData.contact.zipcode = details.zipcode
+          } else {
+            formData.contact.address = selectedSuggestion.mainText
+          }
+          addressSuggestionsData.value = []
+          askForPhone()
+        })
+      } else {
+        // User typed their own address, validate it
+        getAddressSuggestions(response).then(async (suggestions) => {
+          if (suggestions.length > 0) {
+            const details = await getPlaceDetails(suggestions[0].placeId)
+            if (details) {
+              formData.contact.address = details.formattedAddress
+              if (details.city) formData.contact.city = details.city
+              if (details.state) formData.contact.state = details.state
+              if (details.zipcode) formData.contact.zipcode = details.zipcode
+            } else {
+              formData.contact.address = response
+            }
+          } else {
+            formData.contact.address = response
+          }
+          addressSuggestionsData.value = []
+          askForPhone()
+        })
+      }
       return
     }
 
