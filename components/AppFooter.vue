@@ -1,7 +1,16 @@
+<script setup>
+defineProps({
+  minimal: {
+    type: Boolean,
+    default: false
+  }
+})
+</script>
+
 <template>
-  <footer class="footer">
+  <footer class="footer" :class="{ 'footer--minimal': minimal }">
     <div class="container">
-      <div class="row footer-columns">
+      <div v-if="!minimal" class="row footer-columns">
         <div class="footer-column">
           <div class="logo">
             <img alt="Protect.com Logo" src="/assets/protect_logo_tm.svg" width="115" height="22" loading="lazy" />
@@ -106,6 +115,11 @@
     text-align: left;
     padding: 5em 0 6em;
     min-height: 587px;
+
+    &--minimal {
+      padding: 2em 1em;
+      min-height: auto;
+    }
 
     a {
       &:hover {

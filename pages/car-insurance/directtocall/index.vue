@@ -159,6 +159,8 @@
     </main>
     </div>
 
+    <!-- Footer -->
+    <AppFooter :minimal="true" />
   </div>
 </template>
 
