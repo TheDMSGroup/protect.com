@@ -446,7 +446,7 @@ const fetchMastodonBids = async () => {
   // Check for mastodonoff URL parameter
   const urlParams = new URLSearchParams(window.location.search)
   const useMockData = urlParams.get('mastodonoff') === 'true'
-  const rtkclid = urlParams.get('rtkclid') || window.rtkClickID || window.rtCookie|| null;
+  const rtkclid = urlParams.get('rtkclid') || sessionStorage.getItem('rtkclickid') || window.rtkClickID || window.rtCookie|| null;
 
   try {
     let result
