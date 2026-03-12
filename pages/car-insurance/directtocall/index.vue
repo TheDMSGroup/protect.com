@@ -299,8 +299,8 @@ const scrollToBottom = () => {
 
             // Only scroll if element is not fully visible
             if (!isVisible) {
-              // Position element so its bottom is 100px above the bottom of viewport
-              const scrollTarget = window.pageYOffset + rect.bottom - window.innerHeight + 100
+              // Position element so its bottom is 200px above the bottom of viewport
+              const scrollTarget = window.pageYOffset + rect.bottom - window.innerHeight + 200
               window.scrollTo({
                 top: scrollTarget,
                 behavior: 'smooth'
