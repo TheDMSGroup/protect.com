@@ -1,21 +1,21 @@
 <script setup>
 // Check if we're on dev subdomain (works on both server and client)
-const isDev = computed(() => {
-  if (import.meta.server) {
-    // Server-side: use request URL
-    const event = useRequestEvent()
-    const hostname = event?.node?.req?.headers?.host || ''
-    return hostname.startsWith('dev.')
-  } else {
-    // Client-side: use window
-    return typeof window !== 'undefined' && window.location.hostname.startsWith('dev.')
-  }
-})
+let isDev = false
 
-useHead(() => ({
+if (import.meta.server) {
+  // Server-side: use request event
+  const event = useRequestEvent()
+  const hostname = event?.node?.req?.headers?.host || ''
+  isDev = hostname.startsWith('dev.')
+} else if (import.meta.client) {
+  // Client-side: use window
+  isDev = window.location.hostname.startsWith('dev.')
+}
+
+useHead({
   meta: [
     // Add noindex for dev subdomain
-    ...(isDev.value ? [{ name: 'robots', content: 'noindex, nofollow' }] : [])
+    ...(isDev ? [{ name: 'robots', content: 'noindex, nofollow' }] : [])
   ],
   link: [
     { rel: 'preload', href: '/lib/geoip2.js', as: 'script' },
@@ -29,7 +29,7 @@ useHead(() => ({
       async: true
     }
   ]
-}))
+})
 </script>
 <template>
   <div id="protectApp">
