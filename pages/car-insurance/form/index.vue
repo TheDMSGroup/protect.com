@@ -1,5 +1,9 @@
 <script setup>
 import { getFormType, assignABVariant, AB_TEST_VARIANTS } from '~/utils/form-router-config'
+import ChatForm from '~/pages/car-insurance/chat-form.vue'
+import DirectToCall from '~/pages/car-insurance/directtocall/index.vue'
+import MinimalForm from '~/pages/car-insurance/form/minimal/index.vue'
+import DetailedForm from '~/pages/car-insurance/form/detailed/index.vue'
 
 definePageMeta({
   layout: false
@@ -7,37 +11,55 @@ definePageMeta({
 
 const route = useRoute()
 
-// Determine form type reactively
-const formType = computed(() => {
-  // If no variant in URL, randomly assign one
+// Determine form type (works on both server and client)
+let formType
+let variant
+
+if (import.meta.server) {
+  // Server-side: determine form type once
   if (!route.query.variant) {
     const randomVariant = assignABVariant()
-    return AB_TEST_VARIANTS[randomVariant]
+    formType = AB_TEST_VARIANTS[randomVariant]
+    variant = randomVariant
   } else {
-    return getFormType(route.query)
+    formType = getFormType(route.query)
+    const variantEntry = Object.entries(AB_TEST_VARIANTS).find(([, type]) => type === formType)
+    variant = variantEntry ? variantEntry[0] : 'A'
   }
-})
+} else {
+  // Client-side: use reactive computed
+  const formTypeComputed = computed(() => {
+    if (!route.query.variant) {
+      const randomVariant = assignABVariant()
+      return AB_TEST_VARIANTS[randomVariant]
+    } else {
+      return getFormType(route.query)
+    }
+  })
 
-// Determine variant letter for customization
-const variant = computed(() => {
-  if (route.query.variant) {
-    return route.query.variant.toUpperCase()
-  }
-  // Map form type back to variant letter
-  const variantEntry = Object.entries(AB_TEST_VARIANTS).find(([, type]) => type === formType.value)
-  return variantEntry ? variantEntry[0] : 'A'
-})
+  formType = formTypeComputed.value
+
+  const variantComputed = computed(() => {
+    if (route.query.variant) {
+      return route.query.variant.toUpperCase()
+    }
+    const variantEntry = Object.entries(AB_TEST_VARIANTS).find(([, type]) => type === formTypeComputed.value)
+    return variantEntry ? variantEntry[0] : 'A'
+  })
+
+  variant = variantComputed.value
+}
 
 // Provide variant to child components
-provide('formVariant', variant)
+provide('formVariant', ref(variant))
 
-// Track form router event
+// Track form router event (client-side only)
 onMounted(() => {
   if (typeof window !== 'undefined' && window.dataLayer) {
     window.dataLayer.push({
       event: 'form_router',
-      form_type: formType.value,
-      variant: variant.value,
+      form_type: formType,
+      variant: variant,
       utm_source: route.query.utm_source || '',
       utm_medium: route.query.utm_medium || '',
       utm_campaign: route.query.utm_campaign || ''
@@ -45,26 +67,26 @@ onMounted(() => {
   }
 })
 
-// Import the form components dynamically based on variant
-const formComponent = computed(() => {
-  switch (formType.value) {
+// Select the form component based on form type (works in SSR)
+const formComponent = (() => {
+  switch (formType) {
     case 'chat-form':
-      return defineAsyncComponent(() => import('~/pages/car-insurance/chat-form.vue'))
+      return ChatForm
     case 'directtocall':
-      return defineAsyncComponent(() => import('~/pages/car-insurance/directtocall/index.vue'))
+      return DirectToCall
     case 'forms-minimal':
-      return defineAsyncComponent(() => import('~/pages/car-insurance/form/minimal/index.vue'))
+      return MinimalForm
     case 'forms-detailed':
-      return defineAsyncComponent(() => import('~/pages/car-insurance/form/detailed/index.vue'))
+      return DetailedForm
     default:
-      return defineAsyncComponent(() => import('~/pages/car-insurance/chat-form.vue'))
+      return ChatForm
   }
-})
+})()
 </script>
 
 <template>
   <div class="forms-container">
-    <!-- Render the selected form component dynamically -->
+    <!-- Render the selected form component (SSR-compatible) -->
     <component :is="formComponent" />
   </div>
 </template>

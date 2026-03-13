@@ -92,7 +92,7 @@ export function getFormType(params) {
  * Returns variant letter ('A', 'B', 'C', or 'D')
  */
 export function assignABVariant() {
-  const variants = ['A', 'B', 'C', 'D']
+  const variants = ['D']
   const randomIndex = Math.floor(Math.random() * variants.length)
   return variants[randomIndex]
 }
