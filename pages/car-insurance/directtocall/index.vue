@@ -212,6 +212,7 @@ const showCallCTA = ref(false)
 const zipcodeInput = ref('')
 const isTyping = ref(false) // Typing indicator state
 const isTypingFollowUp = ref(false) // Typing indicator for follow-up messages
+const hasEngaged = ref(false) // Track if user has engaged (first interaction)
 
 // Countdown timer state
 const countdownSeconds = ref(300) // 5 minutes = 300 seconds
@@ -315,7 +316,20 @@ const scrollToBottom = () => {
 
 watch([messages, followUpMessages, quickReplies, showCallCTA, showZipcodeInput, apiResults, isTyping, isTypingFollowUp, isLoadingBids], scrollToBottom, { deep: true })
 
+/**
+ * Fire GTM dataLayer event
+ */
+const fireGtmEvent = (eventType) => {
+  if (typeof window !== 'undefined' && window.dataLayer) {
+    window.dataLayer.push({ event: eventType })
+    console.log('GTM Event:', eventType)
+  }
+}
+
 onMounted(() => {
+  // Fire landing event on page load
+  fireGtmEvent('landing')
+
   // Show connecting indicator, then first message
   setTimeout(() => {
     isConnecting.value = false
@@ -350,6 +364,12 @@ const addBotMessage = (text, replies = []) => {
 }
 
 const handleQuickReply = (reply) => {
+  // Fire engagement event on first interaction
+  if (!hasEngaged.value) {
+    fireGtmEvent('engagement')
+    hasEngaged.value = true
+  }
+
   quickReplies.value = []
   setTimeout(() => {
     messages.value.push({ type: 'user', text: reply })
@@ -359,6 +379,12 @@ const handleQuickReply = (reply) => {
 
 const handleZipcodeSubmit = () => {
   if (zipcodeInput.value.length !== 5) return
+
+  // Fire engagement event on first interaction
+  if (!hasEngaged.value) {
+    fireGtmEvent('engagement')
+    hasEngaged.value = true
+  }
 
   showZipcodeInput.value = false
   collectedData.value.zipcode = zipcodeInput.value
