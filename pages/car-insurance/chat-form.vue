@@ -291,6 +291,7 @@ const discounts = ref([])
 const emojiIndex = ref(0)
 const messagesContainer = ref(null)
 const isTyping = ref(false)
+const hasEngaged = ref(false) // Track if user has engaged (first click/type)
 
 const celebrationEmojis = ['🎉', '🙌', '👍', '🎊', '✨', '💰', '🌟']
 
@@ -431,6 +432,16 @@ const steps = [
   { id: 'contact', label: 'Contact' }
 ]
 
+/**
+ * Fire GTM dataLayer event
+ */
+const fireGtmEvent = (eventType) => {
+  if (typeof window !== 'undefined' && window.dataLayer) {
+    window.dataLayer.push({ event: eventType })
+    console.log('GTM Event:', eventType)
+  }
+}
+
 // Lifecycle - use onMounted to avoid hydration mismatch
 onMounted(() => {
   // Load TrustedForm script
@@ -441,6 +452,9 @@ onMounted(() => {
 
   // Load Google Places for address autocomplete
   loadGooglePlaces()
+
+  // Fire landing event on page load
+  fireGtmEvent('landing')
 
   // Check for previewfeed URL param to show mock results immediately
   const urlParams = new URLSearchParams(window.location.search)
@@ -583,6 +597,12 @@ const addUserMessage = (text) => {
 const handleSend = () => {
   if (!inputValue.value.trim()) return
 
+  // Fire engagement event on first interaction
+  if (!hasEngaged.value) {
+    fireGtmEvent('engagement')
+    hasEngaged.value = true
+  }
+
   addUserMessage(inputValue.value)
   processResponse(inputValue.value)
   inputValue.value = ''
@@ -593,6 +613,12 @@ const handleSend = () => {
 }
 
 const handleQuickReply = (reply) => {
+  // Fire engagement event on first interaction
+  if (!hasEngaged.value) {
+    fireGtmEvent('engagement')
+    hasEngaged.value = true
+  }
+
   addUserMessage(reply)
   processResponse(reply)
   inputValue.value = ''
@@ -1187,6 +1213,8 @@ const processResponse = async (response) => {
           // Ask military question only for first driver
           if (idx === 0) {
             setTimeout(() => {
+              // Fire midpoint event when military question shows up
+              fireGtmEvent('midpoint')
               addBotMessage(`Does anyone in your family have any military affiliation?`, false, ['Yes', 'No'])
               currentQuestion.value = { type: 'driver_military', driverIndex: idx }
             }, 800)
@@ -1204,6 +1232,8 @@ const processResponse = async (response) => {
         // Ask military question only for first driver
         if (idx === 0) {
           setTimeout(() => {
+            // Fire midpoint event when military question shows up
+            fireGtmEvent('midpoint')
             addBotMessage(`Does anyone in your family have any military affiliation?`, false, ['Yes', 'No'])
             currentQuestion.value = { type: 'driver_military', driverIndex: idx }
           }, 800)
@@ -1384,6 +1414,9 @@ const processResponse = async (response) => {
       formData.contact.phone = response
 
       setTimeout(() => {
+        // Fire contact event when TCPA shows up
+        fireGtmEvent('contact')
+
         addBotMessage(`${getNextEmoji()} Awesome! One last step - please review our consent terms:`, true, [], false, () => {
           currentQuestion.value = { type: 'tcpa_consent' }
           messages.value.push({ type: 'tcpa' })
