@@ -62,18 +62,20 @@
                 </svg>
                 Call {{ formattedPhoneNumber }}
               </a>
-
               <!-- TCPA Consent -->
               <div v-else-if="msg.type === 'tcpa'" class="tcpa-container">
-                <div class="tcpa-text">
-                  By clicking "Get Auto & Home Quotes", I provide my express consent via e-signature to be contacted, for marketing purposes, by or on behalf of Quotza.com
-                  <a href="https://easy.quotza.com/partners.php" target="_blank" rel="noopener noreferrer">partners</a>, by telephone, which may include artificial, generative AI, or pre-recorded voice messages and/or SMS text messages, delivered via automatic telephone dialing system at the number I provided regarding Auto & Home Insurance offers, even if my number is on a Federal, State or Company Do Not Call list. I also represent that I am the subscriber and primary user of the telephone number that I have provided above. I understand that my consent is not required to make a purchase or obtain services and that I may opt-out at any time. In order to proceed without providing consent, skip. I certify that I am a US resident over 18, and I agree to the
-                  <a href="https://easy.quotza.com/privacy.php" target="_blank" rel="noopener noreferrer">Privacy Policy</a> and
-                  <a href="http://easy.quotza.com/terms.php" target="_blank" rel="noopener noreferrer">Terms & Conditions</a>. I understand and agree that third parties, including, but not limited to, Jornaya and Active Prospect are being employed to monitor my activity on this website today.
+                <div class="tcpa-text" @click="handleTcpaTextClick">
+                  <span v-if="tcpaHtml" v-html="tcpaHtml"></span>
+                  <span v-else>
+                    By clicking "Get Auto Quotes", I provide my express consent via e-signature to be contacted, for marketing purposes, by or on behalf of Protect.com
+                    <a href="https://protect.com/partners" target="_blank" rel="noopener noreferrer">partners</a>, by telephone, which may include artificial, generative AI, or pre-recorded voice messages and/or SMS text messages, delivered via automatic telephone dialing system at the number I provided regarding Auto Insurance offers, even if my number is on a Federal, State or Company Do Not Call list. I also represent that I am the subscriber and primary user of the telephone number that I have provided above. I understand that my consent is not required to make a purchase or obtain services and that I may opt-out at any time. In order to proceed without providing consent, skip. I certify that I am a US resident over 18, and I agree to the
+                    <a href="https://protect.com/privacy" target="_blank" rel="noopener noreferrer">Privacy Policy</a> and
+                    <a href="https://protect.com/terms" target="_blank" rel="noopener noreferrer">Terms & Conditions</a>. I understand and agree that third parties, including, but not limited to, Jornaya and Active Prospect are being employed to monitor my activity on this website today.
+                  </span>
                 </div>
                 <div class="tcpa-buttons">
                   <button @click="handleQuickReply('Yes, I agree')" class="tcpa-accept">
-                    Get Auto & Home Quotes
+                    {{ tcpaButtonText }}
                   </button>
                   <button @click="handleQuickReply('skip')" class="tcpa-skip">
                     Skip
@@ -206,7 +208,11 @@
             </h3>
             <div class="summary-details">
               <div>{{ formData.contact.email }}</div>
-              <div v-if="formData.contact.phone">{{ formData.contact.phone }}</div>
+              <div v-if="formData.contact.phone">{{ formatPhoneDisplay(formData.contact.phone) }}</div>
+              <div v-if="formData.contact.address">{{ formData.contact.address }}</div>
+              <div v-if="formData.contact.city || formData.contact.state || formData.contact.zipcode">
+                {{ [formData.contact.city, formData.contact.state].filter(Boolean).join(', ') }} {{ formData.contact.zipcode }}
+              </div>
             </div>
           </div>
 
@@ -237,6 +243,7 @@ import { ref, reactive, watch, nextTick, onMounted, computed } from 'vue'
 import { useVehicleApi } from '~/composables/useVehicleApi'
 import { useMastodonApi } from '~/composables/useMastodonApi'
 import { useTrustedForm } from '~/composables/useTrustedForm'
+import { useGooglePlaces } from '~/composables/useGooglePlaces'
 
 const route = useRoute()
 const config = useRuntimeConfig()
@@ -257,7 +264,8 @@ const formattedPhoneNumber = computed(() => {
 
 const { getMakes, getModels, getYears, findMatch } = useVehicleApi()
 const { submitLead, buildLeadPayload } = useMastodonApi()
-const { loadTrustedForm, getCertificateUrl } = useTrustedForm()
+const { loadTrustedForm, getCertificateId } = useTrustedForm()
+const { loadGooglePlaces, getAddressSuggestions, getPlaceDetails } = useGooglePlaces()
 const vehicleYears = getYears()
 const availableMakes = ref([])
 const availableModels = ref([])
@@ -270,7 +278,8 @@ const formData = reactive({
   vehicles: [],
   drivers: [],
   insurance: {},
-  contact: {}
+  contact: {},
+  tcpaConsent: true
 })
 const currentQuestion = ref(null)
 const quickReplies = ref([])
@@ -282,16 +291,138 @@ const discounts = ref([])
 const emojiIndex = ref(0)
 const messagesContainer = ref(null)
 const isTyping = ref(false)
+const hasEngaged = ref(false) // Track if user has engaged (first click/type)
 
 const celebrationEmojis = ['🎉', '🙌', '👍', '🎊', '✨', '💰', '🌟']
 
-const TCPA_DISCLOSURE = 'By clicking "Get Auto & Home Quotes", I provide my express consent via e-signature to be contacted, for marketing purposes, by or on behalf of Quotza.com partners, by telephone, which may include artificial, generative AI, or pre-recorded voice messages and/or SMS text messages, delivered via automatic telephone dialing system at the number I provided regarding Auto & Home Insurance offers, even if my number is on a Federal, State or Company Do Not Call list. I also represent that I am the subscriber and primary user of the telephone number that I have provided above. I understand that my consent is not required to make a purchase or obtain services and that I may opt-out at any time. In order to proceed without providing consent, skip. I certify that I am a US resident over 18, and I agree to the Privacy Policy and Terms & Conditions. I understand and agree that third parties, including, but not limited to, Jornaya and Active Prospect are being employed to monitor my activity on this website today.'
+// TCPA content from dynamic script
+const tcpaHtml = ref('')
+const tcpaDisclosure = ref('')
+const tcpaSkipped = ref(false)
+
+/**
+ * Load the TCPA script and generate TCPA HTML
+ */
+const loadTcpaScript = () => {
+  return new Promise((resolve) => {
+    if (typeof document === 'undefined') {
+      resolve()
+      return
+    }
+
+    if (!document.querySelector('#tcpa-script')) {
+      const s = document.createElement('script')
+      s.src = 'https://ue-sites.s3.us-east-1.amazonaws.com/js/create-tcpa/d/js/client.js'
+      s.id = 'tcpa-script'
+      s.addEventListener('load', () => {
+        generateTcpaContent().then(resolve)
+      })
+      document.head.appendChild(s)
+    } else {
+      generateTcpaContent().then(resolve)
+    }
+  })
+}
+
+// TCPA button text - used in template
+const tcpaButtonText = ref('Get Auto Quotes')
+
+/**
+ * Generate TCPA content using the loaded script
+ */
+const generateTcpaContent = async () => {
+  if (typeof window === 'undefined' || !window.generateTCPA) return
+
+  const buttonText = 'Get Auto Quotes'
+  const vertical = 'Auto Insurance'
+
+  const fragment = await window.generateTCPA({
+    buttonText,
+    siteName: 'Protect.com',
+    vertical,
+    brandSlug: 'protect',
+    pageSlug: 'tcpa-auto'
+  })
+
+  // Convert DocumentFragment to HTML string
+  const tempDiv = document.createElement('div')
+  tempDiv.appendChild(fragment.cloneNode(true))
+
+  // Extract just the label/text content (not the buttons)
+  const label = tempDiv.querySelector('label')
+  if (label) {
+    tcpaHtml.value = label.innerHTML
+  } else {
+    // Fallback - use full HTML but remove buttons
+    const buttons = tempDiv.querySelectorAll('button')
+    buttons.forEach(btn => btn.remove())
+    tcpaHtml.value = tempDiv.innerHTML
+  }
+
+  tcpaButtonText.value = buttonText
+
+  // Store plain text version for API submission
+  tcpaDisclosure.value = `By clicking "${buttonText}", I provide my express consent via e-signature to be contacted, for marketing purposes, by or on behalf of Protect.com partners, by telephone, which may include artificial, generative AI, or pre-recorded voice messages and/or SMS text messages, delivered via automatic telephone dialing system at the number I provided regarding ${vertical} offers, even if my number is on a Federal, State or Company Do Not Call list. I also represent that I am the subscriber and primary user of the telephone number that I have provided above. I understand that my consent is not required to make a purchase or obtain services and that I may opt-out at any time. In order to proceed without providing consent, skip. I certify that I am a US resident over 18, and I agree to the Privacy Policy and Terms & Conditions. I understand and agree that third parties, including, but not limited to, Jornaya and Active Prospect are being employed to monitor my activity on this website today.`
+}
 
 // Capitalize first letter of each word in a name
 const capitalizeName = (name) => {
   return name.split(/\s+/).map(word =>
     word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
   ).join(' ')
+}
+
+// Format phone number for display (e.g., 1234567890 -> (123) 456-7890)
+const formatPhoneDisplay = (phone) => {
+  if (!phone) return ''
+  const digits = phone.replace(/\D/g, '')
+  if (digits.length === 10) {
+    return `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6)}`
+  }
+  if (digits.length === 11 && digits[0] === '1') {
+    return `(${digits.slice(1, 4)}) ${digits.slice(4, 7)}-${digits.slice(7)}`
+  }
+  return phone
+}
+
+// Insurance companies for fuzzy matching (common typos/aliases for when users type and submit without selecting)
+const insuranceCompanyMap = {
+  'triple a': 'AAA',
+  'geco': 'GEICO',
+  'gieco': 'GEICO',
+  'gecio': 'GEICO',
+  'statefarm': 'State Farm',
+  'progresive': 'Progressive',
+  'allsate': 'Allstate',
+  'all state': 'Allstate',
+  'libertymutual': 'Liberty Mutual',
+  'nation wide': 'Nationwide',
+  'farmer': 'Farmers',
+  'americanfamily': 'American Family',
+  'amfam': 'American Family',
+  'travellers': 'Travelers',
+  'traveler': 'Travelers'
+}
+
+const insuranceCompanies = ['AAA', 'Allstate', 'American Family', 'Farmers', 'GEICO', 'Liberty Mutual', 'Nationwide', 'Progressive', 'State Farm', 'Travelers', 'USAA', 'Other']
+
+/**
+ * Match insurance company name
+ * Returns matched company or 'Other' if no match found
+ */
+const matchInsuranceCompany = (input) => {
+  const normalized = input.trim().toLowerCase()
+
+  // Check exact match against company list (case-insensitive)
+  const exactMatch = insuranceCompanies.find(c => c.toLowerCase() === normalized)
+  if (exactMatch) return exactMatch
+
+  // Check typo map
+  if (insuranceCompanyMap[normalized]) {
+    return insuranceCompanyMap[normalized]
+  }
+
+  return 'Other'
 }
 
 const steps = [
@@ -301,10 +432,29 @@ const steps = [
   { id: 'contact', label: 'Contact' }
 ]
 
+/**
+ * Fire GTM dataLayer event
+ */
+const fireGtmEvent = (eventType) => {
+  if (typeof window !== 'undefined' && window.dataLayer) {
+    window.dataLayer.push({ event: eventType })
+    console.log('GTM Event:', eventType)
+  }
+}
+
 // Lifecycle - use onMounted to avoid hydration mismatch
 onMounted(() => {
   // Load TrustedForm script
   loadTrustedForm()
+
+  // Load TCPA script
+  loadTcpaScript()
+
+  // Load Google Places for address autocomplete
+  loadGooglePlaces()
+
+  // Fire landing event on page load
+  fireGtmEvent('landing')
 
   // Check for previewfeed URL param to show mock results immediately
   const urlParams = new URLSearchParams(window.location.search)
@@ -447,53 +597,95 @@ const addUserMessage = (text) => {
 const handleSend = () => {
   if (!inputValue.value.trim()) return
 
+  // Fire engagement event on first interaction
+  if (!hasEngaged.value) {
+    fireGtmEvent('engagement')
+    hasEngaged.value = true
+  }
+
   addUserMessage(inputValue.value)
   processResponse(inputValue.value)
   inputValue.value = ''
   quickReplies.value = []
   searchSuggestions.value = []
+  addressSuggestionsData.value = []
   awaitingAnswer.value = false
 }
 
 const handleQuickReply = (reply) => {
+  // Fire engagement event on first interaction
+  if (!hasEngaged.value) {
+    fireGtmEvent('engagement')
+    hasEngaged.value = true
+  }
+
   addUserMessage(reply)
   processResponse(reply)
   inputValue.value = ''
   quickReplies.value = []
   searchSuggestions.value = []
+  addressSuggestionsData.value = []
   awaitingAnswer.value = false
 }
 
-const handleSearchInput = () => {
-  const query = inputValue.value.trim().toLowerCase()
+const handleTcpaTextClick = (event) => {
+  // Handle clicks on dynamically injected #tcpa_skip link
+  if (event.target.id === 'tcpa_skip' || event.target.closest('#tcpa_skip')) {
+    event.preventDefault()
+    tcpaSkipped.value = true
+    formData.tcpaConsent = false
+    handleQuickReply('skip')
+  }
+}
 
-  // Only show suggestions for make/model questions
-  if (!['vehicle_make', 'vehicle_model'].includes(currentQuestion.value?.type)) {
+// Store address suggestions with place IDs for lookup
+const addressSuggestionsData = ref([])
+
+const handleSearchInput = async () => {
+  const query = inputValue.value.trim()
+  const queryLower = query.toLowerCase()
+
+  // Handle address autocomplete separately (async)
+  if (currentQuestion.value?.type === 'address') {
+    if (query.length < 3) {
+      searchSuggestions.value = []
+      addressSuggestionsData.value = []
+      return
+    }
+    const suggestions = await getAddressSuggestions(query)
+    addressSuggestionsData.value = suggestions
+    // Display full address (description) but we'll store mainText when selected
+    searchSuggestions.value = suggestions.map(s => s.description)
+    // Scroll to show suggestions
+    nextTick(() => scrollToBottom())
+    return
+  }
+
+  // Only show suggestions for make/model/insurance questions
+  if (!['vehicle_make', 'vehicle_model', 'current_company'].includes(currentQuestion.value?.type)) {
     searchSuggestions.value = []
     return
   }
 
-  if (!query) {
-    // Show priority makes when empty
-    if (currentQuestion.value?.type === 'vehicle_make') {
-      searchSuggestions.value = availableMakes.value.slice(0, 6)
-    } else if (currentQuestion.value?.type === 'vehicle_model') {
-      searchSuggestions.value = availableModels.value.slice(0, 6)
-    }
-    return
-  }
-
-  // Filter based on current question type
+  // Get the appropriate list based on question type
   let list = []
   if (currentQuestion.value?.type === 'vehicle_make') {
     list = availableMakes.value
   } else if (currentQuestion.value?.type === 'vehicle_model') {
     list = availableModels.value
+  } else if (currentQuestion.value?.type === 'current_company') {
+    list = insuranceCompanies
+  }
+
+  if (!queryLower) {
+    // Show first 6 options when empty
+    searchSuggestions.value = list.slice(0, 6)
+    return
   }
 
   // Find matches (starts with or contains)
-  const startsWithMatches = list.filter(item => item.toLowerCase().startsWith(query))
-  const containsMatches = list.filter(item => !item.toLowerCase().startsWith(query) && item.toLowerCase().includes(query))
+  const startsWithMatches = list.filter(item => item.toLowerCase().startsWith(queryLower))
+  const containsMatches = list.filter(item => !item.toLowerCase().startsWith(queryLower) && item.toLowerCase().includes(queryLower))
 
   // Combine: startsWith first, then contains, limit to 6
   searchSuggestions.value = [...startsWithMatches, ...containsMatches].slice(0, 6)
@@ -511,6 +703,9 @@ const getInputPlaceholder = () => {
   }
   if (currentQuestion.value?.type === 'vehicle_model') {
     return 'Type to search models...'
+  }
+  if (currentQuestion.value?.type === 'address') {
+    return 'Start typing your address...'
   }
   return 'Type your answer...'
 }
@@ -535,6 +730,14 @@ const handleKeypress = (event) => {
   }
   // vehicle_year now allows letters for smart input like "2020 Honda Pilot"
 }
+// Helper to ask for phone number after address
+const askForPhone = () => {
+  setTimeout(() => {
+    addBotMessage(`And what's the best phone number to reach you?`)
+    currentQuestion.value = { type: 'phone' }
+  }, 800)
+}
+
 const processResponse = async (response) => {
   // Normalize y/n to yes/no
   const normalizedResponse = response.trim().toLowerCase() === 'y' ? 'Yes'
@@ -1010,6 +1213,8 @@ const processResponse = async (response) => {
           // Ask military question only for first driver
           if (idx === 0) {
             setTimeout(() => {
+              // Fire midpoint event when military question shows up
+              fireGtmEvent('midpoint')
               addBotMessage(`Does anyone in your family have any military affiliation?`, false, ['Yes', 'No'])
               currentQuestion.value = { type: 'driver_military', driverIndex: idx }
             }, 800)
@@ -1027,6 +1232,8 @@ const processResponse = async (response) => {
         // Ask military question only for first driver
         if (idx === 0) {
           setTimeout(() => {
+            // Fire midpoint event when military question shows up
+            fireGtmEvent('midpoint')
             addBotMessage(`Does anyone in your family have any military affiliation?`, false, ['Yes', 'No'])
             currentQuestion.value = { type: 'driver_military', driverIndex: idx }
           }, 800)
@@ -1061,7 +1268,10 @@ const processResponse = async (response) => {
         }, 800)
       } else {
         setTimeout(() => {
-          addBotMessage(`Is ${formData.drivers[idx].firstName} currently employed?`, false, ['Yes', 'No'])
+          const message = idx === 0
+            ? `Are you currently employed?`
+            : `Is ${formData.drivers[idx].firstName} currently employed?`
+          addBotMessage(message, false, ['Yes', 'No'])
           currentQuestion.value = { type: 'driver_employed', driverIndex: idx }
         }, 800)
       }
@@ -1096,7 +1306,15 @@ const processResponse = async (response) => {
       if (lowerResponse === 'yes') {
         addDiscount('Continuous Coverage Discount')
         setTimeout(() => {
-          addBotMessage(`${getNextEmoji()} Great! Continuous coverage can help you save. Who's your current insurance provider?`, true, ['GEICO', 'State Farm', 'Progressive', 'Allstate', 'Other'])
+          addBotMessage(
+            `${getNextEmoji()} Great! Continuous coverage can help you save. Who's your current insurance provider?`,
+            true,
+            [],
+            false,
+            () => {
+              searchSuggestions.value = insuranceCompanies.slice(0, 6)
+            }
+          )
           currentQuestion.value = { type: 'current_company' }
         }, 800)
       } else {
@@ -1110,10 +1328,13 @@ const processResponse = async (response) => {
     }
 
     if (currentQuestion.value?.type === 'current_company') {
-      formData.insurance.currentCompany = response
+      const matchedCompany = matchInsuranceCompany(response)
+      formData.insurance.currentCompany = matchedCompany
+      // Use friendly text in message but store actual value
+      const displayName = matchedCompany === 'Other' ? 'your current provider' : matchedCompany
 
       setTimeout(() => {
-        addBotMessage(`How long have you been with ${response}?`, false, ['Less than 1 year', '1-2 years', '3-5 years', '5+ years'])
+        addBotMessage(`How long have you been with ${displayName}?`, false, ['Less than 1 year', '1-2 years', '3-5 years', '5+ years'])
         currentQuestion.value = { type: 'coverage_length' }
       }, 800)
       return
@@ -1141,9 +1362,51 @@ const processResponse = async (response) => {
       formData.contact.email = response
 
       setTimeout(() => {
-        addBotMessage(`And what's the best phone number to reach you?`)
-        currentQuestion.value = { type: 'phone' }
+        addBotMessage(`What's your home address? This helps us find accurate rates for your area.`, true)
+        currentQuestion.value = { type: 'address' }
       }, 800)
+      return
+    }
+
+    if (currentQuestion.value?.type === 'address') {
+      // Check if user selected from suggestions (match by full description)
+      const selectedSuggestion = addressSuggestionsData.value.find(s => s.description === response)
+
+      if (selectedSuggestion) {
+        // Get detailed address from Google Places
+        getPlaceDetails(selectedSuggestion.placeId).then(details => {
+          if (details) {
+            // Store just the street address (mainText), not the full address
+            formData.contact.address = selectedSuggestion.mainText
+            if (details.city) formData.contact.city = details.city
+            if (details.state) formData.contact.state = details.state
+            if (details.zipcode) formData.contact.zipcode = details.zipcode
+          } else {
+            formData.contact.address = selectedSuggestion.mainText
+          }
+          addressSuggestionsData.value = []
+          askForPhone()
+        })
+      } else {
+        // User typed their own address, validate it
+        getAddressSuggestions(response).then(async (suggestions) => {
+          if (suggestions.length > 0) {
+            const details = await getPlaceDetails(suggestions[0].placeId)
+            if (details) {
+              formData.contact.address = details.formattedAddress
+              if (details.city) formData.contact.city = details.city
+              if (details.state) formData.contact.state = details.state
+              if (details.zipcode) formData.contact.zipcode = details.zipcode
+            } else {
+              formData.contact.address = response
+            }
+          } else {
+            formData.contact.address = response
+          }
+          addressSuggestionsData.value = []
+          askForPhone()
+        })
+      }
       return
     }
 
@@ -1151,20 +1414,30 @@ const processResponse = async (response) => {
       formData.contact.phone = response
 
       setTimeout(() => {
-        addBotMessage(`${getNextEmoji()} Awesome! One last step - please review our consent terms:`, true)
-        currentQuestion.value = { type: 'tcpa_consent' }
-        messages.value.push({ type: 'tcpa' })
+        // Fire contact event when TCPA shows up
+        fireGtmEvent('contact')
+
+        addBotMessage(`${getNextEmoji()} Awesome! One last step - please review our consent terms:`, true, [], false, () => {
+          currentQuestion.value = { type: 'tcpa_consent' }
+          messages.value.push({ type: 'tcpa' })
+        })
       }, 800)
       return
     }
 
     if (currentQuestion.value?.type === 'tcpa_consent') {
       if (lowerResponse.includes('agree') || lowerResponse.includes('yes')) {
+        // User agreed to TCPA consent
+        tcpaSkipped.value = false
+        formData.tcpaConsent = true
         setTimeout(() => {
           addBotMessage(`${getNextEmoji()} Thank you! Let me find the best quotes for you...`, true)
           submitToApi()
         }, 800)
       } else {
+        // User skipped TCPA consent
+        tcpaSkipped.value = true
+        formData.tcpaConsent = false
         setTimeout(() => {
           addBotMessage(`No problem! We'll still find you some great quotes.`)
           submitToApi()
@@ -1359,8 +1632,8 @@ const submitToApi = async () => {
     // Build the payload from form data
     const payload = buildLeadPayload(formData, {
       rtclid,
-      trustedFormCertId: getCertificateUrl(),
-      tcpaDisclosure: TCPA_DISCLOSURE
+      trustedFormCertId: getCertificateId(),
+      tcpaDisclosure: tcpaSkipped.value ? '' : tcpaDisclosure.value
     })
 
     let result
@@ -1807,6 +2080,9 @@ const submitToApi = async () => {
 .tcpa-text a {
   color: #2563eb;
   text-decoration: underline;
+}
+.tcpa-text :deep(p) {
+  font-size: .8rem !important;
 }
 
 .tcpa-buttons {

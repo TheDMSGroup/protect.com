@@ -47,6 +47,16 @@ export const useMastodonApi = () => {
       }
 
       const data = await response.json()
+
+      // Track when API returns zero bids
+      if (data && data.bids && data.bids.length === 0) {
+        const { proxy } = useScriptGoogleTagManager()
+        proxy.dataLayer.push({
+          event: 'mst_no_results',
+          auction_id: data.auction_id,
+        })
+      }
+
       return data
     } catch (err) {
       error.value = err.message
@@ -78,7 +88,7 @@ export const useMastodonApi = () => {
         phone: formData.contact?.phone || '',
         email: formData.contact?.email || '',
         zipcode: formData.contact?.zipcode || '',
-        ip_address: options.ipAddress || '',
+        ip_address: options.ipAddress || visitorInfo.ip_address || '',
         user_agent: typeof navigator !== 'undefined' ? navigator.userAgent : '',
         utm_source: options.utmSource || visitorInfo.utm_source || '',
         utm_medium: options.utmMedium || visitorInfo.utm_medium || '',
@@ -98,7 +108,7 @@ export const useMastodonApi = () => {
         home_ownership: formData.homeOwnership || false,
         military_affiliation: formData.drivers?.some(d => ['yes', 'y'].includes(d.military?.toLowerCase())) || false,
         bundle_insurance: formData.bundleInsurance || false,
-        zipcode_fallback: formData.contact?.zipcode || '',
+        zipcode_fallback: formData.contact?.zipcode || visitorInfo.zip || '',
         form_submit: formSubmit,
         coverage_type: options.coverageType || 'Standard Protection',
         bi_per_incident: options.biPerIncident || 300000,
@@ -182,7 +192,6 @@ export const useMastodonApi = () => {
    * Format drivers array for API
    */
   const formatDrivers = (drivers) => {
-    console.log('formatDrivers input:', JSON.stringify(drivers))
     return drivers.map((driver, index) => ({
       gender: parseGender(driver.gender),
       marital_status: ['yes', 'y', 'married'].includes(driver.married?.toLowerCase()) ? 'Married' : 'Single',

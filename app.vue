@@ -1,5 +1,22 @@
 <script setup>
+// Check if we're on dev subdomain (works on both server and client)
+let isDev = false
+
+if (import.meta.server) {
+  // Server-side: use request event
+  const event = useRequestEvent()
+  const hostname = event?.node?.req?.headers?.host || ''
+  isDev = hostname.startsWith('dev.')
+} else if (import.meta.client) {
+  // Client-side: use window
+  isDev = window.location.hostname.startsWith('dev.')
+}
+
 useHead({
+  meta: [
+    // Add noindex for dev subdomain
+    ...(isDev ? [{ name: 'robots', content: 'noindex, nofollow' }] : [])
+  ],
   link: [
     { rel: 'preload', href: '/lib/geoip2.js', as: 'script' },
     // Preconnect to MaxMind GeoIP to speed up SSL handshake
@@ -12,7 +29,7 @@ useHead({
       async: true
     }
   ]
-});
+})
 </script>
 <template>
   <div id="protectApp">

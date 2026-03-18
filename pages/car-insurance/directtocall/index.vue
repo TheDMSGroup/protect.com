@@ -159,13 +159,15 @@
     </main>
     </div>
 
+    <!-- Footer -->
+    <AppFooter :minimal="true" />
   </div>
 </template>
 
 <script setup>
-console.log("Version A");
 import { ref, watch, nextTick, onMounted, onBeforeUnmount, computed } from 'vue'
 import { useMastodonApi } from '~/composables/useMastodonApi'
+import { useStore } from '~/stores/store'
 
 definePageMeta({
   layout: 'chatbot'
@@ -210,6 +212,7 @@ const showCallCTA = ref(false)
 const zipcodeInput = ref('')
 const isTyping = ref(false) // Typing indicator state
 const isTypingFollowUp = ref(false) // Typing indicator for follow-up messages
+const hasEngaged = ref(false) // Track if user has engaged (first interaction)
 
 // Countdown timer state
 const countdownSeconds = ref(300) // 5 minutes = 300 seconds
@@ -261,38 +264,72 @@ const collectedData = ref({
   ownsHome: null
 })
 
-// Auto-scroll down slightly when content changes
+// Auto-scroll to keep latest content in view
 const scrollToBottom = () => {
   nextTick(() => {
-    // Only scroll to mastodon container if apiResults has data
-    if (apiResults.value) {
-      // Retry logic to wait for container to render
-      const checkForContainer = (attempts = 0) => {
-        const mastodonContainer = document.querySelector('#mastodon-results-container')
+    // Add small delay to ensure DOM has updated
+    setTimeout(() => {
+      if (apiResults.value) {
+        // Scroll to mastodon container if apiResults has data
+        const checkForContainer = (attempts = 0) => {
+          const mastodonContainer = document.querySelector('#mastodon-results-container')
 
-        if (mastodonContainer) {
-          mastodonContainer.scrollIntoView({ behavior: 'smooth', block: 'start' })
-        } else if (attempts < 10) {
-          setTimeout(() => checkForContainer(attempts + 1), 100)
+          if (mastodonContainer) {
+            // Position element so its bottom is 100px above the bottom of viewport
+            const rect = mastodonContainer.getBoundingClientRect()
+            const scrollTarget = window.pageYOffset + rect.bottom - window.innerHeight + 100
+            window.scrollTo({
+              top: scrollTarget,
+              behavior: 'smooth'
+            })
+          } else if (attempts < 10) {
+            setTimeout(() => checkForContainer(attempts + 1), 100)
+          }
+        }
+
+        checkForContainer()
+      } else {
+        // Scroll to the bottom of the messages wrapper with smoother animation
+        const messagesWrapper = document.querySelector('.messages-wrapper')
+        if (messagesWrapper) {
+          const lastElement = messagesWrapper.lastElementChild
+          if (lastElement) {
+            // Get element position relative to viewport
+            const rect = lastElement.getBoundingClientRect()
+            const isVisible = rect.top >= 0 && rect.bottom <= window.innerHeight
+
+            // Only scroll if element is not fully visible
+            if (!isVisible) {
+              // Position element so its bottom is 200px above the bottom of viewport
+              const scrollTarget = window.pageYOffset + rect.bottom - window.innerHeight + 200
+              window.scrollTo({
+                top: scrollTarget,
+                behavior: 'smooth'
+              })
+            }
+          }
         }
       }
-
-      checkForContainer()
-    } else {
-      // Default: scroll down 20px from current position after a brief delay
-      setTimeout(() => {
-        window.scrollBy({
-          top: 20,
-          behavior: 'smooth'
-        })
-      }, 150)
-    }
+    }, 100)
   })
 }
 
 watch([messages, followUpMessages, quickReplies, showCallCTA, showZipcodeInput, apiResults, isTyping, isTypingFollowUp, isLoadingBids], scrollToBottom, { deep: true })
 
+/**
+ * Fire GTM dataLayer event
+ */
+const fireGtmEvent = (eventType) => {
+  if (typeof window !== 'undefined' && window.dataLayer) {
+    window.dataLayer.push({ event: eventType })
+    console.log('GTM Event:', eventType)
+  }
+}
+
 onMounted(() => {
+  // Fire landing event on page load
+  fireGtmEvent('landing')
+
   // Show connecting indicator, then first message
   setTimeout(() => {
     isConnecting.value = false
@@ -327,6 +364,12 @@ const addBotMessage = (text, replies = []) => {
 }
 
 const handleQuickReply = (reply) => {
+  // Fire engagement event on first interaction
+  if (!hasEngaged.value) {
+    fireGtmEvent('engagement')
+    hasEngaged.value = true
+  }
+
   quickReplies.value = []
   setTimeout(() => {
     messages.value.push({ type: 'user', text: reply })
@@ -336,6 +379,12 @@ const handleQuickReply = (reply) => {
 
 const handleZipcodeSubmit = () => {
   if (zipcodeInput.value.length !== 5) return
+
+  // Fire engagement event on first interaction
+  if (!hasEngaged.value) {
+    fireGtmEvent('engagement')
+    hasEngaged.value = true
+  }
 
   showZipcodeInput.value = false
   collectedData.value.zipcode = zipcodeInput.value
@@ -374,9 +423,11 @@ const processResponse = (response) => {
       case 'ask_homeowner':
         collectedData.value.ownsHome = response === 'Yes'
         conversationStep.value = 'complete'
+        console.log('Ask homeowner completed. Collected data:', collectedData.value)
         addBotMessage("I found your match! Click the button below to speak with an advisor and get your personalized quote.")
         // Wait for typing animation to complete (max typingDelay is 2000ms) + message display time
         setTimeout(() => {
+          console.log('About to show call CTA and fetch bids')
           showCallCTA.value = true
           startCountdown() // Start the countdown timer
 
@@ -414,12 +465,15 @@ const getMockResults = () => ({
 })
 
 const fetchMastodonBids = async () => {
+  console.log('fetchMastodonBids called')
+
   // Don't show loading indicator yet - fetch silently in background
 
   // Check for mastodonoff URL parameter
   const urlParams = new URLSearchParams(window.location.search)
   const useMockData = urlParams.get('mastodonoff') === 'true'
-  const rtclid = urlParams.get('rtclid') || sessionStorage.getItem('rtkclickid') || window.rtkClickId || null;
+  const rtkclid = urlParams.get('rtkclid') || sessionStorage.getItem('rtkclickid') || window.rtkClickID || window.rtCookie|| null;
+
   try {
     let result
     // Build minimal payload from collected data
@@ -433,13 +487,18 @@ const fetchMastodonBids = async () => {
         user_agent: typeof navigator !== 'undefined' ? navigator.userAgent : '',
         source_url: typeof window !== 'undefined' ? window.location.href : '',
         custom: {
-          rtclid
+          rtkclid
         }
       }
     }
+
     if (store.visitorInfo?.mst) {
       payload.source_token = store.visitorInfo.mst;
     }
+
+    console.log('Mastodon payload:', payload)
+    console.log('Using mock data:', useMockData)
+
     if (useMockData) {
       console.log('Using mock Mastodon API data (mastodonoff=true)', payload)
       // Simulate API delay
@@ -447,7 +506,9 @@ const fetchMastodonBids = async () => {
       result = getMockResults()
     } else {
       // Submit to Mastodon API
+      console.log('Calling submitLead with payload')
       result = await submitLead(payload)
+      console.log('Mastodon API result:', result)
     }
 
     if (result && result.bids && result.bids.length > 0) {
@@ -783,8 +844,7 @@ const fetchMastodonBids = async () => {
   flex-wrap: wrap;
   gap: 0.5rem;
   margin-top: 0.5rem;
-  padding-left: 2.5rem; // Align with messages (avatar width + gap)
-  scroll-margin-top: -60px;
+  padding-left: 2.5rem;
 }
 
 .quick-reply-btn {
