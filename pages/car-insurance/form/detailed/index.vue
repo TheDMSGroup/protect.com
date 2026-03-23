@@ -1,4 +1,6 @@
 <script setup>
+import { redirectWithParams } from '~/composables/utils'
+
 definePageMeta({
   layout: false
 })
@@ -71,6 +73,13 @@ const selectYear = (year) => {
   formData.value.vehicleYear = year
   // Navigate to next step or submit
   console.log('Selected year:', year)
+
+  // redirectWithParams will automatically append rtclid and other tracking params from the store
+  const options = {
+    vehicle1year: year,
+  }
+
+  redirectWithParams("https://quote.protect.com", options);
 }
 </script>
 

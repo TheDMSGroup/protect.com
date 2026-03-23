@@ -176,7 +176,7 @@ definePageMeta({
 const store = useStore()
 const route = useRoute()
 const cityCookie = useCookie('protect_geo_city')
-const { submitLead } = useMastodonApi()
+const { submitLead, buildLeadPayload } = useMastodonApi()
 
 const userCity = computed(() => {
   // Priority: store (live GeoIP) > cookie (SSR-accessible) > fallback
@@ -472,29 +472,20 @@ const fetchMastodonBids = async () => {
   // Check for mastodonoff URL parameter
   const urlParams = new URLSearchParams(window.location.search)
   const useMockData = urlParams.get('mastodonoff') === 'true'
-  const rtkclid = urlParams.get('rtkclid') || sessionStorage.getItem('rtkclickid') || window.rtkClickID || window.rtCookie|| null;
 
   try {
     let result
-    // Build minimal payload from collected data
-    const payload = {
-      source_token: 'r0TV0W_hUOqv_Uow4brhX-wkx5F9TQ',
-      limit: 3,
-      data: {
-        zipcode: collectedData.value.zipcode || store.visitorInfo.zip || '',
-        currently_insured: collectedData.value.isInsured || false,
-        home_ownership: collectedData.value.ownsHome || false,
-        user_agent: typeof navigator !== 'undefined' ? navigator.userAgent : '',
-        source_url: typeof window !== 'undefined' ? window.location.href : '',
-        custom: {
-          rtkclid
-        }
+    const payload = buildLeadPayload(
+      {
+        contact: { zipcode: collectedData.value.zipcode || store.visitorInfo.zip || '' },
+        // currently_insured is derived from insurance.currentCompany being set
+        insurance: { currentCompany: collectedData.value.isInsured ? 'other' : '' },
+        homeOwnership: collectedData.value.ownsHome || false,
+      },
+      {
+        sourceToken: store.visitorInfo?.mst || 'r0TV0W_hUOqv_Uow4brhX-wkx5F9TQ',
       }
-    }
-
-    if (store.visitorInfo?.mst) {
-      payload.source_token = store.visitorInfo.mst;
-    }
+    )
 
     console.log('Mastodon payload:', payload)
     console.log('Using mock data:', useMockData)
