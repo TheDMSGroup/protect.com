@@ -39,6 +39,19 @@ export const generateRedirectUrl = (route, paramsToAppend) => {
     }
   });
 
+  // Special fallback for rtclid - check multiple sources if not in store
+  if (!paramsToAppend.rtclid && typeof window !== 'undefined') {
+    const urlParams = new URLSearchParams(window.location.search);
+    const rtclid = urlParams.get('rtkclid') ||
+                   sessionStorage.getItem('rtkclickid') ||
+                   window.rtkClickID ||
+                   window.rtCookie ||
+                   null;
+    if (rtclid) {
+      paramsToAppend.rtclid = rtclid;
+    }
+  }
+
   //append any params we need to the current URL params - vue router is persisting params across navigations
   const params = new URLSearchParams(window.location.search);
   Object.entries(paramsToAppend).forEach(([key, value]) => {
@@ -75,7 +88,9 @@ export const generateRedirectUrl = (route, paramsToAppend) => {
 };
 
 export const redirectWithParams = (route, { ...paramsToAppend }) => {
-  window.open(generateRedirectUrl(route, paramsToAppend), "_blank");
+  let url = generateRedirectUrl(route, paramsToAppend);
+  console.log('url', url);
+  window.open(url, "_blank");
 };
 
 export const updateMetaData = (tags = {}) => {
