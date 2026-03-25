@@ -79,7 +79,9 @@ const selectYear = (year) => {
     vehicle1year: year,
   }
 
-  redirectWithParams("https://quote.protect.com", options);
+  redirectWithParams("https://insure.protect.com", options, {
+    'fbpb_auto': 'https://quote.protect.com',
+  });
 }
 </script>
 
@@ -98,7 +100,9 @@ const selectYear = (year) => {
 
         <!-- Form Step -->
         <div class="form-step">
-          <h1 class="form-title">Select Your Vehicle Year to Begin</h1>
+          <label class="question-label">
+            <h2>Select Your Vehicle Year to Begin</h2>
+          </label>
 
           <!-- Year Grid -->
           <div class="year-grid">
@@ -115,64 +119,28 @@ const selectYear = (year) => {
       </div>
     </main>
 
-    <!-- Footer -->
-    <footer class="quote-footer">
-      <div class="container">
-        <!-- Partner Logos -->
-        <div class="partners-section">
-          <p class="partners-heading">Free quotes from over 40 providers including:</p>
-
-          <div class="partner-logos">
-            <img
-              src="https://product.impressure.io/build/images/providers/progressive.png"
-              alt="Progressive"
-              class="partner-logo"
-            >
-            <img
-              src="https://djk97zng6lbya.cloudfront.net/2025/04/26/00/53/06/5af83923-a0b8-4126-94be-125b502b04ea.png"
-              alt="Geico"
-              class="partner-logo"
-            >
-            <img
-              src="https://product.impressure.io/build/images/providers/nationwide.png"
-              alt="Nationwide"
-              class="partner-logo"
-            >
-            <img
-              src="https://product.impressure.io/build/images/providers/state-farm.png"
-              alt="State Farm"
-              class="partner-logo"
-            >
-            <img
-              src="https://product.impressure.io/build/images/providers/liberty.png"
-              alt="Liberty Mutual"
-              class="partner-logo"
-            >
-          </div>
-
-          <p class="disclaimer">
-            *These are Insurance companies that typically issue quotes to our users. Results may vary and are not guaranteed.
-          </p>
+    <footer class="form-footer">
+      <div class="partners-section">
+        <p class="partners-heading">Free quotes from over 40 providers including:</p>
+        <div class="partner-logos">
+          <img src="/assets/providers/progressive.png" alt="Progressive" class="partner-logo">
+          <img src="/assets/providers/geico.png" alt="Geico" class="partner-logo">
+          <img src="/assets/providers/nationwide.png" alt="Nationwide" class="partner-logo">
+          <img src="/assets/providers/state-farm.png" alt="State Farm" class="partner-logo">
+          <img src="/assets/providers/liberty.png" alt="Liberty Mutual" class="partner-logo">
         </div>
-
-        <!-- Legal Links -->
-        <div class="legal-section">
+        <p class="disclaimer">*These are Insurance companies that typically issue quotes to our users. Results may vary and are not guaranteed.</p>
+      </div>
+      <div class="privacy-policies">
+        <FooterLegal>
           <p>
-            <a href="https://dmsunsub.io/">Do Not Sell Or Share My Personal Information</a>
-          </p>
-          <p>
-            Protect.com |
-            <a href="https://easy.protect.com/privacy.php" target="_blank">Privacy Policy</a> |
-            <a href="https://easy.protect.com/terms.php" target="_blank">Terms Of Use</a> |
-            <a href="https://easy.protect.com/california.php" target="_blank">California Privacy Notice</a>
-          </p>
-          <p class="disclaimer-text">
             Rates advertised are subject to availability and may not be available for all consumers. Rates vary based on factors such as driving history, location, vehicle type, coverage options, and other individual circumstances.
           </p>
-          <p class="disclaimer-text">
-            The specified use of this site is to accurately connect you to a licensed insurance agent in your state who can match you and provide quotes from the auto insurance companies that best meet your needs.
+          <p>
+            The specified use of this site is to accurately connect you to a licensed insurance agent in your state who can match you and provide quotes from the auto insurance companies that best meet your needs. We are not a licensed agency or insurer and do not provide insurance or quotes for insurance. We do not represent any particular insurance carriers. We are a top online marketplace for  those seeking auto insurance and as such connect you directly to licensed local agents who will provide quotes from various insurance companies licensed in your state. If you do not receive a quote from a specific insurer you were searching for we recommend that you contact that insurer or one of its agents directly to obtain a quote. We are not responsible for any actions taken by any licensed agents or insurers. Any trademarks and/or copyrighted material displayed are the property of their respective owners.
+            Protect.com® and its logos are trademarks or registered trademarks of Digital Media Solutions, LLC. All rights reserved.
           </p>
-        </div>
+        </FooterLegal>
       </div>
     </footer>
   </div>
@@ -204,7 +172,7 @@ const selectYear = (year) => {
 .quote-main {
   flex: 1;
   background: white;
-  padding: 40px 0;
+  padding: 35px 0;
 }
 
 /* Progress Bar */
@@ -213,7 +181,7 @@ const selectYear = (year) => {
   height: 18px;
   background: #f0f0f0;
   border-radius: 10px;
-  margin-bottom: 40px;
+  margin-bottom: 20px;
   overflow: hidden;
 }
 
@@ -233,12 +201,15 @@ const selectYear = (year) => {
   margin: 0 auto;
 }
 
-.form-title {
-  font-size: 28px;
-  font-weight: 400;
-  color: #333;
-  margin: 0 0 40px 0;
-  text-align: left;
+.question-label h2{
+    font-size: 2em;
+    color: #333;
+    margin: 5px auto 20px;
+    padding: 5px 0;
+    position: relative;
+    line-height: 1.2;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-weight: normal;
 }
 
 /* Year Grid */
@@ -278,18 +249,21 @@ const selectYear = (year) => {
   transform: translateY(0);
 }
 
-/* Footer */
-.quote-footer {
+.form-footer {
+  padding: 20px;
   background: white;
-  border-top: 1px solid #e0e0e0;
-  padding: 40px 0 30px;
-  margin-top: auto;
 }
 
-/* Partners Section */
 .partners-section {
   text-align: center;
   margin-bottom: 40px;
+  display: none;
+}
+
+@media screen and (min-width: 768px) {
+  .partners-section {
+    display: block;
+  }
 }
 
 .partners-heading {
@@ -309,8 +283,7 @@ const selectYear = (year) => {
 }
 
 .partner-logo {
-  height: 35px;
-  width: auto;
+  width: 156px;
   object-fit: contain;
 }
 
@@ -321,38 +294,8 @@ const selectYear = (year) => {
   margin: 0;
 }
 
-/* Legal Section */
-.legal-section {
-  text-align: center;
-  font-size: 11px;
-  color: #666;
-  line-height: 1.6;
-}
-
-.legal-section p {
-  margin: 10px 0;
-}
-
-.legal-section a {
-  color: #666;
-  text-decoration: none;
-}
-
-.legal-section a:hover {
-  text-decoration: underline;
-}
-
-.disclaimer-text {
-  margin-top: 15px;
-}
-
 /* Mobile Responsive */
 @media screen and (max-width: 768px) {
-  .form-title {
-    font-size: 22px;
-    margin-bottom: 30px;
-  }
-
   .year-grid {
     grid-template-columns: repeat(4, 1fr);
     gap: 10px;
@@ -361,14 +304,6 @@ const selectYear = (year) => {
   .year-button {
     padding: 14px 6px;
     font-size: 14px;
-  }
-
-  .partner-logos {
-    gap: 20px;
-  }
-
-  .partner-logo {
-    height: 28px;
   }
 }
 
@@ -379,8 +314,8 @@ const selectYear = (year) => {
   }
 
   .year-button {
-    padding: 12px 4px;
-    font-size: 13px;
+    padding: 20px;
+    font-size: 20px;
   }
 }
 </style>
