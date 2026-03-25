@@ -113,14 +113,7 @@ defineProps({
 
       <div class="row footer-columns">
         <div class="privacy-policies">
-          <p>
-            <a href="https://dmsunsub.io/" target="_blank"
-              >Do Not Sell Or Share My Personal Information</a
-            >
-            | <NuxtLink to="/privacy-policy">Privacy Policy</NuxtLink> |
-            <NuxtLink to="/terms">Terms Of Use</NuxtLink> |
-            <NuxtLink to="/privacy-notice">California Privacy Notice</NuxtLink>
-          </p>
+          <FooterLegal />
           <p>
             The specified use of this site is to accurately match users to the
             auto insurance companies to best meet their needs. We do not provide
