@@ -95,7 +95,7 @@ const selectYear = (year) => {
       <div class="container">
         <!-- Progress Bar -->
         <div class="progress-bar">
-          <div class="progress-fill" style="width: 12.5%"></div>
+          <div class="progress-fill" style="width: 4%"></div>
         </div>
 
         <!-- Form Step -->
@@ -162,9 +162,9 @@ const selectYear = (year) => {
 }
 
 .container {
-  max-width: 900px;
+  max-width: 1000px;
   margin: 0 auto;
-  padding: 0 20px;
+  padding: 0;
   width: 100%;
 }
 
@@ -172,16 +172,17 @@ const selectYear = (year) => {
 .quote-main {
   flex: 1;
   background: white;
-  padding: 35px 0;
+  padding: 20px;
 }
 
 /* Progress Bar */
 .progress-bar {
   width: 100%;
   height: 18px;
-  background: #f0f0f0;
-  border-radius: 10px;
-  margin-bottom: 20px;
+  background: #F5F8F7;
+  border: 1px solid #efefef;
+  border-radius: 50px;
+  margin: 10px 0;
   overflow: hidden;
 }
 
@@ -197,8 +198,7 @@ const selectYear = (year) => {
 
 /* Form Step */
 .form-step {
-  max-width: 800px;
-  margin: 0 auto;
+  margin: 0;
 }
 
 .question-label h2{
@@ -208,7 +208,7 @@ const selectYear = (year) => {
     padding: 5px 0;
     position: relative;
     line-height: 1.2;
-    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-family: "Nunito Sans", sans-serif;
     font-weight: normal;
 }
 
@@ -217,7 +217,7 @@ const selectYear = (year) => {
   display: grid;
   grid-template-columns: repeat(8, 1fr);
   gap: 12px;
-  margin-bottom: 60px;
+  margin-bottom: 30px;
 }
 
 .year-button {
@@ -228,21 +228,18 @@ const selectYear = (year) => {
   white-space: nowrap;
   padding: 20px;
   line-height: 27px;
-  font-weight: 600;
   border-radius: 4px;
   color: rgb(59, 84, 186);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-family: "Nunito Sans", sans-serif;
   text-transform: initial;
   box-shadow: none;
   transition: 0.25s;
   cursor: pointer;
+  font-weight: 600;
 }
 
 .year-button:hover {
-  background: #e5e7eb;
-  border-color: #e5e7eb;
-  transform: translateY(-1px);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border: 2px solid rgb(59, 84, 186);
 }
 
 .year-button:active {
@@ -267,10 +264,11 @@ const selectYear = (year) => {
 }
 
 .partners-heading {
-  font-size: 14px;
-  color: #333;
+  font-size: 21px;
+  color: #666;
   margin: 0 0 20px 0;
-  font-weight: 400;
+  font-weight: bold;
+  font-family: "Nunito Sans", sans-serif;
 }
 
 .partner-logos {
