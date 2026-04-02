@@ -1,16 +1,16 @@
+import { GTM_DEFAULT_ID } from "~/composables/useGtm";
+
 export default defineNuxtPlugin(() => {
   const router = useRouter();
-  const { proxy } = useScriptGoogleTagManager();
+  const route = useRoute();
 
-  // Initial page view tracking
-  // proxy.dataLayer.push({
-  //   event: "page_view",
-  //   page_path: router.currentRoute.value.fullPath,
-  // });
-  // console.log("GA Event Sent:", proxy.dataLayer);
+  if (route.meta.gtm === false) return;
 
-  // Track subsequent route changes
+  const id = typeof route.meta.gtm === "string" ? route.meta.gtm : GTM_DEFAULT_ID;
+  const { proxy } = useScriptGoogleTagManager({ id });
+
   router.afterEach((to) => {
+    if (to.meta.gtm === false) return;
     proxy.dataLayer.push({
       event: "page_view",
       page_path: to.fullPath,

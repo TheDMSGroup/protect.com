@@ -309,7 +309,7 @@
     });
   };
   const sendEngagementToGa = (eventType, eventPayload) => {
-    const { proxy } = useScriptGoogleTagManager();
+    const proxy = useGtm();
     proxy.dataLayer.push({
       event: eventType,
       ...eventPayload,

@@ -24,13 +24,7 @@ export default defineNuxtConfig({
   features: {
     inlineStyles: true,
   },
-  scripts: {
-    registry: {
-      googleTagManager: {
-        id: "GTM-MZPRQHZ", // Replace with your Google Tag Manager ID
-      },
-    },
-  },
+  scripts: {},
   image: {
     quality: 80,
     format: ["webp"],

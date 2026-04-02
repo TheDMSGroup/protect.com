@@ -2,7 +2,8 @@
 import { redirectWithParams } from '~/composables/utils'
 
 definePageMeta({
-  layout: false
+  layout: false,
+  gtm: false,
 })
 
 const store = useStore()

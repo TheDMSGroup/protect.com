@@ -50,7 +50,7 @@ export const useMastodonApi = () => {
 
       // Track when API returns zero bids
       if (data && data.bids && data.bids.length === 0) {
-        const { proxy } = useScriptGoogleTagManager()
+        const proxy = useGtm()
         proxy.dataLayer.push({
           event: 'mst_no_results',
           auction_id: data.auction_id,
