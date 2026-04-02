@@ -26,7 +26,9 @@ defineProps({
 .form-header {
   background: white;
   border-bottom: 1px solid #e0e0e0;
-  padding: 20px 0;
+  padding: 32px 0;
+  position: relative;
+  z-index: 1;
 }
 
 .container {
@@ -58,6 +60,7 @@ defineProps({
   display: flex;
   align-items: flex-start;
   justify-content: center;
+  font-family: "Nunito Sans", sans-serif;
 }
 
 @media screen and (max-width: 768px) {

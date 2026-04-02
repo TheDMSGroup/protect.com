@@ -21,6 +21,7 @@ export const preprocessTextForLinks = (fullText, linkData, className = "") => {
   return processedFullText;
 };
 
+
 // All tracking params to persist in redirect URLs
 const TRACKING_PARAMS = [
   'gclid', 'msclkid', 'fbc', 'fbp', 'fbclid', 'clickid', 'rtclid',
@@ -87,10 +88,13 @@ export const generateRedirectUrl = (route, paramsToAppend) => {
   return url;
 };
 
-export const redirectWithParams = (route, { ...paramsToAppend }) => {
-  let url = generateRedirectUrl(route, paramsToAppend);
-  console.log('url', url);
-  window.open(url, "_blank");
+// ueidUrls: optional map of ueid values to URLs, e.g. { 'abc123': 'https://other.com' }
+export const redirectWithParams = (route, { ...paramsToAppend }, ueidUrls = {}) => {
+  const store = useStore();
+  const ueid = store.visitorInfo?.ueid;
+  const resolvedRoute = (ueid && ueidUrls[ueid]) ? ueidUrls[ueid] : route;
+
+  window.open(generateRedirectUrl(resolvedRoute, paramsToAppend), "_blank");
 };
 
 export const updateMetaData = (tags = {}) => {
