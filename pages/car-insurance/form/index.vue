@@ -6,7 +6,8 @@ import MinimalForm from '~/pages/car-insurance/form/minimal/index.vue'
 import DetailedForm from '~/pages/car-insurance/form/detailed/index.vue'
 
 definePageMeta({
-  layout: false
+  layout: false,
+  gtm: false,
 })
 
 const route = useRoute()
