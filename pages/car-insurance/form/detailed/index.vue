@@ -6,6 +6,8 @@ definePageMeta({
   gtm: false,
 })
 
+const { proxy: ga } = useScriptGoogleAnalytics({ id: 'G-NGMYQLELL2' })
+
 const store = useStore()
 const currentStep = ref(1)
 const formData = ref({
@@ -21,6 +23,8 @@ const isGeoLoaded = ref(false)
 
 // Watch for GeoIP data to load
 onMounted(() => {
+  ga.gtag('event', 'landing')
+
   // Set initial value if already loaded
   if (store.visitorInfo.region) {
     userState.value = store.visitorInfo.region.charAt(0).toUpperCase() + store.visitorInfo.region.slice(1)
@@ -72,8 +76,7 @@ const years = computed(() => {
 
 const selectYear = (year) => {
   formData.value.vehicleYear = year
-  // Navigate to next step or submit
-  console.log('Selected year:', year)
+  ga.gtag('event', 'year_selected', { vehicle_year: year })
 
   // redirectWithParams will automatically append rtclid and other tracking params from the store
   const options = {
