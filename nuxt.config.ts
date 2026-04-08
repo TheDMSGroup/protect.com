@@ -183,7 +183,7 @@ export default defineNuxtConfig({
       },
     },
     build: {
-      cssCodeSplit: false,
+      cssCodeSplit: true,
     },
     logLevel: "error",
   },
