@@ -7,7 +7,7 @@ export default defineNuxtPlugin(() => {
   if (route.meta.gtm === false) return;
 
   const id = typeof route.meta.gtm === "string" ? route.meta.gtm : GTM_DEFAULT_ID;
-  const { proxy } = useScriptGoogleTagManager({ id });
+  const { proxy } = useScriptGoogleTagManager({ id }, { trigger: 'onNuxtReady' });
 
   router.afterEach((to) => {
     if (to.meta.gtm === false) return;
