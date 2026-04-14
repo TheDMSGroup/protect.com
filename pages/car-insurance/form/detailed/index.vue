@@ -6,7 +6,11 @@ definePageMeta({
   gtm: false,
 })
 
-const { proxy: ga } = useScriptGoogleAnalytics({ id: 'G-NGMYQLELL2' })
+useHead({
+  link: [{ rel: 'preload', href: '/assets/protect_logo.svg', as: 'image' }]
+})
+
+const { proxy: ga } = useScriptGoogleAnalytics({ id: 'G-NGMYQLELL2' }, { trigger: 'onNuxtReady' })
 
 const store = useStore()
 const currentStep = ref(1)
@@ -127,11 +131,11 @@ const selectYear = (year) => {
       <div class="partners-section">
         <p class="partners-heading">Free quotes from over 40 providers including:</p>
         <div class="partner-logos">
-          <img src="/assets/providers/progressive.png" alt="Progressive" class="partner-logo">
-          <img src="/assets/providers/geico.png" alt="Geico" class="partner-logo">
-          <img src="/assets/providers/nationwide.png" alt="Nationwide" class="partner-logo">
-          <img src="/assets/providers/state-farm.png" alt="State Farm" class="partner-logo">
-          <img src="/assets/providers/liberty.png" alt="Liberty Mutual" class="partner-logo">
+          <img src="/assets/providers/progressive.png" alt="Progressive" class="partner-logo" loading="lazy">
+          <img src="/assets/providers/geico.png" alt="Geico" class="partner-logo" loading="lazy">
+          <img src="/assets/providers/nationwide.png" alt="Nationwide" class="partner-logo" loading="lazy">
+          <img src="/assets/providers/state-farm.png" alt="State Farm" class="partner-logo" loading="lazy">
+          <img src="/assets/providers/liberty.png" alt="Liberty Mutual" class="partner-logo" loading="lazy">
         </div>
         <p class="disclaimer">*These are Insurance companies that typically issue quotes to our users. Results may vary and are not guaranteed.</p>
       </div>
