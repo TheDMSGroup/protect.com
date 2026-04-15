@@ -26,6 +26,10 @@ const userState = ref(null)
 const isGeoLoaded = ref(false)
 
 // Watch for GeoIP data to load
+onNuxtReady(() => {
+  console.log('page loaded prefetchLinks');
+})
+
 onMounted(() => {
   ga.gtag('event', 'landing')
 
