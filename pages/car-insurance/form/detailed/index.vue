@@ -27,7 +27,7 @@ const isGeoLoaded = ref(false)
 
 // Watch for GeoIP data to load
 onNuxtReady(() => {
-  console.log('page loaded cssCodeSplit');
+  console.log('page loaded nitro plugin');
 })
 
 onMounted(() => {
