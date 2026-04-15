@@ -12,6 +12,7 @@ export default defineNuxtConfig({
     "nuxt-seo-utils",
   ],
   experimental: {
+    prefetchLinks: false,  // disable if footer links are triggering CSS injection
     defaults: {
       nuxtLink: {
         trailingSlash: "remove",
