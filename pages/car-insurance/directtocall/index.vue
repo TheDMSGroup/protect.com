@@ -167,6 +167,7 @@
 <script setup>
 import { ref, watch, nextTick, onMounted, onBeforeUnmount, computed } from 'vue'
 import { useMastodonApi } from '~/composables/useMastodonApi'
+import { useJornaya } from '~/composables/useJornaya'
 import { useStore } from '~/stores/store'
 
 definePageMeta({
@@ -177,6 +178,7 @@ const store = useStore()
 const route = useRoute()
 const cityCookie = useCookie('protect_geo_city')
 const { submitLead, buildLeadPayload } = useMastodonApi()
+const { loadJornaya, getLeadToken } = useJornaya()
 
 const userCity = computed(() => {
   // Priority: store (live GeoIP) > cookie (SSR-accessible) > fallback
@@ -327,6 +329,9 @@ const fireGtmEvent = (eventType) => {
 }
 
 onMounted(() => {
+  // Load Jornaya LeadiD script
+  loadJornaya()
+
   // Fire landing event on page load
   fireGtmEvent('landing')
 
@@ -484,6 +489,7 @@ const fetchMastodonBids = async () => {
       },
       {
         sourceToken: store.visitorInfo?.mst || 'r0TV0W_hUOqv_Uow4brhX-wkx5F9TQ',
+        universalLeadId: getLeadToken(),
       }
     )
 
