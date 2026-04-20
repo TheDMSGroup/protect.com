@@ -243,6 +243,7 @@ import { ref, reactive, watch, nextTick, onMounted, computed } from 'vue'
 import { useVehicleApi } from '~/composables/useVehicleApi'
 import { useMastodonApi } from '~/composables/useMastodonApi'
 import { useTrustedForm } from '~/composables/useTrustedForm'
+import { useJornaya } from '~/composables/useJornaya'
 import { useGooglePlaces } from '~/composables/useGooglePlaces'
 
 const route = useRoute()
@@ -265,13 +266,16 @@ const formattedPhoneNumber = computed(() => {
 const { getMakes, getModels, getYears, findMatch } = useVehicleApi()
 const { submitLead, buildLeadPayload } = useMastodonApi()
 const { loadTrustedForm, getCertificateId } = useTrustedForm()
+const { loadJornaya, getLeadToken } = useJornaya()
 const { loadGooglePlaces, getAddressSuggestions, getPlaceDetails } = useGooglePlaces()
 const vehicleYears = getYears()
 const availableMakes = ref([])
 const availableModels = ref([])
 const searchSuggestions = ref([])
 
-const messages = ref([])
+const messages = ref([
+  { type: 'bot', text: "Hi! I'm here to help you get a quote for your auto insurance. I'll guide you through a few questions to find you the best rate. Ready to get started?" }
+])
 const inputValue = ref('')
 const currentStep = ref('welcome')
 const formData = reactive({
@@ -447,6 +451,9 @@ onMounted(() => {
   // Load TrustedForm script
   loadTrustedForm()
 
+  // Load Jornaya LeadiD script
+  loadJornaya()
+
   // Load TCPA script
   loadTcpaScript()
 
@@ -461,13 +468,10 @@ onMounted(() => {
   if (urlParams.get('previewfeed') === 'true') {
     apiResults.value = getMockResults()
   } else {
-    setTimeout(() => {
-      const welcomeReplies = hasPhoneNumber.value
-        ? ['Yes', 'No, I\'d rather talk to someone on the phone']
-        : ['Yes']
-      addBotMessage("Hi! I'm here to help you get a quote for your auto insurance. I'll guide you through a few questions to find you the best rate. Ready to get started?", false, welcomeReplies)
-      currentQuestion.value = { type: 'welcome', expecting: 'confirmation' }
-    }, 500)
+    quickReplies.value = hasPhoneNumber.value
+      ? ['Yes', 'No, I\'d rather talk to someone on the phone']
+      : ['Yes']
+    currentQuestion.value = { type: 'welcome', expecting: 'confirmation' }
   }
 })
 
@@ -1620,7 +1624,6 @@ const getMockResults = () => ({
 })
 
 const submitToApi = async () => {
-  const { proxy } = useScriptGoogleTagManager();
   isLoadingResults.value = true
 
   try {
@@ -1633,6 +1636,7 @@ const submitToApi = async () => {
     const payload = buildLeadPayload(formData, {
       rtclid,
       trustedFormCertId: getCertificateId(),
+      universalLeadId: getLeadToken(),
       tcpaDisclosure: tcpaSkipped.value ? '' : tcpaDisclosure.value
     })
 
