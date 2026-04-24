@@ -91,9 +91,7 @@ const selectYear = (year) => {
     vehicle1year: year,
   }
 
-  redirectWithParams("https://insure.protect.com", options, {
-    'fbpb_auto': 'https://quote.protect.com',
-  });
+  redirectWithParams("https://insure.protect.com", options);
 }
 </script>
 
