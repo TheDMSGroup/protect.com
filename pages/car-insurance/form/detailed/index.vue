@@ -88,7 +88,7 @@ const selectYear = (year) => {
 
   // redirectWithParams will automatically append rtclid and other tracking params from the store
   const options = {
-    vehicle1year: year,
+    year,
   }
 
   redirectWithParams("https://insure.protect.com", options);
