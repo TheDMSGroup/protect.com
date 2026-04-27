@@ -108,6 +108,7 @@
               >
                 {{ reply }}
               </button>
+              <span v-if="currentQuestion?.type === 'vehicle_year'" class="quick-reply-hint">or type a year below</span>
             </div>
 
             <!-- Search Suggestions (for make/model typeahead) -->
@@ -119,6 +120,26 @@
                 class="quick-reply-btn"
               >
                 {{ suggestion }}
+              </button>
+            </div>
+
+            <!-- Skip vehicle button -->
+            <div
+              v-if="['vehicle_year', 'vehicle_make', 'vehicle_model'].includes(currentQuestion?.type) && currentQuestion?.vehicleIndex > 0 && !apiResults"
+              class="skip-vehicle-wrap"
+            >
+              <button class="skip-vehicle-btn" @click="handleSkipVehicle">
+                &#9658;&#9658; Skip {{ getOrdinal(currentQuestion.vehicleIndex + 1) }} vehicle
+              </button>
+            </div>
+
+            <!-- Skip driver button -->
+            <div
+              v-if="['driver_firstName', 'driver_lastName', 'driver_dob', 'driver_gender', 'driver_married', 'driver_military', 'driver_employed'].includes(currentQuestion?.type) && currentQuestion?.driverIndex > 0 && !apiResults"
+              class="skip-vehicle-wrap"
+            >
+              <button class="skip-vehicle-btn" @click="handleSkipDriver">
+                &#9658;&#9658; Skip {{ getOrdinal(currentQuestion.driverIndex + 1) }} driver
               </button>
             </div>
           </div>
@@ -462,6 +483,7 @@ onMounted(() => {
 
   // Fire landing event on page load
   fireGtmEvent('landing')
+  fireGtmEvent('Get Started')
 
   // Check for previewfeed URL param to show mock results immediately
   const urlParams = new URLSearchParams(window.location.search)
@@ -614,6 +636,64 @@ const handleSend = () => {
   searchSuggestions.value = []
   addressSuggestionsData.value = []
   awaitingAnswer.value = false
+}
+
+const getOrdinal = (n) => {
+  const s = ['th', 'st', 'nd', 'rd']
+  const v = n % 100
+  return n + (s[(v - 20) % 10] || s[v] || s[0])
+}
+
+watch(currentQuestion, (newVal) => {
+  if (!newVal) return
+  const { type, vehicleIndex: vIdx = 0, driverIndex: dIdx = 0 } = newVal
+  switch (type) {
+    case 'vehicle_count':     fireGtmEvent('Vehicle Count'); break
+    case 'vehicle_year':      fireGtmEvent(`Vehicle ${vIdx + 1} Year`); break
+    case 'vehicle_make':      fireGtmEvent(`Vehicle ${vIdx + 1} Make`); break
+    case 'vehicle_model':     fireGtmEvent(`Vehicle ${vIdx + 1} Model`); break
+    case 'driver_count':      fireGtmEvent('Driver Count'); break
+    case 'driver_firstName':  fireGtmEvent(`Driver ${dIdx + 1} Name`); break
+    case 'driver_dob':        fireGtmEvent(`Driver ${dIdx + 1} DOB`); break
+    case 'driver_gender':     fireGtmEvent(`Driver ${dIdx + 1} Gender`); break
+    case 'driver_married':    fireGtmEvent(`Driver ${dIdx + 1} Married`); break
+    case 'driver_military':   fireGtmEvent('midpoint'); fireGtmEvent(`Driver ${dIdx + 1} Military`); break
+    case 'driver_employed':   fireGtmEvent(`Driver ${dIdx + 1} Employed`); break
+    case 'has_insurance':     fireGtmEvent('Currently Insured'); break
+    case 'current_company':   fireGtmEvent('Insurance Company'); break
+    case 'coverage_length':   fireGtmEvent('Continuous Coverage'); break
+    case 'email':             fireGtmEvent('Email'); break
+    case 'address':           fireGtmEvent('Address'); break
+    case 'phone':             fireGtmEvent('Phone'); break
+  }
+})
+
+const handleSkipVehicle = () => {
+  const idx = currentQuestion.value?.vehicleIndex
+  if (idx == null) return
+  // Remove current and any future vehicles
+  formData.vehicles.splice(idx)
+  quickReplies.value = []
+  searchSuggestions.value = []
+  setTimeout(() => {
+    addBotMessage(`${getNextEmoji()} No problem! Now let's talk about the drivers. How many drivers will be on this policy?`, true, ['1', '2', '3', '4+'])
+    currentStep.value = 'drivers'
+    currentQuestion.value = { type: 'driver_count' }
+  }, 400)
+}
+
+const handleSkipDriver = () => {
+  const idx = currentQuestion.value?.driverIndex
+  if (idx == null) return
+  // Remove current and any future drivers
+  formData.drivers.splice(idx)
+  quickReplies.value = []
+  searchSuggestions.value = []
+  setTimeout(() => {
+    addBotMessage(`${getNextEmoji()} No problem! Now a few questions about your current insurance. Do you currently have auto insurance?`, true, ['Yes', 'No'])
+    currentStep.value = 'insurance'
+    currentQuestion.value = { type: 'has_insurance' }
+  }, 400)
 }
 
 const handleQuickReply = (reply) => {
@@ -797,7 +877,7 @@ const processResponse = async (response) => {
       }
 
       // Show recent years as quick replies
-      const recentYears = vehicleYears.slice(0, 6).map(String)
+      const recentYears = vehicleYears.slice(0, 8).map(String)
       setTimeout(() => {
         addBotMessage(`Great! Let's get the details for vehicle 1. You can type the year, or enter your full vehicle like "2020 Honda Pilot".`, false, recentYears)
         currentQuestion.value = { type: 'vehicle_year', vehicleIndex: 0 }
@@ -861,10 +941,12 @@ const processResponse = async (response) => {
 
               if (matchedModel) {
                 formData.vehicles[idx].model = matchedModel
+                fireGtmEvent(`Vehicle ${idx + 1} Make`)
+                fireGtmEvent(`Vehicle ${idx + 1} Model`)
 
                 // Check if there are more vehicles to add
                 if (idx < formData.vehicles.length - 1) {
-                  const recentYears = vehicleYears.slice(0, 6).map(String)
+                  const recentYears = vehicleYears.slice(0, 8).map(String)
                   setTimeout(() => {
                     addBotMessage(`${getNextEmoji()} Perfect! Added your ${year} ${matchedMake} ${matchedModel}. Now let's get vehicle ${idx + 2}. Enter the year or full vehicle.`, true, recentYears)
                     currentQuestion.value = { type: 'vehicle_year', vehicleIndex: idx + 1 }
@@ -1060,7 +1142,7 @@ const processResponse = async (response) => {
 
       // Check if there are more vehicles to add
       if (idx < formData.vehicles.length - 1) {
-        const recentYears = vehicleYears.slice(0, 6).map(String)
+        const recentYears = vehicleYears.slice(0, 8).map(String)
         setTimeout(() => {
           addBotMessage(`${getNextEmoji()} Got it! Now let's get the details for vehicle ${idx + 2}. Enter the year or full vehicle.`, true, recentYears)
           currentQuestion.value = { type: 'vehicle_year', vehicleIndex: idx + 1 }
@@ -1217,9 +1299,7 @@ const processResponse = async (response) => {
           // Ask military question only for first driver
           if (idx === 0) {
             setTimeout(() => {
-              // Fire midpoint event when military question shows up
-              fireGtmEvent('midpoint')
-              addBotMessage(`Does anyone in your family have any military affiliation?`, false, ['Yes', 'No'])
+              addBotMessage(formData.drivers[idx].married === 'Yes' ? `Do you or your spouse have any military affiliation?` : `Do you have any military affiliation?`, false, ['Yes', 'No'])
               currentQuestion.value = { type: 'driver_military', driverIndex: idx }
             }, 800)
           } else {
@@ -1238,7 +1318,7 @@ const processResponse = async (response) => {
           setTimeout(() => {
             // Fire midpoint event when military question shows up
             fireGtmEvent('midpoint')
-            addBotMessage(`Does anyone in your family have any military affiliation?`, false, ['Yes', 'No'])
+            addBotMessage(formData.drivers[idx].married === 'Yes' ? `Do you or your spouse have any military affiliation?` : `Do you have any military affiliation?`, false, ['Yes', 'No'])
             currentQuestion.value = { type: 'driver_military', driverIndex: idx }
           }, 800)
         } else {
@@ -1531,7 +1611,7 @@ const repeatCurrentQuestion = () => {
       addBotMessage("How many vehicles would you like to insure?", false, ['1', '2', '3', '4+'])
       break
     case 'vehicle_year':
-      const recentYears = vehicleYears.slice(0, 6).map(String)
+      const recentYears = vehicleYears.slice(0, 8).map(String)
       addBotMessage(`What year is vehicle ${idx + 1}? You can also type the full vehicle like "2020 Honda Pilot".`, false, recentYears)
       break
     case 'vehicle_make':
@@ -1567,7 +1647,7 @@ const repeatCurrentQuestion = () => {
       addBotMessage(`Is ${formData.drivers[idx]?.firstName || 'the driver'} married?`, false, ['Yes', 'No'])
       break
     case 'driver_military':
-      addBotMessage(`Does anyone in your family have any military affiliation?`, false, ['Yes', 'No'])
+      addBotMessage(formData.drivers[idx]?.married === 'Yes' ? `Do you or your spouse have any military affiliation?` : `Do you have any military affiliation?`, false, ['Yes', 'No'])
       break
     case 'driver_employed':
       addBotMessage(`Is ${formData.drivers[idx]?.firstName || 'the driver'} currently employed?`, false, ['Yes', 'No'])
@@ -2174,6 +2254,34 @@ const submitToApi = async () => {
 
 .quick-reply-btn:hover {
   background-color: #eff6ff;
+}
+
+.quick-reply-hint {
+  display: flex;
+  align-items: center;
+  color: #6b7280;
+  font-size: 0.8rem;
+  white-space: nowrap;
+}
+
+.skip-vehicle-wrap {
+  margin-top: 0.5rem;
+}
+
+.skip-vehicle-btn {
+  padding: 0.5rem 1rem;
+  background: white;
+  border: 1.5px solid #d1d5db;
+  border-radius: 9999px;
+  color: #6b7280;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background-color 0.15s, border-color 0.15s;
+}
+
+.skip-vehicle-btn:hover {
+  background-color: #f9fafb;
+  border-color: #9ca3af;
 }
 
 /* Chat Input */
