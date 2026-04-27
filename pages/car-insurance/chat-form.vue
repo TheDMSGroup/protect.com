@@ -108,6 +108,7 @@
               >
                 {{ reply }}
               </button>
+              <span v-if="currentQuestion?.type === 'vehicle_year'" class="quick-reply-hint">or type a year below</span>
             </div>
 
             <!-- Search Suggestions (for make/model typeahead) -->
@@ -119,6 +120,26 @@
                 class="quick-reply-btn"
               >
                 {{ suggestion }}
+              </button>
+            </div>
+
+            <!-- Skip vehicle button -->
+            <div
+              v-if="['vehicle_year', 'vehicle_make', 'vehicle_model'].includes(currentQuestion?.type) && currentQuestion?.vehicleIndex > 0 && !apiResults"
+              class="skip-vehicle-wrap"
+            >
+              <button class="skip-vehicle-btn" @click="handleSkipVehicle">
+                &#9658;&#9658; Skip {{ getOrdinal(currentQuestion.vehicleIndex + 1) }} vehicle
+              </button>
+            </div>
+
+            <!-- Skip driver button -->
+            <div
+              v-if="['driver_firstName', 'driver_lastName', 'driver_dob', 'driver_gender', 'driver_married', 'driver_military', 'driver_employed'].includes(currentQuestion?.type) && currentQuestion?.driverIndex > 0 && !apiResults"
+              class="skip-vehicle-wrap"
+            >
+              <button class="skip-vehicle-btn" @click="handleSkipDriver">
+                &#9658;&#9658; Skip {{ getOrdinal(currentQuestion.driverIndex + 1) }} driver
               </button>
             </div>
           </div>
@@ -616,6 +637,40 @@ const handleSend = () => {
   awaitingAnswer.value = false
 }
 
+const getOrdinal = (n) => {
+  const s = ['th', 'st', 'nd', 'rd']
+  const v = n % 100
+  return n + (s[(v - 20) % 10] || s[v] || s[0])
+}
+
+const handleSkipVehicle = () => {
+  const idx = currentQuestion.value?.vehicleIndex
+  if (idx == null) return
+  // Remove current and any future vehicles
+  formData.vehicles.splice(idx)
+  quickReplies.value = []
+  searchSuggestions.value = []
+  setTimeout(() => {
+    addBotMessage(`${getNextEmoji()} No problem! Now let's talk about the drivers. How many drivers will be on this policy?`, true, ['1', '2', '3', '4+'])
+    currentStep.value = 'drivers'
+    currentQuestion.value = { type: 'driver_count' }
+  }, 400)
+}
+
+const handleSkipDriver = () => {
+  const idx = currentQuestion.value?.driverIndex
+  if (idx == null) return
+  // Remove current and any future drivers
+  formData.drivers.splice(idx)
+  quickReplies.value = []
+  searchSuggestions.value = []
+  setTimeout(() => {
+    addBotMessage(`${getNextEmoji()} No problem! Now a few questions about your current insurance. Do you currently have auto insurance?`, true, ['Yes', 'No'])
+    currentStep.value = 'insurance'
+    currentQuestion.value = { type: 'has_insurance' }
+  }, 400)
+}
+
 const handleQuickReply = (reply) => {
   // Fire engagement event on first interaction
   if (!hasEngaged.value) {
@@ -765,6 +820,7 @@ const processResponse = async (response) => {
       return
     }
 
+    fireGtmEvent('Get Started')
     setTimeout(() => {
       addBotMessage("Great! Let's start with your vehicles. How many vehicles would you like to insure?", false, ['1', '2', '3', '4+'])
       currentStep.value = 'vehicles'
@@ -796,8 +852,9 @@ const processResponse = async (response) => {
         addDiscount('Multi-Vehicle Discount')
       }
 
+      fireGtmEvent('Vehicle Count')
       // Show recent years as quick replies
-      const recentYears = vehicleYears.slice(0, 6).map(String)
+      const recentYears = vehicleYears.slice(0, 8).map(String)
       setTimeout(() => {
         addBotMessage(`Great! Let's get the details for vehicle 1. You can type the year, or enter your full vehicle like "2020 Honda Pilot".`, false, recentYears)
         currentQuestion.value = { type: 'vehicle_year', vehicleIndex: 0 }
@@ -853,6 +910,8 @@ const processResponse = async (response) => {
           if (matchedMake) {
             formData.vehicles[idx].year = year.toString()
             formData.vehicles[idx].make = matchedMake
+            fireGtmEvent(`Vehicle ${idx + 1} Year`)
+            fireGtmEvent(`Vehicle ${idx + 1} Make`)
 
             if (model) {
               // Validate model against API
@@ -861,10 +920,11 @@ const processResponse = async (response) => {
 
               if (matchedModel) {
                 formData.vehicles[idx].model = matchedModel
+                fireGtmEvent(`Vehicle ${idx + 1} Model`)
 
                 // Check if there are more vehicles to add
                 if (idx < formData.vehicles.length - 1) {
-                  const recentYears = vehicleYears.slice(0, 6).map(String)
+                  const recentYears = vehicleYears.slice(0, 8).map(String)
                   setTimeout(() => {
                     addBotMessage(`${getNextEmoji()} Perfect! Added your ${year} ${matchedMake} ${matchedModel}. Now let's get vehicle ${idx + 2}. Enter the year or full vehicle.`, true, recentYears)
                     currentQuestion.value = { type: 'vehicle_year', vehicleIndex: idx + 1 }
@@ -920,6 +980,7 @@ const processResponse = async (response) => {
             // Make not found, ask for make
             availableMakes.value = makes
             formData.vehicles[idx].year = year.toString()
+            fireGtmEvent(`Vehicle ${idx + 1} Year`)
             setTimeout(() => {
               addBotMessage(
                 `Got ${year}! I couldn't find "${make}" though. What make is your vehicle?`,
@@ -939,6 +1000,7 @@ const processResponse = async (response) => {
 
         // Just year provided (no make/model text after)
         formData.vehicles[idx].year = year.toString()
+        fireGtmEvent(`Vehicle ${idx + 1} Year`)
       } else {
         // No pattern matched - try parsing as just a number
         let yearNum = parseInt(response)
@@ -961,6 +1023,7 @@ const processResponse = async (response) => {
           return
         }
         formData.vehicles[idx].year = yearNum.toString()
+        fireGtmEvent(`Vehicle ${idx + 1} Year`)
       }
 
       // Fetch makes from API (show typing indicator while loading)
@@ -1008,6 +1071,7 @@ const processResponse = async (response) => {
       }
 
       formData.vehicles[idx].make = matchedMake
+      fireGtmEvent(`Vehicle ${idx + 1} Make`)
 
       // Fetch models from API (show typing indicator while loading)
       isTyping.value = true
@@ -1054,13 +1118,14 @@ const processResponse = async (response) => {
       }
 
       formData.vehicles[idx].model = matchedModel
+      fireGtmEvent(`Vehicle ${idx + 1} Model`)
 
       // Clear suggestions
       searchSuggestions.value = []
 
       // Check if there are more vehicles to add
       if (idx < formData.vehicles.length - 1) {
-        const recentYears = vehicleYears.slice(0, 6).map(String)
+        const recentYears = vehicleYears.slice(0, 8).map(String)
         setTimeout(() => {
           addBotMessage(`${getNextEmoji()} Got it! Now let's get the details for vehicle ${idx + 2}. Enter the year or full vehicle.`, true, recentYears)
           currentQuestion.value = { type: 'vehicle_year', vehicleIndex: idx + 1 }
@@ -1097,6 +1162,7 @@ const processResponse = async (response) => {
         formData.drivers.push({ firstName: '', lastName: '', dob: '', gender: '', married: '', military: '', employed: '' })
       }
 
+      fireGtmEvent('Driver Count')
       setTimeout(() => {
         addBotMessage(`Great! What's your name?`)
         currentQuestion.value = { type: 'driver_firstName', driverIndex: 0 }
@@ -1127,6 +1193,7 @@ const processResponse = async (response) => {
         const lastName = capitalizeName(nameParts[1])
         formData.drivers[idx].firstName = firstName
         formData.drivers[idx].lastName = lastName
+        fireGtmEvent(`Driver ${idx + 1} Name`)
         setTimeout(() => {
           const message = idx === 0
             ? `Got it! What's your date of birth? (MM/DD/YYYY)`
@@ -1140,6 +1207,7 @@ const processResponse = async (response) => {
         const firstName = capitalizeName(nameParts.slice(0, -1).join(' '))
         formData.drivers[idx].firstName = firstName
         formData.drivers[idx].lastName = lastName
+        fireGtmEvent(`Driver ${idx + 1} Name`)
         setTimeout(() => {
           const message = idx === 0
             ? `Got it! What's your date of birth? (MM/DD/YYYY)`
@@ -1154,6 +1222,7 @@ const processResponse = async (response) => {
     if (currentQuestion.value?.type === 'driver_lastName') {
       const idx = currentQuestion.value.driverIndex
       formData.drivers[idx].lastName = capitalizeName(response)
+      fireGtmEvent(`Driver ${idx + 1} Name`)
 
       setTimeout(() => {
         const message = idx === 0
@@ -1181,6 +1250,7 @@ const processResponse = async (response) => {
       }
 
       formData.drivers[idx].dob = dob
+      fireGtmEvent(`Driver ${idx + 1} DOB`)
 
       setTimeout(() => {
         const message = idx === 0
@@ -1195,6 +1265,7 @@ const processResponse = async (response) => {
     if (currentQuestion.value?.type === 'driver_gender') {
       const idx = currentQuestion.value.driverIndex
       formData.drivers[idx].gender = normalizedResponse
+      fireGtmEvent(`Driver ${idx + 1} Gender`)
 
       setTimeout(() => {
         const message = idx === 0
@@ -1209,6 +1280,7 @@ const processResponse = async (response) => {
     if (currentQuestion.value?.type === 'driver_married') {
       const idx = currentQuestion.value.driverIndex
       formData.drivers[idx].married = normalizedResponse
+      fireGtmEvent(`Driver ${idx + 1} Married`)
 
       if (lowerResponse === 'yes') {
         addDiscount('Married Discount')
@@ -1219,7 +1291,7 @@ const processResponse = async (response) => {
             setTimeout(() => {
               // Fire midpoint event when military question shows up
               fireGtmEvent('midpoint')
-              addBotMessage(`Does anyone in your family have any military affiliation?`, false, ['Yes', 'No'])
+              addBotMessage(formData.drivers[idx].married === 'Yes' ? `Do you or your spouse have any military affiliation?` : `Do you have any military affiliation?`, false, ['Yes', 'No'])
               currentQuestion.value = { type: 'driver_military', driverIndex: idx }
             }, 800)
           } else {
@@ -1238,7 +1310,7 @@ const processResponse = async (response) => {
           setTimeout(() => {
             // Fire midpoint event when military question shows up
             fireGtmEvent('midpoint')
-            addBotMessage(`Does anyone in your family have any military affiliation?`, false, ['Yes', 'No'])
+            addBotMessage(formData.drivers[idx].married === 'Yes' ? `Do you or your spouse have any military affiliation?` : `Do you have any military affiliation?`, false, ['Yes', 'No'])
             currentQuestion.value = { type: 'driver_military', driverIndex: idx }
           }, 800)
         } else {
@@ -1257,6 +1329,7 @@ const processResponse = async (response) => {
     if (currentQuestion.value?.type === 'driver_military') {
       const idx = currentQuestion.value.driverIndex
       formData.drivers[idx].military = normalizedResponse
+      fireGtmEvent(`Driver ${idx + 1} Military`)
 
       if (lowerResponse === 'yes') {
         addDiscount('Military Discount')
@@ -1285,6 +1358,7 @@ const processResponse = async (response) => {
     if (currentQuestion.value?.type === 'driver_employed') {
       const idx = currentQuestion.value.driverIndex
       formData.drivers[idx].employed = normalizedResponse
+      fireGtmEvent(`Driver ${idx + 1} Employed`)
 
       // Check if there are more drivers to add
       if (idx < formData.drivers.length - 1) {
@@ -1307,6 +1381,7 @@ const processResponse = async (response) => {
   // Handle insurance step
   if (currentStep.value === 'insurance') {
     if (currentQuestion.value?.type === 'has_insurance') {
+      fireGtmEvent('Currently Insured')
       if (lowerResponse === 'yes') {
         addDiscount('Continuous Coverage Discount')
         setTimeout(() => {
@@ -1334,6 +1409,7 @@ const processResponse = async (response) => {
     if (currentQuestion.value?.type === 'current_company') {
       const matchedCompany = matchInsuranceCompany(response)
       formData.insurance.currentCompany = matchedCompany
+      fireGtmEvent('Insurance Company')
       // Use friendly text in message but store actual value
       const displayName = matchedCompany === 'Other' ? 'your current provider' : matchedCompany
 
@@ -1346,6 +1422,7 @@ const processResponse = async (response) => {
 
     if (currentQuestion.value?.type === 'coverage_length') {
       formData.insurance.coverageLength = response
+      fireGtmEvent('Continuous Coverage')
 
       if (response === '3-5 years' || response === '5+ years') {
         addDiscount('Loyalty Discount')
@@ -1364,6 +1441,7 @@ const processResponse = async (response) => {
   if (currentStep.value === 'contact') {
     if (currentQuestion.value?.type === 'email') {
       formData.contact.email = response
+      fireGtmEvent('Email')
 
       setTimeout(() => {
         addBotMessage(`What's your home address? This helps us find accurate rates for your area.`, true)
@@ -1389,6 +1467,7 @@ const processResponse = async (response) => {
             formData.contact.address = selectedSuggestion.mainText
           }
           addressSuggestionsData.value = []
+          fireGtmEvent('Address')
           askForPhone()
         })
       } else {
@@ -1408,6 +1487,7 @@ const processResponse = async (response) => {
             formData.contact.address = response
           }
           addressSuggestionsData.value = []
+          fireGtmEvent('Address')
           askForPhone()
         })
       }
@@ -1416,6 +1496,7 @@ const processResponse = async (response) => {
 
     if (currentQuestion.value?.type === 'phone') {
       formData.contact.phone = response
+      fireGtmEvent('Phone')
 
       setTimeout(() => {
         // Fire contact event when TCPA shows up
@@ -1531,7 +1612,7 @@ const repeatCurrentQuestion = () => {
       addBotMessage("How many vehicles would you like to insure?", false, ['1', '2', '3', '4+'])
       break
     case 'vehicle_year':
-      const recentYears = vehicleYears.slice(0, 6).map(String)
+      const recentYears = vehicleYears.slice(0, 8).map(String)
       addBotMessage(`What year is vehicle ${idx + 1}? You can also type the full vehicle like "2020 Honda Pilot".`, false, recentYears)
       break
     case 'vehicle_make':
@@ -1567,7 +1648,7 @@ const repeatCurrentQuestion = () => {
       addBotMessage(`Is ${formData.drivers[idx]?.firstName || 'the driver'} married?`, false, ['Yes', 'No'])
       break
     case 'driver_military':
-      addBotMessage(`Does anyone in your family have any military affiliation?`, false, ['Yes', 'No'])
+      addBotMessage(formData.drivers[idx]?.married === 'Yes' ? `Do you or your spouse have any military affiliation?` : `Do you have any military affiliation?`, false, ['Yes', 'No'])
       break
     case 'driver_employed':
       addBotMessage(`Is ${formData.drivers[idx]?.firstName || 'the driver'} currently employed?`, false, ['Yes', 'No'])
@@ -2174,6 +2255,34 @@ const submitToApi = async () => {
 
 .quick-reply-btn:hover {
   background-color: #eff6ff;
+}
+
+.quick-reply-hint {
+  display: flex;
+  align-items: center;
+  color: #6b7280;
+  font-size: 0.8rem;
+  white-space: nowrap;
+}
+
+.skip-vehicle-wrap {
+  margin-top: 0.5rem;
+}
+
+.skip-vehicle-btn {
+  padding: 0.5rem 1rem;
+  background: white;
+  border: 1.5px solid #d1d5db;
+  border-radius: 9999px;
+  color: #6b7280;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background-color 0.15s, border-color 0.15s;
+}
+
+.skip-vehicle-btn:hover {
+  background-color: #f9fafb;
+  border-color: #9ca3af;
 }
 
 /* Chat Input */
