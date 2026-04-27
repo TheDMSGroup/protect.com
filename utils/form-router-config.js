@@ -58,10 +58,11 @@ export const formRoutingRules = [
  * Assign users to test groups for comparison
  */
 export const AB_TEST_VARIANTS = {
-  A: 'chat-form',         // Control - full chat form
-  B: 'directtocall',      // Variant B - minimal phone form
-  C: 'forms-minimal',     // Variant C - minimal form under /form/
-  D: 'forms-detailed'     // Variant D - detailed form under /form/
+  A: 'chat-form',               // Control - full chat form
+  B: 'directtocall',            // Variant B - minimal phone form
+  C: 'forms-minimal',           // Variant C - minimal form under /form/
+  D: 'forms-detailed',          // Variant D - detailed form under /form/
+  'QUICKREDIRECT-1': 'forms-detailed'
 }
 
 /**
