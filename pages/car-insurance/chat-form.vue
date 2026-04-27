@@ -483,6 +483,7 @@ onMounted(() => {
 
   // Fire landing event on page load
   fireGtmEvent('landing')
+  fireGtmEvent('Get Started')
 
   // Check for previewfeed URL param to show mock results immediately
   const urlParams = new URLSearchParams(window.location.search)
@@ -642,6 +643,30 @@ const getOrdinal = (n) => {
   const v = n % 100
   return n + (s[(v - 20) % 10] || s[v] || s[0])
 }
+
+watch(currentQuestion, (newVal) => {
+  if (!newVal) return
+  const { type, vehicleIndex: vIdx = 0, driverIndex: dIdx = 0 } = newVal
+  switch (type) {
+    case 'vehicle_count':     fireGtmEvent('Vehicle Count'); break
+    case 'vehicle_year':      fireGtmEvent(`Vehicle ${vIdx + 1} Year`); break
+    case 'vehicle_make':      fireGtmEvent(`Vehicle ${vIdx + 1} Make`); break
+    case 'vehicle_model':     fireGtmEvent(`Vehicle ${vIdx + 1} Model`); break
+    case 'driver_count':      fireGtmEvent('Driver Count'); break
+    case 'driver_firstName':  fireGtmEvent(`Driver ${dIdx + 1} Name`); break
+    case 'driver_dob':        fireGtmEvent(`Driver ${dIdx + 1} DOB`); break
+    case 'driver_gender':     fireGtmEvent(`Driver ${dIdx + 1} Gender`); break
+    case 'driver_married':    fireGtmEvent(`Driver ${dIdx + 1} Married`); break
+    case 'driver_military':   fireGtmEvent('midpoint'); fireGtmEvent(`Driver ${dIdx + 1} Military`); break
+    case 'driver_employed':   fireGtmEvent(`Driver ${dIdx + 1} Employed`); break
+    case 'has_insurance':     fireGtmEvent('Currently Insured'); break
+    case 'current_company':   fireGtmEvent('Insurance Company'); break
+    case 'coverage_length':   fireGtmEvent('Continuous Coverage'); break
+    case 'email':             fireGtmEvent('Email'); break
+    case 'address':           fireGtmEvent('Address'); break
+    case 'phone':             fireGtmEvent('Phone'); break
+  }
+})
 
 const handleSkipVehicle = () => {
   const idx = currentQuestion.value?.vehicleIndex
@@ -820,7 +845,6 @@ const processResponse = async (response) => {
       return
     }
 
-    fireGtmEvent('Get Started')
     setTimeout(() => {
       addBotMessage("Great! Let's start with your vehicles. How many vehicles would you like to insure?", false, ['1', '2', '3', '4+'])
       currentStep.value = 'vehicles'
@@ -852,7 +876,6 @@ const processResponse = async (response) => {
         addDiscount('Multi-Vehicle Discount')
       }
 
-      fireGtmEvent('Vehicle Count')
       // Show recent years as quick replies
       const recentYears = vehicleYears.slice(0, 8).map(String)
       setTimeout(() => {
@@ -910,8 +933,6 @@ const processResponse = async (response) => {
           if (matchedMake) {
             formData.vehicles[idx].year = year.toString()
             formData.vehicles[idx].make = matchedMake
-            fireGtmEvent(`Vehicle ${idx + 1} Year`)
-            fireGtmEvent(`Vehicle ${idx + 1} Make`)
 
             if (model) {
               // Validate model against API
@@ -920,6 +941,7 @@ const processResponse = async (response) => {
 
               if (matchedModel) {
                 formData.vehicles[idx].model = matchedModel
+                fireGtmEvent(`Vehicle ${idx + 1} Make`)
                 fireGtmEvent(`Vehicle ${idx + 1} Model`)
 
                 // Check if there are more vehicles to add
@@ -980,7 +1002,6 @@ const processResponse = async (response) => {
             // Make not found, ask for make
             availableMakes.value = makes
             formData.vehicles[idx].year = year.toString()
-            fireGtmEvent(`Vehicle ${idx + 1} Year`)
             setTimeout(() => {
               addBotMessage(
                 `Got ${year}! I couldn't find "${make}" though. What make is your vehicle?`,
@@ -1000,7 +1021,6 @@ const processResponse = async (response) => {
 
         // Just year provided (no make/model text after)
         formData.vehicles[idx].year = year.toString()
-        fireGtmEvent(`Vehicle ${idx + 1} Year`)
       } else {
         // No pattern matched - try parsing as just a number
         let yearNum = parseInt(response)
@@ -1023,7 +1043,6 @@ const processResponse = async (response) => {
           return
         }
         formData.vehicles[idx].year = yearNum.toString()
-        fireGtmEvent(`Vehicle ${idx + 1} Year`)
       }
 
       // Fetch makes from API (show typing indicator while loading)
@@ -1071,7 +1090,6 @@ const processResponse = async (response) => {
       }
 
       formData.vehicles[idx].make = matchedMake
-      fireGtmEvent(`Vehicle ${idx + 1} Make`)
 
       // Fetch models from API (show typing indicator while loading)
       isTyping.value = true
@@ -1118,7 +1136,6 @@ const processResponse = async (response) => {
       }
 
       formData.vehicles[idx].model = matchedModel
-      fireGtmEvent(`Vehicle ${idx + 1} Model`)
 
       // Clear suggestions
       searchSuggestions.value = []
@@ -1162,7 +1179,6 @@ const processResponse = async (response) => {
         formData.drivers.push({ firstName: '', lastName: '', dob: '', gender: '', married: '', military: '', employed: '' })
       }
 
-      fireGtmEvent('Driver Count')
       setTimeout(() => {
         addBotMessage(`Great! What's your name?`)
         currentQuestion.value = { type: 'driver_firstName', driverIndex: 0 }
@@ -1193,7 +1209,6 @@ const processResponse = async (response) => {
         const lastName = capitalizeName(nameParts[1])
         formData.drivers[idx].firstName = firstName
         formData.drivers[idx].lastName = lastName
-        fireGtmEvent(`Driver ${idx + 1} Name`)
         setTimeout(() => {
           const message = idx === 0
             ? `Got it! What's your date of birth? (MM/DD/YYYY)`
@@ -1207,7 +1222,6 @@ const processResponse = async (response) => {
         const firstName = capitalizeName(nameParts.slice(0, -1).join(' '))
         formData.drivers[idx].firstName = firstName
         formData.drivers[idx].lastName = lastName
-        fireGtmEvent(`Driver ${idx + 1} Name`)
         setTimeout(() => {
           const message = idx === 0
             ? `Got it! What's your date of birth? (MM/DD/YYYY)`
@@ -1222,7 +1236,6 @@ const processResponse = async (response) => {
     if (currentQuestion.value?.type === 'driver_lastName') {
       const idx = currentQuestion.value.driverIndex
       formData.drivers[idx].lastName = capitalizeName(response)
-      fireGtmEvent(`Driver ${idx + 1} Name`)
 
       setTimeout(() => {
         const message = idx === 0
@@ -1250,7 +1263,6 @@ const processResponse = async (response) => {
       }
 
       formData.drivers[idx].dob = dob
-      fireGtmEvent(`Driver ${idx + 1} DOB`)
 
       setTimeout(() => {
         const message = idx === 0
@@ -1265,7 +1277,6 @@ const processResponse = async (response) => {
     if (currentQuestion.value?.type === 'driver_gender') {
       const idx = currentQuestion.value.driverIndex
       formData.drivers[idx].gender = normalizedResponse
-      fireGtmEvent(`Driver ${idx + 1} Gender`)
 
       setTimeout(() => {
         const message = idx === 0
@@ -1280,7 +1291,6 @@ const processResponse = async (response) => {
     if (currentQuestion.value?.type === 'driver_married') {
       const idx = currentQuestion.value.driverIndex
       formData.drivers[idx].married = normalizedResponse
-      fireGtmEvent(`Driver ${idx + 1} Married`)
 
       if (lowerResponse === 'yes') {
         addDiscount('Married Discount')
@@ -1289,8 +1299,6 @@ const processResponse = async (response) => {
           // Ask military question only for first driver
           if (idx === 0) {
             setTimeout(() => {
-              // Fire midpoint event when military question shows up
-              fireGtmEvent('midpoint')
               addBotMessage(formData.drivers[idx].married === 'Yes' ? `Do you or your spouse have any military affiliation?` : `Do you have any military affiliation?`, false, ['Yes', 'No'])
               currentQuestion.value = { type: 'driver_military', driverIndex: idx }
             }, 800)
@@ -1329,7 +1337,6 @@ const processResponse = async (response) => {
     if (currentQuestion.value?.type === 'driver_military') {
       const idx = currentQuestion.value.driverIndex
       formData.drivers[idx].military = normalizedResponse
-      fireGtmEvent(`Driver ${idx + 1} Military`)
 
       if (lowerResponse === 'yes') {
         addDiscount('Military Discount')
@@ -1358,7 +1365,6 @@ const processResponse = async (response) => {
     if (currentQuestion.value?.type === 'driver_employed') {
       const idx = currentQuestion.value.driverIndex
       formData.drivers[idx].employed = normalizedResponse
-      fireGtmEvent(`Driver ${idx + 1} Employed`)
 
       // Check if there are more drivers to add
       if (idx < formData.drivers.length - 1) {
@@ -1381,7 +1387,6 @@ const processResponse = async (response) => {
   // Handle insurance step
   if (currentStep.value === 'insurance') {
     if (currentQuestion.value?.type === 'has_insurance') {
-      fireGtmEvent('Currently Insured')
       if (lowerResponse === 'yes') {
         addDiscount('Continuous Coverage Discount')
         setTimeout(() => {
@@ -1409,7 +1414,6 @@ const processResponse = async (response) => {
     if (currentQuestion.value?.type === 'current_company') {
       const matchedCompany = matchInsuranceCompany(response)
       formData.insurance.currentCompany = matchedCompany
-      fireGtmEvent('Insurance Company')
       // Use friendly text in message but store actual value
       const displayName = matchedCompany === 'Other' ? 'your current provider' : matchedCompany
 
@@ -1422,7 +1426,6 @@ const processResponse = async (response) => {
 
     if (currentQuestion.value?.type === 'coverage_length') {
       formData.insurance.coverageLength = response
-      fireGtmEvent('Continuous Coverage')
 
       if (response === '3-5 years' || response === '5+ years') {
         addDiscount('Loyalty Discount')
@@ -1441,7 +1444,6 @@ const processResponse = async (response) => {
   if (currentStep.value === 'contact') {
     if (currentQuestion.value?.type === 'email') {
       formData.contact.email = response
-      fireGtmEvent('Email')
 
       setTimeout(() => {
         addBotMessage(`What's your home address? This helps us find accurate rates for your area.`, true)
@@ -1467,7 +1469,6 @@ const processResponse = async (response) => {
             formData.contact.address = selectedSuggestion.mainText
           }
           addressSuggestionsData.value = []
-          fireGtmEvent('Address')
           askForPhone()
         })
       } else {
@@ -1487,7 +1488,6 @@ const processResponse = async (response) => {
             formData.contact.address = response
           }
           addressSuggestionsData.value = []
-          fireGtmEvent('Address')
           askForPhone()
         })
       }
@@ -1496,7 +1496,6 @@ const processResponse = async (response) => {
 
     if (currentQuestion.value?.type === 'phone') {
       formData.contact.phone = response
-      fireGtmEvent('Phone')
 
       setTimeout(() => {
         // Fire contact event when TCPA shows up
