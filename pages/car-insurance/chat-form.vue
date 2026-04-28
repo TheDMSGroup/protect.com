@@ -121,6 +121,7 @@
               >
                 {{ suggestion }}
               </button>
+              <span v-if="currentQuestion?.type === 'current_company'" class="quick-reply-hint">or type a provider below</span>
             </div>
 
             <!-- Skip vehicle button -->
@@ -389,6 +390,12 @@ const generateTcpaContent = async () => {
   // Store plain text version for API submission
   tcpaDisclosure.value = `By clicking "${buttonText}", I provide my express consent via e-signature to be contacted, for marketing purposes, by or on behalf of Protect.com partners, by telephone, which may include artificial, generative AI, or pre-recorded voice messages and/or SMS text messages, delivered via automatic telephone dialing system at the number I provided regarding ${vertical} offers, even if my number is on a Federal, State or Company Do Not Call list. I also represent that I am the subscriber and primary user of the telephone number that I have provided above. I understand that my consent is not required to make a purchase or obtain services and that I may opt-out at any time. In order to proceed without providing consent, skip. I certify that I am a US resident over 18, and I agree to the Privacy Policy and Terms & Conditions. I understand and agree that third parties, including, but not limited to, Jornaya and Active Prospect are being employed to monitor my activity on this website today.`
 }
+
+const isValidNamePart = (name) =>
+  /^[a-zA-Z''\-]+$/.test(name) && name.replace(/[^a-zA-Z]/g, '').length >= 2
+
+const isValidChoice = (response, choices) =>
+  choices.map(c => c.toLowerCase()).includes(response.trim().toLowerCase())
 
 // Capitalize first letter of each word in a name
 const capitalizeName = (name) => {
@@ -1192,6 +1199,14 @@ const processResponse = async (response) => {
       // Parse name - check if user provided multiple words (first + last name)
       const nameParts = response.trim().split(/\s+/).filter(part => part.length > 0)
 
+      const invalidPart = nameParts.find(p => !isValidNamePart(p))
+      if (invalidPart || nameParts.length === 0) {
+        setTimeout(() => {
+          addBotMessage(`Please enter a valid name using letters only (at least 2 characters per name).`)
+        }, 400)
+        return
+      }
+
       if (nameParts.length === 1) {
         // Single word - just first name, ask for last name
         const firstName = capitalizeName(nameParts[0])
@@ -1235,6 +1250,14 @@ const processResponse = async (response) => {
 
     if (currentQuestion.value?.type === 'driver_lastName') {
       const idx = currentQuestion.value.driverIndex
+
+      if (!isValidNamePart(response.trim())) {
+        setTimeout(() => {
+          addBotMessage(`Please enter a valid last name using letters only (at least 2 characters).`)
+        }, 400)
+        return
+      }
+
       formData.drivers[idx].lastName = capitalizeName(response)
 
       setTimeout(() => {
@@ -1253,13 +1276,40 @@ const processResponse = async (response) => {
       // Parse and potentially expand 2-digit year in DOB
       let dob = response
       const dobParts = response.split('/')
-      if (dobParts.length === 3) {
-        let year = parseInt(dobParts[2])
-        // If 2-digit year, expand it for age context
-        if (year >= 0 && year <= 99) {
-          year = expandTwoDigitYear(year, 'age')
-          dob = `${dobParts[0]}/${dobParts[1]}/${year}`
-        }
+      if (dobParts.length !== 3) {
+        setTimeout(() => {
+          addBotMessage(`Please enter a valid date of birth in MM/DD/YYYY format.`)
+        }, 400)
+        return
+      }
+
+      let dobYear = parseInt(dobParts[2])
+      const dobMonth = parseInt(dobParts[0])
+      const dobDay = parseInt(dobParts[1])
+
+      if (isNaN(dobMonth) || isNaN(dobDay) || isNaN(dobYear)) {
+        setTimeout(() => {
+          addBotMessage(`Please enter a valid date of birth in MM/DD/YYYY format.`)
+        }, 400)
+        return
+      }
+
+      if (dobYear >= 0 && dobYear <= 99) {
+        dobYear = expandTwoDigitYear(dobYear, 'age')
+      }
+
+      dob = `${dobParts[0]}/${dobParts[1]}/${dobYear}`
+
+      const birthDate = new Date(dobYear, dobMonth - 1, dobDay)
+      const today = new Date()
+      const age = today.getFullYear() - birthDate.getFullYear() -
+        (today < new Date(today.getFullYear(), birthDate.getMonth(), birthDate.getDate()) ? 1 : 0)
+
+      if (age < 18) {
+        setTimeout(() => {
+          addBotMessage(`Drivers must be at least 18 years old to get a quote.`)
+        }, 400)
+        return
       }
 
       formData.drivers[idx].dob = dob
@@ -1276,6 +1326,10 @@ const processResponse = async (response) => {
 
     if (currentQuestion.value?.type === 'driver_gender') {
       const idx = currentQuestion.value.driverIndex
+      if (!isValidChoice(normalizedResponse, ['Male', 'Female'])) {
+        setTimeout(() => { addBotMessage(`Please select Male or Female.`, false, ['Male', 'Female']) }, 400)
+        return
+      }
       formData.drivers[idx].gender = normalizedResponse
 
       setTimeout(() => {
@@ -1290,6 +1344,10 @@ const processResponse = async (response) => {
 
     if (currentQuestion.value?.type === 'driver_married') {
       const idx = currentQuestion.value.driverIndex
+      if (!isValidChoice(normalizedResponse, ['Yes', 'No'])) {
+        setTimeout(() => { addBotMessage(`Please answer Yes or No.`, false, ['Yes', 'No']) }, 400)
+        return
+      }
       formData.drivers[idx].married = normalizedResponse
 
       if (lowerResponse === 'yes') {
@@ -1336,6 +1394,10 @@ const processResponse = async (response) => {
 
     if (currentQuestion.value?.type === 'driver_military') {
       const idx = currentQuestion.value.driverIndex
+      if (!isValidChoice(normalizedResponse, ['Yes', 'No'])) {
+        setTimeout(() => { addBotMessage(`Please answer Yes or No.`, false, ['Yes', 'No']) }, 400)
+        return
+      }
       formData.drivers[idx].military = normalizedResponse
 
       if (lowerResponse === 'yes') {
@@ -1364,6 +1426,10 @@ const processResponse = async (response) => {
 
     if (currentQuestion.value?.type === 'driver_employed') {
       const idx = currentQuestion.value.driverIndex
+      if (!isValidChoice(normalizedResponse, ['Yes', 'No'])) {
+        setTimeout(() => { addBotMessage(`Please answer Yes or No.`, false, ['Yes', 'No']) }, 400)
+        return
+      }
       formData.drivers[idx].employed = normalizedResponse
 
       // Check if there are more drivers to add
@@ -1387,6 +1453,10 @@ const processResponse = async (response) => {
   // Handle insurance step
   if (currentStep.value === 'insurance') {
     if (currentQuestion.value?.type === 'has_insurance') {
+      if (!isValidChoice(normalizedResponse, ['Yes', 'No'])) {
+        setTimeout(() => { addBotMessage(`Please answer Yes or No.`, false, ['Yes', 'No']) }, 400)
+        return
+      }
       if (lowerResponse === 'yes') {
         addDiscount('Continuous Coverage Discount')
         setTimeout(() => {
@@ -1443,7 +1513,15 @@ const processResponse = async (response) => {
   // Handle contact step
   if (currentStep.value === 'contact') {
     if (currentQuestion.value?.type === 'email') {
-      formData.contact.email = response
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+      if (!emailRegex.test(response.trim()) || /\p{Emoji_Presentation}/u.test(response)) {
+        setTimeout(() => {
+          addBotMessage(`Please enter a valid email address.`)
+        }, 400)
+        return
+      }
+
+      formData.contact.email = response.trim()
 
       setTimeout(() => {
         addBotMessage(`What's your home address? This helps us find accurate rates for your area.`, true)
@@ -1453,6 +1531,10 @@ const processResponse = async (response) => {
     }
 
     if (currentQuestion.value?.type === 'address') {
+      if (/\p{Emoji_Presentation}/u.test(response)) {
+        setTimeout(() => { addBotMessage(`Please enter a valid street address.`) }, 400)
+        return
+      }
       // Check if user selected from suggestions (match by full description)
       const selectedSuggestion = addressSuggestionsData.value.find(s => s.description === response)
 
@@ -1472,29 +1554,23 @@ const processResponse = async (response) => {
           askForPhone()
         })
       } else {
-        // User typed their own address, validate it
-        getAddressSuggestions(response).then(async (suggestions) => {
-          if (suggestions.length > 0) {
-            const details = await getPlaceDetails(suggestions[0].placeId)
-            if (details) {
-              formData.contact.address = details.formattedAddress
-              if (details.city) formData.contact.city = details.city
-              if (details.state) formData.contact.state = details.state
-              if (details.zipcode) formData.contact.zipcode = details.zipcode
-            } else {
-              formData.contact.address = response
-            }
-          } else {
-            formData.contact.address = response
-          }
-          addressSuggestionsData.value = []
-          askForPhone()
-        })
+        setTimeout(() => {
+          addBotMessage(`Please select an address from the suggestions that appear as you type.`)
+        }, 400)
       }
       return
     }
 
     if (currentQuestion.value?.type === 'phone') {
+      const digits = response.replace(/\D/g, '')
+      const isValidPhone = digits.length >= 10 &&
+        !['0', '1'].includes(digits[0]) &&
+        !/^(\d)\1+$/.test(digits) &&
+        !/\p{Emoji_Presentation}/u.test(response)
+      if (!isValidPhone) {
+        setTimeout(() => { addBotMessage(`Please enter a valid US phone number.`) }, 400)
+        return
+      }
       formData.contact.phone = response
 
       setTimeout(() => {
@@ -1713,12 +1789,19 @@ const submitToApi = async () => {
     const rtclid = urlParams.get('rtclid') || window.rtClickId || null;
 
     // Build the payload from form data
-    const payload = buildLeadPayload(formData, {
+    const stripEmojis = (val) => {
+      if (typeof val === 'string') return val.replace(/\p{Emoji_Presentation}/gu, '').trim()
+      if (Array.isArray(val)) return val.map(stripEmojis)
+      if (val && typeof val === 'object') return Object.fromEntries(Object.entries(val).map(([k, v]) => [k, stripEmojis(v)]))
+      return val
+    }
+
+    const payload = stripEmojis(buildLeadPayload(formData, {
       rtclid,
       trustedFormCertId: getCertificateId(),
       universalLeadId: getLeadToken(),
       tcpaDisclosure: tcpaSkipped.value ? '' : tcpaDisclosure.value
-    })
+    }))
 
     let result
     if (useMockData) {
