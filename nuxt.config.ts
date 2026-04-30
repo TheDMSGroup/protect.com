@@ -83,6 +83,8 @@ export default defineNuxtConfig({
       process.env.GRAPHQL_API_URL ||
       "https://us-west-2.cdn.hygraph.com/content/ckwzg7tk528a001z4e7z0bqi0/master",
     mastodonApiKey: process.env.MASTODON_API_KEY || "",
+    statsigServerKey: process.env.STATSIG_SERVER_KEY || "secret-lFAqVManeHJSPqANwLpGYTBH3v553hfbNvskad81Yd7",
+
     // Google Sheets API configuration
     statesSpreadsheetId: "1qjb3pBf2-jVhJna5tF884OzjJaCo5LdUIy0EsCatjc4",
     vehiclesSpreadsheetId: "1gpwj9rK5vNYeCfkdFwpdGCEgZBWGe8u27EMdVEbRlac",
@@ -90,6 +92,7 @@ export default defineNuxtConfig({
     googleSheetsApiKey: process.env.GOOGLE_SHEETS_API_KEY || "AIzaSyB3Kx7qlcuuX4HxgugR64o0XcNa-6M6hhc",
     // Public keys (exposed to client-side)
     public: {
+      statsigClientKey: process.env.STATSIG_CLIENT_KEY || "client-etrqmWcZl9seLVvDO1ScxuTbIutSre9EhfJXNtHMT6o",
       statesRange: "Sheet1!A:Z",
       vehiclesMakesRange: "Makes!A:Z",
       vehiclesModelsRange: "Models!A:Z",
