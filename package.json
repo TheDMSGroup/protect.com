@@ -16,6 +16,7 @@
     "@nuxt/scripts": "^0.13.0",
     "@nuxtjs/sitemap": "^7.4.7",
     "@pinia/nuxt": "^0.11.3",
+    "@statsig/js-client": "^3.33.0",
     "@unhead/ssr": "^2.0.19",
     "@unhead/vue": "^2.0.19",
     "axios": "^1.13.2",
