@@ -92,12 +92,17 @@ export const generateRedirectUrl = (route, paramsToAppend) => {
 };
 
 // ueidUrls: optional map of ueid values to URLs, e.g. { 'abc123': 'https://other.com' }
-export const redirectWithParams = (route, { ...paramsToAppend }, ueidUrls = {}) => {
+export const redirectWithParams = (route, { ...paramsToAppend }, ueidUrls = {}, newTab = true) => {
   const store = useStore();
   const ueid = store.visitorInfo?.ueid;
   const resolvedRoute = (ueid && ueidUrls[ueid]) ? ueidUrls[ueid] : route;
+  const url = generateRedirectUrl(resolvedRoute, paramsToAppend);
 
-  window.open(generateRedirectUrl(resolvedRoute, paramsToAppend), "_blank");
+  if (newTab) {
+    window.open(url, "_blank");
+  } else {
+    window.location.href = url;
+  }
 };
 
 export const updateMetaData = (tags = {}) => {

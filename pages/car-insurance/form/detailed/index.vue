@@ -91,7 +91,7 @@ const selectYear = (year) => {
     year,
   }
 
-  redirectWithParams("https://insure.protect.com", options);
+  redirectWithParams("https://insure.protect.com", options, {}, false);
 }
 </script>
 

@@ -58,7 +58,7 @@ const selectInsured = (value) => {
     ...route.query,
     insured: value,
     ...(ga4SessionId.value && { ga_session: ga4SessionId.value }),
-  })
+  }, {}, false)
 }
 </script>
 
