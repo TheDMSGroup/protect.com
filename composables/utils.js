@@ -43,8 +43,10 @@ export const generateRedirectUrl = (route, paramsToAppend) => {
   // Special fallback for rtclid - check multiple sources if not in store
   if (!paramsToAppend.rtclid && typeof window !== 'undefined') {
     const urlParams = new URLSearchParams(window.location.search);
+    const cookieMatch = document.cookie.match(/(?:^|; )rtkclickid-store=([^;]*)/);
     const rtclid = urlParams.get('rtkclid') ||
                    sessionStorage.getItem('rtkclickid') ||
+                   (cookieMatch ? decodeURIComponent(cookieMatch[1]) : null) ||
                    window.rtkClickID ||
                    window.rtCookie ||
                    null;
