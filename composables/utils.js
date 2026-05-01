@@ -40,6 +40,16 @@ export const generateRedirectUrl = (route, paramsToAppend) => {
     }
   });
 
+  // Fallback for statsig_sid - read from Statsig's localStorage entry if not in store yet
+  if (!paramsToAppend.statsig_sid && typeof window !== 'undefined') {
+    const lsKey = Object.keys(localStorage).find(k => k.startsWith('statsig.stable_id.'));
+    const statsig_sid = lsKey ? JSON.parse(localStorage.getItem(lsKey)) : null;
+    if (statsig_sid) {
+      paramsToAppend.statsig_sid = statsig_sid;
+      store.setVisitorInfo({ statsig_sid });
+    }
+  }
+
   // Special fallback for rtclid - check multiple sources if not in store
   if (!paramsToAppend.rtclid && typeof window !== 'undefined') {
     const urlParams = new URLSearchParams(window.location.search);
