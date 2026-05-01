@@ -1,5 +1,6 @@
 import { StatsigClient } from '@statsig/js-client'
 import { runStatsigAutoCapture } from '@statsig/web-analytics'
+import { useStore } from '~/stores/store'
 
 export default defineNuxtPlugin(async (nuxtApp) => {
   const config = useRuntimeConfig()
@@ -9,6 +10,11 @@ export default defineNuxtPlugin(async (nuxtApp) => {
   await client.initializeAsync()
 
   runStatsigAutoCapture(client)
+
+  if (client.stableID) {
+    const store = useStore()
+    store.setVisitorInfo({ statsig_sid: client.stableID })
+  }
 
   nuxtApp.provide('statsig', {
     checkGate: (name: string) => client.checkGate(name),

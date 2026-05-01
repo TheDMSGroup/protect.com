@@ -26,7 +26,7 @@ export const preprocessTextForLinks = (fullText, linkData, className = "") => {
 const TRACKING_PARAMS = [
   'gclid', 'msclkid', 'fbc', 'fbp', 'fbclid', 'clickid', 'rtclid',
   'campaignid', 'ueid', 'variant', 'referrer', 'adgroupid', 'accountid',
-  'targetid', 'gbraid', 'wbraid', 'segment', 'mst',
+  'targetid', 'gbraid', 'wbraid', 'segment', 'mst', 'statsig_sid',
   'utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term'
 ];
 
