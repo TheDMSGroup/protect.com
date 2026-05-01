@@ -82,7 +82,7 @@ const selectInsured = (value) => {
     </header>
 
     <!-- Main -->
-    <div class="regionMain">
+    <main class="regionMain">
       <div class="container-fluid">
         <div class="stack">
 
@@ -158,7 +158,7 @@ const selectInsured = (value) => {
 
         </div>
       </div>
-    </div>
+    </main>
 
     <!-- Footer -->
     <footer class="regionFooter">
@@ -379,7 +379,7 @@ form {
   margin: 50px auto 0;
   text-align: center;
   font-size: 13px;
-  color: #888;
+  color: #666;
 }
 
 #footer-disclaimer p {
@@ -388,7 +388,7 @@ form {
 }
 
 .regionFooter a {
-  color: #888;
+  color: #666;
   text-decoration: none;
 }
 
