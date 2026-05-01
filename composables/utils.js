@@ -52,6 +52,7 @@ export const generateRedirectUrl = (route, paramsToAppend) => {
                    null;
     if (rtclid) {
       paramsToAppend.rtclid = rtclid;
+      store.setVisitorInfo({ rtclid });
     }
   }
 
