@@ -1,23 +1,14 @@
 import { StatsigClient } from '@statsig/js-client'
+import { runStatsigAutoCapture } from '@statsig/web-analytics'
 
 export default defineNuxtPlugin(async (nuxtApp) => {
   const config = useRuntimeConfig()
   if (!config.public.statsigClientKey) return
 
-  const state = useState<{ bootstrapValues: object; user: { userID: string } } | null>('statsig', () => null)
-  const { bootstrapValues, user } = state.value ?? { bootstrapValues: null, user: { userID: `anon-${crypto.randomUUID()}` } }
+  const client = new StatsigClient(config.public.statsigClientKey, {})
+  await client.initializeAsync()
 
-  const client = new StatsigClient(
-    config.public.statsigClientKey,
-    user,
-    bootstrapValues ? { initializeValues: bootstrapValues } : {}
-  )
-
-  if (bootstrapValues) {
-    client.initializeSync()
-  } else {
-    await client.initializeAsync()
-  }
+  runStatsigAutoCapture(client)
 
   nuxtApp.provide('statsig', {
     checkGate: (name: string) => client.checkGate(name),
