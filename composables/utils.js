@@ -26,7 +26,7 @@ export const preprocessTextForLinks = (fullText, linkData, className = "") => {
 const TRACKING_PARAMS = [
   'gclid', 'msclkid', 'fbc', 'fbp', 'fbclid', 'clickid', 'rtclid',
   'campaignid', 'ueid', 'variant', 'referrer', 'adgroupid', 'accountid',
-  'targetid', 'gbraid', 'wbraid', 'segment', 'mst',
+  'targetid', 'gbraid', 'wbraid', 'segment', 'mst', 'statsig_sid',
   'utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term'
 ];
 
@@ -39,6 +39,16 @@ export const generateRedirectUrl = (route, paramsToAppend) => {
       paramsToAppend[param] = store.visitorInfo[param];
     }
   });
+
+  // Fallback for statsig_sid - read from Statsig's localStorage entry if not in store yet
+  if (!paramsToAppend.statsig_sid && typeof window !== 'undefined') {
+    const lsKey = Object.keys(localStorage).find(k => k.startsWith('statsig.stable_id.'));
+    const statsig_sid = lsKey ? JSON.parse(localStorage.getItem(lsKey)) : null;
+    if (statsig_sid) {
+      paramsToAppend.statsig_sid = statsig_sid;
+      store.setVisitorInfo({ statsig_sid });
+    }
+  }
 
   // Special fallback for rtclid - check multiple sources if not in store
   if (!paramsToAppend.rtclid && typeof window !== 'undefined') {
