@@ -12,7 +12,6 @@ definePageMeta({
 
 useHead({
   script: [
-    { innerHTML: `try{window.rtclid=sessionStorage.getItem('rtkclickid')}catch(e){}` },
     { src: 'https://rttracking.protect.com/uniclick.js?attribution=lastpaid&cookiedomain=protect.com&cookieduration=90&defaultcampaignid=68c9bcd22af551454ef88733&regviewonce=false', async: true },
   ],
 })

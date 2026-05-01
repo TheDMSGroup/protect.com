@@ -13,7 +13,6 @@ useHead({
     { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css2?family=Google+Sans+Flex:wght@400;600;700&display=swap' },
   ],
   script: [
-    { innerHTML: `try{window.rtclid=sessionStorage.getItem('rtkclickid')}catch(e){}` },
     { src: 'https://rttracking.protect.com/uniclick.js?attribution=lastpaid&cookiedomain=protect.com&cookieduration=90&defaultcampaignid=68c9bcd22af551454ef88733&regviewonce=false', async: true },
   ],
 })
@@ -51,15 +50,14 @@ onMounted(() => {
       }
     }, 100)
   }
+
 })
 
 const selectInsured = (value) => {
-  const rtclid = sessionStorage.getItem('rtkclickid')
   redirectWithParams('https://deals.protect.com', {
     ...route.query,
     insured: value,
     ...(ga4SessionId.value && { ga_session: ga4SessionId.value }),
-    ...(rtclid && { rtclid }),
   })
 }
 </script>
