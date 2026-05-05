@@ -67,6 +67,21 @@ export default defineNuxtRouteMiddleware((to) => {
     return;
   }
 
+  // Detect in-app browser
+  if (import.meta.client && !visitorInfoFromStore.inAppBrowser) {
+    const ua = navigator.userAgent;
+    const IAB_PATTERNS = [
+      { name: 'facebook',  pattern: /FBAN|FBAV|FB_IAB|FB4A|FBIOS/ },
+      { name: 'instagram', pattern: /Instagram/ },
+      { name: 'tiktok',   pattern: /musical_ly|TikTok/ },
+      { name: 'twitter',  pattern: /Twitter/ },
+      { name: 'snapchat', pattern: /Snapchat/ },
+      { name: 'linkedin', pattern: /LinkedInApp/ },
+    ];
+    const match = IAB_PATTERNS.find(({ pattern }) => pattern.test(ua));
+    if (match) store.setVisitorInfo({ inAppBrowser: match.name });
+  }
+
   // Fallback: detect referrer if no ueid
   if (!visitorInfoFromStore.ueid && !cookies.ueid.value) {
     const referrerParam = to.query.referrer;
