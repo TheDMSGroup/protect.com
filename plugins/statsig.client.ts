@@ -6,7 +6,9 @@ export default defineNuxtPlugin(async (nuxtApp) => {
   const config = useRuntimeConfig()
   if (!config.public.statsigClientKey) return
 
-  const client = new StatsigClient(config.public.statsigClientKey, {})
+  const client = new StatsigClient(config.public.statsigClientKey, {}, {
+    environment: { tier: import.meta.dev ? 'development' : 'production' },
+  })
   await client.initializeAsync()
 
   runStatsigAutoCapture(client)
