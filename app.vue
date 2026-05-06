@@ -10,6 +10,7 @@ if (import.meta.server) {
 } else if (import.meta.client) {
   // Client-side: use window
   isDev = window.location.hostname.startsWith('dev.')
+  console.log('[env]', import.meta.dev ? 'development' : 'production', '| hostname:', window.location.hostname)
 }
 
 useHead({
