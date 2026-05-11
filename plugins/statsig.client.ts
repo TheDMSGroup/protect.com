@@ -16,6 +16,8 @@ export default defineNuxtPlugin(async (nuxtApp) => {
   if (client.stableID) {
     const store = useStore()
     store.setVisitorInfo({ statsig_sid: client.stableID })
+
+    document.cookie = `sig_uid=${client.stableID}; path=/; max-age=${60 * 60 * 24}`
   }
 
   nuxtApp.provide('statsig', {
