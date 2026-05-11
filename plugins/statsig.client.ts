@@ -3,6 +3,8 @@ import { runStatsigAutoCapture } from '@statsig/web-analytics'
 import { useStore } from '~/stores/store'
 
 export default defineNuxtPlugin(async (nuxtApp) => {
+  return // temporarily disabled
+
   const config = useRuntimeConfig()
   if (!config.public.statsigClientKey) return
 
