@@ -18,7 +18,7 @@ useHead({
   ],
 })
 
-const { proxy: ga } = useScriptGoogleAnalytics({ id: 'G-NGMYQLELL2' }, { trigger: 'onNuxtReady' })
+const { proxy: ga } = useScriptGoogleAnalytics({ id: 'G-NGMYQLELL2' }, { trigger: 'onNuxtReady' }) ?? {}
 
 const route = useRoute()
 const ga4SessionId = ref(null)
@@ -33,13 +33,13 @@ const getGA4SessionId = () => {
 }
 
 onMounted(() => {
-  ga.gtag('event', 'Pre Landing',
+  ga?.gtag('event', 'Pre Landing',
     {
       ueid: store.visitorInfo.ueid,
       variant: store.visitorInfo.variant
     }
   );
-  ga.gtag('event', 'page_view',
+  ga?.gtag('event', 'page_view',
     {
       ueid: store.visitorInfo.ueid,
       variant: store.visitorInfo.variant
@@ -67,7 +67,7 @@ onMounted(() => {
 
 const selectInsured = (value) => {
 
-  ga.gtag('event', 'Insured', {
+  ga?.gtag('event', 'Insured', {
     insured: value,
     ueid: store.visitorInfo.ueid,
     variant: store.visitorInfo.variant

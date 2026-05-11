@@ -10,7 +10,7 @@ useHead({
   link: [{ rel: 'preload', href: '/assets/protect_logo.svg', as: 'image' }]
 })
 
-const { proxy: ga } = useScriptGoogleAnalytics({ id: 'G-NGMYQLELL2' }, { trigger: 'onNuxtReady' })
+const { proxy: ga } = useScriptGoogleAnalytics({ id: 'G-NGMYQLELL2' }, { trigger: 'onNuxtReady' }) ?? {}
 
 const store = useStore()
 const currentStep = ref(1)
@@ -31,13 +31,13 @@ onNuxtReady(() => {
 })
 
 onMounted(() => {
-  ga.gtag('event', 'Pre Landing',
+  ga?.gtag('event', 'Pre Landing',
     {
       ueid: store.visitorInfo.ueid,
       variant: store.visitorInfo.variant,
     }
   );
-  ga.gtag('event', 'page_view', {
+  ga?.gtag('event', 'page_view', {
     ueid: store.visitorInfo.ueid,
     variant: store.visitorInfo.variant,
   });
@@ -93,7 +93,7 @@ const years = computed(() => {
 
 const selectYear = (year) => {
   formData.value.vehicleYear = year
-  ga.gtag('event', 'Year Selected', {
+  ga?.gtag('event', 'Year Selected', {
     vehicle_year: year,
     ueid: store.visitorInfo.ueid,
     variant: store.visitorInfo.variant

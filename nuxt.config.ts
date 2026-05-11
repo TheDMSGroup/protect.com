@@ -1,3 +1,9 @@
+import { execSync } from 'child_process'
+
+const gitHash = (() => {
+  try { return execSync('git rev-parse --short HEAD').toString().trim() } catch { return 'unknown' }
+})()
+
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   compatibilityDate: "2025-07-15",
@@ -92,6 +98,7 @@ export default defineNuxtConfig({
     googleSheetsApiKey: process.env.GOOGLE_SHEETS_API_KEY || "AIzaSyB3Kx7qlcuuX4HxgugR64o0XcNa-6M6hhc",
     // Public keys (exposed to client-side)
     public: {
+      gitHash,
       statsigClientKey: process.env.STATSIG_CLIENT_KEY || "client-etrqmWcZl9seLVvDO1ScxuTbIutSre9EhfJXNtHMT6o",
       statesRange: "Sheet1!A:Z",
       vehiclesMakesRange: "Makes!A:Z",
