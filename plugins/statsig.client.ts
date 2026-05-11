@@ -1,0 +1,32 @@
+import { StatsigClient } from '@statsig/js-client'
+import { runStatsigAutoCapture } from '@statsig/web-analytics'
+import { useStore } from '~/stores/store'
+
+export default defineNuxtPlugin(async (nuxtApp) => {
+  return // temporarily disabled
+
+  const config = useRuntimeConfig()
+  if (!config.public.statsigClientKey) return
+
+  const client = new StatsigClient(config.public.statsigClientKey, {}, {
+    environment: { tier: import.meta.dev ? 'development' : 'production' },
+  })
+  await client.initializeAsync()
+
+  runStatsigAutoCapture(client)
+
+  if (client.stableID) {
+    const store = useStore()
+    store.setVisitorInfo({ statsig_sid: client.stableID })
+
+    document.cookie = `sig_uid=${client.stableID}; path=/; max-age=${60 * 60 * 24}`
+  }
+
+  nuxtApp.provide('statsig', {
+    checkGate: (name: string) => client.checkGate(name),
+    getExperiment: (name: string) => client.getExperiment(name),
+    getDynamicConfig: (name: string) => client.getDynamicConfig(name),
+    logEvent: (name: string, value?: string | number, metadata?: Record<string, string>) =>
+      client.logEvent(name, value, metadata),
+  })
+})

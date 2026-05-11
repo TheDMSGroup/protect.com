@@ -26,7 +26,7 @@ export const preprocessTextForLinks = (fullText, linkData, className = "") => {
 const TRACKING_PARAMS = [
   'gclid', 'msclkid', 'fbc', 'fbp', 'fbclid', 'clickid', 'rtclid',
   'campaignid', 'ueid', 'variant', 'referrer', 'adgroupid', 'accountid',
-  'targetid', 'gbraid', 'wbraid', 'segment', 'mst',
+  'targetid', 'gbraid', 'wbraid', 'segment', 'mst', 'statsig_sid',
   'utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term'
 ];
 
@@ -40,16 +40,29 @@ export const generateRedirectUrl = (route, paramsToAppend) => {
     }
   });
 
+  // Fallback for statsig_sid - read from Statsig's localStorage entry if not in store yet
+  if (!paramsToAppend.statsig_sid && typeof window !== 'undefined') {
+    const lsKey = Object.keys(localStorage).find(k => k.startsWith('statsig.stable_id.'));
+    const statsig_sid = lsKey ? JSON.parse(localStorage.getItem(lsKey)) : null;
+    if (statsig_sid) {
+      paramsToAppend.statsig_sid = statsig_sid;
+      store.setVisitorInfo({ statsig_sid });
+    }
+  }
+
   // Special fallback for rtclid - check multiple sources if not in store
   if (!paramsToAppend.rtclid && typeof window !== 'undefined') {
     const urlParams = new URLSearchParams(window.location.search);
+    const cookieMatch = document.cookie.match(/(?:^|; )rtkclickid-store=([^;]*)/);
     const rtclid = urlParams.get('rtkclid') ||
                    sessionStorage.getItem('rtkclickid') ||
+                   (cookieMatch ? decodeURIComponent(cookieMatch[1]) : null) ||
                    window.rtkClickID ||
                    window.rtCookie ||
                    null;
     if (rtclid) {
       paramsToAppend.rtclid = rtclid;
+      store.setVisitorInfo({ rtclid });
     }
   }
 
@@ -89,12 +102,17 @@ export const generateRedirectUrl = (route, paramsToAppend) => {
 };
 
 // ueidUrls: optional map of ueid values to URLs, e.g. { 'abc123': 'https://other.com' }
-export const redirectWithParams = (route, { ...paramsToAppend }, ueidUrls = {}) => {
+export const redirectWithParams = (route, { ...paramsToAppend }, ueidUrls = {}, newTab = true) => {
   const store = useStore();
   const ueid = store.visitorInfo?.ueid;
   const resolvedRoute = (ueid && ueidUrls[ueid]) ? ueidUrls[ueid] : route;
+  const url = generateRedirectUrl(resolvedRoute, paramsToAppend);
 
-  window.open(generateRedirectUrl(resolvedRoute, paramsToAppend), "_blank");
+  if (newTab) {
+    window.open(url, "_blank");
+  } else {
+    window.location.href = url;
+  }
 };
 
 export const updateMetaData = (tags = {}) => {

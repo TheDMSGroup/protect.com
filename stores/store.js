@@ -44,6 +44,7 @@ export const useStore = defineStore("store", {
       fbc: null,
       fbp: null,
       fbclid: null,
+      inAppBrowser: null,
       clickid: null,
       rtclid: null,
       campaignid: null,

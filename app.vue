@@ -10,6 +10,8 @@ if (import.meta.server) {
 } else if (import.meta.client) {
   // Client-side: use window
   isDev = window.location.hostname.startsWith('dev.')
+  const { public: { gitHash } } = useRuntimeConfig()
+  console.log('[version]', gitHash)
 }
 
 useHead({
