@@ -1,5 +1,6 @@
 <script setup>
 import { redirectWithParams } from '~/composables/utils'
+const store = useStore();
 
 definePageMeta({
   layout: false,
@@ -17,7 +18,7 @@ useHead({
   ],
 })
 
-const { proxy: ga } = useScriptGoogleAnalytics({ id: 'G-NGMYQLELL2' }, { trigger: 'onNuxtReady' })
+const { proxy: ga } = useScriptGoogleAnalytics({ id: 'G-NGMYQLELL2' }, { trigger: 'onNuxtReady' }) ?? {}
 
 const route = useRoute()
 const ga4SessionId = ref(null)
@@ -32,7 +33,18 @@ const getGA4SessionId = () => {
 }
 
 onMounted(() => {
-  ga.gtag('event', 'landing')
+  ga?.gtag('event', 'Pre Landing',
+    {
+      ueid: store.visitorInfo.ueid,
+      variant: store.visitorInfo.variant
+    }
+  );
+  ga?.gtag('event', 'page_view',
+    {
+      ueid: store.visitorInfo.ueid,
+      variant: store.visitorInfo.variant
+    }
+  );
 
   const sid = getGA4SessionId()
   if (sid) {
@@ -54,6 +66,13 @@ onMounted(() => {
 })
 
 const selectInsured = (value) => {
+
+  ga?.gtag('event', 'Insured', {
+    insured: value,
+    ueid: store.visitorInfo.ueid,
+    variant: store.visitorInfo.variant
+  });
+
   redirectWithParams('https://deals.protect.com', {
     ...route.query,
     insured: value,

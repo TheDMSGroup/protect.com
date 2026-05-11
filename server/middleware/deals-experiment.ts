@@ -22,10 +22,12 @@ export default defineEventHandler(async (event) => {
 
   const config = Statsig.getConfig(user, DYNAMIC_CONFIG_NAME)
   const redirectUrl = config.get<string>('redirect_url', '')
+  const variant = config.get<string>('variant', '')
 
   if (redirectUrl) {
     const destination = new URL(redirectUrl)
     url.searchParams.forEach((value, key) => destination.searchParams.set(key, value))
+    if (variant) destination.searchParams.set('variant', variant)
 
     const gaCookie = getCookie(event, '_ga_NGMYQLELL2')
     if (gaCookie) {

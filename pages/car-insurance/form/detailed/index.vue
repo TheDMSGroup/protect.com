@@ -10,7 +10,7 @@ useHead({
   link: [{ rel: 'preload', href: '/assets/protect_logo.svg', as: 'image' }]
 })
 
-const { proxy: ga } = useScriptGoogleAnalytics({ id: 'G-NGMYQLELL2' }, { trigger: 'onNuxtReady' })
+const { proxy: ga } = useScriptGoogleAnalytics({ id: 'G-NGMYQLELL2' }, { trigger: 'onNuxtReady' }) ?? {}
 
 const store = useStore()
 const currentStep = ref(1)
@@ -31,7 +31,16 @@ onNuxtReady(() => {
 })
 
 onMounted(() => {
-  ga.gtag('event', 'landing')
+  ga?.gtag('event', 'Pre Landing',
+    {
+      ueid: store.visitorInfo.ueid,
+      variant: store.visitorInfo.variant,
+    }
+  );
+  ga?.gtag('event', 'page_view', {
+    ueid: store.visitorInfo.ueid,
+    variant: store.visitorInfo.variant,
+  });
 
   // Set initial value if already loaded
   if (store.visitorInfo.region) {
@@ -84,8 +93,11 @@ const years = computed(() => {
 
 const selectYear = (year) => {
   formData.value.vehicleYear = year
-  ga.gtag('event', 'year_selected', { vehicle_year: year })
-
+  ga?.gtag('event', 'Year Selected', {
+    vehicle_year: year,
+    ueid: store.visitorInfo.ueid,
+    variant: store.visitorInfo.variant
+  });
   // redirectWithParams will automatically append rtclid and other tracking params from the store
   const options = {
     year,
