@@ -6,10 +6,12 @@ export default defineNitroPlugin(async () => {
   const config = useRuntimeConfig()
   if (!config.statsigServerKey) return
 
+  const env = config.public.branch === 'master' ? 'production' : config.public.branch === 'stage' ? 'stage' : 'development'
+
   await Statsig.initialize(config.statsigServerKey, {
-    environment: { tier: import.meta.dev ? 'development' : 'production' },
+    environment: { tier: env },
   })
 
   statsigReady = true
-  console.log('Statsig initialized, env:', import.meta.dev ? 'development' : 'production')
+  console.log('Statsig initialized, env:', env)
 })
