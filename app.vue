@@ -2,16 +2,17 @@
 // Check if we're on dev subdomain (works on both server and client)
 let isDev = false
 
+const { public: { gitHash, branch } } = useRuntimeConfig()
+const env = branch === 'master' ? 'production' : branch === 'stage' ? 'stage' : 'development'
+
 if (import.meta.server) {
-  // Server-side: use request event
   const event = useRequestEvent()
   const hostname = event?.node?.req?.headers?.host || ''
   isDev = hostname.startsWith('dev.')
+  console.log('[version]', gitHash, '| branch:', branch, '| env:', env)
 } else if (import.meta.client) {
-  // Client-side: use window
   isDev = window.location.hostname.startsWith('dev.')
-  const { public: { gitHash } } = useRuntimeConfig()
-  console.log('[version]', gitHash)
+  console.log('[version]', gitHash, '| branch:', branch, '| env:', env)
 }
 
 useHead({

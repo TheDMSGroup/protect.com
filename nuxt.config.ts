@@ -4,6 +4,10 @@ const gitHash = (() => {
   try { return execSync('git rev-parse --short HEAD').toString().trim() } catch { return 'unknown' }
 })()
 
+const branch = process.env.BRANCH_NAME || process.env.AWS_BRANCH || (() => {
+  try { return execSync('git rev-parse --abbrev-ref HEAD').toString().trim() } catch { return 'master' }
+})()
+
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   compatibilityDate: "2025-07-15",
@@ -99,6 +103,7 @@ export default defineNuxtConfig({
     // Public keys (exposed to client-side)
     public: {
       gitHash,
+      branch,
       statsigClientKey: process.env.STATSIG_CLIENT_KEY || "client-etrqmWcZl9seLVvDO1ScxuTbIutSre9EhfJXNtHMT6o",
       statesRange: "Sheet1!A:Z",
       vehiclesMakesRange: "Makes!A:Z",
