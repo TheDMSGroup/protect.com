@@ -44,7 +44,6 @@ onMounted(() => {
     redirectUrl.value = experiment.get('redirect_url', '')
     experimentVariant.value = experiment.get('variant', '')
 
-    console.log('statig user', $statsig.getUser());
     $statsig.logEvent('route_view', redirectUrl.value);
     if(redirectUrl.value) {
       var options = {
