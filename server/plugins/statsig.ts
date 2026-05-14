@@ -6,7 +6,7 @@ export default defineNitroPlugin(async () => {
   const config = useRuntimeConfig()
   if (!config.statsigServerKey) return
 
-  const env = config.public.branch === 'master' ? 'production' : config.public.branch === 'stage' ? 'stage' : 'development'
+  const env = config.public.branch === 'master' ? 'production' : config.public.branch === 'stage' ? 'staging' : 'development'
 
   await Statsig.initialize(config.statsigServerKey, {
     environment: { tier: env },

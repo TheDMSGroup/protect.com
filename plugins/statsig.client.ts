@@ -22,8 +22,7 @@ export default defineNuxtPlugin(async (nuxtApp) => {
     custom,
   }
 
-  const tier = config.public.branch === 'master' ? 'production' : config.public.branch === 'stage' ? 'stage' : 'development'
-
+  const tier = config.public.branch === 'master' ? 'production' : config.public.branch === 'stage' ? 'staging' : 'development'
   const client = new StatsigClient(config.public.statsigClientKey, statsigUser, {
     environment: { tier },
   })
