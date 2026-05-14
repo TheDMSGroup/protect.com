@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { redirectWithParams } from '~/composables/utils'
 
 definePageMeta({
@@ -25,12 +25,37 @@ const formVariant = inject('formVariant', ref('D'))
 const userState = ref(null)
 const isGeoLoaded = ref(false)
 
-// Watch for GeoIP data to load
-onNuxtReady(() => {
-  console.log('page loaded updated images');
-})
+type StatsigPlugin = {
+  checkGate: (name: string) => boolean
+  getExperiment: (name: string) => any
+  getDynamicConfig: (name: string) => any
+  logEvent: (name: string, value?: string | number, metadata?: Record<string, string>) => void
+  getUser: () => any
+}
+
+const { $statsig } = useNuxtApp() as ReturnType<typeof useNuxtApp> & { $statsig?: StatsigPlugin }
+
+const redirectUrl = ref('')
+const experimentVariant = ref('')
 
 onMounted(() => {
+  if ($statsig) {
+    const experiment = $statsig.getExperiment("insurify_redirect")
+    redirectUrl.value = experiment.get('redirect_url', '')
+    experimentVariant.value = experiment.get('variant', '')
+
+    console.log('statig user', $statsig.getUser());
+    $statsig.logEvent('route_view', redirectUrl.value);
+    if(redirectUrl.value) {
+      var options = {
+        variant: experimentVariant.value,
+        statsig_user: $statsig.getUser(),
+
+      };
+      redirectWithParams(redirectUrl.value, options,{},false);
+    }
+  }
+
   ga?.gtag('event', 'Pre Landing',
     {
       ueid: store.visitorInfo.ueid,
