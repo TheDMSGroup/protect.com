@@ -22,7 +22,11 @@ export default defineNuxtPlugin(async (nuxtApp) => {
     custom,
   }
 
-  const client = new StatsigClient(config.public.statsigClientKey, statsigUser)
+  const tier = config.public.branch === 'master' ? 'production' : config.public.branch === 'stage' ? 'stage' : 'development'
+
+  const client = new StatsigClient(config.public.statsigClientKey, statsigUser, {
+    environment: { tier },
+  })
   await client.initializeAsync()
 
   runStatsigAutoCapture(client)
