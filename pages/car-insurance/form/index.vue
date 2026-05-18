@@ -1,5 +1,6 @@
 <script setup>
 import { getFormType, assignABVariant, AB_TEST_VARIANTS } from '~/utils/form-router-config'
+import { redirectWithParams } from '~/composables/utils'
 import ChatForm from '~/pages/car-insurance/chat-form.vue'
 import DirectToCall from '~/pages/car-insurance/directtocall/index.vue'
 import MinimalForm from '~/pages/car-insurance/form/minimal/index.vue'
@@ -61,6 +62,9 @@ if (import.meta.server) {
 // Provide variant to child components
 provide('formVariant', ref(variant))
 
+const { $statsig } = useNuxtApp()
+const store = useStore()
+
 // Track form router event (client-side only)
 onMounted(() => {
   if (typeof window !== 'undefined' && window.dataLayer) {
@@ -72,6 +76,17 @@ onMounted(() => {
       utm_medium: route.query.utm_medium || '',
       utm_campaign: route.query.utm_campaign || ''
     })
+  }
+
+  if (formType === 'forms-detailed' && $statsig) {
+    const experiment = $statsig.getExperiment('insurify_redirect')
+    const redirectUrl = experiment.get('redirect_url', '')
+    const experimentVariant = experiment.get('variant', '')
+    store.setVisitorInfo({ variant: experimentVariant })
+    $statsig.logEvent('route_view', redirectUrl)
+    if (redirectUrl) {
+      redirectWithParams(redirectUrl, { statsig_user: $statsig.getUser() }, {}, false)
+    }
   }
 })
 
