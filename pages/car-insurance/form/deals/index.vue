@@ -1,5 +1,6 @@
 <script setup>
 import { redirectWithParams } from '~/composables/utils'
+import { useFacebookPixel } from '~/composables/useFacebookPixel'
 const store = useStore();
 
 definePageMeta({
@@ -19,6 +20,7 @@ useHead({
 })
 
 const { proxy: ga } = useScriptGoogleAnalytics({ id: 'G-NGMYQLELL2' }, { trigger: 'onNuxtReady' }) ?? {}
+useFacebookPixel()
 
 const route = useRoute()
 const ga4SessionId = ref(null)

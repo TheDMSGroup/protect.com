@@ -110,6 +110,7 @@ export default defineNuxtConfig({
       vehiclesModelsRange: "Models!A:Z",
       // Default click-to-call phone number (can be overridden via ?c2cnumber query param)
       c2cnumber: "",
+      facebookPixelId: process.env.FACEBOOK_PIXEL_ID || "425247491835185",
     },
   },
   sitemap: {

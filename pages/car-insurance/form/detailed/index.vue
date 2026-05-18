@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { redirectWithParams } from '~/composables/utils'
+import { useFacebookPixel } from '~/composables/useFacebookPixel'
 
 definePageMeta({
   layout: false,
@@ -11,6 +12,7 @@ useHead({
 })
 
 const { proxy: ga } = useScriptGoogleAnalytics({ id: 'G-NGMYQLELL2' }, { trigger: 'onNuxtReady' }) ?? {}
+useFacebookPixel()
 
 const store = useStore()
 const currentStep = ref(1)
@@ -43,18 +45,15 @@ onMounted(() => {
     const experiment = $statsig.getExperiment("insurify_redirect")
     redirectUrl.value = experiment.get('redirect_url', '')
     experimentVariant.value = experiment.get('variant', '')
-
+    store.setVisitorInfo({ variant: experimentVariant.value })
     $statsig.logEvent('route_view', redirectUrl.value);
     if(redirectUrl.value) {
       var options = {
-        variant: experimentVariant.value,
         statsig_user: $statsig.getUser(),
-
       };
       redirectWithParams(redirectUrl.value, options,{},false);
     }
   }
-
   ga?.gtag('event', 'Pre Landing',
     {
       ueid: store.visitorInfo.ueid,
