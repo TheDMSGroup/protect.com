@@ -12,7 +12,6 @@ export default defineEventHandler(async (event) => {
 
   if (pathname !== '/car-insurance/form' && pathname !== '/car-insurance/form/') return
 
-  console.log('[insurify-redirect] statsigReady:', statsigReady)
   if (!statsigReady) return
 
   let userId = getCookie(event, COOKIE_NAME)
@@ -27,7 +26,7 @@ export default defineEventHandler(async (event) => {
   const redirectUrl = experiment.get<string>('redirect_url', '')
   const variant = experiment.get<string>('variant', '')
 
-  console.log('[insurify-redirect] userId:', userId, 'redirectUrl:', redirectUrl, 'variant:', variant)
+  event.context.insurifyVariant = variant
 
   if (redirectUrl) {
     const destination = new URL(redirectUrl)
