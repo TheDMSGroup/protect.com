@@ -17,8 +17,9 @@ export default defineNuxtPlugin(async (nuxtApp) => {
   if (utm_medium) custom.utm_medium = utm_medium
   if (utm_campaign) custom.utm_campaign = utm_campaign
 
+  const existingId = document.cookie.match(/(?:^|; )sig_uid=([^;]*)/)?.[1]
   const statsigUser = {
-    userID: crypto.randomUUID(),
+    userID: existingId || crypto.randomUUID(),
     custom,
   }
 
