@@ -24,6 +24,10 @@ export default defineEventHandler(async (event) => {
   const redirectUrl = config.get<string>('redirect_url', '')
   const variant = config.get<string>('variant', '')
 
+  if (variant) {
+    event.context.dealsVariant = variant
+  }
+
   if (redirectUrl) {
     const destination = new URL(redirectUrl)
     url.searchParams.forEach((value, key) => destination.searchParams.set(key, value))
