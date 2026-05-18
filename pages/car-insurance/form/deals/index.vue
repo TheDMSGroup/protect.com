@@ -1,7 +1,14 @@
 <script setup>
 import { redirectWithParams } from '~/composables/utils'
 import { useFacebookPixel } from '~/composables/useFacebookPixel'
-const store = useStore();
+const store = useStore()
+const dealsVariant = useState('dealsVariant', () => {
+  const event = useRequestEvent()
+  return event?.context.dealsVariant ?? ''
+})
+if (dealsVariant.value) {
+  store.setVisitorInfo({ variant: dealsVariant.value })
+}
 
 definePageMeta({
   layout: false,

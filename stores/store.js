@@ -48,7 +48,7 @@ export const useStore = defineStore("store", {
       clickid: null,
       rtclid: null,
       campaignid: null,
-      variant: null,
+      variant: 'protect_control',
       referrer: null,
       adgroupid: null,
       accountid: null,
