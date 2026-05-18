@@ -27,7 +27,8 @@ const TRACKING_PARAMS = [
   'gclid', 'msclkid', 'fbc', 'fbp', 'fbclid', 'clickid', 'rtclid',
   'campaignid', 'ueid', 'variant', 'referrer', 'adgroupid', 'accountid',
   'targetid', 'gbraid', 'wbraid', 'segment', 'mst', 'statsig_sid',
-  'utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term'
+  'utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term',
+  'ga_client_id'
 ];
 
 export const generateRedirectUrl = (route, paramsToAppend) => {
@@ -63,6 +64,19 @@ export const generateRedirectUrl = (route, paramsToAppend) => {
     if (rtclid) {
       paramsToAppend.rtclid = rtclid;
       store.setVisitorInfo({ rtclid });
+    }
+  }
+
+  // Read GA4 client ID from _ga cookie for cross-domain tracking
+  if (!paramsToAppend.ga_client_id && typeof document !== 'undefined') {
+    const gaCookie = document.cookie.match(/(?:^|; )_ga=([^;]*)/);
+    if (gaCookie) {
+      const parts = decodeURIComponent(gaCookie[1]).split('.');
+      if (parts.length >= 4) {
+        const ga_client_id = parts.slice(2).join('.');
+        paramsToAppend.ga_client_id = ga_client_id;
+        store.setVisitorInfo({ ga_client_id });
+      }
     }
   }
 
