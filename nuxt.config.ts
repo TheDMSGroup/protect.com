@@ -164,6 +164,12 @@ export default defineNuxtConfig({
           "cache-control": "no-cache, no-store, must-revalidate",
         },
       },
+      // Personalized form entry — Statsig experiment decides redirect per user, never cache
+      "/car-insurance/form": {
+        headers: {
+          "cache-control": "no-store, no-cache, must-revalidate",
+        },
+      },
       // HTML pages - short cache with revalidation
       "/**": {
         headers: {
